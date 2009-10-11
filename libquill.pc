@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libquill
+Description: quill library
+Version: 1.0.0
+Libs:-lqtimagefilter -lquillimagefilter 
+Cflags: -DQT_SHARED -I/usr/include/qt4 -I${includedir}

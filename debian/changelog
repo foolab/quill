@@ -1,0 +1,216 @@
+libquill (1.091009.0) unstable; urgency=low
+
+  * change version number.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Fri, 09 Oct 2009 10:55:00 +0200
+
+libquill (1.091006.0) unstable; urgency=low
+
+  * change version number.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 06 Oct 2009 10:55:00 +0200
+
+libquill (1.091002.0) unstable; urgency=low
+
+  * change version number.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Fir, 02 Oct 2009 10:55:00 +0200
+
+libquill (1.090930.0) unstable; urgency=low
+
+  * change version number.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 30 Sep 2009 10:55:00 +0200
+
+libquill (1.090928.0) unstable; urgency=low
+
+  * change tests.xml.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 28 Sep 2009 10:55:00 +0200
+
+libquill (1.090924.0) unstable; urgency=low
+
+  * Small fixes.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 23 Sep 2009 14:55:00 +0200
+
+libquill (1.090923.1) unstable; urgency=low
+
+  * Add dependency to libqt4-opengl-dev to get around build problem with Qt 4.6
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 23 Sep 2009 14:55:00 +0200
+
+libquill (1.090923.0) unstable; urgency=low
+
+  * Edit history auto-save
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 23 Sep 2009 12:00:00 +0200
+
+libquill (1.090918.1) unstable; urgency=low
+
+  * fixed bugs
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 18 Sep 2009 15:00:00 +0200
+
+libquill (1.090918.0) unstable; urgency=low
+
+  * deletion and thumbnail support
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 18 Sep 2009 08:00:00 +0200
+
+libquill (1.090914.1) unstable; urgency=low
+
+  * fixed bugs
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 14 Sep 2009 12:30:00 +0200
+
+libquill (1.090908.1) unstable; urgency=low
+
+  * true multi-file and multi-editing support
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 08 Sep 2009 09:00:00 +0200
+
+libquill (1.090804.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 04 Aug 2009 09:00:00 +0200
+
+libquill (1.090727.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 27 July 2009 15:00:00 +0200
+
+libquill (1.090715.1) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 15 July 2009 15:23:00 +0200
+
+ (1.090715.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 15 July 2009 09:23:00 +0200
+
+libquill (1.090618.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Thu, 18 June 2009 09:23:00 +0200
+
+libquill (1.090617.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 17 June 2009 09:23:00 +0200
+
+libquill (1.090616.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 16 June 2009 09:23:00 +0200
+
+libquill (1.090608.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 08 June 2009 09:23:00 +0200
+
+libquill (1.090604.1) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Thu, 04 June 2009 09:23:00 +0200
+
+libquill (1.090604.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Thu, 04 June 2009 09:23:00 +0200
+
+libquill (1.090603.1) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 02 June 2009 09:23:00 +0200
+
+libquill (1.090603.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 02 June 2009 09:23:00 +0200
+
+libquill (1.090602.0) unstable; urgency=low
+
+  * change version number for integration
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 02 June 2009 09:23:00 +0200
+
+libquill (1.090527.1) unstable; urgency=low
+
+  * remove dev package version check
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 27 May 2009 09:23:00 +0200
+
+libquill (1.090527.0) unstable; urgency=low
+
+  * fixed dev package dependency
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 27 May 2009 09:23:00 +0200
+
+libquill (1.090526.1) unstable; urgency=low
+
+  * add xml format
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 26 May 2009 09:23:00 +0200
+
+libquill (1.090526.0) unstable; urgency=low
+
+  * add tiling
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 26 May 2009 09:23:00 +0200
+
+libquill (1.090511.0) unstable; urgency=low
+
+  * add doxygen
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 11 May 2009 09:23:00 +0200
+
+libquill (1.090427.0) unstable; urgency=low
+
+  * integration with gallery
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Mon, 27 April 2009 09:23:00 +0200
+
+libquill (1.090325.0) unstable; urgency=low
+
+  * -tests package updated
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 25 Mar 2009 09:23:00 +0200
+
+libquill (1.090324.0) unstable; urgency=low
+
+  * Update
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 24 Mar 2009 15:05:00 +0200
+
+libquill (1.090320.0) unstable; urgency=low
+
+  * Update
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 20 Mar 2009 09:25:00 +0200
+
+libquill (1.090319.5) unstable; urgency=low
+
+  * Debianisation changed
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 10 Mar 2009 15:12:00 +0200
+
+libquill (0.1.1) unstable; urgency=low
+
+  * Initial release
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Tue, 16 Dec 2008 13:56:00 +0200
+

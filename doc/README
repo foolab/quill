@@ -1,0 +1,9 @@
+BUILDING
+
+Quill requires QtImageFilters which can be downloaded from 
+http://qt.nokia.com/products/appdev/add-on-products/catalog/4/Utilities/qtimagefilters
+
+QtImageFilters are available under LGPL and commercial licenses for your choice.
+
+Before building Quill, please build QtImageFilters and QuillImageFilters.
+

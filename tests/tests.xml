@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<testdefinition version="0.1">
+  <suite name="libquill-tests" domain="example-domain">
+    <set name="libquill automated tests" description="Automated test cases for libquill">
+      <case name="ut_filtergenerator" type="unit" description="libquill-Test filter generator" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_filtergenerator </step>
+      </case>
+
+      <case name="ut_imageloader" type="unit" description="libquill-Test image loader" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_imageloader </step>
+      </case>
+
+      <case name="ut_tilemap" type="unit" description="libquill-Test tile map" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_tilemap </step>
+      </case>
+
+      <case name="ut_savemap" type="unit" description="libquill-Test save map" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_savemap </step>
+      </case>
+
+      <case name="ut_command" type="unit" description="libquill-Test undo command" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_command </step>
+      </case>
+
+      <case name="ut_stack" type="unit" description="libquill-Test undo stack operations" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_stack </step>
+      </case>
+
+      <case name="ut_imagecache" type="unit" description="libquill-Test preview image cache" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_imagecache </step>
+      </case>
+
+      <case name="ut_xml" type="unit" description="libquill-Test XML conversion" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_xml </step>
+      </case>
+      <case name="ut_partialloader" type="unit" description="libquill-Test partial loader" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_partialloader </step>
+      </case>
+
+      <case name="ut_tiling" type="unit" description="libquill-Test high-level tiling" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_tiling </step>
+      </case>
+
+      <case name="ut_core" type="unit" description="libquill-Test core" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_core </step>
+      </case>
+
+      <case name="ut_file" type="unit" description="libquill-Test file operations" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_file </step>
+      </case>
+
+      <case name="ut_thumbnail" type="unit" description="libquill-Test thumbnailing" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_thumbnail </step>
+      </case>
+
+      <!-- Environments optional - tells where the tests are run -->
+      <environments>
+        <scratchbox>true</scratchbox>
+        <hardware>true</hardware>
+      </environments>
+      <!-- Get optional - fetches additional result files -->
+      <get>
+        <file>/tmp/libquill-tests/libquill-tests.xml</file>
+      </get>
+    </set>
+  </suite>
+</testdefinition>
+
+
+
