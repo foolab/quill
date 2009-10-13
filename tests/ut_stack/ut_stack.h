@@ -57,6 +57,7 @@ private slots:
     void cleanupTestCase();
 
     void testSessionSetup();
+    void testUndoRedoDuringSessionRecording();
     void testSessionUndoRedo();
 };
 
