@@ -42,12 +42,11 @@
 
 #include <QSize>
 #include <QRect>
+#include <QList>
 #include <QuillImage>
 
 class QuillImage;
 class TileMap;
-
-class SaveMapPrivate;
 
 class SaveMap
 {
@@ -120,7 +119,11 @@ public:
 private:
     QRect bufferArea(int bufferId) const;
 
-    SaveMapPrivate *priv;
+    QSize m_fullImageSize;
+    int m_bufferHeight;
+    int m_bufferId;
+    QuillImage m_buffer;
+    QList<QList<int> > m_tileRows;
 };
 
 #endif // __QUILL_SAVE_MAP_H_
