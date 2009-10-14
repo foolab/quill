@@ -48,6 +48,7 @@
 class QuillUndoCommand;
 class QuillUndoStack;
 class ImageCache;
+class ThreadManager;
 class TileCache;
 class CorePrivate;
 
@@ -219,7 +220,7 @@ public:
       From all stacks open and closed, finds one command by its unique id.
     */
 
-    QuillUndoCommand *findInAllStacks(int id);
+    QuillUndoCommand *findInAllStacks(int id) const;
 
     /*
       Used to check if the background thread could be activated to do
@@ -273,7 +274,22 @@ private:
 
     QList<QuillFile*> existingFiles() const;
 
-    CorePrivate *priv;
+private:
+
+    QList<QSize> m_previewSize;
+    QList<ImageCache*> m_cache;
+
+    QString m_editHistoryDirectory;
+    QList<QString> m_thumbnailDirectory;
+    QString m_thumbnailExtension;
+
+    QMap<QString, QuillFile*> m_files;
+
+    QSize m_defaultTileSize;
+    int m_saveBufferSize;
+
+    TileCache *m_tileCache;
+    ThreadManager *m_threadManager;
 };
 
 #endif

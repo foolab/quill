@@ -48,8 +48,8 @@ class Core;
 class QuillUndoCommand;
 class QuillImageFilter;
 class SaveMap;
-class QuillUndoStackPrivate;
 class QuillImageFilterGenerator;
+class QUndoStack;
 
 class QuillUndoStack : public QObject
 {
@@ -229,7 +229,13 @@ public:
     SaveMap *saveMap();
 
 private:
-    QuillUndoStackPrivate *priv;
+    Core *m_core;
+    QUndoStack *m_stack;
+    QuillFile *m_file;
+    int m_sessionId, m_nextSessionId;
+    int m_savedIndex;
+    QuillUndoCommand *m_saveCommand;
+    SaveMap *m_saveMap;
 };
 
 #endif // __QUILL_UNDO_STACK_H__

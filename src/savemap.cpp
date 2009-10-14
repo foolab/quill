@@ -46,48 +46,36 @@
 #include "tilemap.h"
 #include "savemap.h"
 
-class SaveMapPrivate
+SaveMap::SaveMap(const QSize &fullImageSize, int bufferSize, TileMap *tileMap) :
+    m_fullImageSize(fullImageSize),
+    m_bufferHeight(bufferSize / fullImageSize.width()),
+    m_bufferId(0),
+    m_buffer(QuillImage())
 {
-public:
-    QSize fullImageSize;
-    int bufferHeight;
-    int bufferId;
-    QuillImage buffer;
-    QList<QList<int> > tileRows;
-};
+    if (m_bufferHeight == 0)
+        m_bufferHeight = 1;
 
-SaveMap::SaveMap(const QSize &fullImageSize, int bufferSize, TileMap *tileMap)
-{
-    priv = new SaveMapPrivate;
+    m_buffer.setArea(bufferArea(0));
 
-    priv->fullImageSize = fullImageSize;
-    priv->bufferHeight = bufferSize / fullImageSize.width();
-    if (priv->bufferHeight == 0)
-        priv->bufferHeight = 1;
-    priv->buffer = QuillImage();
-    priv->buffer.setArea(bufferArea(0));
-    priv->bufferId = 0;
-
-    for (int i=0; i<fullImageSize.height(); i+=priv->bufferHeight)
+    for (int i=0; i<fullImageSize.height(); i+=m_bufferHeight)
     {
-        priv->tileRows.append(tileMap->findArea(QRect(0, i,
-                                                      fullImageSize.width(),
-                                                      priv->bufferHeight)));
+        m_tileRows.append(tileMap->findArea(QRect(0, i,
+                                                  fullImageSize.width(),
+                                                  m_bufferHeight)));
     }
 }
 
 SaveMap::~SaveMap()
 {
-    delete priv;
 }
 
 int SaveMap::processNext(TileMap *tileMap)
 {
-    QListIterator<int> iterator(priv->tileRows.at(0));
+    QListIterator<int> iterator(m_tileRows.at(0));
     while (iterator.hasNext())
     {
         int id = iterator.next();
-        if (tileMap->tile(id) != QuillImage())
+        if (!tileMap->tile(id).isNull())
             return id;
     }
     return -1;
@@ -95,69 +83,69 @@ int SaveMap::processNext(TileMap *tileMap)
 
 int SaveMap::prioritize()
 {
-    return priv->tileRows.at(0).at(0);
+    return m_tileRows.at(0).at(0);
 }
 
 QuillImageFilter *SaveMap::addToBuffer(int index)
 {
-    if (!priv->tileRows.at(0).contains(index))
+    if (!m_tileRows.at(0).contains(index))
         return 0;
 
-    priv->tileRows[0].removeOne(index);
+    m_tileRows[0].removeOne(index);
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("Overlay");
 
     filter->setOption(QuillImageFilter::CropRectangle,
-                      QVariant(priv->buffer.area()));
+                      QVariant(m_buffer.area()));
     filter->setOption(QuillImageFilter::Background,
-                      QVariant(QImage(priv->buffer)));
+                      QVariant(QImage(m_buffer)));
 
     return filter;
 }
 
 QuillImage SaveMap::buffer() const
 {
-    return priv->buffer;
+    return m_buffer;
 }
 
 void SaveMap::setBuffer(const QuillImage &buffer)
 {
-    priv->buffer = buffer;
+    m_buffer = buffer;
 }
 
 void SaveMap::nextBuffer()
 {
-    priv->tileRows.removeAt(0);
-    priv->bufferId++;
-    priv->buffer = QuillImage();
-    priv->buffer.setArea(bufferArea(priv->bufferId));
-    priv->buffer.setFullImageSize(priv->fullImageSize);
+    m_tileRows.removeAt(0);
+    m_bufferId++;
+    m_buffer = QuillImage();
+    m_buffer.setArea(bufferArea(m_bufferId));
+    m_buffer.setFullImageSize(m_fullImageSize);
 }
 
 bool SaveMap::isBufferComplete() const
 {
-    return priv->tileRows.at(0).isEmpty();
+    return m_tileRows.at(0).isEmpty();
 }
 
 bool SaveMap::isSaveComplete() const
 {
-    return (priv->tileRows.isEmpty() ||
-            ((priv->tileRows.count() == 1) &&
-             (priv->tileRows.at(0).isEmpty())));
+    return (m_tileRows.isEmpty() ||
+            ((m_tileRows.count() == 1) &&
+             (m_tileRows.at(0).isEmpty())));
 }
 
 QRect SaveMap::bufferArea(int bufferId) const
 {
-    int top = bufferId*priv->bufferHeight;
-    int bottom = top + priv->bufferHeight;
-    if (bottom > priv->fullImageSize.height())
-        bottom = priv->fullImageSize.height();
-    return QRect(0, top, priv->fullImageSize.width(), bottom - top);
+    int top = bufferId*m_bufferHeight;
+    int bottom = top + m_bufferHeight;
+    if (bottom > m_fullImageSize.height())
+        bottom = m_fullImageSize.height();
+    return QRect(0, top, m_fullImageSize.width(), bottom - top);
 }
 
 int SaveMap::bufferCount() const
 {
-    return (priv->fullImageSize.height() - 1) / priv->bufferHeight + 1;
+    return (m_fullImageSize.height() - 1) / m_bufferHeight + 1;
 }
 
