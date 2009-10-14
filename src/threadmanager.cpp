@@ -315,7 +315,14 @@ bool ThreadManager::suggestNewTask(QuillFile *file, int level)
     }
     else
     {
-        prevImage = prev->image(level);
+        QuillImageFilterGenerator *generator =
+            dynamic_cast<QuillImageFilterGenerator*>(command->filter());
+
+        // Red eye detection always uses the best available image
+        if (generator && (!generator->isUsedOnPreview()))
+            prevImage = prev->bestImage();
+        else
+            prevImage = prev->image(level);
     }
 
     startThread(command->uniqueId(),
@@ -444,6 +451,9 @@ void ThreadManager::calculationFinished()
     if (command != 0)
         stack = command->stack();
 
+    QuillImageFilterGenerator *generator =
+        dynamic_cast<QuillImageFilterGenerator*>(activeFilter);
+
     if (command == 0)
     {
         // The command has been deleted.
@@ -477,13 +487,10 @@ void ThreadManager::calculationFinished()
             // Full image saving proceeds
             stack->saveMap()->nextBuffer();
     }
-    else if (dynamic_cast<QuillImageFilterGenerator*>(activeFilter))
+    else if (generator)
     {
         // A detection phase has been passed, replacing the detector
         // with its resulting filter.
-
-        QuillImageFilterGenerator *generator =
-            dynamic_cast<QuillImageFilterGenerator*>(activeFilter);
 
         QuillImageFilter *filter = generator->resultingFilter();
 

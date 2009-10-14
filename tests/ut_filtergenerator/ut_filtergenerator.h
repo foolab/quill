@@ -53,6 +53,7 @@ private slots:
     void cleanupTestCase();
 
     void testAutoContrast();
+    void testRedEyeRemoval();
 };
 
 #endif  // UT__FILTER_GENERATOR__H
