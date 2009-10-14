@@ -159,11 +159,12 @@ void QuillUndoStack::undo()
 
         int sessionId = command()->sessionId();
 
-        // Undo everything from one session in here, however at least one
-        // command
+        // If we are not currently recording a session, an entire
+        // session should be undone at once.
         do
             priv->stack->undo();
-        while ((sessionId != 0) && (command()->sessionId() == sessionId));
+        while ((priv->sessionId == 0) && (sessionId != 0) &&
+               (command()->sessionId() == sessionId));
     }
 }
 
@@ -185,11 +186,11 @@ void QuillUndoStack::redo()
     if (canRedo()) {
         int sessionId = command(index())->sessionId();
 
-        // Redo everything from one session in here, however at least one
-        // command
+        // If we are not currently recording a session, an entire
+        // session should be redone at once.
         do
             priv->stack->redo();
-        while ((sessionId != 0) && (command(index())) &&
+        while ((priv->sessionId == 0) && (sessionId != 0) && command(index()) &&
                (command(index())->sessionId() == sessionId));
 
         // In case of intermediate load, double redo

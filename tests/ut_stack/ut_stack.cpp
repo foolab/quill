@@ -110,6 +110,47 @@ void ut_stack::testSessionSetup()
     delete quill;
 }
 
+// Make sure that undo/redo during the recording of a session does not undo
+// more than one command at a time
+
+void ut_stack::testUndoRedoDuringSessionRecording()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillImageFilter *filter2 =
+        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Contrast, QVariant(20));
+
+    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
+    QVERIFY(quill);
+    QuillFile *file = quill->file(testFile.fileName(), "png");
+
+    file->startSession();
+    file->runFilter(filter);
+    file->runFilter(filter2);
+
+    file->undo();
+    // Between commands, we should still be able to undo
+    QVERIFY(file->canUndo());
+    file->undo();
+
+    QVERIFY(file->canRedo());
+
+    // Between commands, we should still be able to redo
+    file->redo();
+    QVERIFY(file->canRedo());
+}
+
 void ut_stack::testSessionUndoRedo()
 {
     QTemporaryFile testFile;
