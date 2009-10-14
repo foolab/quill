@@ -5,6 +5,9 @@
       <case name="ut_filtergenerator" type="unit" description="libquill-Test filter generator" timeout="10">
 	<step expected_result="0">/usr/lib/libquill-tests/ut_filtergenerator </step>
       </case>
+      <case name="ut_crashrecovery" type="unit" description="libquill-Test crash recovery" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_crashrecovery </step>
+      </case>
 
       <case name="ut_imageloader" type="unit" description="libquill-Test image loader" timeout="10">
 	<step expected_result="0">/usr/lib/libquill-tests/ut_imageloader </step>
@@ -35,6 +38,10 @@
       </case>
       <case name="ut_partialloader" type="unit" description="libquill-Test partial loader" timeout="10">
 	<step expected_result="0">/usr/lib/libquill-tests/ut_partialloader </step>
+      </case>
+
+      <case name="ut_quill" type="unit" description="libquill-Test quill" timeout="10">
+	<step expected_result="0">/usr/lib/libquill-tests/ut_quill </step>
       </case>
 
       <case name="ut_tiling" type="unit" description="libquill-Test high-level tiling" timeout="10">
