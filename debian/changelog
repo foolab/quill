@@ -1,3 +1,9 @@
+libquill (1.091014.0) unstable; urgency=low
+
+  * change version number.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 14 Oct 2009 10:55:00 +0200
+
 libquill (1.091009.0) unstable; urgency=low
 
   * change version number.
