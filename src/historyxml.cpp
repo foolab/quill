@@ -111,11 +111,24 @@ QByteArray HistoryXml::encode(QList<QuillFile *> files)
         writer.writeTextElement("", "SavedIndex",
                                 QString::number(saveIndex));
 
+        int sessionId = 0;
+
         for (int i = 0; i < stack->count(); i++)
-        {
             if (stack->command(i)->filter()->name() != "Load")
+            {
+                if (stack->command(i)->sessionId() != sessionId) {
+                    if (sessionId != 0)
+                        writer.writeEndElement();
+                    sessionId = stack->command(i)->sessionId();
+                    if (sessionId != 0)
+                        writer.writeStartElement("", "Session");
+                }
+
                 writeFilter(stack->command(i)->filter(), &writer);
-        }
+            }
+
+        if (sessionId != 0)
+            writer.writeEndElement();
 
         writer.writeEndElement();
     }
@@ -317,35 +330,10 @@ QList<QuillFile*> HistoryXml::decode(const QByteArray & array, Core *core)
 
         stack->load();
 
-        files.append(file);
-
-        token = readToken(&reader);
-        while (token != QXmlStreamReader::EndElement)
-        {
-            if ((token != QXmlStreamReader::StartElement) ||
-                (reader.name() != "Filter"))
-                return emptyList;
-
-            QuillImageFilter *filter = readFilter(&reader);
-
-            if (filter != 0) {
-
-                stack->add(filter);
-
-                if (stack->index()-1 == savedIndex) {
-
-                    filter =
-                        QuillImageFilterFactory::createImageFilter("Load");
-                    filter->setOption(QuillImageFilter::FileName, fileName);
-                    stack->add(filter);
-                    targetIndex++;
-                }
-            }
-            token = readToken(&reader);
-        }
+        readEditSession(&reader, stack, &savedIndex, &targetIndex, fileName);
 
         // Undo the commands which were undone before the crash.
-        for (int i=stack->count()-targetIndex; i>1; i--)
+        while (stack->index()-1 > targetIndex)
             stack->undo();
 
         // If a load filter was inserted, treat indexes accordingly.
@@ -354,6 +342,8 @@ QList<QuillFile*> HistoryXml::decode(const QByteArray & array, Core *core)
         else
             stack->setSavedIndex(0);
 
+        files.append(file);
+
         token = readToken(&reader);
     }
 
@@ -361,6 +351,45 @@ QList<QuillFile*> HistoryXml::decode(const QByteArray & array, Core *core)
         return emptyList;
 
     return files;
+}
+
+void HistoryXml::readEditSession(QXmlStreamReader *reader,
+                                 QuillUndoStack *stack,
+                                 int *savedIndex,
+                                 int *targetIndex,
+                                 const QString &fileName)
+{
+    QXmlStreamReader::TokenType token = readToken(reader);
+    while (token != QXmlStreamReader::EndElement)
+    {
+        if ((token != QXmlStreamReader::StartElement) ||
+            ((reader->name() != "Filter") && (reader->name() != "Session")))
+            return;
+
+        if (reader->name() == "Filter") {
+            QuillImageFilter *filter = readFilter(reader);
+
+            if (filter != 0) {
+
+                stack->add(filter);
+
+                if (stack->index()-1 == *savedIndex) {
+
+                    filter =
+                        QuillImageFilterFactory::createImageFilter("Load");
+                    filter->setOption(QuillImageFilter::FileName, fileName);
+                    stack->add(filter);
+                    (*targetIndex)++;
+                }
+            }
+        } else {
+            stack->startSession();
+            readEditSession(reader, stack, savedIndex, targetIndex, fileName);
+            stack->endSession();
+        }
+
+        token = readToken(reader);
+    }
 }
 
 QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)

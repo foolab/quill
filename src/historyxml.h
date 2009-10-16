@@ -36,6 +36,8 @@
 ** contact the sales department at qt-sales@nokia.com.
 **
 ****************************************************************************/
+#ifndef HISTORYXML_H
+#define HISTORYXML_H
 
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -43,6 +45,7 @@
 
 class QuillFile;
 class QuillImageFilter;
+class QuillUndoStack;
 class Core;
 
 class HistoryXml
@@ -59,7 +62,12 @@ private:
     static void writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer);
     static bool writeComplexType(QVariant variant, QXmlStreamWriter *writer);
     static QXmlStreamReader::TokenType readToken(QXmlStreamReader *reader);
+    static void readEditSession(QXmlStreamReader *reader, QuillUndoStack *stack,
+                                int *savedIndex, int *targetIndex,
+                                const QString &fileName);
     static QuillImageFilter *readFilter(QXmlStreamReader *reader);
     static QVariant recoverVariant(QVariant::Type variantType, QString string);
     static QVariant recoverComplexType(QVariant::Type variantType, QXmlStreamReader *reader);
 };
+
+#endif
