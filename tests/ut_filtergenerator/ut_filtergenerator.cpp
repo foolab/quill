@@ -122,6 +122,82 @@ void ut_filtergenerator::testAutoContrast()
     delete quill;
 }
 
+/*!
+  Make sure that RER bases its operation on the best available preview.
+*/
+
+void ut_filtergenerator::testRedEyeRemoval()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image(QImage(QSize(4, 4), QImage::Format_ARGB32));
+    image.fill(qRgb(0, 0, 255));
+
+    // Create red "eye" in the center
+
+    image.setPixel(QPoint(1, 1), qRgb(255, 0, 0));
+    image.setPixel(QPoint(2, 1), qRgb(255, 0, 0));
+    image.setPixel(QPoint(1, 2), qRgb(255, 0, 0));
+    image.setPixel(QPoint(2, 2), qRgb(255, 0, 0));
+
+    image.save(testFile.fileName(), "png");
+
+    Quill *quill = new Quill(QSize(2, 2), Quill::ThreadingTest);
+    QVERIFY(quill);
+
+    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    quill->setThumbnailExtension("png");
+
+    // Create blank thumbnail
+    QuillImage blankImage(QImage(QSize(2, 2), QImage::Format_ARGB32));
+    blankImage.fill(qRgb(255, 255, 255));
+
+    QuillFile *file = quill->file(testFile.fileName());
+    QVERIFY(file->exists());
+
+    blankImage.save(file->thumbnailFileName(0));
+
+    file->setDisplayLevel(0);
+    quill->releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), blankImage));
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("RedEyeDetection");
+
+    filter->setOption(QuillImageFilter::Center, QVariant(QPoint(1, 1)));
+    filter->setOption(QuillImageFilter::Radius, QVariant(2));
+
+    quill->releaseAndWait(); // preview
+
+    file->runFilter(filter);
+    file->setDisplayLevel(1);
+    quill->releaseAndWait(); // preview - generator
+    quill->releaseAndWait(); // preview - filter
+    quill->releaseAndWait(); // full - load
+    quill->releaseAndWait(); // full - filter
+
+    // We should see no effect on the full now
+    QVERIFY(Unittests::compareImage(file->image(), image));
+
+    QuillImageFilter *filter2 =
+        QuillImageFilterFactory::createImageFilter("RedEyeDetection");
+    filter2->setOption(QuillImageFilter::Center, QVariant(QPoint(1, 1)));
+    filter2->setOption(QuillImageFilter::Radius, QVariant(2));
+
+    file->runFilter(filter2);
+
+    quill->releaseAndWait(); // full - generator!
+    quill->releaseAndWait(); // preview - filter
+    quill->releaseAndWait(); // full - filter
+
+    // We should see the effect on the full now
+    QVERIFY(!Unittests::compareImage(file->image(), image));
+
+    delete quill;
+}
+
 int main ( int argc, char *argv[] ){
     QApplication app( argc, argv );
     ut_filtergenerator test;
