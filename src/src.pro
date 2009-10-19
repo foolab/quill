@@ -9,7 +9,10 @@ INCLUDEPATH += .
 LIBS +=-lqtimagefilter -lquillimagefilter -lgcov
 QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
 DEFINES     +=
-CONFIG += DEBUG
+# Generate pkg-config support by default
+# Note that we HAVE TO also create prl config as QMake implementation
+# mixes both of them together.
+CONFIG += DEBUG create_pc create_prl
 
 #this is for removing coverage information while doing qmake as "qmake COV_OPTION=off"
 for(OPTION,$$list($$lower($$COV_OPTION))){
@@ -55,7 +58,9 @@ INSTALL_HEADERS = \
 headers.files = $$INSTALL_HEADERS
 headers.path = $$(DESTDIR)/usr/include
 target.path = $$(DESTDIR)/usr/lib
-INSTALLS += target headers
+pkgconfig.files = quill.pc
+pkgconfig.path = $$(DESTDIR)/usr/lib/pkgconfig
+INSTALLS += target headers pkgconfig
 
 # ---clean
 QMAKE_CLEAN += \
