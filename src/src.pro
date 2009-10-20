@@ -14,6 +14,8 @@ DEFINES     +=
 # mixes both of them together.
 CONFIG += DEBUG create_pc create_prl
 
+QMAKE_PKGCONFIG_REQUIRES = QtGui
+
 #this is for removing coverage information while doing qmake as "qmake COV_OPTION=off"
 for(OPTION,$$list($$lower($$COV_OPTION))){
     isEqual(OPTION, off){
