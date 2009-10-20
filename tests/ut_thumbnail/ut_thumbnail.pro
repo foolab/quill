@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_thumbnail
+TARGET = ../bin/ut_thumbnail
 
 # Input
 HEADERS += ut_thumbnail.h

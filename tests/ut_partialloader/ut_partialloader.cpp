@@ -298,6 +298,7 @@ void ut_partialloader::testSingleTile()
 
     QVERIFY(Unittests::compareImage(image,
             QuillImage(Unittests::generatePaletteImage())));
+    delete quill;
 }
 
 void ut_partialloader::testCenterTilePriority()
@@ -347,6 +348,7 @@ void ut_partialloader::testCenterTilePriority()
     QCOMPARE(file->allImageLevels().at(4).area(), QRect(0, 1, 1, 1));
     QCOMPARE(file->allImageLevels().at(5).area(), QRect(1, 1, 1, 1));
     QCOMPARE(file->allImageLevels().at(6).area(), QRect(2, 1, 1, 1));
+    delete quill;
 }
 
 int main ( int argc, char *argv[] ){

@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_crashrecovery
+TARGET = ../bin/ut_crashrecovery
 
 # Input
 HEADERS += ut_crashrecovery.h

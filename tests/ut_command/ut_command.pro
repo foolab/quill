@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_command
+TARGET = ../bin/ut_command
 
 # Input
 HEADERS += ut_command.h

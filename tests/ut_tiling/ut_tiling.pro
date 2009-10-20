@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_tiling
+TARGET = ../bin/ut_tiling
 
 # Input
 HEADERS += ut_tiling.h

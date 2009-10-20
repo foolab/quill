@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_xml
+TARGET = ../bin/ut_xml
 
 # Input
 HEADERS += ut_xml.h

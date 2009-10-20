@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_imagecache
+TARGET = ../bin/ut_imagecache
 
 # Input
 HEADERS += ut_imagecache.h

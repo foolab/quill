@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_filtergenerator
+TARGET = ../bin/ut_filtergenerator
 
 # Input
 HEADERS += ut_filtergenerator.h

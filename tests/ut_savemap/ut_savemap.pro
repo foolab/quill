@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_savemap
+TARGET = ../bin/ut_savemap
 
 # Input
 HEADERS += ut_savemap.h

@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_imageloader
+TARGET = ../bin/ut_imageloader
 
 # Input
 HEADERS += ut_imageloader.h

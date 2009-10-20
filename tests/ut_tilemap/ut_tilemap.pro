@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_tilemap
+TARGET = ../bin/ut_tilemap
 
 # Input
 HEADERS += ut_tilemap.h

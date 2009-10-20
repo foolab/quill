@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = unittests
+TARGET = ../bin/unittests
 DEPENDPATH += .
 INCLUDEPATH += .
 

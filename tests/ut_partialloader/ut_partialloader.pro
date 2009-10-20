@@ -1,6 +1,6 @@
 include(../tests.pri)
 
-TARGET = ut_partialloader
+TARGET = ../bin/ut_partialloader
 
 # Input
 HEADERS += ut_partialloader.h

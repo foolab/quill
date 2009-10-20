@@ -1,7 +1,7 @@
 TEMPLATE = app
 DEPENDPATH += .
 INCLUDEPATH += . ../ut_unittests ../../src
-QMAKE_LIBDIR += ../../src ../ut_unittests
+QMAKE_LIBDIR += ../../src ../bin
 
 CONFIG += link_pkgconfig
 PKGCONFIG += quillimagefilter

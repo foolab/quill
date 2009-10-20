@@ -6,3 +6,4 @@ Makefile
 *.gcda
 *.gcno
 *.so*
+tests/bin/*
