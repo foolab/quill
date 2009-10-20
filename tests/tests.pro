@@ -4,7 +4,7 @@ TEMPLATE = subdirs
 DEPENDPATH += .
 INCLUDEPATH += .
 
-CONFIG += ordered
+CONFIG += ordered 
 
 SUBDIRS += \
            ut_unittests \

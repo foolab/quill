@@ -6,15 +6,21 @@ TEMPLATE = lib
 TARGET = quill
 DEPENDPATH += .
 INCLUDEPATH += .
-LIBS += -lquillimagefilter -lgcov
+LIBS += -lgcov
 QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
 DEFINES     +=
+
+CONFIG += DEBUG 
+
 # Generate pkg-config support by default
 # Note that we HAVE TO also create prl config as QMake implementation
 # mixes both of them together.
-CONFIG += DEBUG create_pc create_prl
+CONFIG += link_pkgconfig create_pc create_prl no_install_prl
+PKGCONFIG += quillimagefilter
 
 QMAKE_PKGCONFIG_REQUIRES = QtGui
+QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
+QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
 #this is for removing coverage information while doing qmake as "qmake COV_OPTION=off"
 for(OPTION,$$list($$lower($$COV_OPTION))){
@@ -58,10 +64,10 @@ INSTALL_HEADERS = \
 
 # --- install
 headers.files = $$INSTALL_HEADERS
-headers.path = $$(DESTDIR)/usr/include
-target.path = $$(DESTDIR)/usr/lib
+headers.path = $$[QT_INSTALL_HEADERS]/$$TARGET
+target.path = $$[QT_INSTALL_LIBS]
 pkgconfig.files = quill.pc
-pkgconfig.path = $$(DESTDIR)/usr/lib/pkgconfig
+pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig
 INSTALLS += target headers pkgconfig
 
 # ---clean

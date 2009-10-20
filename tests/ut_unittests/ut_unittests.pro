@@ -12,7 +12,7 @@ HEADERS += unittests.h
 SOURCES += unittests.cpp
 
 # --- install
-target.path = $$(DESTDIR)/usr/lib
+target.path = $$[QT_INSTALL_LIBS]
 INSTALLS += target
 
 # --- clean

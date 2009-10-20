@@ -1,10 +1,22 @@
+TEMPLATE = app
+DEPENDPATH += .
+INCLUDEPATH += . ../ut_unittests ../../src
+QMAKE_LIBDIR += ../../src ../ut_unittests
 
-QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
-LIBS += -lgcov
-#INCLUDEPATH += . ../src
+CONFIG += link_pkgconfig
+PKGCONFIG += quillimagefilter
 
-target.path = $$(DESTDIR)/usr/lib/libquill-tests/
+LIBS += -lquill -lunittests
+QT += testlib
+
+CONFIG += debug
+
+# --- install
+target.path = $$[QT_INSTALL_LIBS]/libquill-tests/
 INSTALLS += target
 
-QMAKE_CLEAN += *.gcda *.gcno *.gcov *.log *.xml coverage *.o moc_* *.so
-QMAKE_DISTCLEAN += *.gcda *.gcno *.gcov *.log *.xml coverage *.o moc_* *.so
+# --- clean
+QMAKE_CLEAN += \
+	*.gcov *.gcno *.log
+
+QMAKE_DISTCLEAN += *.gcda *.gcno *.gcov *.log *.xml coverage *.o moc_* Makefile*
