@@ -6,7 +6,7 @@ DEPENDPATH += .
 INCLUDEPATH += . ../ut_unittests ../../src
 QMAKE_LIBDIR += ../../src ../ut_unittests
 
-LIBS += -lquill -lqtimagefilter -lquillimagefilter -lunittests
+LIBS += -lquill -lquillimagefilter -lunittests
 QT += testlib
 DEFINES     += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT
 CONFIG += debug
