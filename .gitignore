@@ -1,3 +1,5 @@
 *.pc
 *.prl
-
+moc_*.cpp
+*.o
+Makefile
