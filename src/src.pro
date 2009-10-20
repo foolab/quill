@@ -18,7 +18,7 @@ CONFIG += DEBUG
 CONFIG += link_pkgconfig create_pc create_prl no_install_prl
 PKGCONFIG += quillimagefilter
 
-QMAKE_PKGCONFIG_REQUIRES = QtGui
+QMAKE_PKGCONFIG_REQUIRES = quillimagefilter QtGui
 QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
 QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
