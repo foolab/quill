@@ -42,7 +42,7 @@
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
-
+#include <QDebug>
 #include "quillfile.h"
 #include "quill.h"
 #include "core.h"
