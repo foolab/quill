@@ -3,3 +3,6 @@
 moc_*.cpp
 *.o
 Makefile
+*.gcda
+*.gcno
+*.so*
