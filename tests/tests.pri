@@ -3,7 +3,7 @@ DEPENDPATH += .
 INCLUDEPATH += . ../ut_unittests ../../src
 QMAKE_LIBDIR += ../../src ../bin
 
-QMAKEPATH += ../../src
+QMAKEFEATURES += ../../src
 CONFIG += quill
 
 LIBS += -lquill -lunittests
