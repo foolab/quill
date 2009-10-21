@@ -58,6 +58,7 @@ ut_stack::ut_stack()
 void ut_stack::initTestCase()
 {
     QuillImageFilter::registerAll();
+    QDir().mkpath("/tmp/quill/history");
 }
 
 void ut_stack::cleanupTestCase()

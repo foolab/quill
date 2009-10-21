@@ -58,6 +58,7 @@ Q_DECLARE_METATYPE(QuillImage);
 void ut_quill::initTestCase()
 {
     QuillImageFilter::registerAll();
+    QDir().mkpath("/tmp/quill/history");
 }
 
 void ut_quill::cleanupTestCase()
