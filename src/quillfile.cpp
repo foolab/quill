@@ -39,6 +39,7 @@
 
 #include <QTemporaryFile>
 #include <QFileInfo>
+#include <QUrl>
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
@@ -356,11 +357,13 @@ bool QuillFile::hasThumbnail(int level) const
 
 QString QuillFile::fileNameHash(const QString &fileName)
 {
-    QString path = QFileInfo(fileName).canonicalFilePath();
-    path.prepend("file://");
+    QUrl uri = QUrl::fromLocalFile(QFileInfo(fileName).canonicalFilePath());
+
+    qDebug() << "Uri is:" << uri.toString();
 
     const QByteArray hashValue =
-        QCryptographicHash::hash(path.toLatin1(),QCryptographicHash::Md5);
+        QCryptographicHash::hash(uri.toString().toLatin1(),
+                                 QCryptographicHash::Md5);
 
     return hashValue.toHex();
 }
