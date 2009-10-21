@@ -69,7 +69,7 @@ public:
       Returns the actual file name associated with the QuillFile object.
     */
 
-    QString fileName() const;
+    virtual QString fileName() const;
 
     /*!
       Returns the original file name associated with the QuillFile
@@ -77,13 +77,13 @@ public:
       the file.
     */
 
-    QString originalFileName() const;
+    virtual QString originalFileName() const;
 
     /*!
       Returns format associated with the QuillFile object.
     */
 
-    QString fileFormat() const;
+    virtual QString fileFormat() const;
 
     /*!
       Returns the target format associated with the QuillFile object.
@@ -91,7 +91,7 @@ public:
       exported into a different format.
     */
 
-    QString targetFormat() const;
+    virtual QString targetFormat() const;
 
     /*!
       Sets the file name.
@@ -130,13 +130,13 @@ public:
       with originals.
     */
 
-    void setReadOnly();
+    virtual void setReadOnly();
 
     /*!
       If the file is read only.
     */
 
-    bool isReadOnly() const;
+    virtual bool isReadOnly() const;
 
     /*!
       Sets the display level of the file.
@@ -146,13 +146,13 @@ public:
       Default is -1. This can be modified on the fly.
     */
 
-    void setDisplayLevel(int level);
+    virtual void setDisplayLevel(int level);
 
     /*!
       Returns the current display level of the file.
     */
 
-    int displayLevel() const;
+    virtual int displayLevel() const;
 
     /*!
       Starts to asynchronously save any changes made to the file (if
@@ -160,7 +160,7 @@ public:
       when the changes are finished.
     */
 
-    void save();
+    virtual void save();
 
     /*!
       Exports the file into a new name and format.
@@ -169,20 +169,20 @@ public:
       the format is not evident from the file extension.
     */
 
-    QuillFile *exportFile(const QString &newFileName,
-                          const QString &fileFormat = "");
+    virtual QuillFile *exportFile(const QString &newFileName,
+                                  const QString &fileFormat = "");
 
     /*!
       If the file is in the progress of saving.
     */
 
-    bool isSaveInProgress() const;
+    virtual bool isSaveInProgress() const;
 
     /*!
       Starts to asynchronously run an operation.
      */
 
-    void runFilter(QuillImageFilter *filter);
+    virtual void runFilter(QuillImageFilter *filter);
 
     /*!
       Starts an undo session. When an undo session is in progress,
@@ -191,7 +191,7 @@ public:
       redo().
      */
 
-    void startSession();
+    virtual void startSession();
 
     /*!
       Concludes an undo session started by startSession(). A closed
@@ -199,38 +199,38 @@ public:
       redo().
      */
 
-    void endSession();
+    virtual void endSession();
 
     /*!
       If an undo session is in progress. See startSession() and
       endSession().
     */
 
-    bool isSession() const;
+    virtual bool isSession() const;
 
     /*!
       If the previous operation can be undone.
      */
 
-    bool canUndo() const;
+    virtual bool canUndo() const;
 
     /*!
       Undoes the previous operation.
      */
 
-    void undo();
+    virtual void undo();
 
     /*!
       If an undone operation can be redone.
      */
 
-    bool canRedo() const;
+    virtual bool canRedo() const;
 
     /*!
       Redoes a previously undone operation.
      */
 
-    void redo();
+    virtual void redo();
 
     /*!
       Returns a representation of the current state of the file.
@@ -240,7 +240,7 @@ public:
       image. This function will not return tiles.
     */
 
-    QuillImage image() const;
+    virtual QuillImage image() const;
 
     /*!
       Returns a representation of the current state of the file.
@@ -252,7 +252,7 @@ public:
       image. This function will not return tiles.
     */
 
-    QuillImage image(int level) const;
+    virtual QuillImage image(int level) const;
 
     /*!
       Returns all image levels of the current state of the file.
@@ -261,13 +261,13 @@ public:
       including all resolution levels and tiles.
     */
 
-    QList<QuillImage> allImageLevels() const;
+    virtual QList<QuillImage> allImageLevels() const;
 
     /*!
       Returns the full image size, in pixels, of the current state of the file.
     */
 
-    QSize fullImageSize() const;
+    virtual QSize fullImageSize() const;
 
     /*!
       Sets the viewport area (in full-image coordinates), only
@@ -276,20 +276,20 @@ public:
       (e.g. no tiles will be returned).
     */
 
-    void setViewPort(const QRect &viewPort);
+    virtual void setViewPort(const QRect &viewPort);
 
     /*!
       Returns the viewport in full-image coordinates. Only tiles
       within the viewport will be processed and returned.
      */
 
-    QRect viewPort() const;
+    virtual QRect viewPort() const;
 
     /*!
       If a related thumbnail has been cached to the file system.
      */
 
-    bool hasThumbnail(int level) const;
+    virtual bool hasThumbnail(int level) const;
 
     /*!
       Gets the file name associated with the given preview level.
@@ -299,7 +299,7 @@ public:
       not guaranteed to exist.
      */
 
-    QString thumbnailFileName(int level) const;
+    virtual QString thumbnailFileName(int level) const;
 
     /*!
       Returns the associated undo stack.
@@ -313,13 +313,13 @@ public:
       If the file exists in the file system.
      */
 
-    bool exists() const;
+    virtual bool exists() const;
 
     /*!
       If the file is supported and has no errors.
      */
 
-    bool supported() const;
+    virtual bool supported() const;
 
     /*!
       Reads a complete file object from edit history.
@@ -347,12 +347,12 @@ public:
       backup, edit history, and any thumbnails. Does not remove the
       associated file object. This operation cannot be undone.
      */
-    void remove();
+    virtual void remove();
 
     /*!
       Removes the thumbnails for a file. This operation cannot be undone.
      */
-    void removeThumbnails();
+    virtual void removeThumbnails();
 
     /*!
       Immediately concludes any save operation. Internal use only.
@@ -364,7 +364,7 @@ public:
       Returns the original, read-only copy of this file instance.
     */
 
-    QuillFile *original();
+    virtual QuillFile *original();
 
     /*!
       Immediately triggers the imageAvailable() signal. Internal use only.
@@ -376,7 +376,7 @@ public:
       Triggers an error.
      */
 
-    void setError(Quill::Error errorCode);
+    virtual void setError(Quill::Error errorCode);
 
 signals:
     /*!
