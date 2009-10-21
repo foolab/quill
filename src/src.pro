@@ -17,6 +17,7 @@ CONFIG += DEBUG
 # Note that we HAVE TO also create prl config as QMake implementation
 # mixes both of them together.
 CONFIG += link_pkgconfig create_pc create_prl no_install_prl
+PKG_CONFIG_PATH = $$[QT_INSTALL_LIBS]/pkgconfig
 PKGCONFIG += quillimagefilter
 
 QMAKE_PKGCONFIG_REQUIRES = quillimagefilter QtGui
