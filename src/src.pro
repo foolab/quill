@@ -5,7 +5,7 @@
 TEMPLATE = lib
 TARGET = quill
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . $$[QT_INSTALL_HEADERS]
 LIBS += -lgcov
 QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
 DEFINES     +=
