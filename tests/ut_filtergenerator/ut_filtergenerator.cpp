@@ -56,6 +56,7 @@ ut_filtergenerator::ut_filtergenerator()
 void ut_filtergenerator::initTestCase()
 {
     QuillImageFilter::registerAll();
+    QDir().mkpath("/tmp/quill/thumbnails");
 }
 
 void ut_filtergenerator::cleanupTestCase()
