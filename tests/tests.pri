@@ -3,8 +3,8 @@ DEPENDPATH += .
 INCLUDEPATH += . ../ut_unittests ../../src
 QMAKE_LIBDIR += ../../src ../bin
 
-CONFIG += link_pkgconfig
-PKGCONFIG += quillimagefilter
+QMAKEFEATURES += ../../src
+CONFIG += quill
 
 LIBS += -lquill -lunittests
 QT += testlib
