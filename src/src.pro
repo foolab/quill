@@ -7,9 +7,6 @@ TARGET = quill
 
 DEPENDPATH += .
 
-# INCLUDEPATH += . /usr/include/qt4/quillimagefilter
-INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter
-
 LIBS += -lgcov
 QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
 DEFINES     +=
@@ -74,7 +71,7 @@ target.path = $$[QT_INSTALL_LIBS]
 pkgconfig.files = quill.pc
 pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig
 prf.files = quill.prf
-prf.path = $$[QT_INSTALL_DATA]/mkspecs/features
+prf.path = $$[QMAKE_MKSPECS]/features
 INSTALLS += target headers pkgconfig prf
 
 # ---clean
