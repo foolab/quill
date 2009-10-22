@@ -7,6 +7,8 @@ TARGET = quill
 
 DEPENDPATH += .
 
+INCLUDEPATH += . /usr/include/qt4/quillimagefilter
+
 LIBS += -lgcov
 QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
 DEFINES     +=
