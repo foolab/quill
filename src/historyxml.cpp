@@ -61,7 +61,10 @@ QByteArray HistoryXml::encode(QuillFile *file)
 QuillFile *HistoryXml::decodeOne(const QByteArray & array, Core *core)
 {
     QList<QuillFile *> fileList = HistoryXml::decode(array, core);
-    return fileList.first();
+    if (!fileList.isEmpty())
+        return fileList.first();
+    else
+        return 0;
 }
 
 
