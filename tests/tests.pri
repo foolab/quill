@@ -1,6 +1,6 @@
 TEMPLATE = app
 DEPENDPATH += .
-INCLUDEPATH += . ../ut_unittests ../../src $$[QT_INSTALL_HEADERS]/quillimagefilter
+INCLUDEPATH += . ../ut_unittests ../../src $$[QT_INSTALL_HEADERS]/quillimagefilter $$[QT_INSTALL_HEADERS]/quill
 QMAKE_LIBDIR += ../../src ../bin
 
 QMAKEFEATURES += ../../src
