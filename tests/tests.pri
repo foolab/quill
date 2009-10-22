@@ -1,9 +1,9 @@
 TEMPLATE = app
 DEPENDPATH += .
 INCLUDEPATH += . ../ut_unittests ../../src $$[QT_INSTALL_HEADERS]/quillimagefilter $$[QT_INSTALL_HEADERS]/quill
-QMAKE_LIBDIR += ../../src ../bin
+QMAKE_LIBDIR += ../src ../bin
 
-QMAKEFEATURES += ../../src
+QMAKEFEATURES += ../src
 CONFIG += quill
 CONFIG += quillimagefilter
 CONFIG += debug
@@ -17,7 +17,7 @@ QMAKE_PKGCONFIG_REQUIRES = quill quillimagefilter QtGui
 QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
 QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
-#LIBS += -lquill -lunittests
+#LIBS += -lquill -lquillimagefilter -lunittests
 QT += testlib
 
 # --- install
