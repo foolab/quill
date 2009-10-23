@@ -1,15 +1,13 @@
 TEMPLATE = app
 DEPENDPATH += .
 INCLUDEPATH += . ../ut_unittests ../../src
-QMAKE_LIBDIR += ../../src ../bin
+QMAKE_LIBDIR += ../../src ../bin ../ut_unittests
 
-QMAKEFEATURES += ../../src
-CONFIG += quill
+CONFIG += quillimagefilter
+CONFIG += debug
 
 LIBS += -lquill -lunittests
 QT += testlib
-
-CONFIG += debug
 
 # --- install
 target.path = $$[QT_INSTALL_LIBS]/libquill-tests/
