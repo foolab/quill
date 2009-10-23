@@ -390,6 +390,9 @@ QuillFile *QuillFile::readFromEditHistory(const QString &fileName,
     Core *core = dynamic_cast<Core*>(parent);
 
     QFile file(editHistoryFileName(fileName, core->editHistoryDirectory()));
+
+    qDebug() << "Reading edit history from" << file.fileName();
+
     if (!file.exists())
         return 0;
     file.open(QIODevice::ReadOnly);
