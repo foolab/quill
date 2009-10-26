@@ -4,6 +4,7 @@ DEPENDPATH += .
 INCLUDEPATH += . ../ut_unittests ../../src  $$[QT_INSTALL_HEADERS]/quillimagefilter
 QMAKE_LIBDIR += ../../src ../bin ../ut_unittests
 
+CONFIG += quill
 CONFIG += quillimagefilter
 CONFIG += debug
 
