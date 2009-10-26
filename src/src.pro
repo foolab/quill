@@ -4,7 +4,8 @@
 
 TEMPLATE = lib
 TARGET = quill
-
+# Please do not remove this INCLUDEPATH in any case
+INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter
 DEPENDPATH += .
 
 LIBS += -lgcov
