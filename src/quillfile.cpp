@@ -399,6 +399,9 @@ QuillFile *QuillFile::readFromEditHistory(const QString &fileName,
     const QByteArray history = file.readAll();
     file.close();
 
+    qDebug() << "Read" << history.size() << "bytes";
+    qDebug() << history;
+
     return HistoryXml::decodeOne(history, core);
 }
 
