@@ -327,7 +327,7 @@ void ut_imagecache::testChangeProtectionStatus2()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_imagecache test;
     return QTest::qExec( &test, argc, argv );
 }
