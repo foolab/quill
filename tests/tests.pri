@@ -1,14 +1,23 @@
 TEMPLATE = app
 DEPENDPATH += .
-# Please do not delete the INCLUDEDPATH
-INCLUDEPATH += . ../ut_unittests ../../src  $$[QT_INSTALL_HEADERS]/quillimagefilter
+INCLUDEPATH += . ../ut_unittests ../../src $$[QT_INSTALL_HEADERS]/quillimagefilter
 QMAKE_LIBDIR += ../../src ../bin ../ut_unittests
 
+# QMAKEFEATURES += ../../src
 CONFIG += quill
 CONFIG += quillimagefilter
 CONFIG += debug
 
-LIBS += -lquill -lunittests
+# Generate pkg-config support by default
+# Note that we HAVE TO also create prl config as QMake implementation
+# mixes both of them together.
+CONFIG += create_pc create_prl no_install_prl
+
+QMAKE_PKGCONFIG_REQUIRES = quill quillimagefilter QtGui
+# QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
+QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
+
+LIBS += -lquill -lquillimagefilter -lunittests
 QT += testlib
 
 # --- install
