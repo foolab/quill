@@ -18,7 +18,7 @@ CONFIG += create_pc create_prl no_install_prl
 QMAKE_PKGCONFIG_REQUIRES = quill quillimagefilter QtGui
 QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
-# LIBS += -lquill -lquillimagefilter -lunittests
+LIBS += -lquill -lquillimagefilter -lunittests
 QT += testlib
 
 # --- install
