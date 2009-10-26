@@ -144,7 +144,7 @@ void ut_file::testOriginal()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_file test;
     return QTest::qExec( &test, argc, argv );
 }

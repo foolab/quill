@@ -256,7 +256,7 @@ void ut_tilemap::testMultiple()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_tilemap test;
     return QTest::qExec( &test, argc, argv );
 }

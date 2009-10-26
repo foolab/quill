@@ -1191,7 +1191,7 @@ void ut_quill::testExportWithRedoHistory()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_quill test;
     return QTest::qExec( &test, argc, argv );
 

@@ -200,7 +200,7 @@ void ut_filtergenerator::testRedEyeRemoval()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_filtergenerator test;
     return QTest::qExec( &test, argc, argv );
 

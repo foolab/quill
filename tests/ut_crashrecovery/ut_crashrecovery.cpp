@@ -302,7 +302,7 @@ void ut_crashrecovery::testRecoveryAfterUndo()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_crashrecovery test;
     return QTest::qExec( &test, argc, argv );
 }
