@@ -1,6 +1,7 @@
 TEMPLATE = app
 DEPENDPATH += .
-INCLUDEPATH += . ../ut_unittests ../../src
+# Please do not delete the INCLUDEDPATH
+INCLUDEPATH += . ../ut_unittests ../../src  $$[QT_INSTALL_HEADERS]/quillimagefilter
 QMAKE_LIBDIR += ../../src ../bin ../ut_unittests
 
 CONFIG += quillimagefilter
