@@ -47,7 +47,7 @@
 
 class QuillImage;
 class QString;
-class ImageKey;
+class CacheImage;
 
 class ImageCache: public QObject
 {
@@ -59,10 +59,9 @@ public:
     /*!
       Enumeration values of protection status.
      */
-    enum ProtectionStatus
-    {NotProtected =0,
-     ProtectFirst,
-     ProtectLast
+    enum ProtectionStatus {
+        NotProtected =0,
+        Protected
     };
 
     /*!
@@ -73,98 +72,74 @@ public:
     ImageCache(int maxCost);
     ~ImageCache();
     /*!
-      Insert an image to cache or not deletable memory.
-      @param key the unique id of the image
-      @param image the image to be inserted to cache
+      Insert an image to the cache or the protected cache.
+      @param file the pointer to a QuillFile object
+      @param commandId the unique id of the image
+      @param image the image to be inserted
       @param ProtectionStatus the status of protection for this image
      */
-    bool insertImage(int key, const QuillImage &image, ImageCache::ProtectionStatus=ImageCache::NotProtected);
+    bool insert(void *file, int commandId,
+                const QuillImage &image,
+                ProtectionStatus status = NotProtected);
 
     /*!
-      Take the image stored in cache or not delete cache
-      @return QuillImage* the pointer to QuillImage. The caller has the ownership
+      Returns the image stored in the cache.
      */
-    QuillImage image(int key) const;
+    QuillImage image(void *file, int commandId) const;
 
     /*!
-      Change the protection status of one protected image
-      @param uniqueId the key of the image
-      @param status the protection status to be changed
+      Protect the image. This removes possible protection from any other
+      command in the same file.
 
       Note that trying to change the status to "not protected" will
       have no effect.
+
+      @param commandId the key of the image
      */
-    bool changeProtectionStatus(int uniqueId,
-                                ImageCache::ProtectionStatus status);
+    bool protect(void *file, int commandId);
 
     /*!
-      Change the max cost of the cache.
+      Returns the command id of the image which is currently protected
+      for the file.
+     */
 
-      Images with a protected status do not count towards this max cost.
+    int protectedId(void *file) const;
+
+    /*!
+      Delete the image from the cache.
+
+      @param commandId pointer to the command.
+
+      @param file pointer to the file object, used for comparison
+      purposes only.
+     */
+
+    bool remove(void *file, int commandId);
+
+    /*!
+      Purge from the cache all images related to a given file.
+
+      @param file pointer to the file object, used for comparison
+      purposes only.
+     */
+    bool purge(void *file);
+
+    /*!
+      Change the max size of the cache.
+
+      Images with a protected status do not count towards this max size.
     */
-    void setMaxCost(int maxCost);
+    void setMaxSize(int maxSize);
+
+    /*!
+      The max size of the cache.
+    */
+    int maxSize() const;
 
 private:
 
-    typedef int KeyListPosition;
-
-    static const KeyListPosition firstPosition, secondPosition, emptyPosition;
-
-    /*!
-      Count the number of small pictures in cache
-    */
-
-    int countCache() const;
-    /*!
-      Count the number of not deletable pictures in cache
-     */
-    int countCacheProtected() const;
-
-    /*!
-      Check if one small picture exists in cache by its key
-     */
-    bool cacheCheck(int key) const;
-    /*!
-      Check if one not deletable picture exists in cache by its key
-     */
-    bool cacheProtectedCheck(int key) const;
-
-    /*!
-      Check the total cost in small picture cache
-     */
-    int cacheTotalCost() const;
-
-    /*!
-      Check keys stored in small picture cache
-     */
-    QList<int> checkKeys() const;
-
-    /*!
-      Change the protection status between not delete and cache
-      @param position first or last protected
-      @param key the key of image whose status will be changed
-     */
-    bool internalChangeProtection(KeyListPosition position, int key);
-    /*!
-      Delete one image from not delete memory because we will insert one more
-     */
-    bool deleteFromProtected(KeyListPosition position);
-
-    /*!
-      Change keys in QList to keep track of protected image
-     */
-    void setKey(KeyListPosition position, int key);
-
-private:
-
-    QCache<int, QuillImage> cache, cacheProtected;
-
-    /*!
-      Keep the key of images. There are 3 elements.
-      The first two are the keys and last one is the position if
-     */
-    QList<int> keyList;
-
+    QCache<int, CacheImage> m_cache;
+    QCache<void*, CacheImage> m_cacheProtected;
 };
 
 

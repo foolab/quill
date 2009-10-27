@@ -188,9 +188,6 @@ void ut_quill::testDisableCache()
     QCOMPARE(quill->previewLevelCount(), 2);
 
     quill->setPreviewSize(1, QSize(4, 1));
-    quill->setCacheLimit(0, 0);
-    quill->setCacheLimit(1, 0);
-    quill->setCacheLimit(2, 0);
 
     QuillFile *file = quill->file(testFile.fileName());
 
@@ -385,7 +382,6 @@ void ut_quill::testLoadSave()
 
     Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setCacheLimit(1, 0);
 
     QuillImage image(QImage(testFile.fileName()));
     QCOMPARE(image, QuillImage(Unittests::generatePaletteImage()));
@@ -430,7 +426,6 @@ void ut_quill::testLoadSave()
 
     Quill *quill2 = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill2->setEditHistoryDirectory("/tmp/quill/history");
-    quill2->setCacheLimit(1, 0);
 
     QuillFile *file2 = quill2->file(testFile.fileName(), "png");
 
@@ -473,7 +468,6 @@ void ut_quill::testMultiSave()
 
     Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setCacheLimit(1, 0);
 
     QImage image(testFile.fileName());
     QVERIFY(Unittests::compareImage(image, Unittests::generatePaletteImage()));
@@ -516,7 +510,7 @@ void ut_quill::testMultiSave()
 
     Quill *quill2 = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill2->setEditHistoryDirectory("/tmp/quill/history");
-    quill2->setCacheLimit(1, 0);
+
     QuillFile *file2 = quill2->file(testFile.fileName(), "png");
     QSignalSpy spy2(file2, SIGNAL(saved()));
     file2->setDisplayLevel(1);
@@ -541,7 +535,6 @@ void ut_quill::testMultiSave()
 
     Quill *quill3 = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill3->setEditHistoryDirectory("/tmp/quill/history");
-    quill3->setCacheLimit(1, 0);
 
     QuillFile *file3 = quill3->file(testFile.fileName(), "png");
     file3->setDisplayLevel(1);
@@ -566,7 +559,6 @@ void ut_quill::testNoSave()
 
     Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setCacheLimit(1, 0);
 
     QImage image(testFile.fileName());
     QVERIFY(Unittests::compareImage(image, Unittests::generatePaletteImage()));
@@ -609,7 +601,6 @@ void ut_quill::testNoSave()
 
     Quill *quill2 = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill2->setEditHistoryDirectory("/tmp/quill/history");
-    quill2->setCacheLimit(1, 0);
 
     QuillFile *file3 = quill2->file(testFile.fileName(), "png");
 
@@ -645,7 +636,6 @@ void ut_quill::testSaveIndex()
 
     Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setCacheLimit(1, 0);
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("BrightnessContrast");
@@ -680,7 +670,6 @@ void ut_quill::testSaveIndex()
 
     Quill *quill2 = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill2->setEditHistoryDirectory("/tmp/quill/history");
-    quill2->setCacheLimit(1, 0);
 
     QuillFile *file2 = quill2->file(testFile.fileName(), "png");
     QSignalSpy spy2(file2, SIGNAL(saved()));
@@ -731,7 +720,6 @@ void ut_quill::testBackgroundPriority()
     Quill *quill = new Quill(QSize(2, 1), Quill::ThreadingTest);
     quill->setEditHistoryDirectory("/tmp/quill/history");
     quill->setPreviewLevelCount(2);
-    quill->setCacheLimit(1, 0);
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("BrightnessContrast");
@@ -835,7 +823,6 @@ void ut_quill::testReOpen()
     image.save(testFile2.fileName(), "png");
 
     Quill *quill = new Quill(QSize(2, 1), Quill::ThreadingTest);
-    quill->setCacheLimit(1, 0);
 
     QSignalSpy changedSpy(quill, SIGNAL(imageChanged(int, const QImage)));
     QSignalSpy spy(quill, SIGNAL(saved(const QString, const QByteArray)));
@@ -916,7 +903,6 @@ void ut_quill::testLoadSaveSmallPicture()
 
     Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
     quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setCacheLimit(1, 0);
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("BrightnessContrast");
@@ -960,7 +946,6 @@ void ut_quill::testLoadSaveSmallPicture()
 
     Quill *quill2 = new Quill(QSize(8, 2), Quill::ThreadingTest);
     quill2->setEditHistoryDirectory("/tmp/quill/history");
-    quill2->setCacheLimit(1, 0);
 
     QuillFile *file2 =
         quill2->file(testFile.fileName(), "png");
@@ -1013,7 +998,6 @@ void ut_quill::testExport()
     image.save(testFile.fileName(), "png");
 
     Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    quill->setCacheLimit(1, 0);
 
     QSignalSpy spy(quill, SIGNAL(saved(const QString, const QByteArray)));
 
@@ -1142,7 +1126,6 @@ void ut_quill::testExportWithRedoHistory()
     image.save(testFile.fileName(), "png");
 
     Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    quill->setCacheLimit(1, 0);
 
     // Case: no original file, no changes in history
 

@@ -145,6 +145,9 @@ void QuillUndoStack::undo()
             m_stack->undo();
         while ((m_sessionId == 0) && (sessionId != 0) &&
                (command()->sessionId() == sessionId));
+
+        // If we have any stored images in cache, move them to protected
+        command()->protectImages();
     }
 }
 
@@ -176,6 +179,9 @@ void QuillUndoStack::redo()
         // In case of intermediate load, double redo
         if ((command(index()) && (command(index())->filter()->name() == "Load")))
             m_stack->redo();
+
+        // If we have any stored images in cache, move them to protected
+        command()->protectImages();
     }
 }
 

@@ -75,6 +75,7 @@ public:
         ErrorFormatUnsupported,
         ErrorFileCorrupt,
         ErrorDirectoryCannotCreate,
+        ErrorFileLimitExceeded
     } Error;
 
     static QSize defaultViewPortSize;
@@ -128,14 +129,63 @@ public:
     int previewLevelCount() const;
 
     /*!
-      Set cache limit for the image cache for the given preview level.
+      Sets the maximum number of files that can have their display level
+      equal or bigger than the given level at one time.
+
+      Normally, an application should make sure that file display
+      levels are set to -1 whenever those files are not needed any
+      more. The file limit can be considered an extra safeguard to
+      make sure that there is a hard limit on memory used which is not
+      exceeded at any time.
+
+      If a setPreviewLevel() command violates the constraints given by
+      this command, it will fail, and a QuillFile::error() of type
+      Quill::FileLimitExceeded will be emitted.
+
+      @param level Display level. Trying to set this limit on the full
+      image level will fail, due to the limitations of the tile cache
+      the limit for full images is always 1.
+
+      @param limit Number of files allowed on the given level. The minimum
+      value is 1; the default value is 1.
+     */
+
+    void setFileLimit(int level, int limit);
+
+    /*!
+      Returns the limit for the number of files that can be open at the
+      given level at one time. See setFileLimit().
+     */
+
+    int fileLimit(int level) const;
+
+    /*!
+      Sets the maximum number of edit history steps that can be cached
+      for a given display level. The cached images are used for fast
+      undo and redo.
+
+      This limit is not unique to any QuillFile; edit history images
+      from different files occupy the same cache. The expiration
+      policy used by the cache is approximately FIFO.
+
+      Regardless of this limit, any point in the edit history of any
+      file can be recovered by Quill, it will just be slower.
 
       @param level preview level
 
-      @param limit the cache limit, in bytes.
+      @param limit The cache size for this level, in number of edit
+      history steps (images) saved. The minimum value is 0 (no caching);
+      the default value is 0.
     */
 
-    void setCacheLimit(int level, int limit);
+    void setEditHistoryCacheSize(int level, int limit);
+
+    /*!
+      Returns the edit history cache size for the given preview
+      level. See setEditHistoryCacheSize().
+     */
+
+    int editHistoryCacheSize(int level) const;
 
     /*!
       Sets the recommended size for preview images for a certain

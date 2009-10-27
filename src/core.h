@@ -80,12 +80,6 @@ public:
     void insertFile(QuillFile *file, const QString &key);
 
     /*!
-      Setting the limit for the undo cache(s).
-     */
-
-    void setCacheLimit(int level, int limit);
-
-    /*!
       Modifies the preview level count. If new previews are created,
       both of their dimensions are twice those of the previous level
       by default. Calling this function after any files have been
@@ -134,6 +128,30 @@ public:
     */
 
     QSize defaultTileSize() const;
+
+    /*!
+      Sets the file limit for a given level.
+     */
+
+    void setFileLimit(int level, int limit);
+
+    /*!
+      Returns the file limit for a given level.
+     */
+
+    int fileLimit(int level) const;
+
+    /*!
+      Sets the edit history cache size for a given level.
+     */
+
+    void setEditHistoryCacheSize(int level, int limit);
+
+    /*!
+      Returns the edit history cache size for a given level.
+     */
+
+    int editHistoryCacheSize(int level);
 
     /*!
       Sets the tile cache size (measured in tiles, not bytes!)
@@ -254,21 +272,27 @@ public:
 
     void emitTileAvailable(QuillFile *file, int tileId);
 
+    /*!
+      Return the number of files which have at least a given display level.
+    */
+
+    int numFilesAtLevel(int level) const;
+
 private:
 
-    /*
+    /*!
       Return one file.
     */
 
     QuillFile *priorityFile() const;
 
-    /*
+    /*!
       Return one file.
     */
 
     QuillFile *prioritySaveFile() const;
 
-    /*
+    /*!
       Return all existing files.
     */
 
@@ -278,6 +302,7 @@ private:
 
     QList<QSize> m_previewSize;
     QList<ImageCache*> m_cache;
+    QList<int> m_fileLimit;
 
     QString m_editHistoryDirectory;
     QList<QString> m_thumbnailDirectory;

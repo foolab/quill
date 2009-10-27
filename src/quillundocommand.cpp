@@ -166,12 +166,30 @@ QuillUndoCommand *QuillUndoCommand::prev() const
 
 QuillImage QuillUndoCommand::image(int level) const
 {
-    return m_core->cache(level)->image(m_id);
+    return m_core->cache(level)->image((void*)m_stack->file(), m_id);
 }
 
 void QuillUndoCommand::setImage(int level, const QuillImage &image)
 {
-    m_core->cache(level)->insertImage(m_id, image, ImageCache::ProtectLast);
+    ImageCache *cache = m_core->cache(level);
+    ImageCache::ProtectionStatus status = ImageCache::NotProtected;
+
+    // An image will be protected if it is:
+    // 1) not after the current state (i.e. not in redo history)
+    // 2) closer to the current state than the currently protected image
+
+    if ((m_index < m_stack->index()) &&
+        (m_index >=
+         m_stack->find(cache->protectedId((void*) m_stack->file()))->index()))
+        status = ImageCache::Protected;
+
+    cache->insert((void*) m_stack->file(), m_id, image, status);
+}
+
+void QuillUndoCommand::protectImages()
+{
+    for (int level=0; level<=m_core->previewLevelCount(); level++)
+        m_core->cache(level)->protect((void*) m_stack->file(), m_id);
 }
 
 QuillImage QuillUndoCommand::fullImage() const
