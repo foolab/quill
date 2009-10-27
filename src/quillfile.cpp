@@ -39,6 +39,7 @@
 
 #include <QTemporaryFile>
 #include <QFileInfo>
+#include <QUrl>
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
@@ -193,7 +194,7 @@ QuillFile *QuillFile::exportFile(const QString &newFileName,
     if (!priv->exists || !priv->supported)
         return 0;
 
-    QByteArray dump = HistoryXml::encode(this);
+    const QByteArray dump = HistoryXml::encode(this);
     QuillFile *file = HistoryXml::decodeOne(dump, priv->core);
 
     file->setFileName(newFileName);
@@ -314,7 +315,7 @@ QSize QuillFile::fullImageSize() const
 
 void QuillFile::setViewPort(const QRect &viewPort)
 {
-    QRect oldPort = priv->viewPort;
+    const QRect oldPort = priv->viewPort;
     priv->viewPort = viewPort;
 
     // New tiles will only be calculated if the display level allows it
@@ -356,11 +357,12 @@ bool QuillFile::hasThumbnail(int level) const
 
 QString QuillFile::fileNameHash(const QString &fileName)
 {
-    QString path = QFileInfo(fileName).canonicalFilePath();
-    path.prepend("file://");
+    const QUrl uri =
+        QUrl::fromLocalFile(QFileInfo(fileName).canonicalFilePath());
 
     const QByteArray hashValue =
-        QCryptographicHash::hash(path.toLatin1(),QCryptographicHash::Md5);
+        QCryptographicHash::hash(uri.toString().toLatin1(),
+                                 QCryptographicHash::Md5);
 
     return hashValue.toHex();
 }
@@ -369,7 +371,8 @@ QString QuillFile::thumbnailFileName(int level) const
 {
     QString hashValueString = fileNameHash(priv->fileName);
     hashValueString.append("." + priv->core->thumbnailExtension());
-    hashValueString.prepend(priv->core->thumbnailDirectory(level) + "/");
+    hashValueString.prepend(priv->core->thumbnailDirectory(level) +
+                            QDir::separator());
 
     return hashValueString;
 }
@@ -379,7 +382,7 @@ QString QuillFile::editHistoryFileName(const QString &fileName,
 {
     QString hashValueString = fileNameHash(fileName);
     hashValueString.append(".xml");
-    hashValueString.prepend(editHistoryDirectory + "/");
+    hashValueString.prepend(editHistoryDirectory + QDir::separator());
 
     return hashValueString;
 }
@@ -464,7 +467,7 @@ void QuillFile::overwritingCopy(const QString &fileName,
         target(newName);
 
     source.open(QIODevice::ReadOnly);
-    QByteArray buffer = source.readAll();
+    const QByteArray buffer = source.readAll();
     source.close();
 
     target.open(QIODevice::WriteOnly | QIODevice::Truncate);

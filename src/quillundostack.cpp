@@ -95,7 +95,8 @@ void QuillUndoStack::add(QuillImageFilter *filter)
 
     cmd->setStack(this);
     cmd->setIndex(index());
-    cmd->setSessionId(m_sessionId);
+    if (cmd->filter()->name() != "Load")
+        cmd->setSessionId(m_sessionId);
     cmd->setCore(m_core);
 
     // tile map
