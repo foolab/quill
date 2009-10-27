@@ -1,3 +1,11 @@
+libquill (1.091027.0) unstable; urgency=low
+
+  * Fixes: NB#143813 - Doing undo or redo operations does not save the images.
+  * Fixes: NB#143438 - Various build environment problems for libquill
+  * Fixes: NB#142605 - The .pc file of libquill-dev is incorrect
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 27 Oct 2009 11:50:00 +0200
+
 libquill (1.091021.0) unstable; urgency=low
 
   * change version number for integration.
