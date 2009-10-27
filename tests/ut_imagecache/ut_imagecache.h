@@ -54,22 +54,23 @@ public:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void testInsert();
-    void testDoubleInsert();
+    /*void testInsert();
+    
     void testCount(int number);
     void testCountProtected(int number);
     void testCacheCheck(int key,bool flag);
     void testCacheProtectedCheck(int key, bool flag);
     void testChangeProtectionStatus(int key, ImageCache::ProtectionStatus status);
-    int testCacheTotalCost();
+    int testCacheTotalCost();*/
 
     void testInsert2();
-    void testChangeProtectionStatus2();
+    void testInsertReplace();
+    void testProtect();
 
 private:
     ImageCache *cache;
     QuillImage image;
-
+    void *file;
 };
 
 #endif // TEST_LIBQUILL_UNDO_CACHE_H

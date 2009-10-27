@@ -178,9 +178,11 @@ void QuillUndoCommand::setImage(int level, const QuillImage &image)
     // 1) not after the current state (i.e. not in redo history)
     // 2) closer to the current state than the currently protected image
 
+    QuillUndoCommand *previousProtected =
+        m_stack->find(cache->protectedId((void*) m_stack->file()));
+
     if ((m_index < m_stack->index()) &&
-        (m_index >=
-         m_stack->find(cache->protectedId((void*) m_stack->file()))->index()))
+        (!previousProtected || (m_index >= previousProtected->index())))
         status = ImageCache::Protected;
 
     cache->insert((void*) m_stack->file(), m_id, image, status);

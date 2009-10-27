@@ -46,57 +46,59 @@
 
 ut_imagecache::ut_imagecache()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_imagecache::initTestCase()
 {
+    QuillImageFilter::registerAll();
     cache = new ImageCache(500);
+    file = (void*) this;
 }
 
 void ut_imagecache::cleanupTestCase()
 {
     delete cache;
 }
-
+/*
 void ut_imagecache::testInsert()
 
 {
     bool result;
+    void* file = this;
 
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(1,image);
+    result=cache->insert(file,1,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //one pic in cache
     testCount(1);
     qDebug()<<"the total cost used 1: "<<cache->cacheTotalCost();
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(2,image);
+    result=cache->insert(file,2,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //two pics in cache
     testCount(2);
     qDebug()<<"the total cost used 2: "<<cache->cacheTotalCost();
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(3,image,ImageCache::ProtectFirst);
+    result=cache->insert(file,3,image,ImageCache::ProtectFirst);
     QVERIFY2(result==true, "image is not inserted successfully.");
     testCount(2);
     //one pic in not delete
     testCountProtected(1);
 
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(4,image);
+    result=cache->insert(file,4,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //three pics in cache
     testCount(3);
     qDebug()<<"the total cost used 3: "<<cache->cacheTotalCost();
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(5,image);
+    result=cache->insert(file,5,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //four pics in cache
     testCount(4);
     qDebug()<<"the total cost used 4: "<<cache->cacheTotalCost();
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(6,image, ImageCache::ProtectLast);
+    result=cache->insert(file,6,image, ImageCache::ProtectLast);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //four pics in cache
     //two pics in not delete
@@ -104,19 +106,19 @@ void ut_imagecache::testInsert()
     testCountProtected(2);
 
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(7,image);
+    result=cache->insert(file,7,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //five pics in cache
     testCount(5);
     qDebug()<<"the total cost used 5: "<<cache->cacheTotalCost();
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(8,image);
+    result=cache->insert(file,8,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //six pics in cache
     testCount(6);
     qDebug()<<"the total cost used 6: "<<cache->cacheTotalCost();
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(9,image,ImageCache::ProtectLast);
+    result=cache->insert(file,9,image,ImageCache::ProtectLast);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //key 6 is moved from not delete to cache
     testCountProtected(2);
@@ -127,7 +129,7 @@ void ut_imagecache::testInsert()
     testCacheProtectedCheck(6, false);
 
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(10,image);
+    result=cache->insert(file,10,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //7 pics in cache.
     //key one is deleted
@@ -135,7 +137,7 @@ void ut_imagecache::testInsert()
     testCacheCheck(1, false);
 
     image=Unittests::generatePaletteImage();
-    result=cache->insertImage(11,image);
+    result=cache->insert(file,11,image);
     QVERIFY2(result==true, "image is not inserted successfully.");
     //7 pics i cache
     //key 2 is deleted
@@ -144,7 +146,7 @@ void ut_imagecache::testInsert()
     testCacheCheck(2, false);
 
     //Testing change status
-    testChangeProtectionStatus(11,ImageCache::ProtectLast);
+    testChangeProtectionStatus(file,11,ImageCache::ProtectLast);
     testCacheCheck(11,false);
     testCacheProtectedCheck(11, true);
     testCacheCheck(9,true);
@@ -216,20 +218,13 @@ void ut_imagecache::testCacheProtectedCheck(int key, bool flag)
       QVERIFY2(result==false, "it is in Not delete");
 }
 
-void ut_imagecache::testChangeProtectionStatus(int key, ImageCache::ProtectionStatus status)
-{
-    cache->changeProtectionStatus(key, status);
-}
-
 int ut_imagecache::testCacheTotalCost()
 {
     return cache->cacheTotalCost();
 }
-
+*/
 void ut_imagecache::testInsert2()
 {
-    QuillImageFilter::registerAll();
-
     QtImageFilter *filter =
         QtImageFilterFactory::createImageFilter("BrightnessContrast");
     QVERIFY(filter);
@@ -240,20 +235,18 @@ void ut_imagecache::testInsert2()
     QuillImage image = Unittests::generatePaletteImage();
     QuillImage image2 = filter->apply(image);
 
-    cache->insertImage(1, image, ImageCache::ProtectLast);
-    QCOMPARE(cache->image(1), image);
-    cache->insertImage(2, image2, ImageCache::ProtectLast);
-    QCOMPARE(cache->image(1), image);
-    QCOMPARE(cache->image(2), image2);
+    cache->insert(file, 1, image, ImageCache::Protected);
+    QCOMPARE(cache->image(file, 1), image);
+    cache->insert(file, 2, image2, ImageCache::Protected);
+    QCOMPARE(cache->image(file, 1), image);
+    QCOMPARE(cache->image(file, 2), image2);
 
     delete filter;
     delete cache;
 }
 
-void ut_imagecache::testDoubleInsert()
+void ut_imagecache::testInsertReplace()
 {
-    QuillImageFilter::registerAll();
-
     QtImageFilter *filter =
         QtImageFilterFactory::createImageFilter("BrightnessContrast");
     QVERIFY(filter);
@@ -264,63 +257,37 @@ void ut_imagecache::testDoubleInsert()
     QuillImage image = Unittests::generatePaletteImage();
     QuillImage image2 = filter->apply(image);
 
-    cache->insertImage(1, image, ImageCache::ProtectLast);
-    QCOMPARE(cache->image(1), image);
-    cache->insertImage(1, image2, ImageCache::ProtectLast);
-    QCOMPARE(cache->image(1), image2);
+    cache->insert(file, 1, image, ImageCache::Protected);
+    QCOMPARE(cache->image(file, 1), image);
+    cache->insert(file, 1, image2, ImageCache::Protected);
+    QCOMPARE(cache->image(file, 1), image2);
 
     delete filter;
     delete cache;
 }
 
-void ut_imagecache::testChangeProtectionStatus2()
-
+void ut_imagecache::testProtect()
 {
-    QuillImageFilter::registerAll();
-
     QtImageFilter *filter =
         QtImageFilterFactory::createImageFilter("BrightnessContrast");
     QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness,
+                      QVariant(16));
 
-    ImageCache *cache = new ImageCache(0);
+    ImageCache *cache = new ImageCache(1);
     QuillImage image = Unittests::generatePaletteImage();
     QuillImage image2 = filter->apply(image);
-    QuillImage image3 = filter->apply(image2);
 
-    cache->insertImage(1, image, ImageCache::ProtectLast);
-    QCOMPARE(cache->image(1), image);
+    cache->insert(file, 1, image, ImageCache::NotProtected);
+    QCOMPARE(cache->image(file, 1), image);
 
-    cache->changeProtectionStatus(1, ImageCache::ProtectFirst);
-    QCOMPARE(cache->image(1), image);
+    cache->protect(file, 1);
+    QCOMPARE(cache->image(file, 1), image);
 
-    // Replace the "protect last" status, the first image should still stay
-    // because of the "protect first" status.
-
-    cache->insertImage(2, image2, ImageCache::ProtectLast);
-    QCOMPARE(cache->image(2), image2);
-    QCOMPARE(cache->image(1), image);
-
-    // Replace the "protect first" status, the first image
-    // is no longer protected and should be removed.
-
-    cache->changeProtectionStatus(2, ImageCache::ProtectFirst);
-    QCOMPARE(cache->image(2), image2);
-    QCOMPARE(cache->image(1), QuillImage());
-
-    // Replace the "protect first" status, the second image
-    // should still stay because of the "protect last" status.
-
-    cache->insertImage(3, image3, ImageCache::ProtectFirst);
-    QCOMPARE(cache->image(3), image3);
-    QCOMPARE(cache->image(2), image2);
-
-    // Replace the "protect last" status, the second image
-    // is no longer protected and should be removed.
-
-    cache->changeProtectionStatus(3, ImageCache::ProtectLast);
-    QCOMPARE(cache->image(3), image3);
-    QCOMPARE(cache->image(2), QuillImage());
-    QCOMPARE(cache->image(1), QuillImage());
+    // The "not protected" new image should not replace the "protected" one.
+    cache->insert(file, 2, image2, ImageCache::NotProtected);
+    QCOMPARE(cache->image(file, 2), image2);
+    QCOMPARE(cache->image(file, 1), image);
 
     delete filter;
     delete cache;

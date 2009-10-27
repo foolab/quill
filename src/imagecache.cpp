@@ -77,10 +77,10 @@ bool ImageCache::insert(void *file, int commandId,
 
     // Insert to protected
     else {
-        CacheImage *oldImage = m_cacheProtected.object(file);
+        CacheImage *oldImage = m_cacheProtected.take(file);
 
         // Move old one from not protected to protected
-        if (oldImage)
+        if (oldImage && (oldImage->key != commandId))
             m_cache.insert(oldImage->key, oldImage);
 
         m_cacheProtected.insert(file, cacheImage, 0);
@@ -93,7 +93,7 @@ bool ImageCache::insert(void *file, int commandId,
 
 bool ImageCache::protect(void *file, int commandId)
 {
-    CacheImage *image = m_cache.object(commandId);
+    CacheImage *image = m_cache.take(commandId);
 
     if (image) {
         m_cache.remove(commandId);
