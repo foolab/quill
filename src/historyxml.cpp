@@ -474,13 +474,13 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
 QVariant HistoryXml::recoverVariant(QVariant::Type variantType, QString string)
 {
     bool ok;
-    int toInt = QVariant::toInt(&ok);
+    int toInt = string.toInt(&ok);
     if (ok)
         return toInt;
     else {
-        double toDouble = QVariant::toDouble(&ok);
+        float toFloat = string.toFloat(&ok);
         if (ok)
-            return toDouble;
+            return toFloat;
     }
 
     switch (variantType) {
