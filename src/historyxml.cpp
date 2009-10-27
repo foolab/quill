@@ -473,12 +473,17 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
 
 QVariant HistoryXml::recoverVariant(QVariant::Type variantType, QString string)
 {
-    switch (variantType)
-    {
-    case QVariant::Int:
-        return QVariant(string.toInt());
-    case QVariant::Double:
-        return QVariant(string.toDouble());
+    bool ok;
+    int toInt = QVariant::toInt(&ok);
+    if (ok)
+        return toInt;
+    else {
+        double toDouble = QVariant::toDouble(&ok);
+        if (ok)
+            return toDouble;
+    }
+
+    switch (variantType) {
     case QVariant::String:
         return QVariant(string);
     case QVariant::Bool:
