@@ -55,6 +55,7 @@ void ut_thumbnail::initTestCase()
 {
     QuillImageFilter::registerAll();
     QDir().mkpath("/tmp/quill/thumbnails");
+    Unittests::generatePaletteImage().save("/tmp/test.png");
 }
 
 void ut_thumbnail::cleanupTestCase()
@@ -75,7 +76,7 @@ void ut_thumbnail::testName()
     quill->setThumbnailExtension("jpeg");
 
     QCOMPARE(file->thumbnailFileName(0),
-             QString("/home/user/8fac1f8e1858745191f2db8612565d3d.jpeg"));
+             QString("/home/user/6756f54a791d53a4ece8ebb70471b573.jpeg"));
 }
 
 void ut_thumbnail::testLoad()
