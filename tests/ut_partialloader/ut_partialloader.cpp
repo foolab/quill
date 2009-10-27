@@ -73,7 +73,7 @@ void ut_partialloader::testFilter()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    TileCache *tileCache = new TileCache();
+    TileCache *tileCache = new TileCache(100);
     QVERIFY(tileCache);
 
     QuillImageFilter *filter =

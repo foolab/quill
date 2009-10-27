@@ -44,7 +44,7 @@
 #include "unittests.h"
 #include "ut_imagecache.h"
 
-ut_imagecache::ut_imagecache()
+ut_imagecache::ut_imagecache(): cache(0)
 {
     QuillImageFilter::registerAll();
 }

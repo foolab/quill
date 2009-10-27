@@ -47,7 +47,7 @@
 #include "unittests.h"
 #include "ut_tilemap.h"
 
-ut_tilemap::ut_tilemap()
+ut_tilemap::ut_tilemap(): tileCache(0)
 {
 }
 

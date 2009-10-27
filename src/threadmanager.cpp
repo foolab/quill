@@ -199,6 +199,8 @@ bool ThreadManager::suggestTilingOverlayTask(QuillFile *file)
     QuillUndoStack *stack = file->stack();
     int tileId = stack->saveMap()->processNext(stack->command()->tileMap());
 
+    if(tileId < 0)
+        return false;
     // Should never happen.
     if (stack->command()->tileMap()->tile(tileId) == QuillImage())
         return false;

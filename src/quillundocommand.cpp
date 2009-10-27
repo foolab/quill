@@ -54,7 +54,7 @@ int QuillUndoCommand::m_nextId = 1;
 
 QuillUndoCommand::QuillUndoCommand(QuillImageFilter *filter) :
     QUndoCommand(), m_filter(filter), m_stack(0), m_core(0), m_index(0),
-    m_fullImageSize(QSize()), m_tileMap(0)
+    m_sessionId(0),m_fullImageSize(QSize()), m_tileMap(0)
 {
     // Guarantees that the id will always be unique (at least to maxint)
     m_id = m_nextId;
