@@ -54,14 +54,6 @@ public:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    /*void testInsert();
-    
-    void testCount(int number);
-    void testCountProtected(int number);
-    void testCacheCheck(int key,bool flag);
-    void testCacheProtectedCheck(int key, bool flag);
-    void testChangeProtectionStatus(int key, ImageCache::ProtectionStatus status);
-    int testCacheTotalCost();*/
 
     void testInsert2();
     void testInsertReplace();
