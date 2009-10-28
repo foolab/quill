@@ -49,8 +49,6 @@ class QuillFile;
 class ut_imagecache: public QObject
 {
 Q_OBJECT
-public:
-    ut_imagecache();
 
 private slots:
     void initTestCase();

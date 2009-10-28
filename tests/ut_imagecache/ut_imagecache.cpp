@@ -45,10 +45,6 @@
 #include "quillfile.h"
 #include "ut_imagecache.h"
 
-ut_imagecache::ut_imagecache(): cache(0)
-{
-}
-
 void ut_imagecache::initTestCase()
 {
     QuillImageFilter::registerAll();
