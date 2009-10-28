@@ -1,3 +1,10 @@
+libquill (1.091028.0) unstable; urgency=low
+
+  * Fixes: NB#143123 - <coverity> defects from libquill and quillimagefilter .
+  * Fixes: NB#143477 -libquill's cache limit blocks the panning.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 28 Oct 2009 15:20:00 +0200
+
 libquill (1.091027.0) unstable; urgency=low
 
   * Fixes: NB#143813 - Doing undo or redo operations does not save the images.
@@ -5,6 +12,7 @@ libquill (1.091027.0) unstable; urgency=low
   * Fixes: NB#142605 - The .pc file of libquill-dev is incorrect
 
  -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 27 Oct 2009 11:50:00 +0200
+
 
 libquill (1.091021.0) unstable; urgency=low
 
