@@ -82,6 +82,8 @@ void ut_quill::testQuillFile()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
+    quill->setEditHistoryCacheSize(0, 5);
+    quill->setEditHistoryCacheSize(1, 5);
 
     QuillFile *file = quill->file(testFile.fileName());
 
@@ -230,26 +232,33 @@ void ut_quill::testDisableCache()
     quill->releaseAndWait();
 
     QuillImage laterPreview = file->image();
-    QCOMPARE(laterPreview, file->image(0));
-    QCOMPARE(file->image(1), QuillImage());
-    QCOMPARE(file->image(2), QuillImage());
+    QVERIFY(Unittests::compareImage(laterPreview,
+                                    filter->apply(initialPreview)));
+    QVERIFY(Unittests::compareImage(file->image(0), laterPreview));
+    QVERIFY(file->image(1).isNull());
+    QVERIFY(file->image(2).isNull());
 
     // mid level
 
     quill->releaseAndWait();
 
     QuillImage laterMid = file->image();
-    QCOMPARE(laterMid, file->image(1));
-    QCOMPARE(file->image(2), QuillImage());
+    QVERIFY(Unittests::compareImage(laterMid,
+                                    filter->apply(initialMid)));
+    QVERIFY(Unittests::compareImage(file->image(0), laterPreview));
+    QVERIFY(Unittests::compareImage(file->image(1), laterMid));
+    QVERIFY(file->image(2).isNull());
 
     // high level
 
     quill->releaseAndWait();
 
     QuillImage laterFull = file->image();
-    QCOMPARE(laterPreview, file->image(0));
-    QCOMPARE(laterMid, file->image(1));
-    QCOMPARE(laterFull, file->image(2));
+    QVERIFY(Unittests::compareImage(laterFull,
+                                    filter->apply(initialFull)));
+    QVERIFY(Unittests::compareImage(file->image(0), laterPreview));
+    QVERIFY(Unittests::compareImage(file->image(1), laterMid));
+    QVERIFY(Unittests::compareImage(file->image(2), laterFull));
 
     // undo - preview is regenerated
 
@@ -257,9 +266,9 @@ void ut_quill::testDisableCache()
 
     quill->releaseAndWait();
 
-    QCOMPARE(initialPreview, file->image(0));
-    QCOMPARE(file->image(1), QuillImage());
-    QCOMPARE(file->image(2), QuillImage());
+    QVERIFY(Unittests::compareImage(file->image(0), initialPreview));
+    QVERIFY(file->image(1).isNull());
+    QVERIFY(file->image(2).isNull());
 
     // mid level regenerated
 
@@ -426,6 +435,7 @@ void ut_quill::testLoadSave()
 
     Quill *quill2 = new Quill(QSize(4, 1), Quill::ThreadingTest);
     quill2->setEditHistoryDirectory("/tmp/quill/history");
+    quill2->setEditHistoryCacheSize(0, 5);
 
     QuillFile *file2 = quill2->file(testFile.fileName(), "png");
 

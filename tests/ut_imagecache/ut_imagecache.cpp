@@ -228,8 +228,7 @@ void ut_imagecache::testInsert2()
     QtImageFilter *filter =
         QtImageFilterFactory::createImageFilter("BrightnessContrast");
     QVERIFY(filter);
-    filter->setOption(QuillImageFilter::Brightness,
-                      QVariant(16));
+    filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
     ImageCache *cache = new ImageCache(500);
     QuillImage image = Unittests::generatePaletteImage();
@@ -271,8 +270,7 @@ void ut_imagecache::testProtect()
     QtImageFilter *filter =
         QtImageFilterFactory::createImageFilter("BrightnessContrast");
     QVERIFY(filter);
-    filter->setOption(QuillImageFilter::Brightness,
-                      QVariant(16));
+    filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
     ImageCache *cache = new ImageCache(1);
     QuillImage image = Unittests::generatePaletteImage();
@@ -288,6 +286,36 @@ void ut_imagecache::testProtect()
     cache->insert(file, 2, image2, ImageCache::NotProtected);
     QCOMPARE(cache->image(file, 2), image2);
     QCOMPARE(cache->image(file, 1), image);
+
+    delete filter;
+    delete cache;
+}
+
+void ut_imagecache::testMultipleFile()
+{
+    QtImageFilter *filter =
+        QtImageFilterFactory::createImageFilter("BrightnessContrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(16));
+    void *file2 = (void*) filter;
+
+    ImageCache *cache = new ImageCache(0);
+    QuillImage image = Unittests::generatePaletteImage();
+    QuillImage image2 = filter->apply(image);
+    QuillImage image3 = filter->apply(image2);
+
+    cache->insert(file, 1, image, ImageCache::Protected);
+    QCOMPARE(cache->image(file, 1), image);
+
+    cache->insert(file2, 2, image2, ImageCache::Protected);
+    QCOMPARE(cache->image(file2, 2), image2);
+
+    cache->insert(file, 3, image3, ImageCache::Protected);
+    QCOMPARE(cache->image(file, 3), image3);
+
+    QCOMPARE(cache->image(file2, 2), image2);
+    // The old image should drop from the cache.
+    QCOMPARE(cache->image(file, 1), QuillImage());
 
     delete filter;
     delete cache;

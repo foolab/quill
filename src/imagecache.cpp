@@ -98,7 +98,7 @@ bool ImageCache::protect(void *file, int commandId)
     if (image) {
         m_cache.remove(commandId);
 
-        CacheImage *oldImage = m_cacheProtected.object(file);
+        CacheImage *oldImage = m_cacheProtected.take(file);
 
         // Move old one from not protected to protected
         if (oldImage != 0)

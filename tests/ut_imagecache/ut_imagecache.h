@@ -66,6 +66,7 @@ private slots:
     void testInsert2();
     void testInsertReplace();
     void testProtect();
+    void testMultipleFile();
 
 private:
     ImageCache *cache;

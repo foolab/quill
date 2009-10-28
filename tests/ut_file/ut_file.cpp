@@ -109,6 +109,7 @@ void ut_file::testOriginal()
 
     Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
     QVERIFY(quill);
+    quill->setFileLimit(0, 2);
     QuillFile *file = quill->file(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
@@ -140,6 +141,35 @@ void ut_file::testOriginal()
     QVERIFY(!file->exists());
     QVERIFY(!original->exists());
 
+    delete quill;
+}
+
+void ut_file::testFileLimit()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QTemporaryFile testFile2;
+    testFile2.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+    image.save(testFile2.fileName(), "png");
+
+    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
+    QVERIFY(quill);
+
+    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file2 = quill->file(testFile2.fileName(), "png");
+
+    QVERIFY(file->setDisplayLevel(0));
+    QVERIFY(!file2->setDisplayLevel(0));
+
+    quill->setFileLimit(0, 2);
+    QVERIFY(file2->setDisplayLevel(0));
+
+    quill->releaseAndWait();
+    quill->releaseAndWait();
     delete quill;
 }
 

@@ -16,7 +16,7 @@ SUBDIRS += \
            ut_quill \
            ut_tilemap \
            ut_savemap \
-#           ut_imagecache \
+           ut_imagecache \
            ut_command \
            ut_stack \
            ut_xml \

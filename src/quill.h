@@ -142,6 +142,10 @@ public:
       this command, it will fail, and a QuillFile::error() of type
       Quill::FileLimitExceeded will be emitted.
 
+      This limit can be modified at any time. Lowering the limit under
+      the number of files on the level is allowed; in this case, any
+      files already on the level will function normally.
+
       @param level Display level. Trying to set this limit on the full
       image level will fail, due to the limitations of the tile cache
       the limit for full images is always 1.
