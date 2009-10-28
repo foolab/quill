@@ -44,6 +44,7 @@
 #include <QuillImage>
 #include "imagecache.h"
 class ImageCache;
+class QuillFile;
 
 class ut_imagecache: public QObject
 {
@@ -54,22 +55,15 @@ public:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void testInsert();
-    void testDoubleInsert();
-    void testCount(int number);
-    void testCountProtected(int number);
-    void testCacheCheck(int key,bool flag);
-    void testCacheProtectedCheck(int key, bool flag);
-    void testChangeProtectionStatus(int key, ImageCache::ProtectionStatus status);
-    int testCacheTotalCost();
 
     void testInsert2();
-    void testChangeProtectionStatus2();
+    void testInsertReplace();
+    void testProtect();
+    void testMultipleFile();
 
 private:
-    ImageCache *cache;
     QuillImage image;
-
+    QuillFile *file;
 };
 
 #endif // TEST_LIBQUILL_UNDO_CACHE_H

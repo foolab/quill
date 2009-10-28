@@ -57,7 +57,6 @@ public:
 };
 
 QSize Quill::defaultViewPortSize = QSize(640, 400);
-int Quill::defaultCacheSize = 33000000;
 Quill *QuillPrivate::instance = 0;
 
 Quill::Quill(const QSize &viewPortSize,
@@ -107,9 +106,24 @@ void Quill::setSaveBufferSize(int size)
     priv->core->setSaveBufferSize(size);
 }
 
-void Quill::setCacheLimit(int level, int limit)
+void Quill::setFileLimit(int level, int limit)
 {
-    priv->core->setCacheLimit(level, limit);
+    priv->core->setFileLimit(level, limit);
+}
+
+int Quill::fileLimit(int level) const
+{
+    return priv->core->fileLimit(level);
+}
+
+void Quill::setEditHistoryCacheSize(int level, int limit)
+{
+    priv->core->setEditHistoryCacheSize(level, limit);
+}
+
+int Quill::editHistoryCacheSize(int level) const
+{
+    return priv->core->editHistoryCacheSize(level);
 }
 
 void Quill::setPreviewLevelCount(int count)

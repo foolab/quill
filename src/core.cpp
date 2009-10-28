@@ -61,8 +61,10 @@ Core::Core(const QSize &viewPortSize,
 {
     m_previewSize.append(viewPortSize);
     m_thumbnailDirectory.append(QString());
-    m_cache.append(new ImageCache(Quill::defaultCacheSize));
-    m_cache.append(new ImageCache(Quill::defaultCacheSize));
+    m_fileLimit.append(1);
+    m_fileLimit.append(1);
+    m_cache.append(new ImageCache(0));
+    m_cache.append(new ImageCache(0));
 }
 
 Core::~Core()
@@ -90,12 +92,14 @@ void Core::setPreviewLevelCount(int count)
     if (count > oldCount)
         for (int i = oldCount; i < count; i++) {
             m_previewSize.append(m_previewSize.last() * 2);
-            m_cache.append(new ImageCache(Quill::defaultCacheSize));
+            m_fileLimit.append(1);
+            m_cache.append(new ImageCache(0));
             m_thumbnailDirectory.append(QString());
         }
     else if (count < oldCount)
         for (int i = oldCount; i > count; i--) {
             m_previewSize.removeLast();
+            m_fileLimit.removeLast();
             delete m_cache.last();
             m_cache.removeLast();
             m_thumbnailDirectory.removeLast();
@@ -128,12 +132,33 @@ QSize Core::previewSize(int level) const
         return QSize();
 }
 
-void Core::setCacheLimit(int level, int limit)
+void Core::setFileLimit(int level, int limit)
+{
+    if ((level < 0) || (level >= m_fileLimit.count()))
+        return;
+
+    m_fileLimit[level] = limit;
+}
+
+int Core::fileLimit(int level) const
+{
+    if ((level >=0 ) && (level < m_fileLimit.count()))
+        return m_fileLimit[level];
+    else
+        return 0;
+}
+
+void Core::setEditHistoryCacheSize(int level, int limit)
 {
     if ((level < 0) || (level >= m_cache.count()))
         return;
 
-    m_cache[level]->setMaxCost(limit);
+    m_cache[level]->setMaxSize(limit);
+}
+
+int Core::editHistoryCacheSize(int level)
+{
+    return m_cache[level]->maxSize();
 }
 
 QuillFile *Core::file(const QString &fileName,
@@ -454,4 +479,15 @@ void Core::emitTileAvailable(QuillFile *file, int tileId)
     imageList.append(image);
 
     file->emitImageAvailable(imageList);
+}
+
+int Core::numFilesAtLevel(int level) const
+{
+    int n = 0;
+    for (QMap<QString, QuillFile*>::const_iterator file = m_files.begin();
+         file != m_files.end(); file++) {
+        if ((*file)->displayLevel() >= level)
+            n++;
+    }
+    return n;
 }

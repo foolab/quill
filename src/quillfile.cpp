@@ -158,13 +158,25 @@ bool QuillFile::isReadOnly() const
     return priv->readOnly;
 }
 
-void QuillFile::setDisplayLevel(int level)
+bool QuillFile::setDisplayLevel(int level)
 {
+    // Block if trying to raise display level over strict limits
+    for (int l=priv->displayLevel+1; l<=level; l++)
+        if (priv->core->numFilesAtLevel(l) >= priv->core->fileLimit(l)) {
+            // workaround of setError setting supported to false
+            bool prevSupported = priv->supported;
+            setError(Quill::ErrorFileLimitExceeded);
+            priv->supported = prevSupported;
+            return false;
+        }
     priv->displayLevel = level;
+
+    // setup stack here
     if (exists() && (level >= 0) && (priv->stack->count() == 0))
         priv->stack->load();
 
     priv->core->suggestNewTask();
+    return true;
 }
 
 int QuillFile::displayLevel() const

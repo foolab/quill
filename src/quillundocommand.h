@@ -117,6 +117,12 @@ public:
     void setImage(int level, const QuillImage &image);
 
     /*!
+      Protects all images. Useful when this command is set to current.
+     */
+
+    void protectImages();
+
+    /*!
       The full-size result image of the command
      */
     QuillImage fullImage() const;
