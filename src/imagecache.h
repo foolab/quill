@@ -48,6 +48,7 @@
 class QuillImage;
 class QString;
 class CacheImage;
+class QuillFile;
 
 class ImageCache: public QObject
 {
@@ -78,14 +79,14 @@ public:
       @param image the image to be inserted
       @param ProtectionStatus the status of protection for this image
      */
-    bool insert(void *file, int commandId,
+    bool insert(const QuillFile *file, int commandId,
                 const QuillImage &image,
                 ProtectionStatus status = NotProtected);
 
     /*!
       Returns the image stored in the cache.
      */
-    QuillImage image(void *file, int commandId) const;
+    QuillImage image(const QuillFile *file, int commandId) const;
 
     /*!
       Protect the image. This removes possible protection from any other
@@ -96,14 +97,14 @@ public:
 
       @param commandId the key of the image
      */
-    bool protect(void *file, int commandId);
+    bool protect(const QuillFile *file, int commandId);
 
     /*!
       Returns the command id of the image which is currently protected
       for the file.
      */
 
-    int protectedId(void *file) const;
+    int protectedId(const QuillFile *file) const;
 
     /*!
       Delete the image from the cache.
@@ -114,7 +115,7 @@ public:
       purposes only.
      */
 
-    bool remove(void *file, int commandId);
+    bool remove(const QuillFile *file, int commandId);
 
     /*!
       Purge from the cache all images related to a given file.
@@ -122,7 +123,7 @@ public:
       @param file pointer to the file object, used for comparison
       purposes only.
      */
-    bool purge(void *file);
+    bool purge(const QuillFile *file);
 
     /*!
       Change the max size of the cache.
@@ -139,7 +140,7 @@ public:
 private:
 
     QCache<int, CacheImage> m_cache;
-    QCache<void*, CacheImage> m_cacheProtected;
+    QCache<const QuillFile*, CacheImage> m_cacheProtected;
 };
 
 

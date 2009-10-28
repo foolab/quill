@@ -166,7 +166,7 @@ QuillUndoCommand *QuillUndoCommand::prev() const
 
 QuillImage QuillUndoCommand::image(int level) const
 {
-    return m_core->cache(level)->image((void*)m_stack->file(), m_id);
+    return m_core->cache(level)->image(m_stack->file(), m_id);
 }
 
 void QuillUndoCommand::setImage(int level, const QuillImage &image)
@@ -180,7 +180,7 @@ void QuillUndoCommand::setImage(int level, const QuillImage &image)
     // 3) or, the currently protected image is after the current state
 
     QuillUndoCommand *previousProtected =
-        m_stack->find(cache->protectedId((void*) m_stack->file()));
+        m_stack->find(cache->protectedId(m_stack->file()));
 
     if ((m_index < m_stack->index()) &&
         (!previousProtected ||
@@ -188,13 +188,13 @@ void QuillUndoCommand::setImage(int level, const QuillImage &image)
          (previousProtected->index() >= m_stack->index())))
         status = ImageCache::Protected;
 
-    cache->insert((void*) m_stack->file(), m_id, image, status);
+    cache->insert(m_stack->file(), m_id, image, status);
 }
 
 void QuillUndoCommand::protectImages()
 {
     for (int level=0; level<=m_core->previewLevelCount(); level++)
-        m_core->cache(level)->protect((void*) m_stack->file(), m_id);
+        m_core->cache(level)->protect(m_stack->file(), m_id);
 }
 
 QuillImage QuillUndoCommand::fullImage() const

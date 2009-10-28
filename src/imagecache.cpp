@@ -45,7 +45,7 @@ class CacheImage
 {
 public:
     QuillImage image;
-    void *file;
+    const QuillFile *file;
     int key;
 };
 
@@ -61,7 +61,7 @@ ImageCache::~ImageCache()
     // do it manually.
 }
 
-bool ImageCache::insert(void *file, int commandId,
+bool ImageCache::insert(const QuillFile *file, int commandId,
                         const QuillImage &image, ProtectionStatus status)
 {
     CacheImage *cacheImage = new CacheImage;
@@ -91,7 +91,7 @@ bool ImageCache::insert(void *file, int commandId,
     return result;
 }
 
-bool ImageCache::protect(void *file, int commandId)
+bool ImageCache::protect(const QuillFile *file, int commandId)
 {
     CacheImage *image = m_cache.take(commandId);
 
@@ -111,7 +111,7 @@ bool ImageCache::protect(void *file, int commandId)
         return false;
 }
 
-bool ImageCache::remove(void *file, int commandId)
+bool ImageCache::remove(const QuillFile *file, int commandId)
 {
     CacheImage *image = m_cache.object(commandId);
     if (image) {
@@ -129,7 +129,7 @@ bool ImageCache::remove(void *file, int commandId)
     return false;
 }
 
-bool ImageCache::purge(void *file)
+bool ImageCache::purge(const QuillFile *file)
 {
     CacheImage *image = m_cacheProtected.object(file);
     if (image) {
@@ -140,7 +140,7 @@ bool ImageCache::purge(void *file)
     return false;
 }
 
-QuillImage ImageCache::image(void* file, int key) const
+QuillImage ImageCache::image(const QuillFile *file, int key) const
 {
     if (m_cache.contains(key)) {
         CacheImage *image = m_cache.object(key);
@@ -154,7 +154,7 @@ QuillImage ImageCache::image(void* file, int key) const
     return QuillImage();
 }
 
-int ImageCache::protectedId(void* file) const
+int ImageCache::protectedId(const QuillFile *file) const
 {
     if (m_cacheProtected.contains(file)) {
         CacheImage *image = m_cacheProtected.object(file);

@@ -42,6 +42,7 @@
 #include <QDebug>
 #include <QuillImageFilter>
 #include "unittests.h"
+#include "quillfile.h"
 #include "ut_imagecache.h"
 
 ut_imagecache::ut_imagecache()
@@ -51,13 +52,12 @@ ut_imagecache::ut_imagecache()
 void ut_imagecache::initTestCase()
 {
     QuillImageFilter::registerAll();
-    cache = new ImageCache(500);
-    file = (void*) this;
+    file = new QuillFile(0);
 }
 
 void ut_imagecache::cleanupTestCase()
 {
-    delete cache;
+    delete file;
 }
 
 void ut_imagecache::testInsert2()
@@ -134,7 +134,7 @@ void ut_imagecache::testMultipleFile()
         QtImageFilterFactory::createImageFilter("BrightnessContrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
-    void *file2 = (void*) filter;
+    QuillFile *file2 = new QuillFile(0);
 
     ImageCache *cache = new ImageCache(0);
     QuillImage image = Unittests::generatePaletteImage();
@@ -156,6 +156,7 @@ void ut_imagecache::testMultipleFile()
 
     delete filter;
     delete cache;
+    delete file2;
 }
 
 int main ( int argc, char *argv[] ){
