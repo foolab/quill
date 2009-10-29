@@ -119,10 +119,8 @@ bool ImageCache::remove(const QuillFile *file, int commandId)
         return true;
     } else {
         image = m_cacheProtected.object(file);
-        if (image && (image->key == commandId)) {
-            m_cacheProtected.remove(file);
-            return true;
-        }
+        if (image && (image->key == commandId))
+            return m_cacheProtected.remove(file);
     }
     return false;
 }
