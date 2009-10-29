@@ -47,6 +47,7 @@
 #include "quillfile.h"
 #include "quill.h"
 #include "core.h"
+#include "imagecache.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "historyxml.h"
@@ -169,6 +170,13 @@ bool QuillFile::setDisplayLevel(int level)
             priv->supported = prevSupported;
             return false;
         }
+
+    // Purge images from cache if lowering display level here
+    // Exception: when save is in progress, leave the highest level
+    for (int l=priv->displayLevel; l>level; l--)
+        if ((l < priv->core->previewLevelCount()) || (!priv->saveInProgress))
+            priv->core->cache(l)->purge(this);
+
     priv->displayLevel = level;
 
     // setup stack here
@@ -516,6 +524,10 @@ void QuillFile::prepareSave()
 void QuillFile::concludeSave()
 {
     priv->stack->concludeSave();
+
+    // If save is concluded, purge any full images still in memory.
+    if (priv->displayLevel < priv->core->previewLevelCount())
+        priv->core->cache(priv->core->previewLevelCount())->purge(this);
 
     const QString temporaryName = priv->temporaryFile->fileName();
     priv->temporaryFile->close();

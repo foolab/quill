@@ -77,6 +77,12 @@ QuillUndoCommand::~QuillUndoCommand()
     if (!m_core || (m_core->allowDelete(m_filter)))
         delete m_filter;
 
+    // Eject any images from the cache
+
+    if (m_core)
+        for (int level=0; level<m_core->previewLevelCount(); level++)
+            m_core->cache(level)->remove(m_stack->file(), m_id);
+
     // The tile map becomes property of the command
 
     delete m_tileMap;

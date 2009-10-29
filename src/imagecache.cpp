@@ -113,16 +113,14 @@ bool ImageCache::protect(const QuillFile *file, int commandId)
 
 bool ImageCache::remove(const QuillFile *file, int commandId)
 {
-    CacheImage *image = m_cache.object(commandId);
+    CacheImage *image = m_cache.take(commandId);
     if (image) {
-        m_cache.remove(commandId);
         delete image;
         return true;
     } else {
         image = m_cacheProtected.object(file);
-        if (image && image->key == commandId) {
+        if (image && (image->key == commandId)) {
             m_cacheProtected.remove(file);
-            delete image;
             return true;
         }
     }
@@ -131,13 +129,7 @@ bool ImageCache::remove(const QuillFile *file, int commandId)
 
 bool ImageCache::purge(const QuillFile *file)
 {
-    CacheImage *image = m_cacheProtected.object(file);
-    if (image) {
-        m_cacheProtected.remove(file);
-        delete image;
-        return true;
-    }
-    return false;
+    return m_cacheProtected.remove(file);
 }
 
 QuillImage ImageCache::image(const QuillFile *file, int key) const
