@@ -153,14 +153,16 @@ void QuillUndoStack::undo()
         if ((command()->filter()->name() == "Load") && (m_stack->index() > 2))
             m_stack->undo();
 
-        int sessionId = command()->sessionId();
+        int referenceSessionId = command()->sessionId();
 
         // If we are not currently recording a session, an entire
         // session should be undone at once.
-        do
+        if ((m_sessionId != 0) || (referenceSessionId == 0))
             m_stack->undo();
-        while ((m_sessionId == 0) && (sessionId != 0) &&
-               (command()->sessionId() == sessionId));
+        else
+            do
+                m_stack->undo();
+            while (command()->sessionId() == referenceSessionId);
 
         // If we have any stored images in cache, move them to protected
         command()->protectImages();

@@ -67,9 +67,12 @@ public:
 
     /*!
       Starts an undo session. When an undo session is in progress,
-      no undo/redo outside the session is permitted. A closed
-      undo session will be treated as one operation by undo() and
-      redo().
+      no undo/redo outside the session is permitted. A closed undo
+      session will be treated as one operation by undo() and
+      redo(). Undo sessions can be thought as a more generic
+      replacement of QUndoCommand::mergeWith(). Unlike it, a
+      session can also combine different kinds of filters and requires
+      no support from the QUndoCommand subclass implementation.
      */
 
     void startSession();
