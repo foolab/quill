@@ -52,9 +52,9 @@
 
 int QuillUndoCommand::m_nextId = 1;
 
-QuillUndoCommand::QuillUndoCommand(QuillImageFilter *filter) :
-    QUndoCommand(), m_filter(filter), m_stack(0), m_core(0), m_index(0),
-    m_sessionId(0),m_fullImageSize(QSize()), m_tileMap(0)
+QuillUndoCommand::QuillUndoCommand(QuillUndoStack *parent, Core *core) :
+    QUndoCommand(), m_filter(0), m_stack(parent), m_core(core),
+    m_index(0), m_sessionId(0),m_fullImageSize(QSize()), m_tileMap(0)
 {
     // Guarantees that the id will always be unique (at least to maxint)
     m_id = m_nextId;
@@ -66,7 +66,7 @@ QuillUndoCommand::~QuillUndoCommand()
     // Deleting a command with the intermediate load filter
     // forces save when closing
 
-    if (m_stack && (m_filter->name() == "Load"))
+    if (m_stack && m_filter && (m_filter->name() == "Load"))
         m_stack->setSavedIndex(-1);
 
     // If the background thread is currently running the filter,
@@ -74,7 +74,7 @@ QuillUndoCommand::~QuillUndoCommand()
     // Instead, ThreadManager::calculationFinished() will handle this
     // after the calculation has finished.
 
-    if (!m_core || (m_core->allowDelete(m_filter)))
+    if (m_filter && (!m_core || (m_core->allowDelete(m_filter))))
         delete m_filter;
 
     // Eject any images from the cache
@@ -100,46 +100,12 @@ void QuillUndoCommand::setFilter(QuillImageFilter* filter)
 
 void QuillUndoCommand::redo()
 {
-    // calculate target full image size
-
-    QuillImage previous;
-    QSize previousFullSize, fullSize;
-
-    if (m_stack->index() == 0) {
-        // default preview image size defined here
-
-        previous = QuillImage(QImage(m_core->previewSize(0),
-                                     QuillImage::Format_RGB32));
-        previousFullSize = m_filter->newFullImageSize(previousFullSize);
-    }
-    else {
-        previous = prev()->image(0);
-        previousFullSize = prev()->fullImageSize();
-    }
-
-    if (previousFullSize.isEmpty())
-        m_stack->file()->setError(Quill::ErrorFormatUnsupported);
-
-    previous.setFullImageSize(previousFullSize);
-    previous.setArea(QRect(QPoint(0, 0), previousFullSize));
-
-    // Update full image size
-    m_fullImageSize = m_filter->newFullImageSize(previousFullSize);
+    // no need to do anything here
 }
 
 void QuillUndoCommand::undo()
 {
     // no need to do anything here
-}
-
-void QuillUndoCommand::setStack(QuillUndoStack *stack)
-{
-    m_stack = stack;
-}
-
-void QuillUndoCommand::setCore(Core *core)
-{
-    m_core = core;
 }
 
 QuillUndoStack *QuillUndoCommand::stack() const
@@ -236,6 +202,11 @@ QList<QuillImage> QuillUndoCommand::allImageLevels(int maxLevel) const
             list.append(image(i));
 
     return list;
+}
+
+void QuillUndoCommand::setFullImageSize(const QSize &size)
+{
+    m_fullImageSize = size;
 }
 
 QSize QuillUndoCommand::fullImageSize() const

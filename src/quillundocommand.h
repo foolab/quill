@@ -56,7 +56,7 @@ class QuillUndoCommand : public QUndoCommand
 {
 
 public:
-    QuillUndoCommand(QuillImageFilter *filter);
+    QuillUndoCommand(QuillUndoStack *parent, Core *core);
     ~QuillUndoCommand();
 
     QuillImageFilter *filter() const;
@@ -80,12 +80,10 @@ public:
     void undo();
 
     /*!
-      To be used by QuillUndoStack only!
+      Returns the stack of the command.
      */
 
     QuillUndoStack *stack() const;
-    void setStack(QuillUndoStack *stack);
-    void setCore(Core *core);
 
     int index() const;
     void setIndex(int index);
@@ -126,6 +124,11 @@ public:
       The full-size result image of the command
      */
     QuillImage fullImage() const;
+
+    /*!
+      Setting the full image size of the command
+     */
+    void setFullImageSize(const QSize &size);
 
     /*!
       The full image size - possibly pre-calculated
@@ -189,7 +192,7 @@ private:
     int m_id;
     QuillImageFilter* m_filter;
     QuillUndoStack* m_stack;
-    Core *m_core;
+    const Core *m_core;
 
     /*!
       Position of the command in the stack.

@@ -91,13 +91,28 @@ void QuillUndoStack::add(QuillImageFilter *filter)
 {
     qDebug() << "Command" << filter->name() << "added to stack.";
 
-    QuillUndoCommand *cmd = new QuillUndoCommand(filter);
+    QuillUndoCommand *cmd = new QuillUndoCommand(this, m_core);
 
-    cmd->setStack(this);
+    cmd->setFilter(filter);
     cmd->setIndex(index());
     if (cmd->filter()->name() != "Load")
         cmd->setSessionId(m_sessionId);
-    cmd->setCore(m_core);
+
+    // full image size
+
+    QSize previousFullSize;
+
+    if (index() == 0)
+        previousFullSize = QSize();
+    else
+        previousFullSize = command()->fullImageSize();
+
+    QSize fullSize = filter->newFullImageSize(previousFullSize);
+
+    if (fullSize.isEmpty())
+        m_file->setError(Quill::ErrorFormatUnsupported);
+
+    cmd->setFullImageSize(fullSize);
 
     // tile map
     if (!m_core->defaultTileSize().isEmpty()) {
@@ -319,8 +334,8 @@ void QuillUndoStack::prepareSave(const QString &fileName)
     saveFilter->setOption(QuillImageFilter::FileFormat,
                           QVariant(m_file->targetFormat()));
 
-    m_saveCommand = new QuillUndoCommand(saveFilter);
-    m_saveCommand->setStack(this);
+    m_saveCommand = new QuillUndoCommand(this, m_core);
+    m_saveCommand->setFilter(saveFilter);
 
     if (!m_core->defaultTileSize().isEmpty()) {
         saveFilter->setOption(QuillImageFilter::TileCount,
