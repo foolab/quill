@@ -235,7 +235,8 @@ private:
     Core *m_core;
     QUndoStack *m_stack;
     QuillFile *m_file;
-    int m_sessionId, m_nextSessionId;
+    bool m_isSessionRecording;
+    int m_recordingSessionId, m_nextSessionId;
     int m_savedIndex;
     QuillUndoCommand *m_saveCommand;
     SaveMap *m_saveMap;

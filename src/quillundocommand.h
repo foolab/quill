@@ -161,18 +161,32 @@ public:
     QSize targetPreviewSize(int level) const;
 
     /*!
-      Sets the session id for the command. Commands with the same
-      session id will undo and redo together.
+      Makes the command part of a session, and sets the session id
+      for the command. Commands with the same session id will undo and
+      redo together.
      */
 
     void setSessionId(int id);
 
     /*!
       Gets the session id for the command. Commands with the same
-      session id will undo and redo together.
+      session id will undo and redo together. If the command is not
+      part of any session, returns 0; see also belongsToSession().
      */
 
     int sessionId() const;
+
+    /*!
+      Returns true if the command is part of any session.
+     */
+
+    bool belongsToSession() const;
+
+    /*!
+      Returns true if the command is part of the given session.
+     */
+
+    bool belongsToSession(int id) const;
 
     /*!
       Sets the tile map for the command.
@@ -199,6 +213,8 @@ private:
      */
 
     int m_index;
+
+    int m_belongsToSession;
 
     /*!
       Session id (see QuillUndoStack::startSession())

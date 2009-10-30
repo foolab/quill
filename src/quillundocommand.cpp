@@ -54,7 +54,8 @@ int QuillUndoCommand::m_nextId = 1;
 
 QuillUndoCommand::QuillUndoCommand(QuillUndoStack *parent, Core *core) :
     QUndoCommand(), m_filter(0), m_stack(parent), m_core(core),
-    m_index(0), m_sessionId(0),m_fullImageSize(QSize()), m_tileMap(0)
+    m_index(0), m_belongsToSession(0), m_sessionId(0),
+    m_fullImageSize(QSize()), m_tileMap(0)
 {
     // Guarantees that the id will always be unique (at least to maxint)
     m_id = m_nextId;
@@ -237,12 +238,23 @@ QSize QuillUndoCommand::targetPreviewSize(int level) const
 
 void QuillUndoCommand::setSessionId(int id)
 {
+    m_belongsToSession = true;
     m_sessionId = id;
 }
 
 int QuillUndoCommand::sessionId() const
 {
     return m_sessionId;
+}
+
+bool QuillUndoCommand::belongsToSession() const
+{
+    return m_belongsToSession;
+}
+
+bool QuillUndoCommand::belongsToSession(int id) const
+{
+    return (m_belongsToSession && m_sessionId == id);
 }
 
 void QuillUndoCommand::setTileMap(TileMap *map)
