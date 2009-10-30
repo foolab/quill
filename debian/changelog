@@ -1,3 +1,8 @@
+libquill (1.091029.0) unstable; urgency=low
+  * Fixed memory handling from previous.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 29 Oct 2009 10:55:00 +0200
+
 libquill (1.091028.0) unstable; urgency=low
 
   * Fixes: NB#143123 - <coverity> defects from libquill and quillimagefilter .
