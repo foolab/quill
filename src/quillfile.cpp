@@ -523,8 +523,6 @@ void QuillFile::prepareSave()
 
 void QuillFile::concludeSave()
 {
-    priv->stack->concludeSave();
-
     // If save is concluded, purge any full images still in memory.
     if (priv->displayLevel < priv->core->previewLevelCount())
         priv->core->cache(priv->core->previewLevelCount())->purge(this);
@@ -545,6 +543,8 @@ void QuillFile::concludeSave()
 
     QuillFile::overwritingCopy(temporaryName,
                                priv->fileName);
+
+    priv->stack->concludeSave();
 
     writeEditHistory(HistoryXml::encode(this));
     removeThumbnails();

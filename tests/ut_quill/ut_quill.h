@@ -73,6 +73,8 @@ private slots:
 
     void testExport();
     void testExportWithRedoHistory();
+
+    void testUseAfterSave();
 };
 
 #endif  // _UT_QUILL_H_

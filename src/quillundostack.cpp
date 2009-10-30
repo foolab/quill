@@ -73,10 +73,8 @@ QuillFile* QuillUndoStack::file()
     return m_file;
 }
 
-void QuillUndoStack::load()
+void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 {
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Load");
     QFile loadFile(m_file->originalFileName());
     if (loadFile.exists() && (loadFile.size() > 0))
         filter->setOption(QuillImageFilter::FileName,
@@ -84,6 +82,13 @@ void QuillUndoStack::load()
     else
         filter->setOption(QuillImageFilter::FileName,
                           m_file->fileName());
+}
+
+void QuillUndoStack::load()
+{
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("Load");
+    setInitialLoadFilter(filter);
     add(filter);
 }
 
@@ -333,6 +338,10 @@ void QuillUndoStack::prepareSave(const QString &fileName)
 void QuillUndoStack::concludeSave()
 {
     m_savedIndex = command()->index();
+
+    // Update initial load filter to point to modified file
+    if (m_stack->command(0))
+        setInitialLoadFilter(command(0)->filter());
 
     if (!m_core->defaultTileSize().isEmpty()) {
         delete m_saveCommand;
