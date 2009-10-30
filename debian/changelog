@@ -1,3 +1,9 @@
+libquill (1.091030.0) unstable; urgency=low
+  * Fixed file reopening immediately after save.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 30 Oct 2009 14:15:00 +0200
+
+
 libquill (1.091029.0) unstable; urgency=low
   * Fixed memory handling from previous.
 
