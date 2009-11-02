@@ -101,6 +101,9 @@ QuillImageFilter *SaveMap::addToBuffer(int index)
     filter->setOption(QuillImageFilter::Background,
                       QVariant(QImage(m_buffer)));
 
+    // So that implicit sharing does not copy the buffer
+    m_buffer = QImage();
+
     return filter;
 }
 
