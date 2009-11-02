@@ -101,12 +101,12 @@ void QuillUndoCommand::setFilter(QuillImageFilter* filter)
 
 void QuillUndoCommand::redo()
 {
-    // no need to do anything here
+    // no need to do anything here - see QuillUndoStack::redo()
 }
 
 void QuillUndoCommand::undo()
 {
-    // no need to do anything here
+    // no need to do anything here - see QuillUndoStack::undo()
 }
 
 QuillUndoStack *QuillUndoCommand::stack() const

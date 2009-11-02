@@ -167,6 +167,8 @@ void QuillUndoStack::undo()
         else m_stack->undo();
 
         // If we have any stored images in cache, move them to protected
+        // This is here instead of command::undo() so that intermediate steps
+        // need not be protected.
         command()->protectImages();
     }
 }
@@ -206,6 +208,8 @@ void QuillUndoStack::redo()
             m_stack->redo();
 
         // If we have any stored images in cache, move them to protected
+        // This is here instead of command::redo() so that intermediate steps
+        // need not be protected.
         command()->protectImages();
     }
 }
