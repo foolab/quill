@@ -56,7 +56,7 @@ class QuillUndoCommand : public QUndoCommand
 {
 
 public:
-    QuillUndoCommand(QuillImageFilter *filter);
+    QuillUndoCommand(QuillUndoStack *parent, Core *core);
     ~QuillUndoCommand();
 
     QuillImageFilter *filter() const;
@@ -80,12 +80,10 @@ public:
     void undo();
 
     /*!
-      To be used by QuillUndoStack only!
+      Returns the stack of the command.
      */
 
     QuillUndoStack *stack() const;
-    void setStack(QuillUndoStack *stack);
-    void setCore(Core *core);
 
     int index() const;
     void setIndex(int index);
@@ -128,6 +126,11 @@ public:
     QuillImage fullImage() const;
 
     /*!
+      Setting the full image size of the command
+     */
+    void setFullImageSize(const QSize &size);
+
+    /*!
       The full image size - possibly pre-calculated
      */
     QSize fullImageSize() const;
@@ -158,18 +161,32 @@ public:
     QSize targetPreviewSize(int level) const;
 
     /*!
-      Sets the session id for the command. Commands with the same
-      session id will undo and redo together.
+      Makes the command part of a session, and sets the session id
+      for the command. Commands with the same session id will undo and
+      redo together.
      */
 
     void setSessionId(int id);
 
     /*!
       Gets the session id for the command. Commands with the same
-      session id will undo and redo together.
+      session id will undo and redo together. If the command is not
+      part of any session, returns 0; see also belongsToSession().
      */
 
     int sessionId() const;
+
+    /*!
+      Returns true if the command is part of any session.
+     */
+
+    bool belongsToSession() const;
+
+    /*!
+      Returns true if the command is part of the given session.
+     */
+
+    bool belongsToSession(int id) const;
 
     /*!
       Sets the tile map for the command.
@@ -189,13 +206,15 @@ private:
     int m_id;
     QuillImageFilter* m_filter;
     QuillUndoStack* m_stack;
-    Core *m_core;
+    const Core *m_core;
 
     /*!
       Position of the command in the stack.
      */
 
     int m_index;
+
+    int m_belongsToSession;
 
     /*!
       Session id (see QuillUndoStack::startSession())

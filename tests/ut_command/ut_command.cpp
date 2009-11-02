@@ -54,10 +54,12 @@ ut_command::ut_command()
 void ut_command::initTestCase()
 {
     QuillImageFilter::registerAll();
+    stack = new QuillUndoStack(0, 0);
 }
 
 void ut_command::cleanupTestCase()
 {
+    delete stack;
 }
 
 void ut_command::testFilter()
@@ -66,8 +68,10 @@ void ut_command::testFilter()
         QuillImageFilterFactory::createImageFilter("BrightnessContrast");
     QVERIFY(filter);
 
-    QuillUndoCommand *command = new QuillUndoCommand(filter);
+    QuillUndoCommand *command = new QuillUndoCommand(stack, 0);
     QVERIFY(command);
+
+    command->setFilter(filter);
 
     QCOMPARE(filter, command->filter());
 
@@ -76,9 +80,7 @@ void ut_command::testFilter()
 
 void ut_command::testIndex()
 {
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
-    QuillUndoCommand *command = new QuillUndoCommand(filter);
+    QuillUndoCommand *command = new QuillUndoCommand(stack, 0);
     command->setIndex(11);
 
     QCOMPARE(command->index(), 11);
@@ -88,13 +90,8 @@ void ut_command::testIndex()
 
 void ut_command::testStackPointer()
 {
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
-    QuillUndoCommand *command = new QuillUndoCommand(filter);
+    QuillUndoCommand *command = new QuillUndoCommand(stack, 0);
 
-    QuillUndoStack *stack = new QuillUndoStack(0, 0);
-
-    command->setStack(stack);
     QCOMPARE(command->stack(), stack);
 
     delete command;

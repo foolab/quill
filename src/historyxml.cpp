@@ -114,23 +114,27 @@ QByteArray HistoryXml::encode(QList<QuillFile *> files)
         writer.writeTextElement("", "SavedIndex",
                                 QString::number(saveIndex));
 
+        bool isSession = false;;
         int sessionId = 0;
 
         for (int i = 0; i < stack->count(); i++)
             if (stack->command(i)->filter()->name() != "Load")
             {
-                if (stack->command(i)->sessionId() != sessionId) {
-                    if (sessionId != 0)
-                        writer.writeEndElement();
+                if (isSession &&
+                    !stack->command(i)->belongsToSession(sessionId)) {
+                    writer.writeEndElement();
+                    isSession = false;
+                }
+                if (!isSession && stack->command(i)->belongsToSession()) {
+                    writer.writeStartElement("", "Session");
+                    isSession = true;
                     sessionId = stack->command(i)->sessionId();
-                    if (sessionId != 0)
-                        writer.writeStartElement("", "Session");
                 }
 
                 writeFilter(stack->command(i)->filter(), &writer);
             }
 
-        if (sessionId != 0)
+        if (isSession)
             writer.writeEndElement();
 
         writer.writeEndElement();
