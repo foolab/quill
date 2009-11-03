@@ -293,6 +293,11 @@ QuillImage QuillFile::image(int level) const
     return priv->stack->image(level);
 }
 
+void QuillFile::setImage(int level, const QuillImage &image)
+{
+    priv->stack->setImage(level, image);
+}
+
 QList<QuillImage> QuillFile::allImageLevels() const
 {
     if (!priv->exists || !priv->stack->command())

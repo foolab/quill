@@ -60,6 +60,8 @@ private slots:
     void testUndoRedoDuringSessionRecording();
     void testSessionUndoRedo();
     void testSessionSaveLoad();
+
+    void testSetImage();
 };
 
 #endif  // TEST_LIBQUILL_UNDO_COMMAND_STACK_H

@@ -264,6 +264,16 @@ public:
     virtual QList<QuillImage> allImageLevels() const;
 
     /*!
+      Sets the image representation of the current state of the
+      file. The image is not protected; it might be overwritten or
+      dropped at any time. The specific parameters (full image size)
+      in QuillImage are currently ignored. This can currently only modify
+      a full image or a preview, not tiles.
+    */
+
+    virtual void setImage(int level, const QuillImage &image);
+
+    /*!
       Returns the full image size, in pixels, of the current state of the file.
     */
 
@@ -365,6 +375,13 @@ public:
     */
 
     virtual QuillFile *original();
+
+    /*!
+      Should be used to notify Quill if there are changes in the
+      source image file.
+     */
+
+    void sourceChanged();
 
     /*!
       Immediately triggers the imageAvailable() signal. Internal use only.

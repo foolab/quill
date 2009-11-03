@@ -319,6 +319,39 @@ void ut_stack::testSessionSaveLoad()
     delete quill2;
 }
 
+void ut_stack::testSetImage()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QImage image = Unittests::generatePaletteImage();
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+    QuillImage resultImage = filter->apply(image);
+
+    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
+    QVERIFY(quill);
+    quill->setEditHistoryDirectory("/tmp/quill/history");
+    //    quill->setEditHistoryCacheSize(0, 2);
+
+    QuillFile *file = quill->file(testFile.fileName(), "png");
+
+    file->setDisplayLevel(0);
+    file->setImage(0, image);
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+
+    file->runFilter(filter);
+    quill->releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), resultImage));
+
+    delete quill;
+}
+
 int main ( int argc, char *argv[] ){
     QApplication app( argc, argv );
     ut_stack test;

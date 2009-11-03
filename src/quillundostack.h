@@ -128,6 +128,12 @@ public:
     QuillImage image(int level) const;
 
     /*!
+      Allows forcibly setting an image value from outside.
+    */
+
+    void setImage(int level, const QuillImage &image) const;
+
+    /*!
       Gets the current image in all available image levels.
     */
     QList<QuillImage> allImageLevels(int maxLevel) const;
