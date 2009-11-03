@@ -192,8 +192,7 @@ public:
     TileCache* tileCache() const;
 
 private:
-    TileMapPrivate *priv;
-
+    
     /*!
       If the corresponding tile area is valid (ie. has at least one pixel.)
      */

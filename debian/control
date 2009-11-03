@@ -15,13 +15,13 @@ Description: libquill library
 Package: libquill-dev
 Section: libdevel
 Architecture: all
-Depends: libquill1,libquillimagefilter-dev
+Depends: libquill1 (= ${binary:Version}),libquillimagefilter-dev
 Description: libquill development headers
 
 Package: libquill-doc
 Section: doc
 Architecture: all
-Depends: libquill1 (>= ${source:Version})
+Depends: libquill1 (= ${binary:Version})
 Description: Documentation for libquill
 
 Package: libquill1-dbg
@@ -34,7 +34,7 @@ Description: libquill debug symbols
 Package: libquill-tests
 Section: devel
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqtcore4, libqtgui4, libquill1, libquillimagefilter1, testrunner
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqtcore4, libqtgui4, libquill1 (= ${binary:Version}), libquillimagefilter1, testrunner
 Description: libquill unit tests
  This is the image editor's unit tests and it includes libquill, quillimagefilter and qtimagefilter
 

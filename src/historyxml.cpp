@@ -61,7 +61,10 @@ QByteArray HistoryXml::encode(QuillFile *file)
 QuillFile *HistoryXml::decodeOne(const QByteArray & array, Core *core)
 {
     QList<QuillFile *> fileList = HistoryXml::decode(array, core);
-    return fileList.first();
+    if (!fileList.isEmpty())
+        return fileList.first();
+    else
+        return 0;
 }
 
 
@@ -111,23 +114,27 @@ QByteArray HistoryXml::encode(QList<QuillFile *> files)
         writer.writeTextElement("", "SavedIndex",
                                 QString::number(saveIndex));
 
+        bool isSession = false;;
         int sessionId = 0;
 
         for (int i = 0; i < stack->count(); i++)
             if (stack->command(i)->filter()->name() != "Load")
             {
-                if (stack->command(i)->sessionId() != sessionId) {
-                    if (sessionId != 0)
-                        writer.writeEndElement();
+                if (isSession &&
+                    !stack->command(i)->belongsToSession(sessionId)) {
+                    writer.writeEndElement();
+                    isSession = false;
+                }
+                if (!isSession && stack->command(i)->belongsToSession()) {
+                    writer.writeStartElement("", "Session");
+                    isSession = true;
                     sessionId = stack->command(i)->sessionId();
-                    if (sessionId != 0)
-                        writer.writeStartElement("", "Session");
                 }
 
                 writeFilter(stack->command(i)->filter(), &writer);
             }
 
-        if (sessionId != 0)
+        if (isSession)
             writer.writeEndElement();
 
         writer.writeEndElement();
@@ -470,12 +477,17 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
 
 QVariant HistoryXml::recoverVariant(QVariant::Type variantType, QString string)
 {
-    switch (variantType)
-    {
-    case QVariant::Int:
-        return QVariant(string.toInt());
-    case QVariant::Double:
-        return QVariant(string.toDouble());
+    bool ok;
+    int toInt = string.toInt(&ok);
+    if (ok)
+        return toInt;
+    else {
+        float toFloat = string.toFloat(&ok);
+        if (ok)
+            return toFloat;
+    }
+
+    switch (variantType) {
     case QVariant::String:
         return QVariant(string);
     case QVariant::Bool:

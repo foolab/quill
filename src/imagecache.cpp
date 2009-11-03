@@ -41,15 +41,18 @@
 #include <QDebug>
 #include "imagecache.h"
 
-const ImageCache::KeyListPosition ImageCache::firstPosition = 0;
-const ImageCache::KeyListPosition ImageCache::secondPosition = 1;
-const ImageCache::KeyListPosition ImageCache::emptyPosition = -1;
+class CacheImage
+{
+public:
+    QuillImage image;
+    const QuillFile *file;
+    int key;
+};
 
 ImageCache::ImageCache(int maxCost)
 {
-    keyList << emptyPosition << emptyPosition;
-    cacheProtected.setMaxCost(1000000000);
-    cache.setMaxCost(maxCost);
+    m_cache.setMaxCost(maxCost);
+    m_cacheProtected.setMaxCost(1);
 }
 
 ImageCache::~ImageCache()
@@ -58,171 +61,104 @@ ImageCache::~ImageCache()
     // do it manually.
 }
 
-bool ImageCache::insertImage(int key, const QuillImage &image, ImageCache::ProtectionStatus status)
+bool ImageCache::insert(const QuillFile *file, int commandId,
+                        const QuillImage &image, ProtectionStatus status)
 {
-    QuillImage *imagePointer = new QuillImage(image);
+    CacheImage *cacheImage = new CacheImage;
+    cacheImage->image = image;
+    cacheImage->file = file;
+    cacheImage->key = commandId;
 
-    bool result=false;
-    int cost = imagePointer->numBytes();
-    //case 1: we just insert image to cache
-    if(status == ImageCache::NotProtected)
-        result = cache.insert(key,imagePointer,cost);
-
-    //case 2: we need to take the first one from protected
-    else if (status == ImageCache::ProtectFirst){
-        if ((keyList.first() != emptyPosition) &&
-            (keyList.last() != keyList.first()))
-            deleteFromProtected(firstPosition);
-
-        result = cacheProtected.insert(key, imagePointer, cost);
-
-        //we update the keys in Qlist
-        if (result)
-            setKey(firstPosition, key);
-    }
-    //case 3: we need to take the last one from not delete
-    else if (status == ImageCache::ProtectLast){
-        if ((keyList.last() != emptyPosition) &&
-            (keyList.last() != keyList.first()))
-            deleteFromProtected(secondPosition);
-
-        result = cacheProtected.insert(key, imagePointer, cost);
-
-        if(result)
-            setKey(secondPosition, key);
-    }
-    return result;
-}
-
-bool ImageCache::changeProtectionStatus(int key, ImageCache::ProtectionStatus status)
-{
-    bool result=false;
-    if (cache.contains(key)){
-	//we need to add cost
-        if (status == ImageCache::ProtectFirst){
-            result = internalChangeProtection(firstPosition,key);
-            return result;
-        }
-        else {
-            result = internalChangeProtection(secondPosition,key);
-            return result;
-        }
-    }
-    //change protection ->not protection or still protection (both last and first)
-    else if (cacheProtected.contains(key)){
-        KeyListPosition index = keyList.indexOf(key);
-
-        //last and first
-        if(status == ImageCache::ProtectFirst){
-            //there is one image in first place
-            if (keyList.last() == key){
-                if (keyList.first() != key && keyList.first() != emptyPosition)
-                    result = deleteFromProtected(firstPosition);
-
-                setKey(firstPosition, key);
-            }
-            return result;
-        }
-        else if (status == ImageCache::ProtectLast){
-            if (keyList.first() == key){
-                if (keyList.last() != key && keyList.last() != emptyPosition)
-                    result = deleteFromProtected(secondPosition);
-
-                setKey(secondPosition, key);
-            }
-            return result;
-        }
-        else {
-            result = deleteFromProtected(index);
-            setKey(index, emptyPosition);
-            return result;
-        }
-    }
-    return result;
-}
-
-
-int  ImageCache::countCache() const
-{
-    return cache.count();
-}
-
-int ImageCache::countCacheProtected() const
-{
-    return cacheProtected.count();
-}
-
-bool ImageCache::cacheCheck(int key) const
-{
-    return cache.contains(key);
-}
-
-bool ImageCache::cacheProtectedCheck(int key) const
-{
-    return cacheProtected.contains(key);
-}
-
-QuillImage ImageCache::image(int key) const
-{
-    //check the cache
-    if(cacheProtected.contains(key)){
-        QuillImage *image = cacheProtected.object(key);
-        return *image;
-    }
-    else if (cache.contains(key)){
-        QuillImage *image = cache.object(key);
-        return *image;
-    }
-    else
-        return QuillImage();
-}
-
-int ImageCache::cacheTotalCost() const
-{
-    return cache.totalCost();
-}
-
-QList<int> ImageCache::checkKeys() const
-{
-    return cache.keys();
-}
-
-void ImageCache::setMaxCost(int maxCost)
-{
-    cache.setMaxCost(maxCost);
-}
-
-bool ImageCache::internalChangeProtection(int position, int key)
-{
     bool result = false;
-    QuillImage *image1 = cacheProtected.take(keyList.at(position));
-    int size1 = image1->numBytes();
-    result = cache.insert(keyList.at(position), image1, size1);
-    QuillImage *image2 = cache.take(key);
-    int size2 = image2->numBytes();
-    result = cacheProtected.insert(key, image2, size2);
-    cache.remove(key);
-    //the images are not in order in cache
-    result = cacheProtected.remove(keyList.at(position));
-    keyList.removeAt(position);
-    keyList.insert(position, key);
+
+    // Insert to not protected
+    if (status == NotProtected)
+        result = m_cache.insert(commandId, cacheImage);
+
+    // Insert to protected
+    else {
+        CacheImage *oldImage = m_cacheProtected.take(file);
+
+        // Move old one from not protected to protected
+        if (oldImage && (oldImage->key != commandId))
+            m_cache.insert(oldImage->key, oldImage);
+
+        m_cacheProtected.insert(file, cacheImage, 0);
+
+        result = true;
+    }
+
     return result;
 }
 
-bool ImageCache::deleteFromProtected(KeyListPosition position)
+bool ImageCache::protect(const QuillFile *file, int commandId)
 {
-    bool result = false;
-    QuillImage *image = cacheProtected.take(keyList.at(position));
-    int size = image->numBytes();
-    int key = keyList.at(position);
-    result = cacheProtected.remove(key);
-    result = cache.insert(key, image, size);
-    return result;
+    CacheImage *image = m_cache.take(commandId);
+
+    if (image) {
+        m_cache.remove(commandId);
+
+        CacheImage *oldImage = m_cacheProtected.take(file);
+
+        // Move old one from not protected to protected
+        if (oldImage != 0)
+            m_cache.insert(oldImage->key, oldImage);
+
+        m_cacheProtected.insert(file, image, 0);
+
+        return true;
+    } else
+        return false;
 }
 
-
-void ImageCache::setKey(KeyListPosition position, int key)
+bool ImageCache::remove(const QuillFile *file, int commandId)
 {
-     keyList.removeAt(position);
-     keyList.insert(position,key);
+    CacheImage *image = m_cache.take(commandId);
+    if (image) {
+        delete image;
+        return true;
+    } else {
+        image = m_cacheProtected.object(file);
+        if (image && (image->key == commandId))
+            return m_cacheProtected.remove(file);
+    }
+    return false;
+}
+
+bool ImageCache::purge(const QuillFile *file)
+{
+    return m_cacheProtected.remove(file);
+}
+
+QuillImage ImageCache::image(const QuillFile *file, int key) const
+{
+    if (m_cache.contains(key)) {
+        CacheImage *image = m_cache.object(key);
+        return image->image;
+    } else if (m_cacheProtected.contains(file)) {
+        CacheImage *image = m_cacheProtected.object(file);
+        if (image->key == key)
+            return image->image;
+    }
+
+    return QuillImage();
+}
+
+int ImageCache::protectedId(const QuillFile *file) const
+{
+    if (m_cacheProtected.contains(file)) {
+        CacheImage *image = m_cacheProtected.object(file);
+        return image->key;
+    } else
+        return -1;
+}
+
+void ImageCache::setMaxSize(int maxSize)
+{
+    m_cache.setMaxCost(maxSize);
+}
+
+int ImageCache::maxSize() const
+{
+    return m_cache.maxCost();
 }

@@ -1,2 +1,3 @@
+usr/lib/libunittests-quill*.so*
 usr/lib/libquill-tests/
 /usr/share/libquill-tests/

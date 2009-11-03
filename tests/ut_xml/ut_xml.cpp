@@ -255,7 +255,7 @@ void ut_xml::testRecoverVariant()
     QCOMPARE(QVariant(flag1),HistoryXml::recoverVariant(QVariant::Bool, QString("false")));
     QCOMPARE(QVariant(flag2),HistoryXml::recoverVariant(QVariant::Bool, QString("true")));
     //testing default case
-    QCOMPARE(QVariant(),HistoryXml::recoverVariant(QVariant::Map, QString("1")));
+    QCOMPARE(QVariant(),HistoryXml::recoverVariant(QVariant::Map, QString("quill")));
 }
 
 void ut_xml::testEmptyDocument()
@@ -435,7 +435,7 @@ void ut_xml::testXmlEmptySavedIndex()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_xml test;
     return QTest::qExec( &test, argc, argv );
 }

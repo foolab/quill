@@ -67,9 +67,12 @@ public:
 
     /*!
       Starts an undo session. When an undo session is in progress,
-      no undo/redo outside the session is permitted. A closed
-      undo session will be treated as one operation by undo() and
-      redo().
+      no undo/redo outside the session is permitted. A closed undo
+      session will be treated as one operation by undo() and
+      redo(). Undo sessions can be thought as a more generic
+      replacement of QUndoCommand::mergeWith(). Unlike it, a
+      session can also combine different kinds of filters and requires
+      no support from the QUndoCommand subclass implementation.
      */
 
     void startSession();
@@ -235,10 +238,19 @@ public:
     SaveMap *saveMap();
 
 private:
+
+    /*!
+      Updates the initial load filter to load from a correct file.
+     */
+
+    void setInitialLoadFilter(QuillImageFilter *filter);
+
+private:
     Core *m_core;
     QUndoStack *m_stack;
     QuillFile *m_file;
-    int m_sessionId, m_nextSessionId;
+    bool m_isSessionRecording;
+    int m_recordingSessionId, m_nextSessionId;
     int m_savedIndex;
     QuillUndoCommand *m_saveCommand;
     SaveMap *m_saveMap;

@@ -73,7 +73,7 @@ void ut_partialloader::testFilter()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    TileCache *tileCache = new TileCache();
+    TileCache *tileCache = new TileCache(100);
     QVERIFY(tileCache);
 
     QuillImageFilter *filter =
@@ -352,7 +352,7 @@ void ut_partialloader::testCenterTilePriority()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_partialloader test;
     return QTest::qExec( &test, argc, argv );
 

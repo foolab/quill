@@ -144,9 +144,13 @@ public:
       previewlevelcount = full image or tiles.
 
       Default is -1. This can be modified on the fly.
+
+      If Quill::fileLimit() of the target level, or any level below
+      it, has been exceeded, this command does nothing, returns false,
+      and an error() signal is emitted.
     */
 
-    virtual void setDisplayLevel(int level);
+    virtual bool setDisplayLevel(int level);
 
     /*!
       Returns the current display level of the file.

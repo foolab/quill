@@ -4,19 +4,22 @@
 
 TEMPLATE = lib
 TARGET = quill
+# Please do not remove this INCLUDEPATH in any case
+INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter
 DEPENDPATH += .
-INCLUDEPATH += .
+
 LIBS += -lgcov
 QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
 DEFINES     +=
 
-CONFIG += DEBUG 
+CONFIG += DEBUG
+
+CONFIG += quillimagefilter
 
 # Generate pkg-config support by default
 # Note that we HAVE TO also create prl config as QMake implementation
 # mixes both of them together.
-CONFIG += link_pkgconfig create_pc create_prl no_install_prl
-PKGCONFIG += quillimagefilter
+CONFIG += create_pc create_prl no_install_prl
 
 QMAKE_PKGCONFIG_REQUIRES = quillimagefilter QtGui
 QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
@@ -68,7 +71,9 @@ headers.path = $$[QT_INSTALL_HEADERS]/$$TARGET
 target.path = $$[QT_INSTALL_LIBS]
 pkgconfig.files = quill.pc
 pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig
-INSTALLS += target headers pkgconfig
+prf.files = quill.prf
+prf.path = $$[QMAKE_MKSPECS]/features
+INSTALLS += target headers pkgconfig prf
 
 # ---clean
 QMAKE_CLEAN += \

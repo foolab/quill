@@ -56,6 +56,7 @@ ut_filtergenerator::ut_filtergenerator()
 void ut_filtergenerator::initTestCase()
 {
     QuillImageFilter::registerAll();
+    QDir().mkpath("/tmp/quill/thumbnails");
 }
 
 void ut_filtergenerator::cleanupTestCase()
@@ -199,7 +200,7 @@ void ut_filtergenerator::testRedEyeRemoval()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_filtergenerator test;
     return QTest::qExec( &test, argc, argv );
 

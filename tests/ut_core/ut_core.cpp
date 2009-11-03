@@ -84,7 +84,7 @@ void ut_core::testSetPreviewLevelCount()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_core test;
     return QTest::qExec( &test, argc, argv );
 

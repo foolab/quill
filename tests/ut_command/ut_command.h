@@ -44,6 +44,7 @@
 #include <QImage>
 
 class QuillUndoCommand;
+class QuillUndoStack;
 class QtImageFilter;
 class Quill;
 
@@ -51,6 +52,9 @@ class ut_command: public QObject {
 Q_OBJECT
 public:
     ut_command();
+
+private:
+    QuillUndoStack *stack;
 
 private slots:
     void initTestCase();

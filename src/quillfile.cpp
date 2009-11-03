@@ -39,6 +39,7 @@
 
 #include <QTemporaryFile>
 #include <QFileInfo>
+#include <QUrl>
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
@@ -46,6 +47,7 @@
 #include "quillfile.h"
 #include "quill.h"
 #include "core.h"
+#include "imagecache.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "historyxml.h"
@@ -157,13 +159,32 @@ bool QuillFile::isReadOnly() const
     return priv->readOnly;
 }
 
-void QuillFile::setDisplayLevel(int level)
+bool QuillFile::setDisplayLevel(int level)
 {
+    // Block if trying to raise display level over strict limits
+    for (int l=priv->displayLevel+1; l<=level; l++)
+        if (priv->core->numFilesAtLevel(l) >= priv->core->fileLimit(l)) {
+            // workaround of setError setting supported to false
+            bool prevSupported = priv->supported;
+            setError(Quill::ErrorFileLimitExceeded);
+            priv->supported = prevSupported;
+            return false;
+        }
+
+    // Purge images from cache if lowering display level here
+    // Exception: when save is in progress, leave the highest level
+    for (int l=priv->displayLevel; l>level; l--)
+        if ((l < priv->core->previewLevelCount()) || (!priv->saveInProgress))
+            priv->core->cache(l)->purge(this);
+
     priv->displayLevel = level;
+
+    // setup stack here
     if (exists() && (level >= 0) && (priv->stack->count() == 0))
         priv->stack->load();
 
     priv->core->suggestNewTask();
+    return true;
 }
 
 int QuillFile::displayLevel() const
@@ -193,7 +214,7 @@ QuillFile *QuillFile::exportFile(const QString &newFileName,
     if (!priv->exists || !priv->supported)
         return 0;
 
-    QByteArray dump = HistoryXml::encode(this);
+    const QByteArray dump = HistoryXml::encode(this);
     QuillFile *file = HistoryXml::decodeOne(dump, priv->core);
 
     file->setFileName(newFileName);
@@ -319,7 +340,7 @@ QSize QuillFile::fullImageSize() const
 
 void QuillFile::setViewPort(const QRect &viewPort)
 {
-    QRect oldPort = priv->viewPort;
+    const QRect oldPort = priv->viewPort;
     priv->viewPort = viewPort;
 
     // New tiles will only be calculated if the display level allows it
@@ -361,11 +382,12 @@ bool QuillFile::hasThumbnail(int level) const
 
 QString QuillFile::fileNameHash(const QString &fileName)
 {
-    QString path = QFileInfo(fileName).canonicalFilePath();
-    path.prepend("file://");
+    const QUrl uri =
+        QUrl::fromLocalFile(QFileInfo(fileName).canonicalFilePath());
 
     const QByteArray hashValue =
-        QCryptographicHash::hash(path.toLatin1(),QCryptographicHash::Md5);
+        QCryptographicHash::hash(uri.toString().toLatin1(),
+                                 QCryptographicHash::Md5);
 
     return hashValue.toHex();
 }
@@ -374,7 +396,8 @@ QString QuillFile::thumbnailFileName(int level) const
 {
     QString hashValueString = fileNameHash(priv->fileName);
     hashValueString.append("." + priv->core->thumbnailExtension());
-    hashValueString.prepend(priv->core->thumbnailDirectory(level) + "/");
+    hashValueString.prepend(priv->core->thumbnailDirectory(level) +
+                            QDir::separator());
 
     return hashValueString;
 }
@@ -384,7 +407,7 @@ QString QuillFile::editHistoryFileName(const QString &fileName,
 {
     QString hashValueString = fileNameHash(fileName);
     hashValueString.append(".xml");
-    hashValueString.prepend(editHistoryDirectory + "/");
+    hashValueString.prepend(editHistoryDirectory + QDir::separator());
 
     return hashValueString;
 }
@@ -395,11 +418,17 @@ QuillFile *QuillFile::readFromEditHistory(const QString &fileName,
     Core *core = dynamic_cast<Core*>(parent);
 
     QFile file(editHistoryFileName(fileName, core->editHistoryDirectory()));
+
+    qDebug() << "Reading edit history from" << file.fileName();
+
     if (!file.exists())
         return 0;
     file.open(QIODevice::ReadOnly);
     const QByteArray history = file.readAll();
     file.close();
+
+    qDebug() << "Read" << history.size() << "bytes";
+    qDebug() << history;
 
     return HistoryXml::decodeOne(history, core);
 }
@@ -463,7 +492,7 @@ void QuillFile::overwritingCopy(const QString &fileName,
         target(newName);
 
     source.open(QIODevice::ReadOnly);
-    QByteArray buffer = source.readAll();
+    const QByteArray buffer = source.readAll();
     source.close();
 
     target.open(QIODevice::WriteOnly | QIODevice::Truncate);
@@ -499,7 +528,9 @@ void QuillFile::prepareSave()
 
 void QuillFile::concludeSave()
 {
-    priv->stack->concludeSave();
+    // If save is concluded, purge any full images still in memory.
+    if (priv->displayLevel < priv->core->previewLevelCount())
+        priv->core->cache(priv->core->previewLevelCount())->purge(this);
 
     const QString temporaryName = priv->temporaryFile->fileName();
     priv->temporaryFile->close();
@@ -517,6 +548,8 @@ void QuillFile::concludeSave()
 
     QuillFile::overwritingCopy(temporaryName,
                                priv->fileName);
+
+    priv->stack->concludeSave();
 
     writeEditHistory(HistoryXml::encode(this));
     removeThumbnails();

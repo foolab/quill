@@ -56,8 +56,8 @@
 
 QuillUndoStack::QuillUndoStack(Core *parent, QuillFile *file) :
     m_core(parent), m_stack(new QUndoStack()), m_file(file),
-    m_sessionId(0), m_nextSessionId(1), m_savedIndex(0),
-    m_saveCommand(0), m_saveMap(0)
+    m_isSessionRecording(false), m_recordingSessionId(0), m_nextSessionId(1),
+    m_savedIndex(0), m_saveCommand(0), m_saveMap(0)
 {
 }
 
@@ -73,10 +73,8 @@ QuillFile* QuillUndoStack::file()
     return m_file;
 }
 
-void QuillUndoStack::load()
+void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 {
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Load");
     QFile loadFile(m_file->originalFileName());
     if (loadFile.exists() && (loadFile.size() > 0))
         filter->setOption(QuillImageFilter::FileName,
@@ -84,6 +82,13 @@ void QuillUndoStack::load()
     else
         filter->setOption(QuillImageFilter::FileName,
                           m_file->fileName());
+}
+
+void QuillUndoStack::load()
+{
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("Load");
+    setInitialLoadFilter(filter);
     add(filter);
 }
 
@@ -91,12 +96,28 @@ void QuillUndoStack::add(QuillImageFilter *filter)
 {
     qDebug() << "Command" << filter->name() << "added to stack.";
 
-    QuillUndoCommand *cmd = new QuillUndoCommand(filter);
+    QuillUndoCommand *cmd = new QuillUndoCommand(this, m_core);
 
-    cmd->setStack(this);
+    cmd->setFilter(filter);
     cmd->setIndex(index());
-    cmd->setSessionId(m_sessionId);
-    cmd->setCore(m_core);
+    if (m_isSessionRecording && (cmd->filter()->name() != "Load"))
+        cmd->setSessionId(m_recordingSessionId);
+
+    // full image size
+
+    QSize previousFullSize;
+
+    if (index() == 0)
+        previousFullSize = QSize();
+    else
+        previousFullSize = command()->fullImageSize();
+
+    QSize fullSize = filter->newFullImageSize(previousFullSize);
+
+    if (fullSize.isEmpty())
+        m_file->setError(Quill::ErrorFormatUnsupported);
+
+    cmd->setFullImageSize(fullSize);
 
     // tile map
     if (!m_core->defaultTileSize().isEmpty()) {
@@ -124,7 +145,8 @@ bool QuillUndoStack::canUndo() const
         return false;
 
     // Session mode: cannot undo outside session
-    if ((m_sessionId > 0) && (command()->sessionId() != m_sessionId))
+    if ((m_isSessionRecording) &&
+        (!command()->belongsToSession(m_recordingSessionId)))
         return false;
 
     return true;
@@ -137,14 +159,22 @@ void QuillUndoStack::undo()
         if ((command()->filter()->name() == "Load") && (m_stack->index() > 2))
             m_stack->undo();
 
-        int sessionId = command()->sessionId();
-
         // If we are not currently recording a session, an entire
         // session should be undone at once.
-        do
-            m_stack->undo();
-        while ((m_sessionId == 0) && (sessionId != 0) &&
-               (command()->sessionId() == sessionId));
+        if (!m_isSessionRecording && command()->belongsToSession())
+        {
+            int toUndoSessionId = command()->sessionId();
+
+            do
+                m_stack->undo();
+            while (canUndo() && command()->belongsToSession(toUndoSessionId));
+        }
+        else m_stack->undo();
+
+        // If we have any stored images in cache, move them to protected
+        // This is here instead of command::undo() so that intermediate steps
+        // need not be protected.
+        command()->protectImages();
     }
 }
 
@@ -154,8 +184,8 @@ bool QuillUndoStack::canRedo() const
         return false;
 
     // Session mode: cannot redo outside session
-    if ((m_sessionId > 0) && (command(index())) &&
-        (command(index())->sessionId() != m_sessionId))
+    if ((m_isSessionRecording) &&
+        (!command(index())->belongsToSession(m_recordingSessionId)))
         return false;
 
     return true;
@@ -164,18 +194,28 @@ bool QuillUndoStack::canRedo() const
 void QuillUndoStack::redo()
 {
     if (canRedo()) {
-        int sessionId = command(index())->sessionId();
-
         // If we are not currently recording a session, an entire
         // session should be redone at once.
-        do
-            m_stack->redo();
-        while ((m_sessionId == 0) && (sessionId != 0) && command(index()) &&
-               (command(index())->sessionId() == sessionId));
+        if (!m_isSessionRecording &&
+            command(index())->belongsToSession())
+        {
+            int toRedoSessionId = command(index())->sessionId();
+
+            do
+                m_stack->redo();
+            while (canRedo() &&
+                   command(index())->belongsToSession(toRedoSessionId));
+        }
+        else m_stack->redo();
 
         // In case of intermediate load, double redo
-        if ((command(index()) && (command(index())->filter()->name() == "Load")))
+        if (canRedo() && (command(index())->filter()->name() == "Load"))
             m_stack->redo();
+
+        // If we have any stored images in cache, move them to protected
+        // This is here instead of command::redo() so that intermediate steps
+        // need not be protected.
+        command()->protectImages();
     }
 }
 
@@ -280,25 +320,26 @@ bool QuillUndoStack::isDirty() const
 
 void QuillUndoStack::startSession()
 {
-    if (m_sessionId <= 0) {
-        m_sessionId = m_nextSessionId;
+    if (!m_isSessionRecording) {
+        m_isSessionRecording = true;
+        m_recordingSessionId = m_nextSessionId;
         m_nextSessionId++;
     }
 }
 
 void QuillUndoStack::endSession()
 {
-    m_sessionId = 0;
+    m_isSessionRecording = false;
 }
 
 bool QuillUndoStack::isSession() const
 {
-    return (m_sessionId > 0);
+    return m_isSessionRecording;
 }
 
 void QuillUndoStack::prepareSave(const QString &fileName)
 {
-    m_sessionId = 0;
+    m_isSessionRecording = false;
 
     delete m_saveCommand;
     delete m_saveMap;
@@ -317,8 +358,8 @@ void QuillUndoStack::prepareSave(const QString &fileName)
     saveFilter->setOption(QuillImageFilter::FileFormat,
                           QVariant(m_file->targetFormat()));
 
-    m_saveCommand = new QuillUndoCommand(saveFilter);
-    m_saveCommand->setStack(this);
+    m_saveCommand = new QuillUndoCommand(this, m_core);
+    m_saveCommand->setFilter(saveFilter);
 
     if (!m_core->defaultTileSize().isEmpty()) {
         saveFilter->setOption(QuillImageFilter::TileCount,
@@ -331,6 +372,10 @@ void QuillUndoStack::prepareSave(const QString &fileName)
 void QuillUndoStack::concludeSave()
 {
     m_savedIndex = command()->index();
+
+    // Update initial load filter to point to modified file
+    if (m_stack->command(0))
+        setInitialLoadFilter(command(0)->filter());
 
     if (!m_core->defaultTileSize().isEmpty()) {
         delete m_saveCommand;

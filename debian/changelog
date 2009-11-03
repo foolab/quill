@@ -1,3 +1,45 @@
+libquill (1.091103.0) unstable; urgency=low
+  * Implemented: SWP#HImag-1413
+  * Fixes: NB#145052 - libquill-dev should depend on libqt4-dev
+  * Fixes: NB#145053 - libquill-dev should have a versioned dependency on libquill1
+  * Fixes: NB#145054 - libquill-dev should not contain libunittests.so
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 03 Nov 2009 10:10:00 +0200
+
+
+libquill (1.091030.0) unstable; urgency=low
+  * Fixed file reopening immediately after save.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 30 Oct 2009 14:15:00 +0200
+
+
+libquill (1.091029.0) unstable; urgency=low
+  * Fixed memory handling from previous.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 29 Oct 2009 10:55:00 +0200
+
+libquill (1.091028.0) unstable; urgency=low
+
+  * Fixes: NB#143123 - <coverity> defects from libquill and quillimagefilter .
+  * Fixes: NB#143477 -libquill's cache limit blocks the panning.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 28 Oct 2009 15:20:00 +0200
+
+libquill (1.091027.0) unstable; urgency=low
+
+  * Fixes: NB#143813 - Doing undo or redo operations does not save the images.
+  * Fixes: NB#143438 - Various build environment problems for libquill
+  * Fixes: NB#142605 - The .pc file of libquill-dev is incorrect
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 27 Oct 2009 11:50:00 +0200
+
+
+libquill (1.091021.0) unstable; urgency=low
+
+  * change version number for integration.
+
+ -- Pekka Marjola <Pekka.Marjola@nokia.com>  Wed, 21 Oct 2009 10:55:00 +0200
+
 libquill (1.091014.0) unstable; urgency=low
 
   * change version number.

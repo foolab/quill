@@ -52,8 +52,9 @@
 
 int QuillUndoCommand::m_nextId = 1;
 
-QuillUndoCommand::QuillUndoCommand(QuillImageFilter *filter) :
-    QUndoCommand(), m_filter(filter), m_stack(0), m_core(0), m_index(0),
+QuillUndoCommand::QuillUndoCommand(QuillUndoStack *parent, Core *core) :
+    QUndoCommand(), m_filter(0), m_stack(parent), m_core(core),
+    m_index(0), m_belongsToSession(0), m_sessionId(0),
     m_fullImageSize(QSize()), m_tileMap(0)
 {
     // Guarantees that the id will always be unique (at least to maxint)
@@ -66,7 +67,7 @@ QuillUndoCommand::~QuillUndoCommand()
     // Deleting a command with the intermediate load filter
     // forces save when closing
 
-    if (m_stack && (m_filter->name() == "Load"))
+    if (m_stack && m_filter && (m_filter->name() == "Load"))
         m_stack->setSavedIndex(-1);
 
     // If the background thread is currently running the filter,
@@ -74,8 +75,14 @@ QuillUndoCommand::~QuillUndoCommand()
     // Instead, ThreadManager::calculationFinished() will handle this
     // after the calculation has finished.
 
-    if (!m_core || (m_core->allowDelete(m_filter)))
+    if (m_filter && (!m_core || (m_core->allowDelete(m_filter))))
         delete m_filter;
+
+    // Eject any images from the cache
+
+    if (m_core)
+        for (int level=0; level<m_core->previewLevelCount(); level++)
+            m_core->cache(level)->remove(m_stack->file(), m_id);
 
     // The tile map becomes property of the command
 
@@ -94,46 +101,12 @@ void QuillUndoCommand::setFilter(QuillImageFilter* filter)
 
 void QuillUndoCommand::redo()
 {
-    // calculate target full image size
-
-    QuillImage previous;
-    QSize previousFullSize, fullSize;
-
-    if (m_stack->index() == 0) {
-        // default preview image size defined here
-
-        previous = QuillImage(QImage(m_core->previewSize(0),
-                                     QuillImage::Format_RGB32));
-        previousFullSize = m_filter->newFullImageSize(previousFullSize);
-    }
-    else {
-        previous = prev()->image(0);
-        previousFullSize = prev()->fullImageSize();
-    }
-
-    if (previousFullSize.isEmpty())
-        m_stack->file()->setError(Quill::ErrorFormatUnsupported);
-
-    previous.setFullImageSize(previousFullSize);
-    previous.setArea(QRect(QPoint(0, 0), previousFullSize));
-
-    // Update full image size
-    m_fullImageSize = m_filter->newFullImageSize(previousFullSize);
+    // no need to do anything here - see QuillUndoStack::redo()
 }
 
 void QuillUndoCommand::undo()
 {
-    // no need to do anything here
-}
-
-void QuillUndoCommand::setStack(QuillUndoStack *stack)
-{
-    m_stack = stack;
-}
-
-void QuillUndoCommand::setCore(Core *core)
-{
-    m_core = core;
+    // no need to do anything here - see QuillUndoStack::undo()
 }
 
 QuillUndoStack *QuillUndoCommand::stack() const
@@ -166,12 +139,35 @@ QuillUndoCommand *QuillUndoCommand::prev() const
 
 QuillImage QuillUndoCommand::image(int level) const
 {
-    return m_core->cache(level)->image(m_id);
+    return m_core->cache(level)->image(m_stack->file(), m_id);
 }
 
 void QuillUndoCommand::setImage(int level, const QuillImage &image)
 {
-    m_core->cache(level)->insertImage(m_id, image, ImageCache::ProtectLast);
+    ImageCache *cache = m_core->cache(level);
+    ImageCache::ProtectionStatus status = ImageCache::NotProtected;
+
+    // An image will be protected if it is:
+    // 1) not after the current state (i.e. not in redo history)
+    // 2) closer to the current state than the currently protected image
+    // 3) or, the currently protected image is after the current state
+
+    QuillUndoCommand *previousProtected =
+        m_stack->find(cache->protectedId(m_stack->file()));
+
+    if ((m_index < m_stack->index()) &&
+        (!previousProtected ||
+         (m_index >= previousProtected->index()) ||
+         (previousProtected->index() >= m_stack->index())))
+        status = ImageCache::Protected;
+
+    cache->insert(m_stack->file(), m_id, image, status);
+}
+
+void QuillUndoCommand::protectImages()
+{
+    for (int level=0; level<=m_core->previewLevelCount(); level++)
+        m_core->cache(level)->protect(m_stack->file(), m_id);
 }
 
 QuillImage QuillUndoCommand::fullImage() const
@@ -209,6 +205,11 @@ QList<QuillImage> QuillUndoCommand::allImageLevels(int maxLevel) const
     return list;
 }
 
+void QuillUndoCommand::setFullImageSize(const QSize &size)
+{
+    m_fullImageSize = size;
+}
+
 QSize QuillUndoCommand::fullImageSize() const
 {
     return m_fullImageSize;
@@ -237,12 +238,23 @@ QSize QuillUndoCommand::targetPreviewSize(int level) const
 
 void QuillUndoCommand::setSessionId(int id)
 {
+    m_belongsToSession = true;
     m_sessionId = id;
 }
 
 int QuillUndoCommand::sessionId() const
 {
     return m_sessionId;
+}
+
+bool QuillUndoCommand::belongsToSession() const
+{
+    return m_belongsToSession;
+}
+
+bool QuillUndoCommand::belongsToSession(int id) const
+{
+    return (m_belongsToSession && m_sessionId == id);
 }
 
 void QuillUndoCommand::setTileMap(TileMap *map)

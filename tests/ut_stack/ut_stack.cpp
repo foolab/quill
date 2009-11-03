@@ -185,6 +185,7 @@ void ut_stack::testSessionUndoRedo()
 
     Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
     QVERIFY(quill);
+    quill->setEditHistoryCacheSize(0, 5);
     QuillFile *file = quill->file(testFile.fileName(), "png");
 
     file->runFilter(filter);
@@ -225,6 +226,7 @@ void ut_stack::testSessionUndoRedo()
     QVERIFY(Unittests::compareImage(file->image(), resultImage));
 
     QVERIFY(file->canUndo());
+    QVERIFY(file->canRedo());
 
     // Redo - session command
 
@@ -268,6 +270,7 @@ void ut_stack::testSessionSaveLoad()
     Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
     QVERIFY(quill);
     quill->setEditHistoryDirectory("/tmp/quill/history");
+    quill->setEditHistoryCacheSize(0, 5);
 
     QuillFile *file = quill->file(testFile.fileName(), "png");
 
@@ -295,6 +298,7 @@ void ut_stack::testSessionSaveLoad()
     Quill *quill2 = new Quill(QSize(8, 2), Quill::ThreadingTest);
     QVERIFY(quill2);
     quill2->setEditHistoryDirectory("/tmp/quill/history");
+    quill2->setEditHistoryCacheSize(0, 5);
 
     QuillFile *file2 = quill2->file(testFile.fileName(), "png");
     file2->setDisplayLevel(0);
@@ -353,7 +357,7 @@ void ut_stack::testSetImage()
 }
 
 int main ( int argc, char *argv[] ){
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     ut_stack test;
     return QTest::qExec( &test, argc, argv );
 }
