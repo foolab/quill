@@ -300,6 +300,11 @@ bool ThreadManager::suggestNewTask(QuillFile *file, int level)
 
     QuillUndoCommand *command = getTask(stack, level);
 
+    // If a file is currently waiting for data, load should not be tried
+    if ((command->filter()->name() == "Load") &&
+        (file->isWaitingForData()))
+        return false;
+
     QuillUndoCommand *prev = 0;
     if (command->filter()->name() != "Load")
         prev = command->prev();

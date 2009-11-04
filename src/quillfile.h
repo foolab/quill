@@ -381,11 +381,24 @@ public:
     virtual QuillFile *original();
 
     /*!
-      Should be used to notify Quill if there are changes in the
-      source image file.
-     */
+      Sets the waiting-for-data status for this file.
 
-    void sourceChanged();
+      Set this to true if you want to start editing an image which is not
+      completely available yet, for example if it is currently being
+      transferred by the network. Use setImage() to immediately set a preview
+      level. Set this to false when the full image has arrived.
+
+      Warning: the status must be set before raising the preview level, or the
+      image will get an "unsupported" status.
+    */
+
+    void setWaitingForData(bool);
+
+    /*!
+      Returns the waiting-for-data status for the file. See setWaitingForData().
+    */
+
+    bool isWaitingForData() const;
 
     /*!
       Immediately triggers the imageAvailable() signal. Internal use only.

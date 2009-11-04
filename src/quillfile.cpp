@@ -61,6 +61,7 @@ public:
     bool exists;
     bool supported;
     bool readOnly;
+    bool waitingForData;
 
     QuillUndoStack *stack;
 
@@ -85,6 +86,7 @@ QuillFile::QuillFile(QObject *parent)
     priv->exists = true;
     priv->supported = true;
     priv->readOnly = false;
+    priv->waitingForData = false;
 
     priv->core = dynamic_cast<Core*>(parent);
     priv->stack = new QuillUndoStack(priv->core, this);
@@ -577,6 +579,22 @@ QuillFile *QuillFile::original()
     priv->original = original;
     priv->core->insertFile(original, "");
     return original;
+}
+
+void QuillFile::setWaitingForData(bool status)
+{
+    priv->waitingForData = status;
+
+    if (!status) {
+        priv->supported = true;
+        priv->stack->calculateFullImageSize(priv->stack->command(0));
+        priv->core->suggestNewTask();
+    }
+}
+
+bool QuillFile::isWaitingForData() const
+{
+    return priv->waitingForData;
 }
 
 void QuillFile::setError(Quill::Error errorCode)

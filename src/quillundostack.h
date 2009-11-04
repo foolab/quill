@@ -142,11 +142,16 @@ public:
     QList<QuillImage> allImageLevels(int maxLevel) const;
 
     /*!
-      Gets the full image size for the current image,
-      possibly pre-calculated.
+      Gets the pre-calculated full image size for the current image.
     */
 
     QSize fullImageSize() const;
+
+    /*!
+      Pre-calculates the full image size for the current image.
+    */
+
+    void calculateFullImageSize(QuillUndoCommand *command);
 
     /*!
       Count of the elements in the stack (same as QUndoStack)

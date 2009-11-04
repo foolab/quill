@@ -84,6 +84,39 @@ void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
                           m_file->fileName());
 }
 
+void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
+{
+    QSize previousFullSize;
+
+    QuillImageFilter *filter = command->filter();
+
+    if (filter->name() == "Load")
+        previousFullSize = QSize();
+    else
+        previousFullSize = command->prev()->fullImageSize();
+
+    QSize fullSize = filter->newFullImageSize(previousFullSize);
+
+    if (fullSize.isEmpty()) {
+        m_file->setError(Quill::ErrorFormatUnsupported);
+        return;
+    }
+
+    command->setFullImageSize(fullSize);
+
+    // tile map
+    if (!m_core->defaultTileSize().isEmpty() && !command->tileMap()) {
+        TileMap *tileMap;
+        if (filter->name() == "Load")
+            tileMap = new TileMap(filter->newFullImageSize(QSize()),
+                                  m_core->defaultTileSize(),m_core->tileCache());
+        else
+            tileMap = new TileMap(command->prev()->tileMap(), filter);
+
+        command->setTileMap(tileMap);
+    }
+}
+
 void QuillUndoStack::load()
 {
     QuillImageFilter *filter =
@@ -94,8 +127,6 @@ void QuillUndoStack::load()
 
 void QuillUndoStack::add(QuillImageFilter *filter)
 {
-    qDebug() << "Command" << filter->name() << "added to stack.";
-
     QuillUndoCommand *cmd = new QuillUndoCommand(this, m_core);
 
     cmd->setFilter(filter);
@@ -103,36 +134,14 @@ void QuillUndoStack::add(QuillImageFilter *filter)
     if (m_isSessionRecording && (cmd->filter()->name() != "Load"))
         cmd->setSessionId(m_recordingSessionId);
 
-    // full image size
-
-    QSize previousFullSize;
-
-    if (index() == 0)
-        previousFullSize = QSize();
-    else
-        previousFullSize = command()->fullImageSize();
-
-    QSize fullSize = filter->newFullImageSize(previousFullSize);
-
-    if (fullSize.isEmpty())
-        m_file->setError(Quill::ErrorFormatUnsupported);
-
-    cmd->setFullImageSize(fullSize);
-
-    // tile map
-    if (!m_core->defaultTileSize().isEmpty()) {
-        TileMap *tileMap;
-        if (filter->name() == "Load")
-            tileMap = new TileMap(filter->newFullImageSize(QSize()),
-                                  m_core->defaultTileSize(),m_core->tileCache());
-        else
-            tileMap = new TileMap(command()->tileMap(), filter);
-
-        cmd->setTileMap(tileMap);
-    }
-
     // add to stack
     m_stack->push(cmd);
+
+    // full image size
+    if (!m_file->isWaitingForData())
+        calculateFullImageSize(cmd);
+
+    qDebug() << "Command" << filter->name() << "added to stack.";
 }
 
 bool QuillUndoStack::canUndo() const
@@ -240,6 +249,7 @@ QuillImage QuillUndoStack::image(int level) const
 void QuillUndoStack::setImage(int level, const QuillImage &image) const
 {
     command()->setImage(level, image);
+    command()->setFullImageSize(image.fullImageSize());
 }
 
 QList<QuillImage> QuillUndoStack::allImageLevels(int maxLevel) const
