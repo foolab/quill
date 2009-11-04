@@ -235,7 +235,7 @@ bool ThreadManager::suggestThumbnailLoadTask(QuillFile *file,
         (!file->hasThumbnail(level)))
         return false;
 
-    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter("Load");
+    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
@@ -267,7 +267,7 @@ bool ThreadManager::suggestThumbnailSaveTask(QuillFile *file, int level)
 
     QDir().mkpath(core->thumbnailDirectory(level));
 
-    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter("Save");
+    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
@@ -393,7 +393,7 @@ bool ThreadManager::suggestPreviewImprovementTask(QuillFile *file)
         // Create ad-hoc filter for preview re-calculation
 
         QuillImageFilter *scaleFilter =
-            QuillImageFilterFactory::createImageFilter("Scale");
+            QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_PreviewScale);
         scaleFilter->setOption(QuillImageFilter::SizeAfter,
                                QVariant(targetSize));
 
