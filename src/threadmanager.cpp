@@ -97,7 +97,7 @@ QuillUndoCommand *ThreadManager::getTask(QuillUndoStack *stack, int level) const
             break;
 
         // Load filters can be re-executed
-        if (stack->command(index)->filter()->name() == "Load")
+        if (stack->command(index)->filter()->role() == QuillImageFilter::Role_Load)
         {
             index--;
             break;
@@ -154,7 +154,7 @@ bool ThreadManager::suggestTilingTask(QuillFile *file)
             break;
 
         // Load filters can be re-executed
-        if (stack->command(index)->filter()->name() == "Load")
+        if (stack->command(index)->filter()->role() == QuillImageFilter::Role_Load)
         {
             index--;
             break;
@@ -165,7 +165,7 @@ bool ThreadManager::suggestTilingTask(QuillFile *file)
     QuillUndoCommand *command = stack->command(index + 1);
     QuillImage prevImage;
 
-    if (command->filter()->name() == "Load")
+    if (command->filter()->role() == QuillImageFilter::Role_Load)
         prevImage = command->tileMap()->tile(tileIndex);
     else
         prevImage = command->prev()->tileMap()->tile(tileIndex);
@@ -230,7 +230,7 @@ bool ThreadManager::suggestThumbnailLoadTask(QuillFile *file,
 
     QuillUndoCommand *command = getTask(file->stack(), level);
 
-    if ((command->filter()->name() != "Load") ||
+    if ((command->filter()->role() != QuillImageFilter::Role_Load) ||
         (command->index() != command->stack()->savedIndex()) ||
         (!file->hasThumbnail(level)))
         return false;
@@ -301,7 +301,7 @@ bool ThreadManager::suggestNewTask(QuillFile *file, int level)
     QuillUndoCommand *command = getTask(stack, level);
 
     QuillUndoCommand *prev = 0;
-    if (command->filter()->name() != "Load")
+    if (command->filter()->role() != QuillImageFilter::Role_Load)
         prev = command->prev();
 
     QuillImage prevImage;
@@ -465,14 +465,14 @@ void ThreadManager::calculationFinished()
 
         delete activeFilter;
     }
-    else if (activeFilter->name() == "Overlay")
+    else if (activeFilter->role() == QuillImageFilter::Role_Overlay)
     {
         // Save buffer overlay has finished - update the buffer.
 
         delete activeFilter;
         stack->saveMap()->setBuffer(image);
     }
-    else if (activeFilter->name() == "Save")
+    else if (activeFilter->role() == QuillImageFilter::Role_Save)
     {
         if (!stack->file()->isSaveInProgress())
             // Thumbnail saving
