@@ -77,7 +77,7 @@ void ut_partialloader::testFilter()
     QVERIFY(tileCache);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Load");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::FileName,
                       testFile.fileName());
