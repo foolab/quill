@@ -76,7 +76,7 @@ void ut_file::testRemove()
     QString originalFileName = file->originalFileName();
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -113,7 +113,7 @@ void ut_file::testOriginal()
     QuillFile *file = quill->file(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 

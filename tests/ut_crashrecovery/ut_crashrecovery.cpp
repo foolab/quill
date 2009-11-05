@@ -80,7 +80,7 @@ void ut_crashrecovery::testBasicRecovery()
     file->setDisplayLevel(1);
 
     QuillImageFilter *brightnessFilter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     brightnessFilter->setOption(QuillImageFilter::Brightness,
                                 QVariant(10));
     QImage image = Unittests::generatePaletteImage();
