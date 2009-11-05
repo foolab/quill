@@ -84,6 +84,7 @@ void ut_imageloader::testLoadFilter()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
+
         QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
 
     QVERIFY(filter);
