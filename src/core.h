@@ -41,7 +41,6 @@
 #define __QUILL_CORE_H_
 
 #include <QObject>
-#include <QtImageFilter>
 
 #include "quill.h"
 
