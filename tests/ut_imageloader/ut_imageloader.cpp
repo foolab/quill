@@ -44,6 +44,7 @@
 #include <Quill>
 #include <QuillFile>
 #include <QuillImageFilter>
+#include <QuillImageFilterFactory>
 #include "unittests.h"
 
 ut_imageloader::ut_imageloader()
@@ -82,8 +83,8 @@ void ut_imageloader::testLoadFilter()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    QtImageFilter *filter =
-        QtImageFilterFactory::createImageFilter("Load");
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("Load");
 
     QVERIFY(filter);
 
