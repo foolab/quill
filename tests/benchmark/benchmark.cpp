@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QEventLoop>
 #include <QTime>
 #include <QDebug>
@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv)
 {
-    QApplication app(argc, argv); // Without this, QEventLoop will not work
+    QCoreApplication app(argc, argv); // Without this, QEventLoop will not work
     QEventLoop loop;
 
     QTime time;
