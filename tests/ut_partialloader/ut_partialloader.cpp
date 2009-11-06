@@ -203,7 +203,7 @@ void ut_partialloader::testMultiOperation()
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     filter->setOption(QuillImageFilter::Brightness,
                       QVariant(20));
 

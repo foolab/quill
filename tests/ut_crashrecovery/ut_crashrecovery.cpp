@@ -149,7 +149,7 @@ void ut_crashrecovery::testRecoveryImmediateReOpen()
                     "", "png");
 
     QuillImageFilter *brightnessFilter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     brightnessFilter->setOption(QuillImageFilter::Brightness,
                                 QVariant(10));
 
@@ -223,12 +223,12 @@ void ut_crashrecovery::testRecoveryAfterUndo()
                     "", "png");
 
     QuillImageFilter *brightnessFilter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     brightnessFilter->setOption(QuillImageFilter::Brightness,
                                 QVariant(10));
 
     QuillImageFilter *contrastFilter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     brightnessFilter->setOption(QuillImageFilter::Contrast,
                                 QVariant(10));
 
