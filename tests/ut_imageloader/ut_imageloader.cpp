@@ -84,7 +84,8 @@ void ut_imageloader::testLoadFilter()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Load");
+
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
 
     QVERIFY(filter);
 
@@ -99,12 +100,12 @@ void ut_imageloader::testLoadFilter()
     QCOMPARE(filter->option(QuillImageFilter::DisableUndo).toBool(),
              true);
 
-    QVERIFY(filter->supportsOption(QuillImageFilter::SizeAfter));
+//     QVERIFY(filter->supportsOption(QuillImageFilter::SizeAfter));
 
     QImage image = filter->apply(QImage());
 
-    QCOMPARE(filter->option(QuillImageFilter::SizeAfter).toSize(),
-             QSize(8, 2));
+//     QCOMPARE(filter->option(QuillImageFilter::SizeAfter).toSize(),
+//              QSize(8, 2));
 
     QCOMPARE(image, Unittests::generatePaletteImage());
 

@@ -94,7 +94,7 @@ QuillImageFilter *SaveMap::addToBuffer(int index)
     m_tileRows[0].removeOne(index);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Overlay");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Overlay);
 
     filter->setOption(QuillImageFilter::CropRectangle,
                       QVariant(m_buffer.area()));

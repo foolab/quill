@@ -98,7 +98,7 @@ void ut_tiling::testTiledSaving()
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -154,7 +154,7 @@ void ut_tiling::testTiledSavingSmallCache()
     file->setViewPort(QRect(0, 0, 8, 2));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -220,7 +220,7 @@ void ut_tiling::testTiledSwipe()
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -300,7 +300,7 @@ void ut_tiling::testTiledSaveLoad()
     QSignalSpy spy(file, SIGNAL(saved()));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -387,7 +387,7 @@ void ut_tiling::testSaveBuffer()
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -459,7 +459,7 @@ void ut_tiling::testSaveBufferUnequal()
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -573,7 +573,7 @@ void ut_tiling::testPreviewSizeChanges()
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Rotate");
+        QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
     filter->setOption(QuillImageFilter::Angle, QVariant(90));
 
     // preview level 0
@@ -668,7 +668,7 @@ void ut_tiling::testSaveInterrupted()
     file->setDisplayLevel(-1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
     QImage targetImage = filter->apply(image);

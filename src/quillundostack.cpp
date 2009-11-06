@@ -87,7 +87,7 @@ void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 void QuillUndoStack::load()
 {
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Load");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
     setInitialLoadFilter(filter);
     add(filter);
 }
@@ -100,7 +100,7 @@ void QuillUndoStack::add(QuillImageFilter *filter)
 
     cmd->setFilter(filter);
     cmd->setIndex(index());
-    if (m_isSessionRecording && (cmd->filter()->name() != "Load"))
+    if (m_isSessionRecording && (cmd->filter()->role() != QuillImageFilter::Role_Load))
         cmd->setSessionId(m_recordingSessionId);
 
     // full image size
@@ -122,7 +122,7 @@ void QuillUndoStack::add(QuillImageFilter *filter)
     // tile map
     if (!m_core->defaultTileSize().isEmpty()) {
         TileMap *tileMap;
-        if (filter->name() == "Load")
+        if (filter->role() == QuillImageFilter::Role_Load)
             tileMap = new TileMap(filter->newFullImageSize(QSize()),
                                   m_core->defaultTileSize(),m_core->tileCache());
         else
@@ -156,7 +156,7 @@ void QuillUndoStack::undo()
 {
     if (canUndo()) {
         // In case of an intermediate load, we make a double undo
-        if ((command()->filter()->name() == "Load") && (m_stack->index() > 2))
+        if ((command()->filter()->role() == QuillImageFilter::Role_Load) && (m_stack->index() > 2))
             m_stack->undo();
 
         // If we are not currently recording a session, an entire
@@ -209,7 +209,7 @@ void QuillUndoStack::redo()
         else m_stack->redo();
 
         // In case of intermediate load, double redo
-        if (canRedo() && (command(index())->filter()->name() == "Load"))
+        if (canRedo() && (command(index())->filter()->role() == QuillImageFilter::Role_Load))
             m_stack->redo();
 
         // If we have any stored images in cache, move them to protected
@@ -345,7 +345,7 @@ void QuillUndoStack::prepareSave(const QString &fileName)
                                     command()->tileMap());
 
     QuillImageFilter *saveFilter =
-        QuillImageFilterFactory::createImageFilter("Save");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
     saveFilter->setOption(QuillImageFilter::FileName,
                           QVariant(fileName));

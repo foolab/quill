@@ -60,7 +60,7 @@ void ut_imagecache::cleanupTestCase()
 void ut_imagecache::testInsert2()
 {
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
@@ -81,7 +81,7 @@ void ut_imagecache::testInsert2()
 void ut_imagecache::testInsertReplace()
 {
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+    QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness,
                       QVariant(16));
@@ -102,7 +102,7 @@ void ut_imagecache::testInsertReplace()
 void ut_imagecache::testProtect()
 {
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
@@ -128,7 +128,7 @@ void ut_imagecache::testProtect()
 void ut_imagecache::testMultipleFile()
 {
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
     QuillFile *file2 = new QuillFile(0);
