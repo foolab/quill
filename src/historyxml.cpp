@@ -454,8 +454,7 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
             success = false;
             break;
         }
-
-        filter->setOption(option, value);
+        filter->setOption((QuillImageFilter::QuillFilterOption) option, value);
 
         if (reader->readNext() != QXmlStreamReader::EndElement)
         {
