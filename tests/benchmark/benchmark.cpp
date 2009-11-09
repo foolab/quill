@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     quill->setDefaultTileSize(QSize(256, 256));
 
-    QuillFile *file = quill->file("input/benchmark12.jpg");
+    QuillFile *file = quill->file("input/benchmark12.jpg", "jpg");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("Rotate");
