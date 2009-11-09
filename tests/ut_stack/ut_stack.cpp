@@ -74,12 +74,12 @@ void ut_stack::testSessionSetup()
     image.save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
     QuillImageFilter *filter2 =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Contrast, QVariant(20));
 
@@ -123,12 +123,12 @@ void ut_stack::testUndoRedoDuringSessionRecording()
     image.save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
     QuillImageFilter *filter2 =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Contrast, QVariant(20));
 
@@ -161,24 +161,24 @@ void ut_stack::testSessionUndoRedo()
     image.save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
     QuillImage resultImage = filter->apply(image);
 
     QuillImageFilter *filter2 =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter2->setOption(QuillImageFilter::Contrast, QVariant(20));
     QuillImage resultImage2 = filter2->apply(resultImage);
 
     QuillImageFilter *filter3 =
-        QuillImageFilterFactory::createImageFilter("Flip");
+        QuillImageFilterFactory::createImageFilter("org.maemo.flip");
     QVERIFY(filter);
     QuillImage resultImage3 = filter3->apply(resultImage2);
 
     QuillImageFilter *filter4 =
-        QuillImageFilterFactory::createImageFilter("Rotate");
+        QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
     QVERIFY(filter);
     filter4->setOption(QuillImageFilter::Angle, QVariant(90));
     QuillImage resultImage4 = filter4->apply(resultImage3);
@@ -245,24 +245,24 @@ void ut_stack::testSessionSaveLoad()
     image.save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
     QuillImage resultImage = filter->apply(image);
 
     QuillImageFilter *filter2 =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter2->setOption(QuillImageFilter::Contrast, QVariant(20));
     QuillImage resultImage2 = filter2->apply(resultImage);
 
     QuillImageFilter *filter3 =
-        QuillImageFilterFactory::createImageFilter("Flip");
+        QuillImageFilterFactory::createImageFilter("org.maemo.flip");
     QVERIFY(filter);
     QuillImage resultImage3 = filter3->apply(resultImage2);
 
     QuillImageFilter *filter4 =
-        QuillImageFilterFactory::createImageFilter("Rotate");
+        QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
     QVERIFY(filter);
     filter4->setOption(QuillImageFilter::Angle, QVariant(90));
     QuillImage resultImage4 = filter4->apply(resultImage3);

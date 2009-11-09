@@ -65,7 +65,7 @@ void ut_command::cleanupTestCase()
 void ut_command::testFilter()
 {
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
 
     QuillUndoCommand *command = new QuillUndoCommand(stack, 0);

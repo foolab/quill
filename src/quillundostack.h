@@ -232,6 +232,14 @@ public:
     SaveMap *saveMap();
 
 private:
+
+    /*!
+      Updates the initial load filter to load from a correct file.
+     */
+
+    void setInitialLoadFilter(QuillImageFilter *filter);
+
+private:
     Core *m_core;
     QUndoStack *m_stack;
     QuillFile *m_file;
