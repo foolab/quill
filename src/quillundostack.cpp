@@ -372,13 +372,11 @@ void QuillUndoStack::concludeSave()
     if (m_stack->command(0))
         setInitialLoadFilter(command(0)->filter());
 
-    if (!m_core->defaultTileSize().isEmpty()) {
-        delete m_saveCommand;
-        m_saveCommand = 0;
+    delete m_saveCommand;
+    m_saveCommand = 0;
 
-        delete m_saveMap;
-        m_saveMap = 0;
-    }
+    delete m_saveMap;
+    m_saveMap = 0;
 }
 
 QuillUndoCommand *QuillUndoStack::saveCommand()
