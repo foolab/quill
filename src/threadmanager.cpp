@@ -453,8 +453,18 @@ void ThreadManager::calculationFinished()
     if (command != 0)
         stack = command->stack();
 
+    // Set active filter to zero (so that we do not block its deletion)
+
+    QuillImageFilter *filter = activeFilter;
+    activeFilter = 0;
+
+    // Mark that we are not currently running a thread
+
+    int previousCommandId = commandId;
+    commandId = 0;
+
     QuillImageFilterGenerator *generator =
-        dynamic_cast<QuillImageFilterGenerator*>(activeFilter);
+        dynamic_cast<QuillImageFilterGenerator*>(filter);
 
     if (command == 0)
     {
@@ -463,20 +473,20 @@ void ThreadManager::calculationFinished()
         // since it is now orphan and we could not delete it
         // in QuillUndoCommand::~QuillUndoCommand().
 
-        delete activeFilter;
+        delete filter;
     }
-    else if (activeFilter->role() == QuillImageFilter::Role_Overlay)
+    else if (filter->role() == QuillImageFilter::Role_Overlay)
     {
         // Save buffer overlay has finished - update the buffer.
 
-        delete activeFilter;
+        delete filter;
         stack->saveMap()->setBuffer(image);
     }
-    else if (activeFilter->role() == QuillImageFilter::Role_Save)
+    else if (filter->role() == QuillImageFilter::Role_Save)
     {
         if (!stack->file()->isSaveInProgress())
             // Thumbnail saving
-            delete activeFilter;
+            delete filter;
 
         else if (!stack->saveMap() ||
                  stack->saveMap()->isSaveComplete())
@@ -516,10 +526,10 @@ void ThreadManager::calculationFinished()
     else
     {
         // Ad-hoc filters (preview improvement and thumbnail loading)
-        if (command->filter() != activeFilter)
+        if (command->filter() != filter)
         {
             image = QuillImage(image, command->fullImageSize());
-            delete activeFilter;
+            delete filter;
         }
 
         // Normal case: a better version of an image has been calculated.
@@ -527,12 +537,6 @@ void ThreadManager::calculationFinished()
         command->setImage(commandLevel, image);
         raiseFull = true;
     }
-
-    int previousCommandId = commandId;
-
-    // Mark that we are not currently running a thread
-    commandId = 0;
-    activeFilter = 0;
 
     // since this might be altered by suggestNewTask
     int previousCommandLevel = commandLevel;
