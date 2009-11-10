@@ -1,3 +1,12 @@
+libquill (1.091110.0) unstable; urgency=low
+  * Refactoring and memory related fixes.
+  * Implemented: SWP#HImag-1404
+  * Implemented: SWP#HImag-1439
+  * Fixes: NB#145316 - Libquill packages include profiling
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 10 Nov 2009 10:10:00 +0200
+
+
 libquill (1.091103.0) unstable; urgency=low
   * Implemented: SWP#HImag-1413
   * Fixes: NB#145052 - libquill-dev should depend on libqt4-dev
