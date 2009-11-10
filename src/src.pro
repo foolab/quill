@@ -8,8 +8,6 @@ TARGET = quill
 INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter
 DEPENDPATH += .
 
-LIBS += -lgcov
-QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
 DEFINES     +=
 
 CONFIG += DEBUG
@@ -25,11 +23,13 @@ QMAKE_PKGCONFIG_REQUIRES = quillimagefilter QtGui
 QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
 QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
-#this is for removing coverage information while doing qmake as "qmake COV_OPTION=off"
+# this is for adding coverage information while doing qmake as "qmake COV_OPTION=on"
+# message is shown when 'make' is executed
 for(OPTION,$$list($$lower($$COV_OPTION))){
-    isEqual(OPTION, off){
-        QMAKE_CXXFLAGS -= -ftest-coverage -fprofile-arcs -fno-elide-constructors
-        LIBS -= -lgcov
+    isEqual(OPTION, on){
+        message("TEST COVERAGE IS ENABLED")
+        QMAKE_CXXFLAGS += -ftest-coverage -fprofile-arcs -fno-elide-constructors
+        LIBS += -lgcov
     }
 }
 
