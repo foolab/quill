@@ -1,3 +1,9 @@
+libquill (1.091110.1) unstable; urgency=low
+
+  * change version number for integration.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 10 Nov 2009 10:55:00 +0200
+
 libquill (1.091110.0) unstable; urgency=low
   * Refactoring and memory related fixes.
   * Implemented: SWP#HImag-1404
@@ -41,7 +47,6 @@ libquill (1.091027.0) unstable; urgency=low
   * Fixes: NB#142605 - The .pc file of libquill-dev is incorrect
 
  -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 27 Oct 2009 11:50:00 +0200
-
 
 libquill (1.091021.0) unstable; urgency=low
 
