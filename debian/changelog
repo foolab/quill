@@ -1,3 +1,9 @@
+libquill (1.091110.2) unstable; urgency=low
+
+  * change version number for integration.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 10 Nov 2009 10:55:00 +0200
+
 libquill (1.091110.1) unstable; urgency=low
 
   * change version number for integration.
