@@ -57,7 +57,8 @@ Core::Core(const QSize &viewPortSize,
     m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
-    m_threadManager(new ThreadManager(this, threadingMode))
+    m_threadManager(new ThreadManager(this, threadingMode)),
+    m_temporaryFileDirectory(QString())
 {
     m_previewSize.append(viewPortSize);
     m_thumbnailDirectory.append(QString());
@@ -490,4 +491,14 @@ int Core::numFilesAtLevel(int level) const
             n++;
     }
     return n;
+}
+
+void Core::setTemporaryFileDirectory(const QString fileDir)
+{
+    m_temporaryFileDirectory = fileDir;
+}
+
+QString Core::temporaryFileDirectory()
+{
+    return  m_temporaryFileDirectory;
 }

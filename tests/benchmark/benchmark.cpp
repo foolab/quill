@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <QEventLoop>
+#include <QDir>
 #include <QTime>
 #include <QDebug>
 
@@ -16,8 +17,12 @@ int main(int argc, char **argv)
     QTime time;
     time.start();
 
+    for(int i = 0; i<argc; i++)
+        qDebug()<<"the arg is: "<<argv[i];
     Quill *quill = new Quill(QSize(100, 100));
 
+    if(QString(argv[2]) =="t")
+        quill->setTemporaryFilePath();
     quill->setDefaultTileSize(QSize(256, 256));
 
     QuillFile *file = quill->file("input/benchmark12.jpg", "jpg");
@@ -31,6 +36,7 @@ int main(int argc, char **argv)
     QObject::connect(file, SIGNAL(saved()), &loop, SLOT(quit()));
 
     file->save();
+
     loop.exec();
 
     qDebug() << "Use case batch rotate/save:" << time.elapsed() << "ms";

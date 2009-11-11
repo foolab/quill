@@ -283,6 +283,11 @@ public:
 
     void setDebugDelay(int delay);
 
+    /*!
+      To create the temporary file path
+    */
+    void setTemporaryFilePath();
+
  signals:
 
     /*!

@@ -514,10 +514,14 @@ void QuillFile::prepareSave()
     // extension as the target file, so that the correct format can be
     // deduced by QImageReader.
 
-    priv->temporaryFile =
-        new QTemporaryFile("/tmp/qt_temp.XXXXXX." + info.fileName());
+    //We try to save the tmp file to current path
+    if(priv->core->temporaryFileDirectory().isNull())
+        priv->temporaryFile =
+            new QTemporaryFile("/tmp/qt_temp.XXXXXX." + info.fileName());
+    else
+        priv->temporaryFile =
+            new QTemporaryFile(priv->core->temporaryFileDirectory()+"/qt_temp.XXXXXX." + info.fileName());
     priv->temporaryFile->open();
-
     priv->stack->prepareSave(priv->temporaryFile->fileName());
 }
 

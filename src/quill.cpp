@@ -180,3 +180,10 @@ void Quill::setDebugDelay(int delay)
 {
     priv->core->setDebugDelay(delay);
 }
+
+void Quill::setTemporaryFilePath()
+{
+    QDir appDir=QDir::current();;
+    appDir.mkdir("tmp/");
+    priv->core->setTemporaryFileDirectory(appDir.absolutePath()+"/tmp");
+}
