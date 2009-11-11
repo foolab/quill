@@ -55,6 +55,7 @@
 Core::Core(const QSize &viewPortSize,
            Quill::ThreadingMode threadingMode) :
     m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
+    m_thumbnailCreationEnabled(true),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
     m_threadManager(new ThreadManager(this, threadingMode))
@@ -341,12 +342,13 @@ void Core::suggestNewTask()
 
     // Seventh priority (any): saving thumbnails
 
-    for (QList<QuillFile*>::iterator file = allFiles.begin();
-         file != allFiles.end(); file++)
-        if ((*file)->supported() && (!(*file)->isReadOnly()))
-            for (int level=0; level<=previewLevelCount()-1; level++)
-                if (m_threadManager->suggestThumbnailSaveTask((*file), level))
-                    return;
+    if (m_thumbnailCreationEnabled)
+        for (QList<QuillFile*>::iterator file = allFiles.begin();
+             file != allFiles.end(); file++)
+            if ((*file)->supported() && (!(*file)->isReadOnly()))
+                for (int level=0; level<=previewLevelCount()-1; level++)
+                    if (m_threadManager->suggestThumbnailSaveTask((*file), level))
+                        return;
 }
 
 bool Core::allowDelete(QuillImageFilter *filter) const
@@ -435,6 +437,18 @@ void Core::setThumbnailExtension(const QString &extension)
 QString Core::thumbnailExtension() const
 {
     return m_thumbnailExtension;
+}
+
+void Core::setThumbnailCreationEnabled(bool enabled)
+{
+    m_thumbnailCreationEnabled = enabled;
+    if (enabled)
+        suggestNewTask();
+}
+
+bool Core::isThumbnailCreationEnabled() const
+{
+    return m_thumbnailCreationEnabled;
 }
 
 void Core::insertFile(QuillFile *file, const QString &key)

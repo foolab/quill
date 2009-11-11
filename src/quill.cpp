@@ -171,6 +171,16 @@ void Quill::setThumbnailExtension(const QString &extension)
     priv->core->setThumbnailExtension(extension);
 }
 
+void Quill::setThumbnailCreationEnabled(bool enabled)
+{
+    priv->core->setThumbnailCreationEnabled(enabled);
+}
+
+bool Quill::isThumbnailCreationEnabled() const
+{
+    return priv->core->isThumbnailCreationEnabled();
+}
+
 void Quill::releaseAndWait()
 {
     priv->core->releaseAndWait();
