@@ -15,7 +15,7 @@ Description: libquill library
 Package: libquill-dev
 Section: libdevel
 Architecture: all
-Depends: libquill1 (= ${binary:Version}),libquillimagefilter-dev
+Depends: libquill1 (= ${binary:Version}),libquillimagefilter-dev,libqt4-dev
 Description: libquill development headers
 
 Package: libquill-doc
