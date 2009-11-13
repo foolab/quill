@@ -327,8 +327,9 @@ public:
 
     /*!
       Tries to force Quill to acknowledge the file as supported or
-      unsupported. If this is set to true with a file not recognizable
-      by Quill, it will revert to unsupported.
+      unsupported. This should only be used after the contents of a
+      file have been changed. If this is set to true with a file not
+      recognizable by Quill, it will revert to unsupported.
      */
 
     virtual void setSupported(bool supported);

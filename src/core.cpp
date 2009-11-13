@@ -343,11 +343,10 @@ void Core::suggestNewTask()
     // Seventh priority (any): saving thumbnails
 
     if (m_thumbnailCreationEnabled)
-        for (QList<QuillFile*>::iterator file = allFiles.begin();
-             file != allFiles.end(); file++)
-            if ((*file)->supported() && (!(*file)->isReadOnly()))
+        foreach(QuillFile *file, allFiles)
+            if (file->supported() && !file->isReadOnly())
                 for (int level=0; level<=previewLevelCount()-1; level++)
-                    if (m_threadManager->suggestThumbnailSaveTask((*file), level))
+                    if (m_threadManager->suggestThumbnailSaveTask(file, level))
                         return;
 }
 
