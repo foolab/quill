@@ -1,3 +1,10 @@
+libquill (1.091113.0) unstable; urgency=low
+
+  * Fixes: NB#145052 - libquill-dev should depend on libqt4-dev
+  * Fixes: NB#142807 - gallery crashed when tapped on local collection title with high resolution images.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 13 Nov 2009 10:50:00 +0200
+
 libquill (1.091110.2) unstable; urgency=low
 
   * change version number for integration.
