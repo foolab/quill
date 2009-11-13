@@ -57,6 +57,8 @@ private slots:
     void testSave();
     void testUpdate();
     void testLoadUnsupported();
+
+    void testFailedWrite();
 };
 
 #endif  // TEST_LIBQUILL_THUMBNAIL_H

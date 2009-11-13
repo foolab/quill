@@ -223,6 +223,49 @@ void ut_thumbnail::testLoadUnsupported()
     delete quill;
 }
 
+void ut_thumbnail::testFailedWrite()
+{
+    // Test thumbnail writing with an invalid directory
+
+    QTemporaryFile testFile;
+    testFile.open();
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
+    QVERIFY(quill);
+    QVERIFY(quill->isThumbnailCreationEnabled());
+
+    quill->setThumbnailDirectory(0, "/invalid");
+    quill->setThumbnailExtension("png");
+
+    QuillFile *file = quill->file(testFile.fileName());
+
+    file->setDisplayLevel(0);
+    quill->releaseAndWait(); // load
+    quill->releaseAndWait(); // thumbnail save
+
+    // Verify save failure
+    QVERIFY(!Unittests::compareImage(QImage(file->thumbnailFileName(0)),
+                                     image));
+
+    QVERIFY(!quill->isThumbnailCreationEnabled());
+
+    // Change the thumbnail directory into something reasonable
+    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+
+    quill->setThumbnailCreationEnabled(true);
+    quill->releaseAndWait();
+    // Thumbnail creation must not be disabled now
+    QVERIFY(quill->isThumbnailCreationEnabled());
+
+    // Thumbnail must be saved now
+    QVERIFY(Unittests::compareImage(QImage(file->thumbnailFileName(0)),
+                                    image));
+
+    delete quill;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_thumbnail test;
