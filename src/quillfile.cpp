@@ -164,10 +164,7 @@ bool QuillFile::setDisplayLevel(int level)
     // Block if trying to raise display level over strict limits
     for (int l=priv->displayLevel+1; l<=level; l++)
         if (priv->core->numFilesAtLevel(l) >= priv->core->fileLimit(l)) {
-            // workaround of setError setting supported to false
-            bool prevSupported = priv->supported;
             setError(Quill::ErrorFileLimitExceeded);
-            priv->supported = prevSupported;
             return false;
         }
 
@@ -473,6 +470,11 @@ bool QuillFile::exists() const
     return priv->exists;
 }
 
+void QuillFile::setSupported(bool supported)
+{
+    priv->supported = supported;
+}
+
 bool QuillFile::supported() const
 {
     return priv->supported;
@@ -582,6 +584,5 @@ void QuillFile::setError(Quill::Error errorCode)
 {
     qDebug() << "Error" << errorCode << "with file" << priv->fileName << "!";
 
-    priv->supported = false;
     emit error(errorCode);
 }

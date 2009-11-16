@@ -114,8 +114,10 @@ void QuillUndoStack::add(QuillImageFilter *filter)
 
     QSize fullSize = filter->newFullImageSize(previousFullSize);
 
-    if (fullSize.isEmpty())
+    if (fullSize.isEmpty()) {
         m_file->setError(Quill::ErrorFormatUnsupported);
+        m_file->setSupported(false);
+    }
 
     cmd->setFullImageSize(fullSize);
 

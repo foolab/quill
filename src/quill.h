@@ -75,7 +75,8 @@ public:
         ErrorFormatUnsupported,
         ErrorFileCorrupt,
         ErrorDirectoryCannotCreate,
-        ErrorFileLimitExceeded
+        ErrorFileLimitExceeded,
+        ErrorThumbnailWriteFailed
     } Error;
 
     static QSize defaultViewPortSize;
@@ -263,6 +264,22 @@ public:
      */
 
     void setThumbnailExtension(const QString &format);
+
+    /*!
+      Enables or disables thumbnail creation. Disabling thumbnail
+      creation will not abort a creation of an individual thumbnail
+      currently in progress.
+     */
+
+    void setThumbnailCreationEnabled(bool enabled);
+
+    /*!
+      Returns true if thumbnail creation is enabled. True by
+      default, this can be made false by setThumbnailCreationEnabled(), or if
+      thumbnail creation fails by some reason.
+     */
+
+    bool isThumbnailCreationEnabled() const;
 
     /*!
       To make background loading tests easier on fast machines

@@ -215,6 +215,20 @@ public:
     QString thumbnailExtension() const;
 
     /*!
+      Enables or disables thumbnail creation.
+     */
+
+    void setThumbnailCreationEnabled(bool enabled);
+
+    /*!
+      Returns true if thumbnail creation is enabled. True by
+      default, this can be made false by setThumbnailCreationEnabled(), or if
+      thumbnail creation fails by some reason.
+     */
+
+    bool isThumbnailCreationEnabled() const;
+
+    /*!
       To make background loading tests easier on fast machines
 
       Only works if Quill has been created with threadingMode =
@@ -317,6 +331,7 @@ private:
     QString m_editHistoryDirectory;
     QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
+    bool m_thumbnailCreationEnabled;
 
     QMap<QString, QuillFile*> m_files;
 
