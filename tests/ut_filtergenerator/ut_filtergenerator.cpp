@@ -55,12 +55,21 @@ ut_filtergenerator::ut_filtergenerator()
 
 void ut_filtergenerator::initTestCase()
 {
-    QuillImageFilter::registerAll();
     QDir().mkpath("/tmp/quill/thumbnails");
 }
 
 void ut_filtergenerator::cleanupTestCase()
 {
+}
+
+void ut_filtergenerator::init()
+{
+    Quill::initTestingMode();
+}
+
+void ut_filtergenerator::cleanup()
+{
+    Quill::cleanup();
 }
 
 /*!
@@ -75,13 +84,11 @@ void ut_filtergenerator::testAutoContrast()
 
     QuillImageFilter::registerAll();
 
-    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-
     QuillFile *file =
-        quill->file(testFile.fileName());
+        Quill::file(testFile.fileName());
     file->setDisplayLevel(0);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE((QImage)file->image(), Unittests::generatePaletteImage());
 
     QuillImageFilter *filter =
@@ -93,16 +100,16 @@ void ut_filtergenerator::testAutoContrast()
     file->runFilter(filter);
 
     // Also update big picture
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QuillImageFilter *filterGenerator =
         QuillImageFilterFactory::createImageFilter("org.maemo.auto.contrast");
 
     file->runFilter(filterGenerator);
     // Generator
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     // Generated
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QImage image = file->image();
     QImage refImage = Unittests::generatePaletteImage();
@@ -119,8 +126,6 @@ void ut_filtergenerator::testAutoContrast()
         QVERIFY(abs(qGreen(rgb)-qGreen(rgb2)) <= 1);
         QVERIFY(abs(qBlue(rgb)-qBlue(rgb2)) <= 1);
     }
-
-    delete quill;
 }
 
 /*!
@@ -144,23 +149,21 @@ void ut_filtergenerator::testRedEyeRemoval()
 
     image.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(2, 2), Quill::ThreadingTest);
-    QVERIFY(quill);
-
-    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
-    quill->setThumbnailExtension("png");
+    Quill::setPreviewSize(0, QSize(2, 2));
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailExtension("png");
 
     // Create blank thumbnail
     QuillImage blankImage(QImage(QSize(2, 2), QImage::Format_ARGB32));
     blankImage.fill(qRgb(255, 255, 255));
 
-    QuillFile *file = quill->file(testFile.fileName());
+    QuillFile *file = Quill::file(testFile.fileName());
     QVERIFY(file->exists());
 
     blankImage.save(file->thumbnailFileName(0));
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QVERIFY(Unittests::compareImage(file->image(), blankImage));
 
@@ -170,14 +173,14 @@ void ut_filtergenerator::testRedEyeRemoval()
     filter->setOption(QuillImageFilter::Center, QVariant(QPoint(1, 1)));
     filter->setOption(QuillImageFilter::Radius, QVariant(2));
 
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     file->runFilter(filter);
     file->setDisplayLevel(1);
-    quill->releaseAndWait(); // preview - generator
-    quill->releaseAndWait(); // preview - filter
-    quill->releaseAndWait(); // full - load
-    quill->releaseAndWait(); // full - filter
+    Quill::releaseAndWait(); // preview - generator
+    Quill::releaseAndWait(); // preview - filter
+    Quill::releaseAndWait(); // full - load
+    Quill::releaseAndWait(); // full - filter
 
     // We should see no effect on the full now
     QVERIFY(Unittests::compareImage(file->image(), image));
@@ -189,14 +192,12 @@ void ut_filtergenerator::testRedEyeRemoval()
 
     file->runFilter(filter2);
 
-    quill->releaseAndWait(); // full - generator!
-    quill->releaseAndWait(); // preview - filter
-    quill->releaseAndWait(); // full - filter
+    Quill::releaseAndWait(); // full - generator!
+    Quill::releaseAndWait(); // preview - filter
+    Quill::releaseAndWait(); // full - filter
 
     // We should see the effect on the full now
     QVERIFY(!Unittests::compareImage(file->image(), image));
-
-    delete quill;
 }
 
 int main ( int argc, char *argv[] ){

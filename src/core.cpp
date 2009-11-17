@@ -52,20 +52,23 @@
 #include "tilecache.h"
 #include "historyxml.h"
 
-Core::Core(const QSize &viewPortSize,
-           Quill::ThreadingMode threadingMode) :
+Core *Core::g_instance = 0;
+
+Core::Core(Quill::ThreadingMode threadingMode) :
     m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
     m_thumbnailCreationEnabled(true),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
     m_threadManager(new ThreadManager(this, threadingMode))
 {
-    m_previewSize.append(viewPortSize);
+    m_previewSize.append(Quill::defaultViewPortSize);
     m_thumbnailDirectory.append(QString());
     m_fileLimit.append(1);
     m_fileLimit.append(1);
     m_cache.append(new ImageCache(0));
     m_cache.append(new ImageCache(0));
+
+    qRegisterMetaType<QuillImageList>("QuillImageList");
 }
 
 Core::~Core()
@@ -81,6 +84,31 @@ Core::~Core()
     }
     delete m_tileCache;
     delete m_threadManager;
+}
+
+void Core::init()
+{
+    if (!g_instance)
+        g_instance = new Core();
+}
+
+void Core::initTestingMode()
+{
+    if (!g_instance)
+        g_instance = new Core(Quill::ThreadingTest);
+}
+
+void Core::cleanup()
+{
+    delete g_instance;
+    g_instance = 0;
+}
+
+Core *Core::instance()
+{
+    if (!g_instance)
+        init();
+    return g_instance;
 }
 
 void Core::setPreviewLevelCount(int count)

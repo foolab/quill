@@ -53,6 +53,9 @@ public:
     ut_quill();
 
 private slots:
+    void init();
+    void cleanup();
+
     void initTestCase();
     void cleanupTestCase();
 

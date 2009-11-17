@@ -61,9 +61,43 @@ friend class ut_core;
 
 public:
 
-    Core(const QSize &viewPortSize = Quill::defaultViewPortSize,
-         Quill::ThreadingMode threadingMode = Quill::ThreadingNormal);
+    Core(Quill::ThreadingMode threadingMode = Quill::ThreadingNormal);
     ~Core();
+
+    /*!
+      The initializer is called before instance() is called for the first time,
+      it sets up the core.
+    */
+
+    static void init();
+
+    /*!
+      This initializer is called instead of regular init() when
+      Quill needs to be start up in thread testing mode. If the Core
+      has already been set up, this function will fail.
+    */
+
+    static void initTestingMode();
+
+    /*!
+      This function will destroy the Core and all its related data
+      structures. All instantiated QuillFile objects will have their
+      valid() property set to false.
+     */
+
+    static void cleanup();
+
+    /*!
+      The instance reference for the class.
+     */
+
+    static Core *instance();
+
+    /*!
+      Inserts a file into the file list of the core.
+     */
+
+    void registerFile(QuillFile *file);
 
     /*!
       Opens new file for viewing and editing.
@@ -312,6 +346,8 @@ private:
     QList<QuillFile*> existingFiles() const;
 
 private:
+
+    static Core *g_instance;
 
     QList<QSize> m_previewSize;
     QList<ImageCache*> m_cache;

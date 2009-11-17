@@ -54,11 +54,20 @@ ut_file::ut_file()
 
 void ut_file::initTestCase()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_file::cleanupTestCase()
 {
+}
+
+void ut_file::init()
+{
+    Quill::initTestingMode();
+}
+
+void ut_file::cleanup()
+{
+    Quill::cleanup();
 }
 
 void ut_file::testRemove()
@@ -67,9 +76,7 @@ void ut_file::testRemove()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    QVERIFY(quill);
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     QVERIFY(file);
     QVERIFY(file->exists());
 
@@ -82,7 +89,7 @@ void ut_file::testRemove()
 
     file->runFilter(filter);
     file->save();
-    quill->releaseAndWait(); // for runFilter()
+    Quill::releaseAndWait(); // for runFilter()
 
     file->remove();
 
@@ -90,13 +97,11 @@ void ut_file::testRemove()
     QVERIFY(!QFile::exists(testFile.fileName()));
     QVERIFY(!QFile::exists(originalFileName));
 
-    quill->releaseAndWait(); // for save()
+    Quill::releaseAndWait(); // for save()
 
     QVERIFY(!file->exists());
     QVERIFY(!QFile::exists(testFile.fileName()));
     QVERIFY(!QFile::exists(originalFileName));
-
-    delete quill;
 }
 
 void ut_file::testOriginal()
@@ -107,10 +112,8 @@ void ut_file::testOriginal()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    QVERIFY(quill);
-    quill->setFileLimit(0, 2);
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    Quill::setFileLimit(0, 2);
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -128,11 +131,11 @@ void ut_file::testOriginal()
     QVERIFY(!original->canUndo());
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     original->setDisplayLevel(0);
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->image(), processedImage);
     QCOMPARE(original->image(), image);
@@ -140,8 +143,6 @@ void ut_file::testOriginal()
     file->remove();
     QVERIFY(!file->exists());
     QVERIFY(!original->exists());
-
-    delete quill;
 }
 
 void ut_file::testFileLimit()
@@ -156,21 +157,17 @@ void ut_file::testFileLimit()
     image.save(testFile.fileName(), "png");
     image.save(testFile2.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    QVERIFY(quill);
-
-    QuillFile *file = quill->file(testFile.fileName(), "png");
-    QuillFile *file2 = quill->file(testFile2.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file2 = Quill::file(testFile2.fileName(), "png");
 
     QVERIFY(file->setDisplayLevel(0));
     QVERIFY(!file2->setDisplayLevel(0));
 
-    quill->setFileLimit(0, 2);
+    Quill::setFileLimit(0, 2);
     QVERIFY(file2->setDisplayLevel(0));
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    delete quill;
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 }
 
 int main ( int argc, char *argv[] ){

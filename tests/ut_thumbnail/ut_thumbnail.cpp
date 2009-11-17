@@ -53,7 +53,6 @@ ut_thumbnail::ut_thumbnail()
 
 void ut_thumbnail::initTestCase()
 {
-    QuillImageFilter::registerAll();
     QDir().mkpath("/tmp/quill/thumbnails");
     Unittests::generatePaletteImage().save("/tmp/test.png");
 }
@@ -62,18 +61,26 @@ void ut_thumbnail::cleanupTestCase()
 {
 }
 
+void ut_thumbnail::init()
+{
+    Quill::initTestingMode();
+}
+
+void ut_thumbnail::cleanup()
+{
+    Quill::cleanup();
+}
+
 void ut_thumbnail::testName()
 {
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    QVERIFY(quill);
-    QuillFile *file = quill->file("/tmp/test.png", "");
+    QuillFile *file = Quill::file("/tmp/test.png", "");
     QVERIFY(file);
 
     // This should be safe to run in any environment as this test does
     // not really create, or check existence of, any files.
 
-    quill->setThumbnailDirectory(0, "/home/user");
-    quill->setThumbnailExtension("jpeg");
+    Quill::setThumbnailDirectory(0, "/home/user");
+    Quill::setThumbnailExtension("jpeg");
 
     QCOMPARE(file->thumbnailFileName(0),
              QString("/home/user/6756f54a791d53a4ece8ebb70471b573.jpeg"));
@@ -85,13 +92,11 @@ void ut_thumbnail::testLoad()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    QVERIFY(quill);
+    Quill::setPreviewSize(0, QSize(4, 1));
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailExtension("png");
 
-    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
-    quill->setThumbnailExtension("png");
-
-    QuillFile *file = quill->file(testFile.fileName());
+    QuillFile *file = Quill::file(testFile.fileName());
     QVERIFY(file);
     QVERIFY(file->exists());
 
@@ -102,14 +107,12 @@ void ut_thumbnail::testLoad()
     image.save(thumbName);
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     // We should now see the "thumbnail" that we just created,
     // opposed to a downscaled version of the full image.
 
     QVERIFY(Unittests::compareImage(file->image(), image));
-
-    delete quill;
 }
 
 void ut_thumbnail::testSave()
@@ -120,21 +123,20 @@ void ut_thumbnail::testSave()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    QVERIFY(quill);
+    Quill::setPreviewSize(0, QSize(4, 1));
 
-    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
-    quill->setThumbnailExtension("png");
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailExtension("png");
 
-    QuillFile *file = quill->file(testFile.fileName());
+    QuillFile *file = Quill::file(testFile.fileName());
     QVERIFY(file);
     QVERIFY(file->exists());
 
     QString thumbName = file->thumbnailFileName(0);
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // We should now have a newly created thumbnail.
 
@@ -142,8 +144,6 @@ void ut_thumbnail::testSave()
                                     image.scaled(QSize(4, 1),
                                                  Qt::IgnoreAspectRatio,
                                                  Qt::SmoothTransformation)));
-
-    delete quill;
 }
 
 void ut_thumbnail::testUpdate()
@@ -153,18 +153,16 @@ void ut_thumbnail::testUpdate()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    QVERIFY(quill);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
-    quill->setThumbnailExtension("png");
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailExtension("png");
 
-    QuillFile *file = quill->file(testFile.fileName());
+    QuillFile *file = Quill::file(testFile.fileName());
     QString thumbName = file->thumbnailFileName(0);
     image.save(thumbName);
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -172,21 +170,19 @@ void ut_thumbnail::testUpdate()
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
     file->runFilter(filter);
-    quill->releaseAndWait(); // preview up to date
+    Quill::releaseAndWait(); // preview up to date
 
     file->save();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait(); // save, should also clear thumbnails
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait(); // save, should also clear thumbnails
 
     QVERIFY(!QFile::exists(thumbName));
 
-    quill->releaseAndWait(); // thumbnail created
+    Quill::releaseAndWait(); // thumbnail created
 
     QVERIFY(QFile::exists(thumbName));
     QVERIFY(Unittests::compareImage(filter->apply(image), QImage(thumbName)));
-
-    delete quill;
 }
 
 void ut_thumbnail::testLoadUnsupported()
@@ -199,28 +195,24 @@ void ut_thumbnail::testLoadUnsupported()
 
     QImage image = Unittests::generatePaletteImage();
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    QVERIFY(quill);
-
-    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
-    quill->setThumbnailExtension("png");
+    Quill::setPreviewSize(0, QSize(4, 1));
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailExtension("png");
 
     QString thumbName = "/tmp/quill/thumbnails/" +
         QuillFile::fileNameHash(testFile.fileName()) + ".png";
     image.save(thumbName, "png");
 
-    QuillFile *file = quill->file(testFile.fileName());
+    QuillFile *file = Quill::file(testFile.fileName());
     QVERIFY(file->exists());
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     // We should now see the "thumbnail" even if the original file
     // does not exist.
 
     QVERIFY(Unittests::compareImage(file->image(), image));
-
-    delete quill;
 }
 
 void ut_thumbnail::testFailedWrite()
@@ -232,38 +224,34 @@ void ut_thumbnail::testFailedWrite()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    QVERIFY(quill);
-    QVERIFY(quill->isThumbnailCreationEnabled());
+    QVERIFY(Quill::isThumbnailCreationEnabled());
 
-    quill->setThumbnailDirectory(0, "/invalid");
-    quill->setThumbnailExtension("png");
+    Quill::setThumbnailDirectory(0, "/invalid");
+    Quill::setThumbnailExtension("png");
 
-    QuillFile *file = quill->file(testFile.fileName());
+    QuillFile *file = Quill::file(testFile.fileName());
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait(); // load
-    quill->releaseAndWait(); // thumbnail save
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // thumbnail save
 
     // Verify save failure
     QVERIFY(!Unittests::compareImage(QImage(file->thumbnailFileName(0)),
                                      image));
 
-    QVERIFY(!quill->isThumbnailCreationEnabled());
+    QVERIFY(!Quill::isThumbnailCreationEnabled());
 
     // Change the thumbnail directory into something reasonable
-    quill->setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
 
-    quill->setThumbnailCreationEnabled(true);
-    quill->releaseAndWait();
+    Quill::setThumbnailCreationEnabled(true);
+    Quill::releaseAndWait();
     // Thumbnail creation must not be disabled now
-    QVERIFY(quill->isThumbnailCreationEnabled());
+    QVERIFY(Quill::isThumbnailCreationEnabled());
 
     // Thumbnail must be saved now
     QVERIFY(Unittests::compareImage(QImage(file->thumbnailFileName(0)),
                                     image));
-
-    delete quill;
 }
 
 int main ( int argc, char *argv[] ){

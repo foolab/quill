@@ -56,11 +56,21 @@ ut_tiling::ut_tiling()
 
 void ut_tiling::initTestCase()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_tiling::cleanupTestCase()
 {
+}
+
+void ut_tiling::init()
+{
+    Quill::initTestingMode();
+    Quill::setPreviewSize(0, QSize(4, 1));
+}
+
+void ut_tiling::cleanup()
+{
+    Quill::cleanup();
 }
 
 // Test a simple case of tiled saving
@@ -74,27 +84,26 @@ void ut_tiling::testTiledSaving()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setDefaultTileSize(QSize(2, 2));
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setDefaultTileSize(QSize(2, 2));
 
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
     QCOMPARE(file->viewPort(), QRect());
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     file->setViewPort(QRect(0, 0, 8, 2));
     QCOMPARE(file->viewPort(), QRect(0, 0, 8, 2));
 
     // Load 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
@@ -106,30 +115,28 @@ void ut_tiling::testTiledSaving()
         filter->apply(Unittests::generatePaletteImage());
 
     file->runFilter(filter);
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     // Apply for 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 5);
 
     file->save();
 
     // Overlay 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Save
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
-
-    delete quill;
 }
 
 // Test tiled saving with not enough cache
@@ -144,12 +151,11 @@ void ut_tiling::testTiledSavingSmallCache()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setDefaultTileSize(QSize(2, 2));
-    quill->setTileCacheSize(1);
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setDefaultTileSize(QSize(2, 2));
+    Quill::setTileCacheSize(1);
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
 
     file->setViewPort(QRect(0, 0, 8, 2));
 
@@ -165,32 +171,30 @@ void ut_tiling::testTiledSavingSmallCache()
     file->save();
 
     // Tile 1
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Tile 2
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Tile 3
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Tile 4
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Saving
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
-
-    delete quill;
 }
 
 // Test tiled viewport changes
@@ -211,11 +215,10 @@ void ut_tiling::testTiledSwipe()
     image2.fill(qRgb(255, 255, 255));
     image2.save(testFile2.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setDefaultTileSize(QSize(2, 2));
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setDefaultTileSize(QSize(2, 2));
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     file->setViewPort(QRect(0, 0, 8, 8));
     file->setDisplayLevel(1);
 
@@ -230,52 +233,50 @@ void ut_tiling::testTiledSwipe()
     file->save();
     file->setDisplayLevel(-1);
 
-    QuillFile *file2 = quill->file(testFile2.fileName(), "png");
+    QuillFile *file2 = Quill::file(testFile2.fileName(), "png");
     file2->setViewPort(QRect(0, 0, 8, 8));
     file2->setDisplayLevel(1);
 
-    quill->releaseAndWait(); // preview from first file (let run)
-    quill->releaseAndWait(); // preview for second
+    Quill::releaseAndWait(); // preview from first file (let run)
+    Quill::releaseAndWait(); // preview for second
 
     QCOMPARE(file2->image().size(), QSize(1, 1));
     QCOMPARE(file2->image().fullImageSize(), QSize(4, 4));
     QCOMPARE(file2->image().pixel(0, 0), qRgb(255, 255, 255));
 
     // Save progress: Tile 1
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Tile 2
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Tile 3
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Tile 4
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Saving
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
 
     // Load
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file2->allImageLevels().count(), 5);
-
-    delete quill;
 }
 
 // Test saving and loading
@@ -289,14 +290,13 @@ void ut_tiling::testTiledSaveLoad()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setDefaultTileSize(QSize(2, 2));
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setDefaultTileSize(QSize(2, 2));
 
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(saved()));
 
     QuillImageFilter *filter =
@@ -312,25 +312,25 @@ void ut_tiling::testTiledSaveLoad()
     file->save();
 
     // Load 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Apply for 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Overlay 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Save
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
@@ -341,17 +341,15 @@ void ut_tiling::testTiledSaveLoad()
     file->setDisplayLevel(1);
 
     // preview
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     // Get the tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 5);
-
-    delete quill;
 }
 
 // Test save buffers
@@ -368,22 +366,21 @@ void ut_tiling::testSaveBuffer()
 
     originalImage.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setDefaultTileSize(QSize(2, 2));
-    quill->setSaveBufferSize(4);
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setDefaultTileSize(QSize(2, 2));
+    Quill::setSaveBufferSize(4);
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     file->setViewPort(QRect(0, 0, 2, 8));
     file->setDisplayLevel(1);
 
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     // Load 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
@@ -395,35 +392,33 @@ void ut_tiling::testSaveBuffer()
 
     file->runFilter(filter);
 
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     // Apply for 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 5);
 
     file->save();
 
     // Overlay + save (4 times)
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QImage resultImage(testFile.fileName());
 
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
-
-    delete quill;
 }
 
 void ut_tiling::testSaveBufferUnequal()
@@ -439,23 +434,22 @@ void ut_tiling::testSaveBufferUnequal()
 
     originalImage.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
 
-    quill->setDefaultTileSize(QSize(2, 2));
-    quill->setSaveBufferSize(6);
+    Quill::setDefaultTileSize(QSize(2, 2));
+    Quill::setSaveBufferSize(6);
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     file->setViewPort(QRect(0, 0, 2, 8));
     file->setDisplayLevel(1);
 
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     // Load 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
@@ -467,35 +461,33 @@ void ut_tiling::testSaveBufferUnequal()
 
     file->runFilter(filter);
 
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     // Apply for 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 5);
 
     file->save();
 
     // Overlay + save (2+1 for first 3 rows)
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Overlay + save (2+1 for second 3 rows)
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Overlay + save (1+1 for last 2 rows)
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
-
-    delete quill;
 }
 
 // Test panning
@@ -506,15 +498,13 @@ void ut_tiling::testPan()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
+    Quill::setDefaultTileSize(QSize(2, 2));
 
-    quill->setDefaultTileSize(QSize(2, 2));
-
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(imageAvailable(QuillImageList)));
     file->setDisplayLevel(1);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     // No new tiles
     QCOMPARE(spy.count(), 1);
@@ -522,10 +512,10 @@ void ut_tiling::testPan()
     QCOMPARE(spy.count(), 1);
 
     // Load 4 tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Remove viewport
     QCOMPARE(spy.count(), 5);
@@ -553,8 +543,6 @@ void ut_tiling::testPan()
     QCOMPARE(tileList.count(), 2);
     QCOMPARE(tileList.at(0).area(), QRect(4, 0, 2, 2));
     QCOMPARE(tileList.at(1).area(), QRect(6, 0, 2, 2));
-
-    delete quill;
 }
 
 void ut_tiling::testPreviewSizeChanges()
@@ -564,12 +552,12 @@ void ut_tiling::testPreviewSizeChanges()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(2, 1), Quill::ThreadingTest);
-    quill->setPreviewLevelCount(2);
+    Quill::setPreviewSize(0, QSize(2, 1));
+    Quill::setPreviewLevelCount(2);
 
-    quill->setDefaultTileSize(QSize(4, 4));
+    Quill::setDefaultTileSize(QSize(4, 4));
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
@@ -577,24 +565,22 @@ void ut_tiling::testPreviewSizeChanges()
     filter->setOption(QuillImageFilter::Angle, QVariant(90));
 
     // preview level 0
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->image(0).size(), QSize(2, 1));
-    quill->releaseAndWait(); // level 1
+    Quill::releaseAndWait(); // level 1
 
     file->runFilter(filter);
-    quill->releaseAndWait(); // level 0
+    Quill::releaseAndWait(); // level 0
 
     QCOMPARE(file->image(0).size(), QSize(1, 2));
 
     // preview level 1
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     // preview level 0 regeneration
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->image(0).size(), QSize(1, 1));
-
-    delete quill;
 }
 
 
@@ -608,25 +594,24 @@ void ut_tiling::testViewPortBiggerThanCache()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(2, 1), Quill::ThreadingTest);
+    Quill::setPreviewSize(0, QSize(2, 1));
+    Quill::setDefaultTileSize(QSize(2, 2));
+    Quill::setTileCacheSize(3);
 
-    quill->setDefaultTileSize(QSize(2, 2));
-    quill->setTileCacheSize(3);
-
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     file->setViewPort(QRect(-8, -2, 16, 4));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 2);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 3);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 4);
 
     QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 2, 2));
@@ -636,15 +621,13 @@ void ut_tiling::testViewPortBiggerThanCache()
     // Now that we have 3 tiles aready,
     // this should not be doing anything anymore.
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 4);
 
     QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 2, 2));
     QCOMPARE(file->allImageLevels().at(2).area(), QRect(2, 0, 2, 2));
     QCOMPARE(file->allImageLevels().at(3).area(), QRect(4, 0, 2, 2));
-
-    delete quill;
 }
 
 // Test saving which is interrupted when in progress
@@ -657,14 +640,14 @@ void ut_tiling::testSaveInterrupted()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 2), Quill::ThreadingTest);
-    quill->setEditHistoryDirectory("/tmp/quill/history");
-    quill->setDefaultTileSize(QSize(4, 4));
+    Quill::setPreviewSize(0, QSize(4, 2));
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setDefaultTileSize(QSize(4, 4));
 
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = Quill::file(testFile.fileName(), "png");
     file->setDisplayLevel(-1);
 
     QuillImageFilter *filter =
@@ -677,22 +660,22 @@ void ut_tiling::testSaveInterrupted()
     file->save();
 
     // load both tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // filter for both tiles
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // overlay 1/2
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     file->undo();
 
     // overlay 2/2 - should do nothing
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     // save - should do nothing
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QVERIFY(Unittests::compareImage(QImage(testFile.fileName()), image));
 
@@ -700,14 +683,11 @@ void ut_tiling::testSaveInterrupted()
     file->save();
 
     // overlay + save
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QVERIFY(Unittests::compareImage(QImage(testFile.fileName()), targetImage));
-
-    delete quill;
-
 }
 
 int main ( int argc, char *argv[] ){

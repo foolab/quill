@@ -54,16 +54,23 @@ ut_partialloader::ut_partialloader()
 {
 }
 
-Q_DECLARE_METATYPE(QuillImage);
-
 void ut_partialloader::initTestCase()
 {
-    QuillImageFilter::registerAll();
-    qRegisterMetaType<QuillImage>();
 }
 
 void ut_partialloader::cleanupTestCase()
 {
+}
+
+void ut_partialloader::init()
+{
+    Quill::initTestingMode();
+    Quill::setPreviewSize(0, QSize(4, 1));
+}
+
+void ut_partialloader::cleanup()
+{
+    Quill::cleanup();
 }
 
 void ut_partialloader::testFilter()
@@ -119,18 +126,16 @@ void ut_partialloader::testQuill()
 
     QImage referenceImage = Unittests::generatePaletteImage();
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-
-    quill->setDefaultTileSize(QSize(2, 2));
+    Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file =
-        quill->file(testFile.fileName());
+        Quill::file(testFile.fileName());
 
     file->setViewPort(QRect(-8, -2, 16, 4));
 
     file->setDisplayLevel(1);
 
-    quill->releaseAndWait(); // preview
+    Quill::releaseAndWait(); // preview
 
     QCOMPARE(file->allImageLevels().count(), 1);
 
@@ -139,7 +144,7 @@ void ut_partialloader::testQuill()
     QCOMPARE(previewImage.size(), QSize(4, 1));
     QCOMPARE(previewImage.fullImageSize(), QSize(8, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 2);
     QuillImage fragment = file->allImageLevels().at(1);
@@ -149,7 +154,7 @@ void ut_partialloader::testQuill()
     QCOMPARE(fragment.area(), QRect(0, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(0, 0, 2, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 3);
     fragment = file->allImageLevels().at(2);
@@ -159,7 +164,7 @@ void ut_partialloader::testQuill()
     QCOMPARE(fragment.area(), QRect(2, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(2, 0, 2, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 4);
     fragment = file->allImageLevels().at(3);
@@ -169,7 +174,7 @@ void ut_partialloader::testQuill()
     QCOMPARE(fragment.area(), QRect(4, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(4, 0, 2, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 5);
     fragment = file->allImageLevels().at(4);
@@ -178,8 +183,6 @@ void ut_partialloader::testQuill()
     QCOMPARE(fragment.fullImageSize(), QSize(8, 2));
     QCOMPARE(fragment.area(), QRect(6, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(6, 0, 2, 2));
-
-    delete quill;
 }
 
 // Load + brightness
@@ -192,12 +195,11 @@ void ut_partialloader::testMultiOperation()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     QImage originalImage = Unittests::generatePaletteImage();
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
 
-    quill->setDefaultTileSize(QSize(2, 2));
+    Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file =
-        quill->file(testFile.fileName());
+        Quill::file(testFile.fileName());
 
     file->setViewPort(QRect(-8, -2, 16, 4));
     file->setDisplayLevel(1);
@@ -210,8 +212,8 @@ void ut_partialloader::testMultiOperation()
     QImage referenceImage = filter->apply(originalImage);
 
     file->runFilter(filter);
-    quill->releaseAndWait(); // preview load
-    quill->releaseAndWait(); // preview filter
+    Quill::releaseAndWait(); // preview load
+    Quill::releaseAndWait(); // preview filter
 
     QCOMPARE(file->allImageLevels().count(), 1);
 
@@ -220,10 +222,10 @@ void ut_partialloader::testMultiOperation()
     QCOMPARE(previewImage.size(), QSize(4, 1));
     QCOMPARE(previewImage.fullImageSize(), QSize(8, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 1);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 2);
     QuillImage fragment = file->allImageLevels().at(1);
 
@@ -232,10 +234,10 @@ void ut_partialloader::testMultiOperation()
     QCOMPARE(fragment.area(), QRect(0, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(0, 0, 2, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 2);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 3);
     fragment = file->allImageLevels().at(2);
 
@@ -244,10 +246,10 @@ void ut_partialloader::testMultiOperation()
     QCOMPARE(fragment.area(), QRect(2, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(2, 0, 2, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 3);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 4);
     fragment = file->allImageLevels().at(3);
 
@@ -256,10 +258,10 @@ void ut_partialloader::testMultiOperation()
     QCOMPARE(fragment.area(), QRect(4, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(4, 0, 2, 2));
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 4);
 
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
     QCOMPARE(file->allImageLevels().count(), 5);
     fragment = file->allImageLevels().at(4);
 
@@ -267,8 +269,6 @@ void ut_partialloader::testMultiOperation()
     QCOMPARE(fragment.fullImageSize(), QSize(8, 2));
     QCOMPARE(fragment.area(), QRect(6, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(6, 0, 2, 2));
-
-    delete quill;
 }
 
 // Test case: tiling approach with just a single tile
@@ -280,17 +280,16 @@ void ut_partialloader::testSingleTile()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     QImage originalImage = Unittests::generatePaletteImage();
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
 
-    quill->setDefaultTileSize(QSize(10, 10));
+    Quill::setDefaultTileSize(QSize(10, 10));
 
     QuillFile *file =
-        quill->file(testFile.fileName());
+        Quill::file(testFile.fileName());
     file->setViewPort(QRect(0, 0, 8, 2));
     file->setDisplayLevel(1);
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 2);
 
@@ -298,7 +297,6 @@ void ut_partialloader::testSingleTile()
 
     QVERIFY(Unittests::compareImage(image,
             QuillImage(Unittests::generatePaletteImage())));
-    delete quill;
 }
 
 void ut_partialloader::testCenterTilePriority()
@@ -309,26 +307,25 @@ void ut_partialloader::testCenterTilePriority()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     QImage originalImage = Unittests::generatePaletteImage();
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
 
-    quill->setDefaultTileSize(QSize(1, 1));
+    Quill::setDefaultTileSize(QSize(1, 1));
 
     QuillFile *file =
-        quill->file(testFile.fileName());
+        Quill::file(testFile.fileName());
     file->setViewPort(QRect(0, 0, 3, 2));
     file->setDisplayLevel(1);
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 2);
     QCOMPARE(file->allImageLevels().at(1).area(), QRect(1, 0, 1, 1));
 
     // Immediate surroundings
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 5);
     QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 1, 1));
@@ -338,8 +335,8 @@ void ut_partialloader::testCenterTilePriority()
 
     // Whole image
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 7);
     QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 1, 1));
@@ -348,7 +345,6 @@ void ut_partialloader::testCenterTilePriority()
     QCOMPARE(file->allImageLevels().at(4).area(), QRect(0, 1, 1, 1));
     QCOMPARE(file->allImageLevels().at(5).area(), QRect(1, 1, 1, 1));
     QCOMPARE(file->allImageLevels().at(6).area(), QRect(2, 1, 1, 1));
-    delete quill;
 }
 
 int main ( int argc, char *argv[] ){

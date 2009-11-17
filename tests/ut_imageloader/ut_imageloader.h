@@ -49,6 +49,8 @@ public:
     ut_imageloader();
 
 private slots:
+    void init();
+    void cleanup();
     void initTestCase();
     void cleanupTestCase();
 

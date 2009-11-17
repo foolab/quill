@@ -53,6 +53,8 @@ public:
     ut_tiling();
 
 private slots:
+    void init();
+    void cleanup();
     void initTestCase();
     void cleanupTestCase();
 

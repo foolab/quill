@@ -52,10 +52,8 @@ class QuillFile;
 
 class QuillPrivate;
 
-class Quill : public QObject
+class Quill
 {
-Q_OBJECT
-
 public:
     /*!
       For testing use only.
@@ -83,34 +81,26 @@ public:
     static int defaultCacheSize;
 
     /*!
-      @param viewPortSize maximum viewport size
-      @param threadingMode use for testing only!
-    */
-    Quill(const QSize &viewPortSize = Quill::defaultViewPortSize,
-          Quill::ThreadingMode threadingMode = Quill::ThreadingNormal);
-    virtual ~Quill();
+      Starts Quill with testing mode. This operation will fail if
+      Quill is already in use. In testing mode, any background
+      operation will require a call to releaseAndWait() before
+      completing. This setting should only be used by unit tests.
+     */
+
+    static void initTestingMode();
 
     /*!
-      Used to create a singleton pattern.
-    */
-    static Quill *instance();
+      Destroys the Quill core and resets all settings. All
+      QuillFiles will have their valid() property set to false. If
+      Quill or QuillFiles are used after this command,
+      Quill will start with a fresh core.
 
-    /*!
-      Provides access to a file object. The object will be created
-      if necessary. It will stay as property of the Quill object and
-      kept in memory indefinitely.
+      There should be no reason to call this function except at
+      program cleanup, or cleaning up the state between different unit
+      tests.
+     */
 
-      @param fileName The name of the file where changes are
-      made. Must be non-empty. The file may be non-existing, in which
-      case the file will be created. If creating the file fails, this
-      operation will also fail. Will create directories if necessary.
-
-      @param fileFormat The file format, if not evident from the file
-      name. As in QImageReader::setFormat().
-    */
-
-    QuillFile *file(const QString &fileName,
-                    const QString &fileFormat = "");
+    static void cleanup();
 
     /*!
       Modifies the preview level count. If new previews are
@@ -121,13 +111,13 @@ public:
       @param count The number of preview levels. Must be at least 1.
      */
 
-    void setPreviewLevelCount(int count);
+    static void setPreviewLevelCount(int count);
 
     /*!
       Returns the preview level count set by setPreviewLevelCount().
      */
 
-    int previewLevelCount() const;
+    static int previewLevelCount();
 
     /*!
       Sets the maximum number of files that can have their display level
@@ -155,14 +145,14 @@ public:
       value is 1; the default value is 1.
      */
 
-    void setFileLimit(int level, int limit);
+    static void setFileLimit(int level, int limit);
 
     /*!
       Returns the limit for the number of files that can be open at the
       given level at one time. See setFileLimit().
      */
 
-    int fileLimit(int level) const;
+    static int fileLimit(int level);
 
     /*!
       Sets the maximum number of edit history steps that can be cached
@@ -183,14 +173,14 @@ public:
       the default value is 0.
     */
 
-    void setEditHistoryCacheSize(int level, int limit);
+    static void setEditHistoryCacheSize(int level, int limit);
 
     /*!
       Returns the edit history cache size for the given preview
       level. See setEditHistoryCacheSize().
      */
 
-    int editHistoryCacheSize(int level) const;
+    static int editHistoryCacheSize(int level);
 
     /*!
       Sets the recommended size for preview images for a certain
@@ -198,7 +188,7 @@ public:
       in the progress of saving.
      */
 
-    void setPreviewSize(int level, QSize size);
+    static void setPreviewSize(int level, const QSize &size);
 
     /*!
       Sets the recommended size for preview images for a certain
@@ -206,48 +196,34 @@ public:
       in the progress of saving.
     */
 
-    QSize previewSize(int level) const;
+    static QSize previewSize(int level);
 
     /*!
       Sets the maximum tile size if tiling is in use.
       The default is 0, which disables tiling.
      */
 
-    void setDefaultTileSize(const QSize &size);
+    static void setDefaultTileSize(const QSize &size);
 
     /*!
       Sets the tile cache size (measured in tiles, not bytes!)
       The default is 20.
     */
 
-    void setTileCacheSize(int size);
+    static void setTileCacheSize(int size);
 
     /*!
       Sets the maximum save buffer size, in pixels (4 bytes per pixel).
     */
 
-    void setSaveBufferSize(int size);
-
-    /*!
-      Dumps the image editor state into a byte array which can be
-      saved to the file system.
-     */
-
-    QByteArray dump();
-
-    /*!
-      Recovers the state of the image editor after a crash.
-      All files start as closed.
-    */
-
-    void recover(QByteArray history);
+    static void setSaveBufferSize(int size);
 
     /*
       Sets the default directory where to look for edit histories.
       Default is $HOME/.config/quill/history.
      */
 
-    void setEditHistoryDirectory(const QString &directory);
+    static void setEditHistoryDirectory(const QString &directory);
 
     /*!
       Sets the directory where to look for ready-made thumbnails
@@ -255,7 +231,7 @@ public:
       preview images for the level are generated from the full image.
      */
 
-    void setThumbnailDirectory(int level, const QString &directory);
+    static void setThumbnailDirectory(int level, const QString &directory);
 
     /*!
       Sets the file extension which is used in storing and retrieving thumbnail
@@ -263,7 +239,7 @@ public:
       Does not include a full stop. Default is "png".
      */
 
-    void setThumbnailExtension(const QString &format);
+    static void setThumbnailExtension(const QString &format);
 
     /*!
       Enables or disables thumbnail creation. Disabling thumbnail
@@ -271,7 +247,7 @@ public:
       currently in progress.
      */
 
-    void setThumbnailCreationEnabled(bool enabled);
+    static void setThumbnailCreationEnabled(bool enabled);
 
     /*!
       Returns true if thumbnail creation is enabled. True by
@@ -279,7 +255,7 @@ public:
       thumbnail creation fails by some reason.
      */
 
-    bool isThumbnailCreationEnabled() const;
+    static bool isThumbnailCreationEnabled();
 
     /*!
       To make background loading tests easier on fast machines
@@ -291,22 +267,17 @@ public:
       will freeze forever.
     */
 
-    void releaseAndWait();
+    static void releaseAndWait();
 
     /*!
       To make background loading tests easier on fast machines
       @param delay extra delay per background operation, in seconds
     */
 
-    void setDebugDelay(int delay);
+    static void setDebugDelay(int delay);
 
- signals:
-
-    /*!
-      There was a generic error in Quill.
-     */
-
-    void error(Quill::Error errorCode);
+    static QuillFile *file(const QString &fileName,
+                           const QString &fileFormat = "");
 
 private:
 

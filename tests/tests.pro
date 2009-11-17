@@ -9,7 +9,6 @@ CONFIG += ordered
 SUBDIRS += \
            ut_unittests \
            ut_filtergenerator \
-           ut_crashrecovery \
            ut_imageloader \
            ut_partialloader \
            ut_tiling \

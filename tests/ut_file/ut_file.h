@@ -49,6 +49,8 @@ public:
     ut_file();
 
 private slots:
+    void init();
+    void cleanup();
     void initTestCase();
     void cleanupTestCase();
 

@@ -49,144 +49,110 @@
 #include "core.h"
 #include "threadmanager.h"
 
-class QuillPrivate
-{
-public:
-    Core *core;
-    static Quill *instance;
-};
-
 QSize Quill::defaultViewPortSize = QSize(640, 400);
-Quill *QuillPrivate::instance = 0;
 
-Quill::Quill(const QSize &viewPortSize,
-             Quill::ThreadingMode threadingMode)
+void Quill::initTestingMode()
 {
-    qRegisterMetaType<QuillImage>("QuillImage");
-    qRegisterMetaType<QuillImageList>("QuillImageList");
-
-    priv = new QuillPrivate();
-    priv->core = new Core(viewPortSize, threadingMode);
-
-    QuillImageFilter::registerAll();
+    Core::initTestingMode();
 }
 
-Quill::~Quill()
+void Quill::cleanup()
 {
-    delete priv->core;
-    delete priv;
-    QuillPrivate::instance = 0;
-}
-
-Quill *Quill::instance()
-{
-    if (QuillPrivate::instance == 0)
-        QuillPrivate::instance = new Quill();
-
-    return QuillPrivate::instance;
-}
-
-QuillFile *Quill::file(const QString &fileName, const QString &fileFormat)
-{
-    return priv->core->file(fileName, fileFormat);
+    Core::cleanup();
 }
 
 void Quill::setDefaultTileSize(const QSize &defaultTileSize)
 {
-    priv->core->setDefaultTileSize(defaultTileSize);
+    Core::instance()->setDefaultTileSize(defaultTileSize);
 }
 
 void Quill::setTileCacheSize(int size)
 {
-    priv->core->setTileCacheSize(size);
+    Core::instance()->setTileCacheSize(size);
 }
 
 void Quill::setSaveBufferSize(int size)
 {
-    priv->core->setSaveBufferSize(size);
+    Core::instance()->setSaveBufferSize(size);
 }
 
 void Quill::setFileLimit(int level, int limit)
 {
-    priv->core->setFileLimit(level, limit);
+    Core::instance()->setFileLimit(level, limit);
 }
 
-int Quill::fileLimit(int level) const
+int Quill::fileLimit(int level)
 {
-    return priv->core->fileLimit(level);
+    return Core::instance()->fileLimit(level);
 }
 
 void Quill::setEditHistoryCacheSize(int level, int limit)
 {
-    priv->core->setEditHistoryCacheSize(level, limit);
+    Core::instance()->setEditHistoryCacheSize(level, limit);
 }
 
-int Quill::editHistoryCacheSize(int level) const
+int Quill::editHistoryCacheSize(int level)
 {
-    return priv->core->editHistoryCacheSize(level);
+    return Core::instance()->editHistoryCacheSize(level);
 }
 
 void Quill::setPreviewLevelCount(int count)
 {
-    priv->core->setPreviewLevelCount(count);
+    Core::instance()->setPreviewLevelCount(count);
 }
 
-int Quill::previewLevelCount() const
+int Quill::previewLevelCount()
 {
-    return priv->core->previewLevelCount();
+    return Core::instance()->previewLevelCount();
 }
 
-void Quill::setPreviewSize(int level, QSize size)
+void Quill::setPreviewSize(int level, const QSize &size)
 {
-    priv->core->setPreviewSize(level, size);
+    Core::instance()->setPreviewSize(level, size);
 }
 
-QSize Quill::previewSize(int level) const
+QSize Quill::previewSize(int level)
 {
-    return priv->core->previewSize(level);
-}
-
-QByteArray Quill::dump()
-{
-    return priv->core->dump();
-}
-
-void Quill::recover(QByteArray history)
-{
-    priv->core->recover(history);
+    return Core::instance()->previewSize(level);
 }
 
 void Quill::setEditHistoryDirectory(const QString &directory)
 {
-    priv->core->setEditHistoryDirectory(directory);
+    Core::instance()->setEditHistoryDirectory(directory);
 }
 
 void Quill::setThumbnailDirectory(int level, const QString &directory)
 {
-    priv->core->setThumbnailDirectory(level, directory);
+    Core::instance()->setThumbnailDirectory(level, directory);
 }
 
 void Quill::setThumbnailExtension(const QString &extension)
 {
-    priv->core->setThumbnailExtension(extension);
+    Core::instance()->setThumbnailExtension(extension);
 }
 
 void Quill::setThumbnailCreationEnabled(bool enabled)
 {
-    priv->core->setThumbnailCreationEnabled(enabled);
+    Core::instance()->setThumbnailCreationEnabled(enabled);
 }
 
-bool Quill::isThumbnailCreationEnabled() const
+bool Quill::isThumbnailCreationEnabled()
 {
-    return priv->core->isThumbnailCreationEnabled();
+    return Core::instance()->isThumbnailCreationEnabled();
 }
 
 void Quill::releaseAndWait()
 {
-    priv->core->releaseAndWait();
+    Core::instance()->releaseAndWait();
 }
 
 void Quill::setDebugDelay(int delay)
 {
-    priv->core->setDebugDelay(delay);
+    Core::instance()->setDebugDelay(delay);
+}
+
+QuillFile *Quill::file(const QString &fileName,
+                       const QString &fileFormat)
+{
+    return Core::instance()->file(fileName, fileFormat);
 }
