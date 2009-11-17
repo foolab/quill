@@ -303,7 +303,7 @@ public:
     /*!
       To create the temporary file path
     */
-    void setTemporaryFilePath();
+    void setTemporaryFilePath(const QString tmpFilePath);
 
  signals:
 

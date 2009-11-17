@@ -191,9 +191,7 @@ void Quill::setDebugDelay(int delay)
     priv->core->setDebugDelay(delay);
 }
 
-void Quill::setTemporaryFilePath()
+void Quill::setTemporaryFilePath(const QString tmpFilePath)
 {
-    QDir appDir=QDir::current();;
-    appDir.mkdir("tmp/");
-    priv->core->setTemporaryFileDirectory(appDir.absolutePath()+"/tmp");
+    priv->core->setTemporaryFileDirectory(tmpFilePath);
 }

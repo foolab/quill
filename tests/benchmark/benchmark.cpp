@@ -21,8 +21,8 @@ int main(int argc, char **argv)
         qDebug()<<"the arg is: "<<argv[i];
     Quill *quill = new Quill(QSize(100, 100));
 
-    if(QString(argv[2]) =="t")
-        quill->setTemporaryFilePath();
+    if(argc ==2)
+       quill->setTemporaryFilePath(QString(argv[1]));
     quill->setDefaultTileSize(QSize(256, 256));
 
     QuillFile *file = quill->file("input/benchmark12.jpg", "jpg");
