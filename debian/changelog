@@ -1,3 +1,9 @@
+libquill (1.091117.0) unstable; urgency=low
+
+  * Fixes: NB#146925 - Gallery does not save images when /tmp folder is 100%
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 17 Nov 2009 12:50:00 +0200
+
 libquill (1.091113.0) unstable; urgency=low
 
   * Fixes: NB#145052 - libquill-dev should depend on libqt4-dev
