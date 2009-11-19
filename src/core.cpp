@@ -43,7 +43,7 @@
 #include <QDir>
 #include "quill.h"
 #include "core.h"
-#include "quillfile.h"
+#include "file.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "imagecache.h"
@@ -73,10 +73,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
 
 Core::~Core()
 {
-    while (!m_files.isEmpty()) {
-        delete *(m_files.begin());
-        m_files.erase(m_files.begin());
-    }
+    foreach(File *file, m_files)
+        delete file;
 
     while (!m_cache.isEmpty()) {
         delete m_cache.first();
@@ -190,22 +188,22 @@ int Core::editHistoryCacheSize(int level)
     return m_cache[level]->maxSize();
 }
 
-QuillFile *Core::file(const QString &fileName,
+File *Core::file(const QString &fileName,
                       const QString &fileFormat)
 {
-    QuillFile *file = m_files[fileName];
+    File *file = m_files[fileName];
 
     if (file)
         return file;
 
-    file = QuillFile::readFromEditHistory(fileName, this);
+    file = File::readFromEditHistory(fileName, this);
 
     if (file) {
         m_files.insert(fileName, file);
         return file;
     }
 
-    file = new QuillFile(this);
+    file = new File(this);
     file->setFileName(fileName);
 
     QFileInfo fileInfo(fileName);
@@ -219,11 +217,16 @@ QuillFile *Core::file(const QString &fileName,
     return file;
 }
 
+void Core::detach(const QString &fileName)
+{
+    m_files.remove(fileName);
+}
+
 QuillUndoCommand *Core::findInAllStacks(int id) const
 {
     QuillUndoCommand *command = 0;
 
-    for (QMap<QString, QuillFile*>::const_iterator file = m_files.begin();
+    for (QMap<QString, File*>::const_iterator file = m_files.begin();
          file != m_files.end(); file++)
         if ((*file)->exists()) {
             command = (*file)->stack()->find(id);
@@ -233,12 +236,12 @@ QuillUndoCommand *Core::findInAllStacks(int id) const
     return command;
 }
 
-QuillFile *Core::priorityFile() const
+File *Core::priorityFile() const
 {
     QString name;
     int level = -1;
 
-    for (QMap<QString, QuillFile*>::const_iterator file = m_files.begin();
+    for (QMap<QString, File*>::const_iterator file = m_files.begin();
          file != m_files.end(); file++) {
         if ((*file)->exists() && (*file)->supported() &&
             ((*file)->displayLevel() > level)) {
@@ -253,9 +256,9 @@ QuillFile *Core::priorityFile() const
         return 0;
 }
 
-QuillFile *Core::prioritySaveFile() const
+File *Core::prioritySaveFile() const
 {
-    for (QMap<QString, QuillFile*>::const_iterator file = m_files.begin();
+    for (QMap<QString, File*>::const_iterator file = m_files.begin();
          file != m_files.end(); file++) {
         if ((*file)->isSaveInProgress())
             return *file;
@@ -264,11 +267,11 @@ QuillFile *Core::prioritySaveFile() const
     return 0;
 }
 
-QList<QuillFile*> Core::existingFiles() const
+QList<File*> Core::existingFiles() const
 {
-    QList<QuillFile*> files;
+    QList<File*> files;
 
-    for (QMap<QString, QuillFile*>::const_iterator file = m_files.begin();
+    for (QMap<QString, File*>::const_iterator file = m_files.begin();
          file != m_files.end(); file++)
     {
         if ((*file)->exists())
@@ -289,10 +292,10 @@ void Core::suggestNewTask()
     if (m_files.isEmpty())
         return;
 
-    QList<QuillFile*> allFiles = existingFiles();
+    QList<File*> allFiles = existingFiles();
 
     // First priority (all files): loading any pre-generated thumbnails
-    for (QList<QuillFile*>::iterator file = allFiles.begin();
+    for (QList<File*>::iterator file = allFiles.begin();
          file != allFiles.end(); file++) {
 
         int maxLevel = (*file)->displayLevel();
@@ -307,7 +310,7 @@ void Core::suggestNewTask()
 
     // Second priority (highest display level): all preview levels
 
-    QuillFile *priorityFile = this->priorityFile();
+    File *priorityFile = this->priorityFile();
 
     if (priorityFile) {
 
@@ -322,7 +325,7 @@ void Core::suggestNewTask()
 
     // Third priority (save in progress): getting final full image/tiles
 
-    QuillFile *prioritySaveFile = this->prioritySaveFile();
+    File *prioritySaveFile = this->prioritySaveFile();
 
     if (prioritySaveFile) {
 
@@ -356,7 +359,7 @@ void Core::suggestNewTask()
 
     // Seventh priority (all others): all preview levels
 
-    for (QList<QuillFile*>::iterator file = allFiles.begin();
+    for (QList<File*>::iterator file = allFiles.begin();
          file != allFiles.end(); file++)
         if ((*file)->supported()) {
             int maxLevel = (*file)->displayLevel();
@@ -371,7 +374,7 @@ void Core::suggestNewTask()
     // Seventh priority (any): saving thumbnails
 
     if (m_thumbnailCreationEnabled)
-        foreach(QuillFile *file, allFiles)
+        foreach(File *file, allFiles)
             if (file->supported() && !file->isReadOnly())
                 for (int level=0; level<=previewLevelCount()-1; level++)
                     if (m_threadManager->suggestThumbnailSaveTask(file, level))
@@ -423,9 +426,9 @@ void Core::recover(QByteArray history)
     if (!m_files.isEmpty())
         return;
 
-    QList<QuillFile*> fileList = HistoryXml::decode(history, this);
+    QList<File*> fileList = HistoryXml::decode(history, this);
 
-    for (QMap<QString, QuillFile*>::iterator file = m_files.begin();
+    for (QMap<QString, File*>::iterator file = m_files.begin();
          file != m_files.end(); file++) {
         m_files.insert((*file)->fileName(), *file);
     }
@@ -478,7 +481,7 @@ bool Core::isThumbnailCreationEnabled() const
     return m_thumbnailCreationEnabled;
 }
 
-void Core::insertFile(QuillFile *file, const QString &key)
+void Core::insertFile(File *file, const QString &key)
 {
     // insertMulti() instead of insert() here since original copies
     // will be using empty strings as keys.
@@ -495,7 +498,7 @@ void Core::setDebugDelay(int delay)
     m_threadManager->setDebugDelay(delay);
 }
 
-void Core::emitImageAvailable(QuillFile *file, int level)
+void Core::emitImageAvailable(File *file, int level)
 {
     if (level > file->displayLevel())
         return;
@@ -509,7 +512,7 @@ void Core::emitImageAvailable(QuillFile *file, int level)
     file->emitImageAvailable(imageList);
 }
 
-void Core::emitTileAvailable(QuillFile *file, int tileId)
+void Core::emitTileAvailable(File *file, int tileId)
 {
     if (file->displayLevel() < previewLevelCount())
         return;
@@ -525,7 +528,7 @@ void Core::emitTileAvailable(QuillFile *file, int tileId)
 int Core::numFilesAtLevel(int level) const
 {
     int n = 0;
-    for (QMap<QString, QuillFile*>::const_iterator file = m_files.begin();
+    for (QMap<QString, File*>::const_iterator file = m_files.begin();
          file != m_files.end(); file++) {
         if ((*file)->displayLevel() >= level)
             n++;

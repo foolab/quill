@@ -276,9 +276,6 @@ public:
 
     static void setDebugDelay(int delay);
 
-    static QuillFile *file(const QString &fileName,
-                           const QString &fileFormat = "");
-
 private:
 
     QuillPrivate *priv;

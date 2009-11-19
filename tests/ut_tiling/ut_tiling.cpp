@@ -90,7 +90,7 @@ void ut_tiling::testTiledSaving()
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
     QCOMPARE(file->viewPort(), QRect());
@@ -137,6 +137,8 @@ void ut_tiling::testTiledSaving()
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
+
+    delete file;
 }
 
 // Test tiled saving with not enough cache
@@ -155,7 +157,7 @@ void ut_tiling::testTiledSavingSmallCache()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setTileCacheSize(1);
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     file->setViewPort(QRect(0, 0, 8, 2));
 
@@ -195,6 +197,8 @@ void ut_tiling::testTiledSavingSmallCache()
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
+
+    delete file;
 }
 
 // Test tiled viewport changes
@@ -218,7 +222,7 @@ void ut_tiling::testTiledSwipe()
     Quill::setEditHistoryDirectory("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(2, 2));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setViewPort(QRect(0, 0, 8, 8));
     file->setDisplayLevel(1);
 
@@ -233,7 +237,7 @@ void ut_tiling::testTiledSwipe()
     file->save();
     file->setDisplayLevel(-1);
 
-    QuillFile *file2 = Quill::file(testFile2.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile2.fileName(), "png");
     file2->setViewPort(QRect(0, 0, 8, 8));
     file2->setDisplayLevel(1);
 
@@ -277,6 +281,9 @@ void ut_tiling::testTiledSwipe()
     Quill::releaseAndWait();
 
     QCOMPARE(file2->allImageLevels().count(), 5);
+
+    delete file;
+    delete file2;
 }
 
 // Test saving and loading
@@ -296,7 +303,7 @@ void ut_tiling::testTiledSaveLoad()
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(saved()));
 
     QuillImageFilter *filter =
@@ -350,6 +357,8 @@ void ut_tiling::testTiledSaveLoad()
     Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 5);
+
+    delete file;
 }
 
 // Test save buffers
@@ -370,7 +379,7 @@ void ut_tiling::testSaveBuffer()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setSaveBufferSize(4);
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setViewPort(QRect(0, 0, 2, 8));
     file->setDisplayLevel(1);
 
@@ -419,6 +428,8 @@ void ut_tiling::testSaveBuffer()
     QImage resultImage(testFile.fileName());
 
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
+
+    delete file;
 }
 
 void ut_tiling::testSaveBufferUnequal()
@@ -439,7 +450,7 @@ void ut_tiling::testSaveBufferUnequal()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setSaveBufferSize(6);
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setViewPort(QRect(0, 0, 2, 8));
     file->setDisplayLevel(1);
 
@@ -488,6 +499,8 @@ void ut_tiling::testSaveBufferUnequal()
 
     QImage resultImage(testFile.fileName());
     QVERIFY(Unittests::compareImage(resultImage, targetImage));
+
+    delete file;
 }
 
 // Test panning
@@ -500,7 +513,7 @@ void ut_tiling::testPan()
 
     Quill::setDefaultTileSize(QSize(2, 2));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(imageAvailable(QuillImageList)));
     file->setDisplayLevel(1);
 
@@ -543,6 +556,8 @@ void ut_tiling::testPan()
     QCOMPARE(tileList.count(), 2);
     QCOMPARE(tileList.at(0).area(), QRect(4, 0, 2, 2));
     QCOMPARE(tileList.at(1).area(), QRect(6, 0, 2, 2));
+
+    delete file;
 }
 
 void ut_tiling::testPreviewSizeChanges()
@@ -557,7 +572,7 @@ void ut_tiling::testPreviewSizeChanges()
 
     Quill::setDefaultTileSize(QSize(4, 4));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
@@ -581,6 +596,8 @@ void ut_tiling::testPreviewSizeChanges()
     Quill::releaseAndWait();
 
     QCOMPARE(file->image(0).size(), QSize(1, 1));
+
+    delete file;
 }
 
 
@@ -598,7 +615,7 @@ void ut_tiling::testViewPortBiggerThanCache()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setTileCacheSize(3);
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
     Quill::releaseAndWait(); // preview
@@ -628,6 +645,8 @@ void ut_tiling::testViewPortBiggerThanCache()
     QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 2, 2));
     QCOMPARE(file->allImageLevels().at(2).area(), QRect(2, 0, 2, 2));
     QCOMPARE(file->allImageLevels().at(3).area(), QRect(4, 0, 2, 2));
+
+    delete file;
 }
 
 // Test saving which is interrupted when in progress
@@ -647,7 +666,7 @@ void ut_tiling::testSaveInterrupted()
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setDisplayLevel(-1);
 
     QuillImageFilter *filter =
@@ -688,6 +707,8 @@ void ut_tiling::testSaveInterrupted()
     Quill::releaseAndWait();
 
     QVERIFY(Unittests::compareImage(QImage(testFile.fileName()), targetImage));
+
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

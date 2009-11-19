@@ -44,7 +44,7 @@
 #include <QuillImageFilterFactory>
 
 #include <Quill>
-#include <QuillFile>
+#include "file.h"
 #include "ut_file.h"
 #include "unittests.h"
 
@@ -76,7 +76,7 @@ void ut_file::testRemove()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QVERIFY(file);
     QVERIFY(file->exists());
 
@@ -102,6 +102,8 @@ void ut_file::testRemove()
     QVERIFY(!file->exists());
     QVERIFY(!QFile::exists(testFile.fileName()));
     QVERIFY(!QFile::exists(originalFileName));
+
+    delete file;
 }
 
 void ut_file::testOriginal()
@@ -113,7 +115,7 @@ void ut_file::testOriginal()
     image.save(testFile.fileName(), "png");
 
     Quill::setFileLimit(0, 2);
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -143,6 +145,8 @@ void ut_file::testOriginal()
     file->remove();
     QVERIFY(!file->exists());
     QVERIFY(!original->exists());
+
+    delete file;
 }
 
 void ut_file::testFileLimit()
@@ -157,8 +161,8 @@ void ut_file::testFileLimit()
     image.save(testFile.fileName(), "png");
     image.save(testFile2.fileName(), "png");
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
-    QuillFile *file2 = Quill::file(testFile2.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile2.fileName(), "png");
 
     QVERIFY(file->setDisplayLevel(0));
     QVERIFY(!file2->setDisplayLevel(0));
@@ -168,6 +172,9 @@ void ut_file::testFileLimit()
 
     Quill::releaseAndWait();
     Quill::releaseAndWait();
+
+    delete file;
+    delete file2;
 }
 
 int main ( int argc, char *argv[] ){

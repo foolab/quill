@@ -49,12 +49,12 @@
 
 #include "quillundostack.h"
 #include "quillundocommand.h"
-#include "quillfile.h"
+#include "file.h"
 #include "core.h"
 #include "tilemap.h"
 #include "savemap.h"
 
-QuillUndoStack::QuillUndoStack(Core *parent, QuillFile *file) :
+QuillUndoStack::QuillUndoStack(Core *parent, File *file) :
     m_core(parent), m_stack(new QUndoStack()), m_file(file),
     m_isSessionRecording(false), m_recordingSessionId(0), m_nextSessionId(1),
     m_savedIndex(0), m_saveCommand(0), m_saveMap(0)
@@ -68,7 +68,7 @@ QuillUndoStack::~QuillUndoStack()
     delete m_saveMap;
 }
 
-QuillFile* QuillUndoStack::file()
+File* QuillUndoStack::file()
 {
     return m_file;
 }

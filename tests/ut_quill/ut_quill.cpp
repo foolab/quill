@@ -90,7 +90,7 @@ void ut_quill::testQuillFile()
     Quill::setEditHistoryCacheSize(0, 5);
     Quill::setEditHistoryCacheSize(1, 5);
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
 
     QVERIFY(file);
 
@@ -177,6 +177,8 @@ void ut_quill::testQuillFile()
     targetList.append(file->image());
 
     QCOMPARE(targetList, file->allImageLevels());
+
+    delete file;
 }
 
 // Test cache disabling, 2 preview levels + 1 full level
@@ -193,7 +195,7 @@ void ut_quill::testDisableCache()
     Quill::setPreviewSize(0, QSize(2, 1));
     Quill::setPreviewSize(1, QSize(4, 1));
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
 
     file->setDisplayLevel(2);
 
@@ -287,6 +289,8 @@ void ut_quill::testDisableCache()
     QCOMPARE(initialPreview, file->image(0));
     QCOMPARE(initialMid, file->image(1));
     QCOMPARE(initialFull, file->image(2));
+
+    delete file;
 }
 
 void ut_quill::testSignals()
@@ -298,7 +302,7 @@ void ut_quill::testSignals()
     Quill::setPreviewSize(0, QSize(2, 1));
     Quill::setPreviewLevelCount(2);
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
 
     QSignalSpy spy(file, SIGNAL(imageAvailable(const QuillImageList)));
 
@@ -378,6 +382,8 @@ void ut_quill::testSignals()
     QVERIFY(Unittests::compareImage(spyImage,
                                     filter2->apply(filter->apply(image))));
     QCOMPARE(spyImage.z(), 2);
+
+    delete file;
 }
 
 void ut_quill::testLoadSave()
@@ -392,7 +398,7 @@ void ut_quill::testLoadSave()
     QuillImage image(QImage(testFile.fileName()));
     QCOMPARE(image, QuillImage(Unittests::generatePaletteImage()));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(saved()));
 
     file->setDisplayLevel(1);
@@ -438,7 +444,7 @@ void ut_quill::testLoadSave()
     Quill::setEditHistoryDirectory("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 5);
 
-    QuillFile *file2 = Quill::file(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
 
     file2->setDisplayLevel(1);
 
@@ -463,6 +469,8 @@ void ut_quill::testLoadSave()
     QVERIFY(Unittests::compareImage(file2->image(), loadedImage));
 
     delete backupFilter;
+    delete file;
+    delete file2;
 }
 
 void ut_quill::testMultiSave()
@@ -480,7 +488,7 @@ void ut_quill::testMultiSave()
     QImage image(testFile.fileName());
     QVERIFY(Unittests::compareImage(image, Unittests::generatePaletteImage()));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(saved()));
 
     file->setDisplayLevel(1);
@@ -522,7 +530,7 @@ void ut_quill::testMultiSave()
     Quill::setPreviewSize(0, QSize(4, 1));
     Quill::setEditHistoryDirectory("/tmp/quill/history");
 
-    QuillFile *file2 = Quill::file(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy2(file2, SIGNAL(saved()));
     file2->setDisplayLevel(1);
 
@@ -551,13 +559,17 @@ void ut_quill::testMultiSave()
 
     Quill::setEditHistoryDirectory("/tmp/quill/history");
 
-    QuillFile *file3 = Quill::file(testFile.fileName(), "png");
+    QuillFile *file3 = new QuillFile(testFile.fileName(), "png");
     file3->setDisplayLevel(1);
 
     Quill::releaseAndWait();
     Quill::releaseAndWait();
 
     QVERIFY(Unittests::compareImage(file3->image(), imageBetween));
+
+    delete file;
+    delete file2;
+    delete file3;
 }
 
 // Test situations where nothing should be saved!
@@ -573,7 +585,7 @@ void ut_quill::testNoSave()
     QImage image(testFile.fileName());
     QVERIFY(Unittests::compareImage(image, Unittests::generatePaletteImage()));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(saved()));
 
     file->setDisplayLevel(1);
@@ -592,17 +604,16 @@ void ut_quill::testNoSave()
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
-    QuillFile *file2 = Quill::file(testFile.fileName(), "png");
-    QCOMPARE(file2, file);
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
 
-    file->runFilter(filter);
+    file2->runFilter(filter);
     Quill::releaseAndWait();
     Quill::releaseAndWait();
 
-    QImage imageAfter = file->image();
+    QImage imageAfter = file2->image();
     QVERIFY(Unittests::compareImage(imageAfter, filter->apply(image)));
 
-    file->save();
+    file2->save();
     Quill::releaseAndWait();
 
     // now, as there are changes, something should happen
@@ -615,7 +626,7 @@ void ut_quill::testNoSave()
     Quill::setPreviewSize(0, QSize(4, 1));
     Quill::setEditHistoryDirectory("/tmp/quill/history");
 
-    QuillFile *file3 = Quill::file(testFile.fileName(), "png");
+    QuillFile *file3 = new QuillFile(testFile.fileName(), "png");
 
     QSignalSpy spy2(file3, SIGNAL(saved()));
 
@@ -631,6 +642,10 @@ void ut_quill::testNoSave()
     QVERIFY(Unittests::compareImage(QImage(testFile.fileName(), "png"), imageAfter));
 
     QCOMPARE(spy2.count(), 0);
+
+    delete file;
+    delete file2;
+    delete file3;
 }
 
 // Test that the save index is properly nulled whenever changes are made
@@ -661,7 +676,7 @@ void ut_quill::testSaveIndex()
     QImage image(testFile.fileName());
     QVERIFY(Unittests::compareImage(image, Unittests::generatePaletteImage()));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(saved()));
     file->setDisplayLevel(1);
 
@@ -683,7 +698,7 @@ void ut_quill::testSaveIndex()
     Quill::setPreviewSize(0, QSize(4, 1));
     Quill::setEditHistoryDirectory("/tmp/quill/history");
 
-    QuillFile *file2 = Quill::file(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy2(file2, SIGNAL(saved()));
     file2->setDisplayLevel(1);
 
@@ -708,6 +723,9 @@ void ut_quill::testSaveIndex()
     // we should see changes happen
 
     QCOMPARE(spy2.count(), 1);
+
+    delete file;
+    delete file2;
 }
 
 // Test that background priority works for saving
@@ -715,12 +733,8 @@ void ut_quill::testBackgroundPriority()
 {
     QTemporaryFile testFile;
     testFile.open();
-    QTemporaryFile originFile;
-    originFile.open();
     QTemporaryFile testFile2;
     testFile2.open();
-    QTemporaryFile originFile2;
-    originFile2.open();
 
     QImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
@@ -734,8 +748,7 @@ void ut_quill::testBackgroundPriority()
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
-    file->setOriginalFileName(originFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     QSignalSpy changedSpy(file, SIGNAL(imageAvailable(const QuillImageList)));
     QSignalSpy spy(file, SIGNAL(saved()));
@@ -750,8 +763,7 @@ void ut_quill::testBackgroundPriority()
 
     file->setDisplayLevel(-1);
 
-    QuillFile *file2 = Quill::file(testFile2.fileName(), "png");
-    file2->setOriginalFileName(originFile.fileName());
+    QuillFile *file2 = new QuillFile(testFile2.fileName(), "png");
 
     QSignalSpy changedSpy2(file2, SIGNAL(imageAvailable(const QuillImageList)));
     QSignalSpy spy2(file2, SIGNAL(saved()));
@@ -800,7 +812,7 @@ void ut_quill::testBackgroundPriority()
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy2.count(), 0);
 
-    QFile realFile(originFile.fileName());
+    QFile realFile(file->originalFileName());
     QVERIFY(realFile.size() > 0);
 
     // Open file, full image for new file
@@ -811,6 +823,9 @@ void ut_quill::testBackgroundPriority()
     QCOMPARE(changedSpy2.count(), 3);
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy2.count(), 0);
+
+    delete file;
+    delete file2;
 }
 
 // Test what happens when we reopen a file in progress of saving
@@ -900,8 +915,6 @@ void ut_quill::testLoadSaveSmallPicture()
 {
     QTemporaryFile testFile;
     testFile.open();
-    QTemporaryFile originFile;
-    originFile.open();
 
     QImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
@@ -917,8 +930,8 @@ void ut_quill::testLoadSaveSmallPicture()
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     filter->setOption(QuillImageFilter::Contrast, QVariant(20));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
-    file->setOriginalFileName(originFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
     QSignalSpy spy(file, SIGNAL(saved()));
     file->setDisplayLevel(1);
 
@@ -944,7 +957,7 @@ void ut_quill::testLoadSaveSmallPicture()
 
     QImage blackImage(QSize(8, 2), QImage::Format_RGB32);
     blackImage.fill(qRgb(0, 0, 0));
-    blackImage.save(originFile.fileName(), "png");
+    blackImage.save(file->originalFileName(), "png");
 
     QImage filteredBlackImage(QSize(8, 2), QImage::Format_RGB32);
     filteredBlackImage.fill(qRgb(36, 36, 36));
@@ -956,7 +969,7 @@ void ut_quill::testLoadSaveSmallPicture()
     Quill::setEditHistoryDirectory("/tmp/quill/history");
 
     QuillFile *file2 =
-        Quill::file(testFile.fileName(), "png");
+        new QuillFile(testFile.fileName(), "png");
     file2->setDisplayLevel(1);
 
     // Verify the small picture (and the big picture) that they still
@@ -979,6 +992,9 @@ void ut_quill::testLoadSaveSmallPicture()
     Quill::releaseAndWait();
     Quill::releaseAndWait();
     QVERIFY(Unittests::compareImage(file2->image(), filteredBlackImage));
+
+    delete file;
+    delete file2;
 }
 
 // The stack should load the correct picture after saving.
@@ -1000,7 +1016,7 @@ void ut_quill::testUseAfterSave()
 
     QuillImage targetImage = filter->apply(image);
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
     Quill::releaseAndWait();
@@ -1031,6 +1047,8 @@ void ut_quill::testUseAfterSave()
     Quill::releaseAndWait(); // should now be: load
 
     QVERIFY(Unittests::compareImage(file->image(), targetImage));
+
+    delete file;
 }
 
 // Test that export works, both from an image with a history and from

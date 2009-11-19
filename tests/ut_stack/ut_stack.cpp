@@ -94,7 +94,7 @@ void ut_stack::testSessionSetup()
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Contrast, QVariant(20));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     file->runFilter(filter);
     file->runFilter(filter2);
@@ -116,6 +116,8 @@ void ut_stack::testSessionSetup()
     QVERIFY(!file->isSession());
     QVERIFY(file->canUndo());
     QVERIFY(file->canRedo());
+
+    delete file;
 }
 
 // Make sure that undo/redo during the recording of a session does not undo
@@ -139,7 +141,7 @@ void ut_stack::testUndoRedoDuringSessionRecording()
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Contrast, QVariant(20));
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     file->startSession();
     file->runFilter(filter);
@@ -155,6 +157,8 @@ void ut_stack::testUndoRedoDuringSessionRecording()
     // Between commands, we should still be able to redo
     file->redo();
     QVERIFY(file->canRedo());
+
+    delete file;
 }
 
 void ut_stack::testSessionUndoRedo()
@@ -189,7 +193,7 @@ void ut_stack::testSessionUndoRedo()
     QuillImage resultImage4 = filter4->apply(resultImage3);
 
     Quill::setEditHistoryCacheSize(0, 5);
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     file->runFilter(filter);
 
@@ -235,6 +239,8 @@ void ut_stack::testSessionUndoRedo()
 
     file->redo();
     QVERIFY(Unittests::compareImage(file->image(), resultImage3));
+
+    delete file;
 }
 
 void ut_stack::testSessionSaveLoad()
@@ -271,7 +277,7 @@ void ut_stack::testSessionSaveLoad()
     Quill::setEditHistoryDirectory("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 5);
 
-    QuillFile *file = Quill::file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     file->startSession();
     file->runFilter(filter);
@@ -299,7 +305,7 @@ void ut_stack::testSessionSaveLoad()
     Quill::setEditHistoryDirectory("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 5);
 
-    QuillFile *file2 = Quill::file(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
     file2->setDisplayLevel(0);
 
     Quill::releaseAndWait(); // load
@@ -318,6 +324,9 @@ void ut_stack::testSessionSaveLoad()
     file2->undo();
     Quill::releaseAndWait(); // load
     QVERIFY(Unittests::compareImage(file2->image(), image));
+
+    delete file;
+    delete file2;
 }
 
 int main ( int argc, char *argv[] ){

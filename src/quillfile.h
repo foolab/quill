@@ -40,17 +40,15 @@
 #ifndef QUILLFILE_H
 #define QUILLFILE_H
 
-#include <QMetaType>
-#include <QList>
-#include <QuillImageFilter>
-
+#include <QObject>
 #include "quill.h"
 
 class QuillImage;
 class QuillImageFilter;
-class QuillUndoStack;
 class QuillFilePrivate;
-class QuillFile;
+class QSize;
+class QRect;
+class File;
 
 typedef QList<QuillImage> QuillImageList;
 Q_DECLARE_METATYPE(QuillImageList)
@@ -59,10 +57,28 @@ class QuillFile : public QObject
 {
 Q_OBJECT
 
-    friend class ut_thumbnail;
+    friend class File;
 
 public:
-    QuillFile(QObject *parent);
+    /*!
+      Provides access to a file object. The object will be created
+      if necessary. The object becomes property of the caller and can
+      be destroyed at any time.
+
+      @param fileName The name of the file where changes are
+      made. Must be non-empty. The file may be non-existing, in which
+      case the file will be created. If creating the file fails,
+      this operation will also fail, returning a QuillFile with isValid()
+      set to false. Will create directories if necessary.
+
+      @param fileFormat The file format, if not evident from the file
+      name. As in QImageReader::setFormat().
+    */
+
+    QuillFile(const QString &fileName,
+              const QString &fileFormat = "");
+
+
     virtual ~QuillFile();
 
     /*!
@@ -92,38 +108,6 @@ public:
     */
 
     virtual QString targetFormat() const;
-
-    /*!
-      Sets the file name.
-
-      Internal/testing use only.
-    */
-
-    void setFileName(const QString &fileName);
-
-    /*!
-      Sets the original file name.
-
-      Internal/testing use only.
-    */
-
-    void setOriginalFileName(const QString &originalFileName);
-
-    /*!
-      Sets the file format.
-
-      Internal/testing use only.
-    */
-
-    void setFileFormat(const QString &fileFormat);
-
-    /*!
-      Sets the target format.
-
-      Internal/testing use only.
-    */
-
-    void setTargetFormat(const QString &targetFormat);
 
     /*!
       Sets file as read only, disabling all edits. Only makes sense
@@ -165,16 +149,6 @@ public:
     */
 
     virtual void save();
-
-    /*!
-      Exports the file into a new name and format.
-
-      @param format The file format. This parameter must be given if
-      the format is not evident from the file extension.
-    */
-
-    virtual QuillFile *exportFile(const QString &newFileName,
-                                  const QString &fileFormat = "");
 
     /*!
       If the file is in the progress of saving.
@@ -306,14 +280,6 @@ public:
     virtual QString thumbnailFileName(int level) const;
 
     /*!
-      Returns the associated undo stack.
-
-      Internal/testing use only.
-     */
-
-    QuillUndoStack *stack() const;
-
-    /*!
       If the file exists in the file system.
      */
 
@@ -335,27 +301,6 @@ public:
     virtual void setSupported(bool supported);
 
     /*!
-      Reads a complete file object from edit history.
-
-      @param parent a Quill Core object.
-
-      Internal/testing use only.
-     */
-
-    static QuillFile *readFromEditHistory(const QString &fileName,
-                                          QObject *parent);
-
-    /*!
-      Copies a file over another file in the file system.
-
-      Qt does not have an overwriting copy for platform reasons,
-      this has been is implemented for efficiency reasons.
-     */
-
-    static void overwritingCopy(const QString &fileName,
-                                const QString &targetName);
-
-    /*!
       Completely removes a file along with its associated original
       backup, edit history, and any thumbnails. Does not remove the
       associated file object. This operation cannot be undone.
@@ -368,28 +313,10 @@ public:
     virtual void removeThumbnails();
 
     /*!
-      Immediately concludes any save operation. Internal use only.
-     */
-
-    void concludeSave();
-
-    /*!
       Returns the original, read-only copy of this file instance.
     */
 
     virtual QuillFile *original();
-
-    /*!
-      Immediately triggers the imageAvailable() signal. Internal use only.
-     */
-
-    void emitImageAvailable(QList<QuillImage> imageList);
-
-    /*!
-      Triggers an error.
-     */
-
-    virtual void setError(Quill::Error errorCode);
 
 signals:
     /*!
@@ -418,20 +345,14 @@ signals:
     void error(Quill::Error errorCode);
 
 private:
-    void prepareSave();
 
-    static QString fileNameHash(const QString &fileName);
-
-    static QString editHistoryFileName(const QString &fileName,
-                                       const QString &editHistoryDirectory);
-
-    /*!
-      Writes the edit history.
+    /*
+      The referred file object has been destroyed.
      */
+    void invalidate();
 
-    void writeEditHistory(const QString &history);
-
+private:
     QuillFilePrivate *priv;
 };
 
-#endif // QUILLFILE_H
+#endif

@@ -129,7 +129,7 @@ void ut_partialloader::testQuill()
     Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file =
-        Quill::file(testFile.fileName());
+        new QuillFile(testFile.fileName());
 
     file->setViewPort(QRect(-8, -2, 16, 4));
 
@@ -183,6 +183,8 @@ void ut_partialloader::testQuill()
     QCOMPARE(fragment.fullImageSize(), QSize(8, 2));
     QCOMPARE(fragment.area(), QRect(6, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(6, 0, 2, 2));
+
+    delete file;
 }
 
 // Load + brightness
@@ -199,7 +201,7 @@ void ut_partialloader::testMultiOperation()
     Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file =
-        Quill::file(testFile.fileName());
+        new QuillFile(testFile.fileName());
 
     file->setViewPort(QRect(-8, -2, 16, 4));
     file->setDisplayLevel(1);
@@ -269,6 +271,8 @@ void ut_partialloader::testMultiOperation()
     QCOMPARE(fragment.fullImageSize(), QSize(8, 2));
     QCOMPARE(fragment.area(), QRect(6, 0, 2, 2));
     QCOMPARE((QImage)fragment, referenceImage.copy(6, 0, 2, 2));
+
+    delete file;
 }
 
 // Test case: tiling approach with just a single tile
@@ -284,7 +288,7 @@ void ut_partialloader::testSingleTile()
     Quill::setDefaultTileSize(QSize(10, 10));
 
     QuillFile *file =
-        Quill::file(testFile.fileName());
+        new QuillFile(testFile.fileName());
     file->setViewPort(QRect(0, 0, 8, 2));
     file->setDisplayLevel(1);
 
@@ -297,6 +301,8 @@ void ut_partialloader::testSingleTile()
 
     QVERIFY(Unittests::compareImage(image,
             QuillImage(Unittests::generatePaletteImage())));
+
+    delete file;
 }
 
 void ut_partialloader::testCenterTilePriority()
@@ -311,7 +317,7 @@ void ut_partialloader::testCenterTilePriority()
     Quill::setDefaultTileSize(QSize(1, 1));
 
     QuillFile *file =
-        Quill::file(testFile.fileName());
+        new QuillFile(testFile.fileName());
     file->setViewPort(QRect(0, 0, 3, 2));
     file->setDisplayLevel(1);
 
@@ -345,6 +351,8 @@ void ut_partialloader::testCenterTilePriority()
     QCOMPARE(file->allImageLevels().at(4).area(), QRect(0, 1, 1, 1));
     QCOMPARE(file->allImageLevels().at(5).area(), QRect(1, 1, 1, 1));
     QCOMPARE(file->allImageLevels().at(6).area(), QRect(2, 1, 1, 1));
+
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

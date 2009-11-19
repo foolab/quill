@@ -48,7 +48,7 @@
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
 
-#include "quillfile.h"
+#include "file.h"
 #include "core.h"
 #include "quillundocommand.h"
 #include "quillundostack.h"
@@ -108,7 +108,7 @@ QuillUndoCommand *ThreadManager::getTask(QuillUndoStack *stack, int level) const
     return stack->command(index + 1);
 }
 
-bool ThreadManager::suggestTilingTask(QuillFile *file)
+bool ThreadManager::suggestTilingTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
     int tileIndex;
@@ -179,7 +179,7 @@ bool ThreadManager::suggestTilingTask(QuillFile *file)
     return true;
 }
 
-bool ThreadManager::suggestTilingSaveTask(QuillFile *file)
+bool ThreadManager::suggestTilingSaveTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
     if (stack->saveMap()->isBufferComplete())
@@ -194,7 +194,7 @@ bool ThreadManager::suggestTilingSaveTask(QuillFile *file)
         return suggestTilingOverlayTask(file);
 }
 
-bool ThreadManager::suggestTilingOverlayTask(QuillFile *file)
+bool ThreadManager::suggestTilingOverlayTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
     int tileId = stack->saveMap()->processNext(stack->command()->tileMap());
@@ -218,7 +218,7 @@ bool ThreadManager::suggestTilingOverlayTask(QuillFile *file)
     return true;
 }
 
-bool ThreadManager::suggestThumbnailLoadTask(QuillFile *file,
+bool ThreadManager::suggestThumbnailLoadTask(File *file,
                                              int level)
 {
     if (!file->stack())
@@ -248,7 +248,7 @@ bool ThreadManager::suggestThumbnailLoadTask(QuillFile *file,
     return true;
 }
 
-bool ThreadManager::suggestThumbnailSaveTask(QuillFile *file, int level)
+bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
 {
     QuillUndoStack *stack = file->stack();
 
@@ -280,7 +280,7 @@ bool ThreadManager::suggestThumbnailSaveTask(QuillFile *file, int level)
     return true;
 }
 
-bool ThreadManager::suggestNewTask(QuillFile *file, int level)
+bool ThreadManager::suggestNewTask(File *file, int level)
 {
     QuillUndoStack *stack = file->stack();
 
@@ -335,7 +335,7 @@ bool ThreadManager::suggestNewTask(QuillFile *file, int level)
     return true;
 }
 
-bool ThreadManager::suggestSaveTask(QuillFile *file)
+bool ThreadManager::suggestSaveTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
 
@@ -355,7 +355,7 @@ bool ThreadManager::suggestSaveTask(QuillFile *file)
     return true;
 }
 
-bool ThreadManager::suggestPreviewImprovementTask(QuillFile *file)
+bool ThreadManager::suggestPreviewImprovementTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
 
@@ -502,6 +502,9 @@ void ThreadManager::calculationFinished()
             // If full image saving is concluded, rename the file and clean up.
 
             stack->file()->concludeSave();
+
+            if (stack->file()->allowDelete())
+                delete stack->file();
         }
         else
             // Full image saving proceeds

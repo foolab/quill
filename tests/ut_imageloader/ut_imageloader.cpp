@@ -125,7 +125,7 @@ void ut_imageloader::testSetupSameSize()
     Quill::setPreviewSize(0, QSize(8, 2));
 
     QuillFile *file =
-        Quill::file(testFile.fileName());
+        new QuillFile(testFile.fileName());
     file->setDisplayLevel(1);
 
     QSignalSpy spy(file, SIGNAL(imageAvailable(const QuillImageList)));
@@ -143,6 +143,8 @@ void ut_imageloader::testSetupSameSize()
     QCOMPARE(file->image(), QuillImage(Unittests::generatePaletteImage()));
 
     Quill::releaseAndWait();
+
+    delete file;
 }
 
 
@@ -157,7 +159,7 @@ void ut_imageloader::testSetupSmallerSize()
     Quill::setPreviewSize(0, QSize(4, 1));
 
     QuillFile *file =
-        Quill::file(testFile.fileName());
+        new QuillFile(testFile.fileName());
     file->setDisplayLevel(1);
 
     QSignalSpy spy(file, SIGNAL(imageAvailable(const QuillImageList)));
@@ -181,6 +183,8 @@ void ut_imageloader::testSetupSmallerSize()
                                       Qt::SmoothTransformation)));
 
     Quill::releaseAndWait();
+
+    delete file;
 }
 
 // Test libquill image loading on setup, bigger size than target
@@ -194,7 +198,7 @@ void ut_imageloader::testSetupBiggerSize()
     Quill::setPreviewSize(0, QSize(16, 4));
 
     QuillFile *file =
-        Quill::file(testFile.fileName());
+        new QuillFile(testFile.fileName());
     file->setDisplayLevel(1);
 
     QSignalSpy spy(file, SIGNAL(imageAvailable(const QuillImageList)));
@@ -216,6 +220,8 @@ void ut_imageloader::testSetupBiggerSize()
     QCOMPARE(image, QuillImage(Unittests::generatePaletteImage()));
 
     Quill::releaseAndWait();
+
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

@@ -150,9 +150,3 @@ void Quill::setDebugDelay(int delay)
 {
     Core::instance()->setDebugDelay(delay);
 }
-
-QuillFile *Quill::file(const QString &fileName,
-                       const QString &fileFormat)
-{
-    return Core::instance()->file(fileName, fileFormat);
-}

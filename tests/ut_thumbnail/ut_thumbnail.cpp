@@ -44,6 +44,7 @@
 
 #include <Quill>
 #include <QuillFile>
+#include "file.h"
 #include "ut_thumbnail.h"
 #include "unittests.h"
 
@@ -73,7 +74,7 @@ void ut_thumbnail::cleanup()
 
 void ut_thumbnail::testName()
 {
-    QuillFile *file = Quill::file("/tmp/test.png", "");
+    QuillFile *file = new QuillFile("/tmp/test.png", "");
     QVERIFY(file);
 
     // This should be safe to run in any environment as this test does
@@ -84,6 +85,8 @@ void ut_thumbnail::testName()
 
     QCOMPARE(file->thumbnailFileName(0),
              QString("/home/user/6756f54a791d53a4ece8ebb70471b573.jpeg"));
+
+    delete file;
 }
 
 void ut_thumbnail::testLoad()
@@ -96,7 +99,7 @@ void ut_thumbnail::testLoad()
     Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
     Quill::setThumbnailExtension("png");
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
     QVERIFY(file);
     QVERIFY(file->exists());
 
@@ -113,6 +116,8 @@ void ut_thumbnail::testLoad()
     // opposed to a downscaled version of the full image.
 
     QVERIFY(Unittests::compareImage(file->image(), image));
+
+    delete file;
 }
 
 void ut_thumbnail::testSave()
@@ -128,7 +133,7 @@ void ut_thumbnail::testSave()
     Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
     Quill::setThumbnailExtension("png");
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
     QVERIFY(file);
     QVERIFY(file->exists());
 
@@ -144,6 +149,8 @@ void ut_thumbnail::testSave()
                                     image.scaled(QSize(4, 1),
                                                  Qt::IgnoreAspectRatio,
                                                  Qt::SmoothTransformation)));
+
+    delete file;
 }
 
 void ut_thumbnail::testUpdate()
@@ -157,7 +164,7 @@ void ut_thumbnail::testUpdate()
     Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
     Quill::setThumbnailExtension("png");
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
     QString thumbName = file->thumbnailFileName(0);
     image.save(thumbName);
 
@@ -183,6 +190,8 @@ void ut_thumbnail::testUpdate()
 
     QVERIFY(QFile::exists(thumbName));
     QVERIFY(Unittests::compareImage(filter->apply(image), QImage(thumbName)));
+
+    delete file;
 }
 
 void ut_thumbnail::testLoadUnsupported()
@@ -200,10 +209,10 @@ void ut_thumbnail::testLoadUnsupported()
     Quill::setThumbnailExtension("png");
 
     QString thumbName = "/tmp/quill/thumbnails/" +
-        QuillFile::fileNameHash(testFile.fileName()) + ".png";
+        File::fileNameHash(testFile.fileName()) + ".png";
     image.save(thumbName, "png");
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
     QVERIFY(file->exists());
 
     file->setDisplayLevel(0);
@@ -213,6 +222,8 @@ void ut_thumbnail::testLoadUnsupported()
     // does not exist.
 
     QVERIFY(Unittests::compareImage(file->image(), image));
+
+    delete file;
 }
 
 void ut_thumbnail::testFailedWrite()
@@ -229,7 +240,7 @@ void ut_thumbnail::testFailedWrite()
     Quill::setThumbnailDirectory(0, "/invalid");
     Quill::setThumbnailExtension("png");
 
-    QuillFile *file = Quill::file(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName());
 
     file->setDisplayLevel(0);
     Quill::releaseAndWait(); // load
@@ -252,6 +263,8 @@ void ut_thumbnail::testFailedWrite()
     // Thumbnail must be saved now
     QVERIFY(Unittests::compareImage(QImage(file->thumbnailFileName(0)),
                                     image));
+
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

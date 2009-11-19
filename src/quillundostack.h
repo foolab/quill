@@ -43,7 +43,7 @@
 #include "quill.h"
 
 class QuillImage;
-class QuillFile;
+class File;
 class Core;
 class QuillUndoCommand;
 class QuillImageFilter;
@@ -56,10 +56,10 @@ class QuillUndoStack : public QObject
 Q_OBJECT
 
 public:
-    QuillUndoStack(Core *core, QuillFile *file);
+    QuillUndoStack(Core *core, File *file);
     ~QuillUndoStack();
 
-    QuillFile *file();
+    File *file();
 
     void load();
 
@@ -242,7 +242,7 @@ private:
 private:
     Core *m_core;
     QUndoStack *m_stack;
-    QuillFile *m_file;
+    File *m_file;
     bool m_isSessionRecording;
     int m_recordingSessionId, m_nextSessionId;
     int m_savedIndex;

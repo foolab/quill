@@ -45,25 +45,47 @@
 #include <QuillImageFilter>
 
 #include "quill.h"
+#include "quillfile.h"
 
 class QuillImage;
 class QuillImageFilter;
 class QuillUndoStack;
 class QuillFilePrivate;
-class QuillFile;
 
-typedef QList<QuillImage> QuillImageList;
-Q_DECLARE_METATYPE(QuillImageList)
-
-class QuillFile : public QObject
+class File : public QObject
 {
 Q_OBJECT
 
     friend class ut_thumbnail;
 
 public:
-    QuillFile(QObject *parent);
-    virtual ~QuillFile();
+    File(QObject *parent);
+    virtual ~File();
+
+    /*!
+      Adds the file to the reference list of this file.
+     */
+
+    void addReference(QuillFile *file);
+
+    /*!
+      Removes the file from the reference list of this file.
+     */
+
+    void removeReference(QuillFile *file);
+
+    /*!
+      This must return true before the file can be deleted.
+     */
+
+    bool allowDelete();
+
+    /*!
+      Removes the file from the file lists of Core; invalidates all
+      related QuillFile objects.
+     */
+
+    void detach();
 
     /*!
       Returns the actual file name associated with the QuillFile object.
@@ -171,10 +193,9 @@ public:
 
       @param format The file format. This parameter must be given if
       the format is not evident from the file extension.
-    */
 
     virtual QuillFile *exportFile(const QString &newFileName,
-                                  const QString &fileFormat = "");
+    const QString &fileFormat = "");*/
 
     /*!
       If the file is in the progress of saving.
@@ -342,8 +363,8 @@ public:
       Internal/testing use only.
      */
 
-    static QuillFile *readFromEditHistory(const QString &fileName,
-                                          QObject *parent);
+    static File *readFromEditHistory(const QString &fileName,
+                                     QObject *parent);
 
     /*!
       Copies a file over another file in the file system.
@@ -377,7 +398,7 @@ public:
       Returns the original, read-only copy of this file instance.
     */
 
-    virtual QuillFile *original();
+    virtual File *original();
 
     /*!
       Immediately triggers the imageAvailable() signal. Internal use only.
@@ -432,6 +453,8 @@ private:
     void writeEditHistory(const QString &history);
 
     QuillFilePrivate *priv;
+
+    QList<QuillFile*> m_references;
 };
 
 #endif // QUILLFILE_H

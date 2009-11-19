@@ -48,7 +48,7 @@
 class QuillImage;
 class QString;
 class CacheImage;
-class QuillFile;
+class File;
 
 class ImageCache: public QObject
 {
@@ -74,19 +74,19 @@ public:
     ~ImageCache();
     /*!
       Insert an image to the cache or the protected cache.
-      @param file the pointer to a QuillFile object
+      @param file the pointer to a File object
       @param commandId the unique id of the image
       @param image the image to be inserted
       @param ProtectionStatus the status of protection for this image
      */
-    bool insert(const QuillFile *file, int commandId,
+    bool insert(const File *file, int commandId,
                 const QuillImage &image,
                 ProtectionStatus status = NotProtected);
 
     /*!
       Returns the image stored in the cache.
      */
-    QuillImage image(const QuillFile *file, int commandId) const;
+    QuillImage image(const File *file, int commandId) const;
 
     /*!
       Protect the image. This removes possible protection from any other
@@ -97,14 +97,14 @@ public:
 
       @param commandId the key of the image
      */
-    bool protect(const QuillFile *file, int commandId);
+    bool protect(const File *file, int commandId);
 
     /*!
       Returns the command id of the image which is currently protected
       for the file.
      */
 
-    int protectedId(const QuillFile *file) const;
+    int protectedId(const File *file) const;
 
     /*!
       Delete the image from the cache.
@@ -115,7 +115,7 @@ public:
       purposes only.
      */
 
-    bool remove(const QuillFile *file, int commandId);
+    bool remove(const File *file, int commandId);
 
     /*!
       Purge from the cache all images related to a given file.
@@ -123,7 +123,7 @@ public:
       @param file pointer to the file object, used for comparison
       purposes only.
      */
-    bool purge(const QuillFile *file);
+    bool purge(const File *file);
 
     /*!
       Change the max size of the cache.
@@ -140,7 +140,7 @@ public:
 private:
 
     QCache<int, CacheImage> m_cache;
-    QCache<const QuillFile*, CacheImage> m_cacheProtected;
+    QCache<const File*, CacheImage> m_cacheProtected;
 };
 
 

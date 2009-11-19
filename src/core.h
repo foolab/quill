@@ -44,6 +44,7 @@
 
 #include "quill.h"
 
+class File;
 class QuillUndoCommand;
 class QuillUndoStack;
 class ImageCache;
@@ -94,23 +95,23 @@ public:
     static Core *instance();
 
     /*!
-      Inserts a file into the file list of the core.
-     */
-
-    void registerFile(QuillFile *file);
-
-    /*!
       Opens new file for viewing and editing.
     */
 
-    QuillFile *file(const QString &fileName,
-                    const QString &fileFormat);
+    File *file(const QString &fileName,
+               const QString &fileFormat);
+
+    /*!
+      Removes a file from the core.
+     */
+
+    void detach(const QString &fileName);
 
     /*!
       Inserts a new file.
      */
 
-    void insertFile(QuillFile *file, const QString &key);
+    void insertFile(File *file, const QString &key);
 
     /*!
       Modifies the preview level count. If new previews are created,
@@ -311,13 +312,13 @@ public:
       The core has received an update of an image.
      */
 
-    void emitImageAvailable(QuillFile *file, int level);
+    void emitImageAvailable(File *file, int level);
 
     /*!
       The core has received a partial update of an image.
     */
 
-    void emitTileAvailable(QuillFile *file, int tileId);
+    void emitTileAvailable(File *file, int tileId);
 
     /*!
       Return the number of files which have at least a given display level.
@@ -331,19 +332,19 @@ private:
       Return one file.
     */
 
-    QuillFile *priorityFile() const;
+    File *priorityFile() const;
 
     /*!
       Return one file.
     */
 
-    QuillFile *prioritySaveFile() const;
+    File *prioritySaveFile() const;
 
     /*!
       Return all existing files.
     */
 
-    QList<QuillFile*> existingFiles() const;
+    QList<File*> existingFiles() const;
 
 private:
 
@@ -358,7 +359,7 @@ private:
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
 
-    QMap<QString, QuillFile*> m_files;
+    QMap<QString, File*> m_files;
 
     QSize m_defaultTileSize;
     int m_saveBufferSize;
