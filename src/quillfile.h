@@ -318,6 +318,13 @@ public:
 
     virtual QuillFile *original();
 
+    /*!
+      Returns true if Quill Core holds an internal file object
+      related to this one.
+     */
+
+    virtual bool isValid();
+
 signals:
     /*!
       Triggered when there is a new image representation available on
@@ -339,12 +346,22 @@ signals:
      */
     void removed();
 
-    /*
+    /*!
       There was an error in the file.
      */
     void error(Quill::Error errorCode);
 
 private:
+
+    /*!
+      Constructor creating an invalid QuillFile object.
+     */
+    QuillFile();
+
+    /*!
+      Attaches an internal file object to the QuillFile object.
+     */
+    void attach(File *file);
 
     /*
       The referred file object has been destroyed.

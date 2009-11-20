@@ -188,10 +188,15 @@ int Core::editHistoryCacheSize(int level)
     return m_cache[level]->maxSize();
 }
 
+bool Core::fileExists(const QString &fileName)
+{
+    return (m_files.value(fileName) != 0);
+}
+
 File *Core::file(const QString &fileName,
                       const QString &fileFormat)
 {
-    File *file = m_files[fileName];
+    File *file = m_files.value(fileName);
 
     if (file)
         return file;
@@ -217,9 +222,9 @@ File *Core::file(const QString &fileName,
     return file;
 }
 
-void Core::detach(const QString &fileName)
+void Core::detach(File *file)
 {
-    m_files.remove(fileName);
+    m_files.remove(m_files.key(file));
 }
 
 QuillUndoCommand *Core::findInAllStacks(int id) const
@@ -483,9 +488,7 @@ bool Core::isThumbnailCreationEnabled() const
 
 void Core::insertFile(File *file, const QString &key)
 {
-    // insertMulti() instead of insert() here since original copies
-    // will be using empty strings as keys.
-    m_files.insertMulti(key, file);
+    m_files.insert(key, file);
 }
 
 void Core::releaseAndWait()

@@ -147,6 +147,7 @@ void ut_file::testOriginal()
     QVERIFY(!original->exists());
 
     delete file;
+    delete original;
 }
 
 void ut_file::testFileLimit()

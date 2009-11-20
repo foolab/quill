@@ -75,8 +75,6 @@ public:
 
     bool saveInProgress;
     QTemporaryFile *temporaryFile;
-
-    File *original;
 };
 
 File::File(QObject *parent)
@@ -98,8 +96,6 @@ File::File(QObject *parent)
 
     priv->saveInProgress = false;
     priv->temporaryFile = 0;
-
-    priv->original = 0;
 }
 
 File::~File()
@@ -133,7 +129,7 @@ bool File::allowDelete()
 
 void File::detach()
 {
-    priv->core->detach(priv->fileName);
+    priv->core->detach(this);
     foreach (QuillFile *file, m_references)
         file->invalidate();
 }
@@ -490,8 +486,8 @@ void File::remove()
     delete priv->stack;
     priv->stack = 0;
 
-    if (priv->original)
-        priv->original->remove();
+    if (hasOriginal())
+        original()->remove();
 
     emit removed();
 }
@@ -591,10 +587,18 @@ void File::concludeSave()
     emit saved();
 }
 
+bool File::hasOriginal()
+{
+    QString indexName = QString('\\') + priv->fileName;
+    return priv->core->fileExists(indexName);
+}
+
 File *File::original()
 {
-    if (priv->original)
-        return priv->original;
+    QString indexName = QString('\\') + priv->fileName;
+
+    if (priv->core->fileExists(indexName))
+        return priv->core->file(indexName, "");
 
     File *original = new File(priv->core);
     original->setFileName(priv->fileName);
@@ -602,8 +606,7 @@ File *File::original()
     original->setOriginalFileName(priv->originalFileName);
     original->setReadOnly();
 
-    priv->original = original;
-    priv->core->insertFile(original, "");
+    priv->core->insertFile(original, indexName);
     return original;
 }
 

@@ -47,14 +47,36 @@ public:
     int m_displayLevel;
 };
 
-QuillFile::QuillFile(const QString &fileName,
-                     const QString &fileFormat)
+QuillFile::QuillFile()
 {
     priv = new QuillFilePrivate;
     priv->m_file = 0;
     priv->m_displayLevel = -1;
+}
 
-    priv->m_file = Core::instance()->file(fileName, fileFormat);
+QuillFile::QuillFile(const QString &fileName,
+                     const QString &fileFormat)
+{
+    priv = new QuillFilePrivate;
+    priv->m_displayLevel = -1;
+
+    attach(Core::instance()->file(fileName, fileFormat));
+}
+
+QuillFile::~QuillFile()
+{
+    if (priv->m_file) {
+        priv->m_file->removeReference(this);
+        if (priv->m_file->allowDelete())
+            delete priv->m_file;
+    }
+
+    delete priv;
+}
+
+void QuillFile::attach(File *file)
+{
+    priv->m_file = file;
 
     if (priv->m_file) {
         priv->m_file->addReference(this);
@@ -71,17 +93,6 @@ QuillFile::QuillFile(const QString &fileName,
         connect(priv->m_file, SIGNAL(error(Quill::Error)),
                 SIGNAL(error(Quill::Error)));
     }
-}
-
-QuillFile::~QuillFile()
-{
-    if (priv->m_file) {
-        priv->m_file->removeReference(this);
-        if (priv->m_file->allowDelete())
-            delete priv->m_file;
-    }
-
-    delete priv;
 }
 
 QString QuillFile::fileName() const
@@ -312,12 +323,17 @@ void QuillFile::removeThumbnails()
 
 QuillFile *QuillFile::original()
 {
-    /*    if (priv->m_file)
-          return priv->m_file->origi*/
-    return 0;
+    QuillFile *file = new QuillFile();
+    file->attach(priv->m_file->original());
+    return file;
 }
 
 void QuillFile::invalidate()
 {
     priv->m_file = 0;
+}
+
+bool QuillFile::isValid()
+{
+    return (priv->m_file != 0);
 }

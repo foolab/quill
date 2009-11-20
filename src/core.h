@@ -95,6 +95,12 @@ public:
     static Core *instance();
 
     /*!
+      Does Core have the file?
+    */
+
+    bool fileExists(const QString &fileName);
+
+    /*!
       Opens new file for viewing and editing.
     */
 
@@ -105,7 +111,7 @@ public:
       Removes a file from the core.
      */
 
-    void detach(const QString &fileName);
+    void detach(File *file);
 
     /*!
       Inserts a new file.

@@ -395,6 +395,12 @@ public:
     void concludeSave();
 
     /*!
+      If the file has an original registered in core.
+    */
+
+    virtual bool hasOriginal();
+
+    /*!
       Returns the original, read-only copy of this file instance.
     */
 
