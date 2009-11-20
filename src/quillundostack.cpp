@@ -221,11 +221,11 @@ void QuillUndoStack::redo()
     }
 }
 
-QuillImage QuillUndoStack::image() const
+QuillImage QuillUndoStack::bestImage(int maxLevel) const
 {
     QuillUndoCommand *curr = command();
     if (curr)
-        return curr->bestImage();
+        return curr->bestImage(maxLevel);
     else
         return QuillImage();
 }

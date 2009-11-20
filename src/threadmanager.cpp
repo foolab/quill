@@ -322,7 +322,7 @@ bool ThreadManager::suggestNewTask(File *file, int level)
 
         // Red eye detection always uses the best available image
         if (generator && (!generator->isUsedOnPreview()))
-            prevImage = prev->bestImage();
+            prevImage = prev->bestImage(core->previewLevelCount());
         else
             prevImage = prev->image(level);
     }

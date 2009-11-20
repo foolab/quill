@@ -323,7 +323,7 @@ public:
       related to this one.
      */
 
-    virtual bool isValid();
+    virtual bool isValid() const;
 
 signals:
     /*!
@@ -363,10 +363,23 @@ private:
      */
     void attach(File *file);
 
-    /*
+    /*!
       The referred file object has been destroyed.
      */
     void invalidate();
+
+    /*!
+      Instructs the QuillFile object to emit a signal on new image
+      data being available.
+     */
+
+    void emitImageAvailable(const QuillImage &image);
+
+    /*!
+      Instructs the QuillFile object to emit a signal.
+     */
+
+    void emitImageAvailable(const QList<QuillImage> &imageList);
 
 private:
     QuillFilePrivate *priv;

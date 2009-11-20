@@ -175,17 +175,17 @@ QuillImage QuillUndoCommand::fullImage() const
     return image(m_core->previewLevelCount());
 }
 
-int QuillUndoCommand::bestImageLevel() const
+int QuillUndoCommand::bestImageLevel(int maxLevel) const
 {
-    for (int i=m_core->previewLevelCount(); i>=0; i--)
+    for (int i=maxLevel; i>=0; i--)
         if (!image(i).isNull())
             return i;
     return -1;
 }
 
-QuillImage QuillUndoCommand::bestImage() const
+QuillImage QuillUndoCommand::bestImage(int maxLevel) const
 {
-    int level = bestImageLevel();
+    int level = bestImageLevel(maxLevel);
 
     if (level == -1)
         return QuillImage();

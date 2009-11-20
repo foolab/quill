@@ -261,11 +261,11 @@ public:
       Returns a representation of the current state of the file.
 
       @result the highest-resolution representation of the full image
-      which is available. This can exceed the display level of the
-      image. This function will not return tiles.
+      which is available. This will not exceed the display level of
+      the image. This function will not return tiles.
     */
 
-    virtual QuillImage image() const;
+    virtual QuillImage bestImage(int displayLevel) const;
 
     /*!
       Returns a representation of the current state of the file.
@@ -273,20 +273,22 @@ public:
       @param level The resolution level to be used.
 
       @result a representation of the full image using exactly the
-      given resolution level. This can exceed the display level of the
-      image. This function will not return tiles.
+      given resolution level. This will not exceed the display level
+      of the image. This function will not return tiles.
     */
 
     virtual QuillImage image(int level) const;
 
     /*!
-      Returns all image levels of the current state of the file.
+      Returns all image levels for the current state of the file.
 
-      @result all representations of the full image which are currently cached,
-      including all resolution levels and tiles.
+      @result all representations of the full image which are
+      currently cached, including all resolution levels and
+      tiles. Anything over the display level of the file will be
+      filtered out.
     */
 
-    virtual QList<QuillImage> allImageLevels() const;
+    virtual QList<QuillImage> allImageLevels(int displayLevel) const;
 
     /*!
       Returns the full image size, in pixels, of the current state of the file.
@@ -407,10 +409,26 @@ public:
     virtual File *original();
 
     /*!
-      Immediately triggers the imageAvailable() signal. Internal use only.
+      A single image is available, instructs all referring QuillFile
+      objects with a high enough display level to emit a signal.
      */
 
-    void emitImageAvailable(QList<QuillImage> imageList);
+    void emitSingleImage(QuillImage image, int level);
+
+    /*!
+      A set of new tiles is available, instructs all referring QuillFile
+      objects with a high enough display level to emit a signal.
+     */
+
+    void emitTiles(QList<QuillImage> tiles);
+
+    /*!
+      A set of pre-calculated images and tiles is possibly available,
+      instructs all referring QuillFile objects with a high enough
+      display level to emit a signal.
+     */
+
+    void emitAllImages();
 
     /*!
       Triggers an error.
@@ -419,15 +437,6 @@ public:
     virtual void setError(Quill::Error errorCode);
 
 signals:
-    /*!
-      Triggered when there is a new image representation available on
-      the active state of the file.
-
-      @result a set of preview levels, the full version, or a tile
-      representing the active state of the file.
-     */
-
-    void imageAvailable(const QuillImageList images);
 
     /*!
       Saving a file has been concluded on the background.

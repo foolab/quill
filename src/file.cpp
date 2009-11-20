@@ -116,6 +116,9 @@ void File::removeReference(QuillFile *file)
 {
     if (m_references.contains(file)) {
         m_references.removeOne(file);
+        // Trying to lower the display level, remaining references will
+        // prevent this from happening.
+        setDisplayLevel(-1);
         if (m_references.isEmpty() && !priv->saveInProgress) {
             detach();
         }
@@ -186,12 +189,19 @@ bool File::isReadOnly() const
 
 bool File::setDisplayLevel(int level)
 {
-    // Block if trying to raise display level over strict limits
-    for (int l=priv->displayLevel+1; l<=level; l++)
-        if (priv->core->numFilesAtLevel(l) >= priv->core->fileLimit(l)) {
-            setError(Quill::ErrorFileLimitExceeded);
-            return false;
-        }
+    if (level > priv->displayLevel) {
+        // Block if trying to raise display level over strict limits
+        for (int l=priv->displayLevel+1; l<=level; l++)
+            if (priv->core->numFilesAtLevel(l) >= priv->core->fileLimit(l)) {
+                setError(Quill::ErrorFileLimitExceeded);
+                return false;
+            }
+    } else {
+        // If some other file object wants to keep the display level up
+        foreach (QuillFile *file, m_references)
+            if (file->displayLevel() > level)
+                level = file->displayLevel();
+    }
 
     // Purge images from cache if lowering display level here
     // Exception: when save is in progress, leave the highest level
@@ -295,9 +305,7 @@ void File::undo()
         priv->saveInProgress = false;
         priv->core->suggestNewTask();
 
-        QList<QuillImage> levels = allImageLevels();
-        if (!levels.isEmpty())
-            emit imageAvailable(levels);
+        emitAllImages();
     }
 }
 
@@ -318,17 +326,15 @@ void File::redo()
         priv->saveInProgress = false;
         priv->core->suggestNewTask();
 
-        QList<QuillImage> levels = allImageLevels();
-        if (!levels.isEmpty())
-            emit imageAvailable(levels);
+        emitAllImages();
     }
 }
 
-QuillImage File::image() const
+QuillImage File::bestImage(int displayLevel) const
 {
     if (!priv->exists)
         return QuillImage();
-    return priv->stack->image();
+    return priv->stack->bestImage(displayLevel);
 }
 
 QuillImage File::image(int level) const
@@ -338,15 +344,15 @@ QuillImage File::image(int level) const
     return priv->stack->image(level);
 }
 
-QList<QuillImage> File::allImageLevels() const
+QList<QuillImage> File::allImageLevels(int displayLevel) const
 {
     if (!priv->exists || !priv->stack->command())
         return QList<QuillImage>();
     else if ((!priv->stack->command()->tileMap()) ||
-             (priv->displayLevel < priv->core->previewLevelCount()))
-        return priv->stack->allImageLevels(priv->displayLevel);
+             (displayLevel < priv->core->previewLevelCount()))
+        return priv->stack->allImageLevels(displayLevel);
     else
-        return priv->stack->allImageLevels(priv->displayLevel) +
+        return priv->stack->allImageLevels(displayLevel) +
             priv->stack->command()->tileMap()->nonEmptyTiles(priv->viewPort);
 }
 
@@ -375,7 +381,7 @@ void File::setViewPort(const QRect &viewPort)
 	    newTiles(oldPort, viewPort);
 
     if (!newTiles.isEmpty())
-        emit imageAvailable(newTiles);
+        emitTiles(newTiles);
 }
 
 QRect File::viewPort() const
@@ -465,9 +471,27 @@ void File::writeEditHistory(const QString &history)
     file.close();
 }
 
-void File::emitImageAvailable(QList<QuillImage> imageList)
+void File::emitSingleImage(QuillImage image, int level)
 {
-    emit imageAvailable(imageList);
+    foreach(QuillFile *file, m_references)
+        if (file->displayLevel() >= level)
+            file->emitImageAvailable(image);
+}
+
+void File::emitTiles(QList<QuillImage> tiles)
+{
+    foreach(QuillFile *file, m_references)
+        if (file->displayLevel() == priv->core->previewLevelCount())
+            file->emitImageAvailable(tiles);
+}
+
+void File::emitAllImages()
+{
+    foreach(QuillFile *file, m_references) {
+        QList<QuillImage> allImages = allImageLevels(file->displayLevel());
+        if (!allImages.isEmpty())
+            file->emitImageAvailable(allImages);
+    }
 }
 
 void File::remove()

@@ -139,13 +139,13 @@ public:
       Gets the resolution level of the best image available in the command.
      */
 
-    int bestImageLevel() const;
+    int bestImageLevel(int maxLevel) const;
 
     /*!
       Gets the best image available in the command.
     */
 
-    QuillImage bestImage() const;
+    QuillImage bestImage(int maxLevel) const;
 
     /*!
       Gets all image levels available in the command.

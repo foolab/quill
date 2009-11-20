@@ -509,10 +509,7 @@ void Core::emitImageAvailable(File *file, int level)
     QuillImage image = file->stack()->image(level);
     image.setZ(level);
 
-    QList<QuillImage> imageList = QList<QuillImage>();
-    imageList.append(image);
-
-    file->emitImageAvailable(imageList);
+    file->emitSingleImage(image, level);
 }
 
 void Core::emitTileAvailable(File *file, int tileId)
@@ -522,10 +519,7 @@ void Core::emitTileAvailable(File *file, int tileId)
 
     QuillImage image = file->stack()->command()->tileMap()->tile(tileId);
 
-    QList<QuillImage> imageList = QList<QuillImage>();
-    imageList.append(image);
-
-    file->emitImageAvailable(imageList);
+    file->emitSingleImage(image, previewLevelCount());
 }
 
 int Core::numFilesAtLevel(int level) const

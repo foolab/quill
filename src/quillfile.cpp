@@ -81,9 +81,6 @@ void QuillFile::attach(File *file)
     if (priv->m_file) {
         priv->m_file->addReference(this);
 
-        connect(priv->m_file, SIGNAL(imageAvailable(const QuillImageList)),
-                SIGNAL(imageAvailable(const QuillImageList)));
-
         connect(priv->m_file, SIGNAL(saved()),
                 SIGNAL(saved()));
 
@@ -143,18 +140,21 @@ void QuillFile::setReadOnly()
 
 bool QuillFile::setDisplayLevel(int level)
 {
-    if (priv->m_file)
-        return priv->m_file->setDisplayLevel(level);
-    else
+    // This needs to be done since setDisplayLevel checks the display levels
+    // of referring QuillFile objects.
+    int oldLevel = priv->m_displayLevel;
+    priv->m_displayLevel = level;
+    if (priv->m_file->setDisplayLevel(level))
+        return true;
+    else {
+        priv->m_displayLevel = oldLevel;
         return false;
+    }
 }
 
 int QuillFile::displayLevel() const
 {
-    if (priv->m_file)
-        return priv->m_file->displayLevel();
-    else
-        return -1;
+    return priv->m_displayLevel;
 }
 
 void QuillFile::save()
@@ -228,23 +228,23 @@ void QuillFile::redo()
 QuillImage QuillFile::image() const
 {
     if (priv->m_file)
-        return priv->m_file->image();
+        return priv->m_file->bestImage(priv->m_displayLevel);
     else
         return QuillImage();
 }
 
 QuillImage QuillFile::image(int level) const
 {
-    if (priv->m_file)
-        return priv->m_file->image(level);
-    else
+    if ((level > priv->m_displayLevel) || !priv->m_file)
         return QuillImage();
+    else
+        return priv->m_file->image(level);
 }
 
 QList<QuillImage> QuillFile::allImageLevels() const
 {
     if (priv->m_file)
-        return priv->m_file->allImageLevels();
+        return priv->m_file->allImageLevels(priv->m_displayLevel);
     else
         return QList<QuillImage>();
 }
@@ -333,7 +333,19 @@ void QuillFile::invalidate()
     priv->m_file = 0;
 }
 
-bool QuillFile::isValid()
+bool QuillFile::isValid() const
 {
     return (priv->m_file != 0);
+}
+
+void QuillFile::emitImageAvailable(const QuillImage &image)
+{
+    QList<QuillImage> imageList;
+    imageList.append(image);
+    emit imageAvailable(imageList);
+}
+
+void QuillFile::emitImageAvailable(const QList<QuillImage> &imageList)
+{
+    emit imageAvailable(imageList);
 }

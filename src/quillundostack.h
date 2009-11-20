@@ -122,7 +122,7 @@ public:
       Gets the current image, best resolution available.
     */
 
-    QuillImage image() const;
+    QuillImage bestImage(int maxLevel) const;
 
     /*!
       Gets the current image, given resolution.

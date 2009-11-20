@@ -57,6 +57,8 @@ private slots:
     void testRemove();
     void testOriginal();
     void testFileLimit();
+    void testMultipleAccess();
+    void testDifferentPreviewLevels();
 };
 
 #endif  // TEST_LIBQUILL_FILE_H

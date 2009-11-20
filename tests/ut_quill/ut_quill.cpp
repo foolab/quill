@@ -604,14 +604,13 @@ void ut_quill::testNoSave()
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
+    QuillImage imageAfter = filter->apply(image);
+
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
 
     file2->runFilter(filter);
     Quill::releaseAndWait();
     Quill::releaseAndWait();
-
-    QImage imageAfter = file2->image();
-    QVERIFY(Unittests::compareImage(imageAfter, filter->apply(image)));
 
     file2->save();
     Quill::releaseAndWait();
@@ -796,8 +795,6 @@ void ut_quill::testBackgroundPriority()
 
     // Filter run, full image for closed file
     Quill::releaseAndWait();
-
-    QCOMPARE(file->image().size(), QSize(8, 2));
 
     QCOMPARE(changedSpy.count(), 3);
     QCOMPARE(changedSpy2.count(), 2);
