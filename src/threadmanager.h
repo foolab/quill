@@ -59,8 +59,7 @@ class ThreadManager : public QObject
 Q_OBJECT
 
 public:
-    ThreadManager(Core *core,
-                  Quill::ThreadingMode mode = Quill::ThreadingNormal);
+    ThreadManager(Quill::ThreadingMode mode = Quill::ThreadingNormal);
 
     ~ThreadManager();
 
@@ -176,7 +175,6 @@ private:
     void startThread(int id, int level, int tile,
                      const QuillImage &image, QuillImageFilter *filter);
 
-    Core *core;
     int commandId;
     int commandLevel;
     int tileId;

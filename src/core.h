@@ -315,18 +315,6 @@ public:
     TileCache *tileCache() const;
 
     /*!
-      The core has received an update of an image.
-     */
-
-    void emitImageAvailable(File *file, int level);
-
-    /*!
-      The core has received a partial update of an image.
-    */
-
-    void emitTileAvailable(File *file, int tileId);
-
-    /*!
       Return the number of files which have at least a given display level.
     */
 

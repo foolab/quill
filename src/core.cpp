@@ -59,7 +59,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_thumbnailCreationEnabled(true),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
-    m_threadManager(new ThreadManager(this, threadingMode))
+    m_threadManager(new ThreadManager(threadingMode))
 {
     m_previewSize.append(Quill::defaultViewPortSize);
     m_thumbnailDirectory.append(QString());
@@ -499,27 +499,6 @@ void Core::releaseAndWait()
 void Core::setDebugDelay(int delay)
 {
     m_threadManager->setDebugDelay(delay);
-}
-
-void Core::emitImageAvailable(File *file, int level)
-{
-    if (level > file->displayLevel())
-        return;
-
-    QuillImage image = file->stack()->image(level);
-    image.setZ(level);
-
-    file->emitSingleImage(image, level);
-}
-
-void Core::emitTileAvailable(File *file, int tileId)
-{
-    if (file->displayLevel() < previewLevelCount())
-        return;
-
-    QuillImage image = file->stack()->command()->tileMap()->tile(tileId);
-
-    file->emitSingleImage(image, previewLevelCount());
 }
 
 int Core::numFilesAtLevel(int level) const

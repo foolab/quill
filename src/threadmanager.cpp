@@ -56,8 +56,8 @@
 #include "tilemap.h"
 #include "savemap.h"
 
-ThreadManager::ThreadManager(Core *core, Quill::ThreadingMode mode) :
-    core(core), commandId(0), commandLevel(0), tileId(0),
+ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
+    commandId(0), commandLevel(0), tileId(0),
     activeFilter(0), resultImage(0),
     watcher(new QFutureWatcher<QuillImage>),
     threadingMode(mode),
@@ -171,7 +171,7 @@ bool ThreadManager::suggestTilingTask(File *file)
         prevImage = command->prev()->tileMap()->tile(tileIndex);
 
     startThread(command->uniqueId(),
-                core->previewLevelCount(),
+                Core::instance()->previewLevelCount(),
                 tileIndex,
                 prevImage,
                 command->filter());
@@ -185,7 +185,7 @@ bool ThreadManager::suggestTilingSaveTask(File *file)
     if (stack->saveMap()->isBufferComplete())
     {
         startThread(stack->saveCommand()->uniqueId(),
-                    core->previewLevelCount(), 0,
+                    Core::instance()->previewLevelCount(), 0,
                     stack->saveMap()->buffer(),
                     stack->saveCommand()->filter());
         return true;
@@ -210,7 +210,7 @@ bool ThreadManager::suggestTilingOverlayTask(File *file)
     QuillImage prevImage = stack->command()->tileMap()->tile(tileId);
 
     startThread(stack->saveCommand()->uniqueId(),
-                core->previewLevelCount(),
+                Core::instance()->previewLevelCount(),
                 tileId,
                 prevImage,
                 filter);
@@ -255,7 +255,7 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
     if ((!stack) || (!stack->command()))
         return false;
 
-    if ((core->thumbnailDirectory(level).isEmpty()) ||
+    if ((Core::instance()->thumbnailDirectory(level).isEmpty()) ||
         (file->image(level).isNull()) ||
         (file->stack()->isDirty()) ||
         (file->hasThumbnail(level)))
@@ -265,7 +265,7 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
         file->stack()->command()->targetPreviewSize(level))
         return false;
 
-    QDir().mkpath(core->thumbnailDirectory(level));
+    QDir().mkpath(Core::instance()->thumbnailDirectory(level));
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
@@ -292,8 +292,8 @@ bool ThreadManager::suggestNewTask(File *file, int level)
         // Image already exists - no need to recalculate
         return false;
 
-    if ((level == core->previewLevelCount()) &&
-        (!core->defaultTileSize().isEmpty()))
+    if ((level == Core::instance()->previewLevelCount()) &&
+        (!Core::instance()->defaultTileSize().isEmpty()))
         return suggestTilingTask(file);
 
     // The given resolution level is missing
@@ -305,7 +305,7 @@ bool ThreadManager::suggestNewTask(File *file, int level)
         prev = command->prev();
 
     QuillImage prevImage;
-    if ((prev == 0) && (level == core->previewLevelCount()))
+    if ((prev == 0) && (level == Core::instance()->previewLevelCount()))
         prevImage = QuillImage();
     else if (prev == 0)
     {
@@ -322,7 +322,7 @@ bool ThreadManager::suggestNewTask(File *file, int level)
 
         // Red eye detection always uses the best available image
         if (generator && (!generator->isUsedOnPreview()))
-            prevImage = prev->bestImage(core->previewLevelCount());
+            prevImage = prev->bestImage(Core::instance()->previewLevelCount());
         else
             prevImage = prev->image(level);
     }
@@ -344,12 +344,12 @@ bool ThreadManager::suggestSaveTask(File *file)
         return false;
 
     // Tiling save variant
-    if (!core->defaultTileSize().isEmpty())
+    if (!Core::instance()->defaultTileSize().isEmpty())
         return suggestTilingSaveTask(file);
 
     startThread(stack->saveCommand()->uniqueId(),
-                core->previewLevelCount(), 0,
-                stack->image(core->previewLevelCount()),
+                Core::instance()->previewLevelCount(), 0,
+                stack->image(Core::instance()->previewLevelCount()),
                 stack->saveCommand()->filter());
 
     return true;
@@ -367,7 +367,7 @@ bool ThreadManager::suggestPreviewImprovementTask(File *file)
     int level;
     QSize targetSize;
 
-    for (level=0; level<core->previewLevelCount(); level++)
+    for (level=0; level<Core::instance()->previewLevelCount(); level++)
     {
         // Preview images cannot be bigger than full image
         targetSize = command->targetPreviewSize(level);
@@ -376,15 +376,15 @@ bool ThreadManager::suggestPreviewImprovementTask(File *file)
             break;
     }
 
-    if (level < core->previewLevelCount())
+    if (level < Core::instance()->previewLevelCount())
     {
         QuillImage prevImage = command->fullImage();
 
         if (prevImage == QuillImage())
         {
             // The case with tiling (base on the largest preview)
-            if (level < core->previewLevelCount() - 1)
-                prevImage = command->image(core->previewLevelCount() - 1);
+            if (level < Core::instance()->previewLevelCount() - 1)
+                prevImage = command->image(Core::instance()->previewLevelCount() - 1);
 
             if (prevImage == QuillImage())
                 return false;
@@ -439,8 +439,7 @@ void ThreadManager::startThread(int id, int level, int tile,
 
 void ThreadManager::calculationFinished()
 {
-    bool raiseFull = false,
-        raisePartial = false;
+    bool imageUpdated = false;
 
     QuillImage image = resultImage->result();
     delete resultImage;
@@ -448,7 +447,7 @@ void ThreadManager::calculationFinished()
 
     // See if the command is still in the stack.
 
-    QuillUndoCommand *command = core->findInAllStacks(commandId);
+    QuillUndoCommand *command = Core::instance()->findInAllStacks(commandId);
     QuillUndoStack *stack = 0;
     if (command != 0)
         stack = command->stack();
@@ -492,7 +491,7 @@ void ThreadManager::calculationFinished()
             if (image.isNull()) {
                 stack->file()->setError(Quill::ErrorThumbnailWriteFailed);
                 qDebug() << "Save failed!";
-                core->setThumbnailCreationEnabled(false);
+                Core::instance()->setThumbnailCreationEnabled(false);
             }
         }
 
@@ -526,13 +525,13 @@ void ThreadManager::calculationFinished()
         delete generator;
         command->setFilter(filter);
     }
-    else if ((commandLevel >= core->previewLevelCount()) &&
-             !core->defaultTileSize().isEmpty())
+    else if ((commandLevel >= Core::instance()->previewLevelCount()) &&
+             !Core::instance()->defaultTileSize().isEmpty())
     {
         // A fragment of the full image has been calculated
 
         command->tileMap()->setTile(tileId, image);
-        raisePartial = true;
+        imageUpdated = true;
     }
     else
     {
@@ -546,23 +545,20 @@ void ThreadManager::calculationFinished()
         // Normal case: a better version of an image has been calculated.
 
         command->setImage(commandLevel, image);
-        raiseFull = true;
+        imageUpdated = true;
     }
 
     // since this might be altered by suggestNewTask
     int previousCommandLevel = commandLevel;
-    int previousTileId = tileId;
-    core->suggestNewTask();
+    Core::instance()->suggestNewTask();
 
     // If we just got a better version of the active image, emit signal
     QuillUndoCommand *current = 0;
     if (command != 0)
         current = stack->command();
-    if (current && (current->uniqueId() == previousCommandId)) {
-        if (raiseFull)
-            core->emitImageAvailable(stack->file(), previousCommandLevel);
-        if (raisePartial)
-            core->emitTileAvailable(stack->file(), previousTileId);
+    if (imageUpdated && current && (current->uniqueId() == previousCommandId)) {
+        image.setZ(previousCommandLevel);
+        stack->file()->emitSingleImage(image, previousCommandLevel);
     }
 
     if (threadingMode == Quill::ThreadingTest)
