@@ -44,7 +44,6 @@
 
 class QuillImage;
 class File;
-class Core;
 class QuillUndoCommand;
 class QuillImageFilter;
 class SaveMap;
@@ -56,7 +55,7 @@ class QuillUndoStack : public QObject
 Q_OBJECT
 
 public:
-    QuillUndoStack(Core *core, File *file);
+    QuillUndoStack(File *file);
     ~QuillUndoStack();
 
     File *file();
@@ -240,7 +239,6 @@ private:
     void setInitialLoadFilter(QuillImageFilter *filter);
 
 private:
-    Core *m_core;
     QUndoStack *m_stack;
     File *m_file;
     bool m_isSessionRecording;

@@ -46,7 +46,6 @@
 class QuillUndoStack;
 class QString;
 class QuillImage;
-class Core;
 class Quill;
 class TileMap;
 
@@ -56,7 +55,7 @@ class QuillUndoCommand : public QUndoCommand
 {
 
 public:
-    QuillUndoCommand(QuillUndoStack *parent, Core *core);
+    QuillUndoCommand(QuillUndoStack *parent);
     ~QuillUndoCommand();
 
     QuillImageFilter *filter() const;
@@ -206,7 +205,6 @@ private:
     int m_id;
     QuillImageFilter* m_filter;
     QuillUndoStack* m_stack;
-    const Core *m_core;
 
     /*!
       Position of the command in the stack.

@@ -85,7 +85,7 @@ File::File(QObject *parent)
     priv->readOnly = false;
 
     priv->core = dynamic_cast<Core*>(parent);
-    priv->stack = new QuillUndoStack(priv->core, this);
+    priv->stack = new QuillUndoStack(this);
     priv->displayLevel = -1;
 
     priv->fileName = "";
