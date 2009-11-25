@@ -1,3 +1,9 @@
+libquill (1.091125.0) unstable; urgency=low
+
+  * Fixes: NB#147832 - libquill-doc package doesn' t install doxygen documentation
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 25 Nov 2009 12:50:00 +0200
+
 libquill (1.091117.0) unstable; urgency=low
 
   * Fixes: NB#146925 - Gallery does not save images when /tmp folder is 100%
