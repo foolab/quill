@@ -320,6 +320,17 @@ public:
 
     int numFilesAtLevel(int level) const;
 
+    /*!
+      Sets the temporary file path
+      @param fileDir the file path
+    */
+    void setTemporaryFileDirectory(const QString &fileDir);
+
+    /*!
+      Gets the temporary file path
+     */
+    QString temporaryFileDirectory() const;
+
 private:
 
     /*!
@@ -360,6 +371,8 @@ private:
 
     TileCache *m_tileCache;
     ThreadManager *m_threadManager;
+
+    QString m_temporaryFileDirectory;
 };
 
 #endif

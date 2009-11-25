@@ -141,6 +141,16 @@ bool Quill::isThumbnailCreationEnabled()
     return Core::instance()->isThumbnailCreationEnabled();
 }
 
+void Quill::setTemporaryFilePath(const QString &tmpFilePath)
+{
+    Core::instance()->setTemporaryFileDirectory(tmpFilePath);
+}
+
+QString Quill::temporaryFilePath() const
+{
+    return Core::instance()->temporaryFileDirectory();
+}
+
 void Quill::releaseAndWait()
 {
     Core::instance()->releaseAndWait();

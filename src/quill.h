@@ -258,6 +258,21 @@ public:
     static bool isThumbnailCreationEnabled();
 
     /*!
+      Sets the path where Quill will store its temporary files.
+      The temporary files are currently not autocleaned in case of
+      crash, so it is recommended to use a temporary partition for
+      such files.
+    */
+    static void setTemporaryFilePath(const QString &tmpFilePath);
+
+    /*!
+      The path where Quill will store its temporary files. See
+      setTemporaryFilePath().
+    */
+
+    QString temporaryFilePath() const;
+
+    /*!
       To make background loading tests easier on fast machines
 
       Only works if Quill has been created with threadingMode =

@@ -21,7 +21,8 @@ SUBDIRS += \
            ut_xml \
            ut_core \
            ut_file \
-           ut_thumbnail
+           ut_thumbnail \
+           benchmark  \
 
 # --- install
 tatam.files = tests.xml

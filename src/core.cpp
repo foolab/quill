@@ -59,7 +59,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_thumbnailCreationEnabled(true),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
-    m_threadManager(new ThreadManager(threadingMode))
+    m_threadManager(new ThreadManager(threadingMode)),
+    m_temporaryFileDirectory(QString())
 {
     m_previewSize.append(Quill::defaultViewPortSize);
     m_thumbnailDirectory.append(QString());
@@ -510,4 +511,14 @@ int Core::numFilesAtLevel(int level) const
             n++;
     }
     return n;
+}
+
+void Core::setTemporaryFileDirectory(const QString &fileDir)
+{
+    m_temporaryFileDirectory = fileDir;
+}
+
+QString Core::temporaryFileDirectory() const
+{
+    return m_temporaryFileDirectory;
 }

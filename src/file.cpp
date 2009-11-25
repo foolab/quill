@@ -567,8 +567,15 @@ void File::prepareSave()
     // extension as the target file, so that the correct format can be
     // deduced by QImageReader.
 
-    priv->temporaryFile =
-        new QTemporaryFile("/tmp/qt_temp.XXXXXX." + info.fileName());
+    QString filePath;
+
+    if(priv->core->temporaryFileDirectory().isNull())
+        filePath = "/tmp/qt_temp.XXXXXX." + info.fileName();
+    else
+        filePath = priv->core->temporaryFileDirectory()+"/qt_temp.XXXXXX." +
+            info.fileName();
+
+    priv->temporaryFile = new QTemporaryFile(filePath);
     priv->temporaryFile->open();
 
     priv->stack->prepareSave(priv->temporaryFile->fileName());

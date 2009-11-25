@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <QEventLoop>
+#include <QDir>
 #include <QTime>
 #include <QDebug>
 
@@ -16,11 +17,14 @@ int main(int argc, char **argv)
     QTime time;
     time.start();
 
-    Quill *quill = new Quill(QSize(100, 100));
+    for(int i = 0; i<argc; i++)
+        qDebug()<<"the arg is: "<<argv[i];
 
-    quill->setDefaultTileSize(QSize(256, 256));
+    if(argc ==2)
+        Quill::setTemporaryFilePath(QString(argv[1]));
+    Quill::setDefaultTileSize(QSize(256, 256));
 
-    QuillFile *file = quill->file("input/benchmark12.jpg", "jpg");
+    QuillFile *file = new QuillFile("input/benchmark12.jpg", "jpg");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("Rotate");
@@ -31,8 +35,9 @@ int main(int argc, char **argv)
     QObject::connect(file, SIGNAL(saved()), &loop, SLOT(quit()));
 
     file->save();
+
     loop.exec();
 
     qDebug() << "Use case batch rotate/save:" << time.elapsed() << "ms";
-    delete quill;
+    delete file;
 }
