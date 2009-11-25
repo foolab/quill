@@ -241,6 +241,12 @@ QuillImage QuillFile::image(int level) const
         return priv->m_file->image(level);
 }
 
+void QuillFile::setImage(int level, const QuillImage &image)
+{
+    if (priv->m_file)
+        priv->m_file->setImage(level, image);
+}
+
 QList<QuillImage> QuillFile::allImageLevels() const
 {
     if (priv->m_file)
@@ -348,4 +354,18 @@ void QuillFile::emitImageAvailable(const QuillImage &image)
 void QuillFile::emitImageAvailable(const QList<QuillImage> &imageList)
 {
     emit imageAvailable(imageList);
+}
+
+void QuillFile::setWaitingForData(bool status)
+{
+    if (priv->m_file)
+        priv->m_file->setWaitingForData(status);
+}
+
+bool QuillFile::isWaitingForData() const
+{
+    if (priv->m_file)
+        return priv->m_file->isWaitingForData();
+    else
+        return false;
 }

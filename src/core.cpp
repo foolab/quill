@@ -336,7 +336,7 @@ void Core::suggestNewTask()
     if (prioritySaveFile) {
 
         if (m_threadManager->suggestNewTask(prioritySaveFile,
-                                                previewLevelCount()))
+                                            previewLevelCount()))
             return;
 
         // Fourth priority (save in progress): saving image

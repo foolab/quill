@@ -280,6 +280,16 @@ public:
     virtual QuillImage image(int level) const;
 
     /*!
+      Sets the image representation of the current state of the
+      file. The image is not protected; it might be overwritten or
+      dropped at any time. The specific parameters (full image size)
+      in QuillImage are currently ignored. This can currently only modify
+      a full image or a preview, not tiles.
+    */
+
+    virtual void setImage(int level, const QuillImage &image);
+
+    /*!
       Returns all image levels for the current state of the file.
 
       @result all representations of the full image which are
@@ -407,6 +417,26 @@ public:
     */
 
     virtual File *original();
+
+    /*
+      Sets the waiting-for-data status for this file.
+
+      Set this to true if you want to start editing an image which is not
+      completely available yet, for example if it is currently being
+      transferred by the network. Use setImage() to immediately set a preview
+      level. Set this to false when the full image has arrived.
+
+      Warning: the status must be set before raising the preview level, or the
+      image will get an "unsupported" status.
+    */
+
+    void setWaitingForData(bool status);
+
+    /*!
+      Returns the waiting-for-data status for the file. See setWaitingForData().
+    */
+
+    bool isWaitingForData() const;
 
     /*!
       A single image is available, instructs all referring QuillFile

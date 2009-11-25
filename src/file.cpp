@@ -73,6 +73,7 @@ public:
 
     QRect viewPort;
 
+    bool waitingForData;
     bool saveInProgress;
     QTemporaryFile *temporaryFile;
 };
@@ -94,6 +95,7 @@ File::File(QObject *parent)
     priv->targetFormat = "";
     priv->viewPort = QRect();
 
+    priv->waitingForData = false;
     priv->saveInProgress = false;
     priv->temporaryFile = 0;
 }
@@ -342,6 +344,11 @@ QuillImage File::image(int level) const
     if (!priv->exists)
         return QuillImage();
     return priv->stack->image(level);
+}
+
+void File::setImage(int level, const QuillImage &image)
+{
+    priv->stack->setImage(level, image);
 }
 
 QList<QuillImage> File::allImageLevels(int displayLevel) const
@@ -639,6 +646,22 @@ File *File::original()
 
     priv->core->insertFile(original, indexName);
     return original;
+}
+
+void File::setWaitingForData(bool status)
+{
+    priv->waitingForData = status;
+
+    if (!status) {
+        priv->supported = true;
+        priv->stack->calculateFullImageSize(priv->stack->command(0));
+        priv->core->suggestNewTask();
+    }
+}
+
+bool File::isWaitingForData() const
+{
+    return priv->waitingForData;
 }
 
 void File::setError(Quill::Error errorCode)

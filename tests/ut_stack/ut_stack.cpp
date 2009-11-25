@@ -39,7 +39,6 @@
 
 #include <QtTest/QtTest>
 #include <QuillImage>
-#include <QDebug>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include "unittests.h"
@@ -327,6 +326,73 @@ void ut_stack::testSessionSaveLoad()
 
     delete file;
     delete file2;
+}
+
+void ut_stack::testSetImage()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QImage image = Unittests::generatePaletteImage();
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+    QuillImage resultImage = filter->apply(image);
+
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryCacheSize(0, 2);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
+    file->setDisplayLevel(0);
+    QuillImage quillImage(image);
+    quillImage.setFullImageSize(QSize(8, 2));
+    file->setImage(0, quillImage);
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+
+    file->runFilter(filter);
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), resultImage));
+
+    delete file;
+}
+
+void ut_stack::testSourceChanged()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QImage image = Unittests::generatePaletteImage();
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+    QuillImage resultImage = filter->apply(image);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    file->setWaitingForData(true);
+
+    file->setDisplayLevel(1);
+    file->setImage(0, image);
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+
+    image.save(testFile.fileName(), "png");
+
+    file->setWaitingForData(false);
+    QCOMPARE(file->displayLevel(), 1);
+
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(0), image));
+    QVERIFY(Unittests::compareImage(file->image(1), image));
+
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

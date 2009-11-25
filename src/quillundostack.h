@@ -130,16 +130,27 @@ public:
     QuillImage image(int level) const;
 
     /*!
+      Allows forcibly setting an image value from outside.
+    */
+
+    void setImage(int level, const QuillImage &image) const;
+
+    /*!
       Gets the current image in all available image levels.
     */
     QList<QuillImage> allImageLevels(int maxLevel) const;
 
     /*!
-      Gets the full image size for the current image,
-      possibly pre-calculated.
+      Gets the pre-calculated full image size for the current image.
     */
 
     QSize fullImageSize() const;
+
+    /*!
+      Pre-calculates the full image size for the current image.
+    */
+
+    void calculateFullImageSize(QuillUndoCommand *command);
 
     /*!
       Count of the elements in the stack (same as QUndoStack)

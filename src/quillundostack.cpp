@@ -92,50 +92,60 @@ void QuillUndoStack::load()
     add(filter);
 }
 
-void QuillUndoStack::add(QuillImageFilter *filter)
+void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
 {
-    qDebug() << "Command" << filter->name() << "added to stack.";
-
-    QuillUndoCommand *cmd = new QuillUndoCommand(this);
-
-    cmd->setFilter(filter);
-    cmd->setIndex(index());
-    if (m_isSessionRecording && (cmd->filter()->role() != QuillImageFilter::Role_Load))
-        cmd->setSessionId(m_recordingSessionId);
-
     // full image size
-
     QSize previousFullSize;
 
-    if (index() == 0)
+    QuillImageFilter *filter = command->filter();
+
+    if (filter->role() == QuillImageFilter::Role_Load)
         previousFullSize = QSize();
     else
-        previousFullSize = command()->fullImageSize();
+        previousFullSize = command->prev()->fullImageSize();
 
     QSize fullSize = filter->newFullImageSize(previousFullSize);
 
     if (fullSize.isEmpty()) {
         m_file->setError(Quill::ErrorFormatUnsupported);
         m_file->setSupported(false);
+        return;
     }
 
-    cmd->setFullImageSize(fullSize);
+    command->setFullImageSize(fullSize);
 
     // tile map
-    if (!Core::instance()->defaultTileSize().isEmpty()) {
+    if (!Core::instance()->defaultTileSize().isEmpty() && !command->tileMap()) {
         TileMap *tileMap;
         if (filter->role() == QuillImageFilter::Role_Load)
             tileMap = new TileMap(filter->newFullImageSize(QSize()),
                                   Core::instance()->defaultTileSize(),
                                   Core::instance()->tileCache());
         else
-            tileMap = new TileMap(command()->tileMap(), filter);
+            tileMap = new TileMap(command->prev()->tileMap(), filter);
 
-        cmd->setTileMap(tileMap);
+        command->setTileMap(tileMap);
     }
+}
+
+void QuillUndoStack::add(QuillImageFilter *filter)
+{
+    QuillUndoCommand *cmd = new QuillUndoCommand(this);
+
+    cmd->setFilter(filter);
+    cmd->setIndex(index());
+    if (m_isSessionRecording &&
+        (cmd->filter()->role() != QuillImageFilter::Role_Load))
+        cmd->setSessionId(m_recordingSessionId);
 
     // add to stack
     m_stack->push(cmd);
+
+    // full image size
+    if (!m_file->isWaitingForData())
+        calculateFullImageSize(cmd);
+
+    qDebug() << "Command" << filter->name() << "added to stack.";
 }
 
 bool QuillUndoStack::canUndo() const
@@ -238,6 +248,12 @@ QuillImage QuillUndoStack::image(int level) const
         return curr->image(level);
     else
         return QuillImage();
+}
+
+void QuillUndoStack::setImage(int level, const QuillImage &image) const
+{
+    command()->setImage(level, image);
+    command()->setFullImageSize(image.fullImageSize());
 }
 
 QList<QuillImage> QuillUndoStack::allImageLevels(int maxLevel) const
