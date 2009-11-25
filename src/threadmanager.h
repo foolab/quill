@@ -37,6 +37,17 @@
 **
 ****************************************************************************/
 
+/*!
+  \class ThreadManager
+
+  \brief Responsible for selecting the next task for the worker thread
+  on the background, as well as operating the worker thread.
+
+Contains no explicit thread operations on its own, threading is done
+by the QFuture and QFutureWatcher classes from Qt 4.5, which use
+QThreadPool on the background.
+ */
+
 #ifndef THREADMANAGER_H
 #define THREADMANAGER_H
 

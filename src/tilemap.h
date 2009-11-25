@@ -37,6 +37,21 @@
 **
 ****************************************************************************/
 
+/*!
+  \class TileMap
+
+  \brief Contains the positions of individual tiles related to a
+  QuillUndoCommand
+
+For each image related to one state in an edit history (ie
+QuillUndoCommand) there is a tile map which contains the tile
+positions in full image coordinates. The tile is identified with its
+tile id, which stays the same from a tile map to the next one in the
+edit history. If we want to calculate a tile, we can calculate it
+completely from a predecessor with the same tile id (as there is
+currently no information transfer between different tiles).
+ */
+
 #ifndef __QUILL_TILE_MAP_H_
 #define __QUILL_TILE_MAP_H_
 

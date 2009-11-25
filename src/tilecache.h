@@ -37,6 +37,25 @@
 **
 ****************************************************************************/
 
+/*!
+  \class TileCache
+
+  \brief A cache used to store tiles.
+
+TileCache should be used in a way that it would only contain tiles
+from one image at a time.
+
+TileCache can store a maximum of one tile by tile Id (see TileMap) at
+a time. This also means that TileCache does not support undo. Tile
+cache has an upper size limit, and any items can be removed at any time.
+
+If there is a simultaneous request of more tiles than the tile cache
+has space for, tile cache will not load new tiles.
+
+Due to different cache policies, TileCache is not used to store
+preview images - instead, ImageCache is used for that.
+ */
+
 #ifndef __QUILL_TILE_CACHE_H__
 #define __QUILL_TILE_CACHE_H__
 

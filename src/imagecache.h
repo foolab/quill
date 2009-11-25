@@ -37,6 +37,33 @@
 **
 ****************************************************************************/
 
+/*!
+  \class ImageCache
+
+  \brief A cache used to store preview and full images.
+
+A different image cache is created by LibQuill for each display level.
+
+ImageCache has two internal caches:
+
+The "protected" cache holds the images related to the current state of
+each respective file (or if the current state has not been calculated
+yet, the state which is the most relevant for the calculation of the
+current one). This cache does not have a size limit, but the number of
+open files can be limited by QuillFile::setFileLimit().
+
+The normal, or "not protected", cache is used to store non-current
+edit history images which provide fast image recovery in the case of
+undo. This part of the cache has an upper limit, and cache items
+can be expired at any time.
+
+ImageCache transparently handles moving items between these two
+caches, caused by insert() and protect().
+
+Due to different cache policies, ImageCache is not used to store
+tiles - instead, TileCache is used for that.
+ */
+
 #ifndef QUILL_UNDO_CACHE_H
 #define QUILL_UNDO_CACHE_H
 

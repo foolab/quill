@@ -36,6 +36,21 @@
 ** contact the sales department at qt-sales@nokia.com.
 **
 ****************************************************************************/
+
+/*!
+  \class HistoryXml
+
+  \brief Responsible for conversion between QuillFile objects and XML.
+
+Most of the effort comes from edit history conversion. HistoryXml is
+used when recovering edit history of a file with modifications to
+allow undo and redo even between different application runs. In
+addition, HistoryXml can be used in crash recovery situations to
+recover all edits up to the point of crash.
+
+HistoryXML does not (yet?) support Qt 4.6's XML schema checking capabilities.
+ */
+
 #ifndef HISTORYXML_H
 #define HISTORYXML_H
 

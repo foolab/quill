@@ -37,6 +37,18 @@
 **
 ****************************************************************************/
 
+/*!
+  \class SaveMap
+
+  \brief Contains save buffer handling necessary for serial access
+  saving.
+
+Each QuillFile in progress of saving has a SaveMap, which has a save
+buffer. Individual tiles are inserted into the save buffer using a
+special QuillImageFilter called Overlay. When the save buffer is full,
+its contents are moved to the image writer for further processing.
+ */
+
 #ifndef __QUILL_SAVE_MAP_H_
 #define __QUILL_SAVE_MAP_H_
 

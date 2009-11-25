@@ -37,6 +37,16 @@
 **
 ****************************************************************************/
 
+/*!
+  \class Core
+
+  \brief The private class for Quill, handling centralized settings
+  and the file list.
+
+Core is used to change the global settings of LibQuill. Some settings
+can only be changed if no files have been opened yet.
+ */
+
 #ifndef __QUILL_CORE_H_
 #define __QUILL_CORE_H_
 

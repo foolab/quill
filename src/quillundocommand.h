@@ -37,6 +37,16 @@
 **
 ****************************************************************************/
 
+/*!
+  \class QuillUndoCommand
+
+  \brief Represents one image editing operation in the edit history.
+
+QuillUndoCommand extends QUndoCommand by containing cache references
+to preview and full images (in ImageCache, accessible via image()) and
+tiles (in TileCache, accessible via tileMap()).
+ */
+
 #ifndef QUILL_UNDO_COMMAND
 #define QUILL_UNDO_COMMAND
 

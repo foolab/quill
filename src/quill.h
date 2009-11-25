@@ -37,6 +37,101 @@
 **
 ****************************************************************************/
 
+/*!
+  \mainpage LibQuill Reference Documentation
+
+  \section intro_sec Introduction
+
+LibQuill is a image viewer/editor library with background processing
+capabilities, optimized for mobile devices. It can be used as a
+background library for building an image viewing or editing
+application with a GUI, or it can as well be used as a back-end for an
+application without a GUI, like example a batch job image processor or
+an automatic thumbnailer. The current LibQuill does not have rendering
+capabilities, instead of that all relevant image data is forwarded to
+the GUI application. LibQuill currently does all its operations on
+software but it is easily extendable into using special hardware in
+its operations.
+
+LibQuill currently has a good basic set of image editing
+operations. It supports the Qt image format plugins and thus can use
+any format which has such a plugin. There are also some optimizations
+specific to the Jpeg format.
+
+  \section features_sec Features
+
+  \subsection undo_sec Unlimited undo/redo
+
+For each image which has been edited, an original copy is
+preserved. In addition, all editing operations until the current
+situation, called "commands", are saved into a separate file in xml
+format. This file, along with the original copy, can be then used to
+reconstruct any point in the editing history of the file. Thus, the
+complete edit history will be accessible during any later session, and
+the current state of any file can be recovered even after a forced
+program shutdown (ie. incoming call) or a device crash (ie. low
+battery).
+
+  \subsection bg_sec Background processing
+
+Image editing operations, when done on software, are known to consume
+noticeable amounts of time. To avoid freezing the user interface
+during this time, LibQuill does all its image processing on a separate
+background thread.
+
+  \subsection concurrent_sec Concurrent for many files
+
+LibQuill can have a large number of files open at the same time. This
+not only means that editing can proceeds into a next image when saving
+a previous one is in progress, it also means that several files can be
+loaded, displayed and edited at the same time.
+
+  \subsection incremental_sec Incremental
+
+As image processing operations for large images might take more time
+than what is comfortable for the user, we have adopted a policy of
+incrementality. This means that any operation is first applied to a
+"preview", a downscaled version of the full image. This allows us to
+display a good estimate quickly for the user, who will get instant
+feedback on his edit and can even proceed with editing when the
+background operation for a full image is still in progress. As some
+operations are known to produce different results for lower-scale
+images than higher-scale ones, careful design is needed for
+implementations of such edit operations.
+
+  \subsection tiled_sec Tiled
+
+As complete images in 32-bit format take a lot of memory which is
+scarce on a mobile device, they should never be loaded into the memory as
+such (unless they are very small). Instead, rectangular tiles are used
+to display regions of interest at the request of the user, and also
+when processing with saving any modifications to the file system. This
+allows for a more efficient memory use and, for some cases, a faster
+response time. Again, careful design of image editing operations is
+required to produce an end result with good quality.
+
+  \section sturcture_sec Package structure
+
+LibQuill comes in two packages: QuillImageFilters and LibQuill.
+
+QuillImageFilters contain a standard set of image editing operations,
+including file loading and saving. They all implement a simple
+standard interface. QuillImageFilters can be also used as a
+stand-alone package without LibQuill proper.
+
+LibQuill proper is a meta-editing library, responsible for file
+management, undo history, image caching and the scheduling and running
+of different edit operations. It contains no image editing operations
+on its own.
+ */
+
+/*!
+  \class Quill
+
+  \brief Class containing all centralized information for LibQuill:
+  global settings and list of open QuillFile objects.
+*/
+
 #ifndef QUILL_H
 #define QUILL_H
 

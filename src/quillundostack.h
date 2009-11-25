@@ -37,6 +37,25 @@
 **
 ****************************************************************************/
 
+/*!
+  \class QuillUndoStack
+
+  \brief Contains a QUndoStack specialized for QuillUndoCommands,
+  also stores related non-undoable commands like saving and loading.
+
+In addition to normal stack operations, QuillUndoStack can be used
+used for querying for images from several commands in the undo stack.
+
+Edit sessions are a generic way to merge groups of operations
+together. These can be used if an image editor has a hierarchical
+structure of edit modes (for example, a "red eye removal mode"). See
+startSession() and endSession() for more details.
+
+QuillUndoStack also supports structures speficicly related to saving
+images, like the SaveMap, and the commands prepareSave() and
+concludeSave() which are used to help with these operations.
+ */
+
 #ifndef __QUILL_UNDO_STACK_H__
 #define __QUILL_UNDO_STACK_H__
 
