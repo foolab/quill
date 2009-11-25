@@ -336,6 +336,15 @@ public:
     virtual bool supported() const;
 
     /*!
+      Tries to force Quill to acknowledge the file as supported or
+      unsupported. This should only be used after the contents of a
+      file have been changed. If this is set to true with a file not
+      recognizable by Quill, it will revert to unsupported.
+     */
+
+    virtual void setSupported(bool supported);
+
+    /*!
       Reads a complete file object from edit history.
 
       @param parent a Quill Core object.

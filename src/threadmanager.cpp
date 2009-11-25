@@ -97,7 +97,7 @@ QuillUndoCommand *ThreadManager::getTask(QuillUndoStack *stack, int level) const
             break;
 
         // Load filters can be re-executed
-        if (stack->command(index)->filter()->name() == "Load")
+        if (stack->command(index)->filter()->role() == QuillImageFilter::Role_Load)
         {
             index--;
             break;
@@ -154,7 +154,7 @@ bool ThreadManager::suggestTilingTask(QuillFile *file)
             break;
 
         // Load filters can be re-executed
-        if (stack->command(index)->filter()->name() == "Load")
+        if (stack->command(index)->filter()->role() == QuillImageFilter::Role_Load)
         {
             index--;
             break;
@@ -165,7 +165,7 @@ bool ThreadManager::suggestTilingTask(QuillFile *file)
     QuillUndoCommand *command = stack->command(index + 1);
     QuillImage prevImage;
 
-    if (command->filter()->name() == "Load")
+    if (command->filter()->role() == QuillImageFilter::Role_Load)
         prevImage = command->tileMap()->tile(tileIndex);
     else
         prevImage = command->prev()->tileMap()->tile(tileIndex);
@@ -230,12 +230,12 @@ bool ThreadManager::suggestThumbnailLoadTask(QuillFile *file,
 
     QuillUndoCommand *command = getTask(file->stack(), level);
 
-    if ((command->filter()->name() != "Load") ||
+    if ((command->filter()->role() != QuillImageFilter::Role_Load) ||
         (command->index() != command->stack()->savedIndex()) ||
         (!file->hasThumbnail(level)))
         return false;
 
-    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter("Load");
+    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
@@ -267,7 +267,7 @@ bool ThreadManager::suggestThumbnailSaveTask(QuillFile *file, int level)
 
     QDir().mkpath(core->thumbnailDirectory(level));
 
-    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter("Save");
+    QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
@@ -301,12 +301,12 @@ bool ThreadManager::suggestNewTask(QuillFile *file, int level)
     QuillUndoCommand *command = getTask(stack, level);
 
     // If a file is currently waiting for data, load should not be tried
-    if ((command->filter()->name() == "Load") &&
+    if ((command->filter()->role() == QuillImageFilter::Role_Load) &&
         (file->isWaitingForData()))
         return false;
 
     QuillUndoCommand *prev = 0;
-    if (command->filter()->name() != "Load")
+    if (command->filter()->role() != QuillImageFilter::Role_Load)
         prev = command->prev();
 
     QuillImage prevImage;
@@ -398,7 +398,7 @@ bool ThreadManager::suggestPreviewImprovementTask(QuillFile *file)
         // Create ad-hoc filter for preview re-calculation
 
         QuillImageFilter *scaleFilter =
-            QuillImageFilterFactory::createImageFilter("Scale");
+            QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_PreviewScale);
         scaleFilter->setOption(QuillImageFilter::SizeAfter,
                                QVariant(targetSize));
 
@@ -458,8 +458,18 @@ void ThreadManager::calculationFinished()
     if (command != 0)
         stack = command->stack();
 
+    // Set active filter to zero (so that we do not block its deletion)
+
+    QuillImageFilter *filter = activeFilter;
+    activeFilter = 0;
+
+    // Mark that we are not currently running a thread
+
+    int previousCommandId = commandId;
+    commandId = 0;
+
     QuillImageFilterGenerator *generator =
-        dynamic_cast<QuillImageFilterGenerator*>(activeFilter);
+        dynamic_cast<QuillImageFilterGenerator*>(filter);
 
     if (command == 0)
     {
@@ -468,20 +478,28 @@ void ThreadManager::calculationFinished()
         // since it is now orphan and we could not delete it
         // in QuillUndoCommand::~QuillUndoCommand().
 
-        delete activeFilter;
+        delete filter;
     }
-    else if (activeFilter->name() == "Overlay")
+    else if (filter->role() == QuillImageFilter::Role_Overlay)
     {
         // Save buffer overlay has finished - update the buffer.
 
-        delete activeFilter;
+        delete filter;
         stack->saveMap()->setBuffer(image);
     }
-    else if (activeFilter->name() == "Save")
+    else if (filter->role() == QuillImageFilter::Role_Save)
     {
-        if (!stack->file()->isSaveInProgress())
+        if (!stack->file()->isSaveInProgress()) {
             // Thumbnail saving
-            delete activeFilter;
+            delete filter;
+
+            // Save failed - disabling thumbnailing
+            if (image.isNull()) {
+                stack->file()->setError(Quill::ErrorThumbnailWriteFailed);
+                qDebug() << "Save failed!";
+                core->setThumbnailCreationEnabled(false);
+            }
+        }
 
         else if (!stack->saveMap() ||
                  stack->saveMap()->isSaveComplete())
@@ -521,10 +539,10 @@ void ThreadManager::calculationFinished()
     else
     {
         // Ad-hoc filters (preview improvement and thumbnail loading)
-        if (command->filter() != activeFilter)
+        if (command->filter() != filter)
         {
             image = QuillImage(image, command->fullImageSize());
-            delete activeFilter;
+            delete filter;
         }
 
         // Normal case: a better version of an image has been calculated.
@@ -532,12 +550,6 @@ void ThreadManager::calculationFinished()
         command->setImage(commandLevel, image);
         raiseFull = true;
     }
-
-    int previousCommandId = commandId;
-
-    // Mark that we are not currently running a thread
-    commandId = 0;
-    activeFilter = 0;
 
     // since this might be altered by suggestNewTask
     int previousCommandLevel = commandLevel;

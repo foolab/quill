@@ -41,7 +41,6 @@
 #define __QUILL_CORE_H_
 
 #include <QObject>
-#include <QtImageFilter>
 
 #include "quill.h"
 
@@ -216,6 +215,20 @@ public:
     QString thumbnailExtension() const;
 
     /*!
+      Enables or disables thumbnail creation.
+     */
+
+    void setThumbnailCreationEnabled(bool enabled);
+
+    /*!
+      Returns true if thumbnail creation is enabled. True by
+      default, this can be made false by setThumbnailCreationEnabled(), or if
+      thumbnail creation fails by some reason.
+     */
+
+    bool isThumbnailCreationEnabled() const;
+
+    /*!
       To make background loading tests easier on fast machines
 
       Only works if Quill has been created with threadingMode =
@@ -278,6 +291,17 @@ public:
 
     int numFilesAtLevel(int level) const;
 
+    /*!
+      Sets the temporary file path
+      @param fileDir the file path
+    */
+    void setTemporaryFileDirectory(const QString fileDir);
+
+    /*!
+      Gets the temporary file path
+     */
+    QString temporaryFileDirectory();
+
 private:
 
     /*!
@@ -307,6 +331,7 @@ private:
     QString m_editHistoryDirectory;
     QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
+    bool m_thumbnailCreationEnabled;
 
     QMap<QString, QuillFile*> m_files;
 
@@ -315,6 +340,8 @@ private:
 
     TileCache *m_tileCache;
     ThreadManager *m_threadManager;
+
+    QString m_temporaryFileDirectory;
 };
 
 #endif

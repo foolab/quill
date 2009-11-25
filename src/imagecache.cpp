@@ -79,9 +79,13 @@ bool ImageCache::insert(const QuillFile *file, int commandId,
     else {
         CacheImage *oldImage = m_cacheProtected.take(file);
 
-        // Move old one from not protected to protected
-        if (oldImage && (oldImage->key != commandId))
-            m_cache.insert(oldImage->key, oldImage);
+        // Move old one from protected to not protected
+        if (oldImage) {
+            if (oldImage->key != commandId)
+                m_cache.insert(oldImage->key, oldImage);
+            else
+                delete oldImage;
+        }
 
         m_cacheProtected.insert(file, cacheImage, 0);
 
@@ -96,13 +100,15 @@ bool ImageCache::protect(const QuillFile *file, int commandId)
     CacheImage *image = m_cache.take(commandId);
 
     if (image) {
-        m_cache.remove(commandId);
-
         CacheImage *oldImage = m_cacheProtected.take(file);
 
-        // Move old one from not protected to protected
-        if (oldImage != 0)
-            m_cache.insert(oldImage->key, oldImage);
+        // Move old one from protected to not protected
+        if (oldImage) {
+            if (oldImage->key != commandId)
+                m_cache.insert(oldImage->key, oldImage);
+            else
+                delete oldImage;
+        }
 
         m_cacheProtected.insert(file, image, 0);
 

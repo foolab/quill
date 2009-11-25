@@ -102,7 +102,7 @@ QByteArray HistoryXml::encode(QList<QuillFile *> files)
         // Load filters are not saved and do not affect indexes in the dump.
 
         for (int i = 1; i < stack->index(); i++)
-            if (stack->command(i)->filter()->name() == "Load")
+            if (stack->command(i)->filter()->role() == QuillImageFilter::Role_Load)
             {
                 targetIndex--;
                 saveIndex--;
@@ -118,7 +118,7 @@ QByteArray HistoryXml::encode(QList<QuillFile *> files)
         int sessionId = 0;
 
         for (int i = 0; i < stack->count(); i++)
-            if (stack->command(i)->filter()->name() != "Load")
+            if (stack->command(i)->filter()->role() != QuillImageFilter::Role_Load)
             {
                 if (isSession &&
                     !stack->command(i)->belongsToSession(sessionId)) {
@@ -383,7 +383,7 @@ void HistoryXml::readEditSession(QXmlStreamReader *reader,
                 if (stack->index()-1 == *savedIndex) {
 
                     filter =
-                        QuillImageFilterFactory::createImageFilter("Load");
+                        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
                     filter->setOption(QuillImageFilter::FileName, fileName);
                     stack->add(filter);
                     (*targetIndex)++;
@@ -454,8 +454,7 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
             success = false;
             break;
         }
-
-        filter->setOption(option, value);
+        filter->setOption((QuillImageFilter::QuillFilterOption) option, value);
 
         if (reader->readNext() != QXmlStreamReader::EndElement)
         {

@@ -1,3 +1,43 @@
+libquill (1.091125.0) unstable; urgency=low
+
+  * Fixes: NB#147832 - libquill-doc package doesn' t install doxygen documentation
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 25 Nov 2009 12:50:00 +0200
+
+libquill (1.091117.0) unstable; urgency=low
+
+  * Fixes: NB#146925 - Gallery does not save images when /tmp folder is 100%
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 17 Nov 2009 12:50:00 +0200
+
+libquill (1.091113.0) unstable; urgency=low
+
+  * Fixes: NB#145052 - libquill-dev should depend on libqt4-dev
+  * Fixes: NB#142807 - gallery crashed when tapped on local collection title with high resolution images.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 13 Nov 2009 10:50:00 +0200
+
+libquill (1.091110.2) unstable; urgency=low
+
+  * change version number for integration.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 10 Nov 2009 10:55:00 +0200
+
+libquill (1.091110.1) unstable; urgency=low
+
+  * change version number for integration.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 10 Nov 2009 10:55:00 +0200
+
+libquill (1.091110.0) unstable; urgency=low
+  * Refactoring and memory related fixes.
+  * Implemented: SWP#HImag-1404
+  * Implemented: SWP#HImag-1439
+  * Fixes: NB#145316 - Libquill packages include profiling
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 10 Nov 2009 10:10:00 +0200
+
+
 libquill (1.091103.0) unstable; urgency=low
   * Implemented: SWP#HImag-1413
   * Fixes: NB#145052 - libquill-dev should depend on libqt4-dev
@@ -32,7 +72,6 @@ libquill (1.091027.0) unstable; urgency=low
   * Fixes: NB#142605 - The .pc file of libquill-dev is incorrect
 
  -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 27 Oct 2009 11:50:00 +0200
-
 
 libquill (1.091021.0) unstable; urgency=low
 

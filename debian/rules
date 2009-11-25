@@ -19,7 +19,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE)
+	$(MAKE)  -j2 all doc
 	#docbook-to-man debian/camera-rd.sgml > camera-rd.1
 
 	touch $@
@@ -28,7 +28,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-
+	rm -rf doc/html/*
 	# Add here commands to clean up after the build process.
 	[ ! -f Makefile ] || $(MAKE) distclean
 

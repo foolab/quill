@@ -41,6 +41,7 @@
 #include <QuillImage>
 #include <QDebug>
 #include <QuillImageFilter>
+#include <QuillImageFilterFactory>
 #include "unittests.h"
 #include "quillfile.h"
 #include "ut_imagecache.h"
@@ -58,8 +59,8 @@ void ut_imagecache::cleanupTestCase()
 
 void ut_imagecache::testInsert2()
 {
-    QtImageFilter *filter =
-        QtImageFilterFactory::createImageFilter("BrightnessContrast");
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
@@ -79,8 +80,8 @@ void ut_imagecache::testInsert2()
 
 void ut_imagecache::testInsertReplace()
 {
-    QtImageFilter *filter =
-        QtImageFilterFactory::createImageFilter("BrightnessContrast");
+    QuillImageFilter *filter =
+    QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness,
                       QVariant(16));
@@ -100,8 +101,8 @@ void ut_imagecache::testInsertReplace()
 
 void ut_imagecache::testProtect()
 {
-    QtImageFilter *filter =
-        QtImageFilterFactory::createImageFilter("BrightnessContrast");
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
@@ -126,8 +127,8 @@ void ut_imagecache::testProtect()
 
 void ut_imagecache::testMultipleFile()
 {
-    QtImageFilter *filter =
-        QtImageFilterFactory::createImageFilter("BrightnessContrast");
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
     QuillFile *file2 = new QuillFile(0);

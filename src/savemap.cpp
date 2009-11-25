@@ -94,12 +94,15 @@ QuillImageFilter *SaveMap::addToBuffer(int index)
     m_tileRows[0].removeOne(index);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Overlay");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Overlay);
 
     filter->setOption(QuillImageFilter::CropRectangle,
                       QVariant(m_buffer.area()));
     filter->setOption(QuillImageFilter::Background,
                       QVariant(QImage(m_buffer)));
+
+    // So that implicit sharing does not copy the buffer
+    m_buffer = QImage();
 
     return filter;
 }
