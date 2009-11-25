@@ -1,3 +1,9 @@
+libquill (1.091125.1) unstable; urgency=low
+
+  * Implements: Supports setting images and changing the "waiting for data" state for an image.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 25 Nov 2009 13:50:00 +0200
+
 libquill (1.091125.0) unstable; urgency=low
 
   * Fixes: NB#147832 - libquill-doc package doesn' t install doxygen documentation
