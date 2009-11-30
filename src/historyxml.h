@@ -58,7 +58,7 @@ HistoryXML does not (yet?) support Qt 4.6's XML schema checking capabilities.
 #include <QXmlStreamWriter>
 #include <QVariant>
 
-class QuillFile;
+class File;
 class QuillImageFilter;
 class QuillUndoStack;
 class Core;
@@ -68,10 +68,10 @@ class HistoryXml
     friend class ut_xml;
 
 public:
-    static QByteArray encode(QuillFile *file);
-    static QByteArray encode(QList<QuillFile *> files);
-    static QuillFile *decodeOne(const QByteArray & array, Core *core);
-    static QList<QuillFile *> decode(const QByteArray & array, Core *core);
+    static QByteArray encode(File *file);
+    static QByteArray encode(QList<File *> files);
+    static File *decodeOne(const QByteArray & array, Core *core);
+    static QList<File *> decode(const QByteArray & array, Core *core);
 
 private:
     static void writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer);

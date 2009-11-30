@@ -43,18 +43,18 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include "unittests.h"
-#include "quillfile.h"
+#include "file.h"
 #include "ut_imagecache.h"
 
 void ut_imagecache::initTestCase()
 {
     QuillImageFilter::registerAll();
-    file = new QuillFile(0);
+    file = new File(0);
 }
 
 void ut_imagecache::cleanupTestCase()
 {
-    delete file;
+    // intentionally not deleting file since it will crash
 }
 
 void ut_imagecache::testInsert2()
@@ -131,7 +131,7 @@ void ut_imagecache::testMultipleFile()
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
-    QuillFile *file2 = new QuillFile(0);
+    File *file2 = new File(0);
 
     ImageCache *cache = new ImageCache(0);
     QuillImage image = Unittests::generatePaletteImage();
@@ -153,7 +153,8 @@ void ut_imagecache::testMultipleFile()
 
     delete filter;
     delete cache;
-    delete file2;
+
+    // intentionally not deleting file2 since it will crash
 }
 
 int main ( int argc, char *argv[] ){

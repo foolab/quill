@@ -54,12 +54,13 @@ ut_command::ut_command()
 void ut_command::initTestCase()
 {
     QuillImageFilter::registerAll();
-    stack = new QuillUndoStack(0, 0);
+    stack = new QuillUndoStack(0);
 }
 
 void ut_command::cleanupTestCase()
 {
     delete stack;
+    Quill::cleanup();
 }
 
 void ut_command::testFilter()
@@ -68,7 +69,7 @@ void ut_command::testFilter()
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
 
-    QuillUndoCommand *command = new QuillUndoCommand(stack, 0);
+    QuillUndoCommand *command = new QuillUndoCommand(stack);
     QVERIFY(command);
 
     command->setFilter(filter);
@@ -80,7 +81,7 @@ void ut_command::testFilter()
 
 void ut_command::testIndex()
 {
-    QuillUndoCommand *command = new QuillUndoCommand(stack, 0);
+    QuillUndoCommand *command = new QuillUndoCommand(stack);
     command->setIndex(11);
 
     QCOMPARE(command->index(), 11);
@@ -90,7 +91,7 @@ void ut_command::testIndex()
 
 void ut_command::testStackPointer()
 {
-    QuillUndoCommand *command = new QuillUndoCommand(stack, 0);
+    QuillUndoCommand *command = new QuillUndoCommand(stack);
 
     QCOMPARE(command->stack(), stack);
 

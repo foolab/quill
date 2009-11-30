@@ -49,15 +49,15 @@
 
 #include "quillundostack.h"
 #include "quillundocommand.h"
-#include "quillfile.h"
+#include "file.h"
 #include "core.h"
 #include "tilemap.h"
 #include "savemap.h"
 
-QuillUndoStack::QuillUndoStack(Core *parent, QuillFile *file) :
-    m_core(parent), m_stack(new QUndoStack()), m_file(file),
-    m_isSessionRecording(false), m_recordingSessionId(0), m_nextSessionId(1),
-    m_savedIndex(0), m_saveCommand(0), m_saveMap(0)
+QuillUndoStack::QuillUndoStack(File *file) :
+    m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
+    m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
+    m_saveCommand(0), m_saveMap(0)
 {
 }
 
@@ -68,7 +68,7 @@ QuillUndoStack::~QuillUndoStack()
     delete m_saveMap;
 }
 
-QuillFile* QuillUndoStack::file()
+File* QuillUndoStack::file()
 {
     return m_file;
 }
@@ -94,6 +94,7 @@ void QuillUndoStack::load()
 
 void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
 {
+    // full image size
     QSize previousFullSize;
 
     QuillImageFilter *filter = command->filter();
@@ -114,11 +115,12 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
     command->setFullImageSize(fullSize);
 
     // tile map
-    if (!m_core->defaultTileSize().isEmpty() && !command->tileMap()) {
+    if (!Core::instance()->defaultTileSize().isEmpty() && !command->tileMap()) {
         TileMap *tileMap;
         if (filter->role() == QuillImageFilter::Role_Load)
             tileMap = new TileMap(filter->newFullImageSize(QSize()),
-                                  m_core->defaultTileSize(),m_core->tileCache());
+                                  Core::instance()->defaultTileSize(),
+                                  Core::instance()->tileCache());
         else
             tileMap = new TileMap(command->prev()->tileMap(), filter);
 
@@ -128,7 +130,7 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
 
 void QuillUndoStack::add(QuillImageFilter *filter)
 {
-    QuillUndoCommand *cmd = new QuillUndoCommand(this, m_core);
+    QuillUndoCommand *cmd = new QuillUndoCommand(this);
 
     cmd->setFilter(filter);
     cmd->setIndex(index());
@@ -230,11 +232,11 @@ void QuillUndoStack::redo()
     }
 }
 
-QuillImage QuillUndoStack::image() const
+QuillImage QuillUndoStack::bestImage(int maxLevel) const
 {
     QuillUndoCommand *curr = command();
     if (curr)
-        return curr->bestImage();
+        return curr->bestImage(maxLevel);
     else
         return QuillImage();
 }
@@ -356,10 +358,10 @@ void QuillUndoStack::prepareSave(const QString &fileName)
     delete m_saveCommand;
     delete m_saveMap;
 
-    if (!m_core->defaultTileSize().isEmpty())
+    if (!Core::instance()->defaultTileSize().isEmpty())
         m_saveMap = new SaveMap(command()->fullImageSize(),
-                                    m_core->saveBufferSize(),
-                                    command()->tileMap());
+                                Core::instance()->saveBufferSize(),
+                                command()->tileMap());
 
     QuillImageFilter *saveFilter =
         QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
@@ -370,10 +372,10 @@ void QuillUndoStack::prepareSave(const QString &fileName)
     saveFilter->setOption(QuillImageFilter::FileFormat,
                           QVariant(m_file->targetFormat()));
 
-    m_saveCommand = new QuillUndoCommand(this, m_core);
+    m_saveCommand = new QuillUndoCommand(this);
     m_saveCommand->setFilter(saveFilter);
 
-    if (!m_core->defaultTileSize().isEmpty()) {
+    if (!Core::instance()->defaultTileSize().isEmpty()) {
         saveFilter->setOption(QuillImageFilter::TileCount,
                               QVariant(m_saveMap->bufferCount()));
         m_saveCommand->setTileMap(new TileMap(command()->tileMap(),

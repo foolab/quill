@@ -261,14 +261,14 @@ void ut_xml::testRecoverVariant()
 void ut_xml::testEmptyDocument()
 {
     // we don't need a core in this one
-    QList<QuillFile*> list = HistoryXml::decode(QByteArray(), 0);
+    QList<File*> list = HistoryXml::decode(QByteArray(), 0);
 
     QVERIFY(list.isEmpty());
 }
 
 void ut_xml::testXmlVersionOnly()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
         HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>"), 0);
 
     QVERIFY(list.isEmpty());
@@ -276,7 +276,7 @@ void ut_xml::testXmlVersionOnly()
 
 void ut_xml::testXmlVersionDtd()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
         HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                       <!DOCTYPE QuillEditHistory>"), 0);
 
@@ -285,7 +285,7 @@ void ut_xml::testXmlVersionDtd()
 
 void ut_xml::testXmlInvalidTopElement()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Quill/>"), 0);
@@ -296,7 +296,7 @@ void ut_xml::testXmlInvalidTopElement()
 
 void ut_xml::testXmlEmptyCore()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core/>"), 0);
@@ -306,7 +306,7 @@ void ut_xml::testXmlEmptyCore()
 
 void ut_xml::testXmlBadCoreContents()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><Stack/></Core>"), 0);
@@ -316,7 +316,7 @@ void ut_xml::testXmlBadCoreContents()
 
 void ut_xml::testXmlEmptyStack()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack/></Core>"), 0);
@@ -326,7 +326,7 @@ void ut_xml::testXmlEmptyStack()
 
 void ut_xml::testXmlBadStackContents()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack><Filter/>\
@@ -337,7 +337,7 @@ void ut_xml::testXmlBadStackContents()
 
 void ut_xml::testXmlBadFileContents()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\
@@ -349,7 +349,7 @@ void ut_xml::testXmlBadFileContents()
 
 void ut_xml::testXmlNoOriginalFile()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\
@@ -362,7 +362,7 @@ void ut_xml::testXmlNoOriginalFile()
 
 void ut_xml::testXmlBadOriginalFileContents()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\
@@ -375,7 +375,7 @@ void ut_xml::testXmlBadOriginalFileContents()
 
 void ut_xml::testXmlNoTargetIndex()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\
@@ -389,7 +389,7 @@ void ut_xml::testXmlNoTargetIndex()
 
 void ut_xml::testXmlEmptyTargetIndex()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\
@@ -405,7 +405,7 @@ void ut_xml::testXmlEmptyTargetIndex()
 
 void ut_xml::testXmlNoSavedIndex()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\
@@ -420,7 +420,7 @@ void ut_xml::testXmlNoSavedIndex()
 
 void ut_xml::testXmlEmptySavedIndex()
 {
-    QList<QuillFile*> list =
+    QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\

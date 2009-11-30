@@ -19,13 +19,12 @@ int main(int argc, char **argv)
 
     for(int i = 0; i<argc; i++)
         qDebug()<<"the arg is: "<<argv[i];
-    Quill *quill = new Quill(QSize(100, 100));
 
     if(argc ==2)
-       quill->setTemporaryFilePath(QString(argv[1]));
-    quill->setDefaultTileSize(QSize(256, 256));
+        Quill::setTemporaryFilePath(QString(argv[1]));
+    Quill::setDefaultTileSize(QSize(256, 256));
 
-    QuillFile *file = quill->file("input/benchmark12.jpg", "jpg");
+    QuillFile *file = new QuillFile("input/benchmark12.jpg", "jpg");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("Rotate");
@@ -40,5 +39,5 @@ int main(int argc, char **argv)
     loop.exec();
 
     qDebug() << "Use case batch rotate/save:" << time.elapsed() << "ms";
-    delete quill;
+    delete file;
 }

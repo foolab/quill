@@ -52,8 +52,8 @@
 
 int QuillUndoCommand::m_nextId = 1;
 
-QuillUndoCommand::QuillUndoCommand(QuillUndoStack *parent, Core *core) :
-    QUndoCommand(), m_filter(0), m_stack(parent), m_core(core),
+QuillUndoCommand::QuillUndoCommand(QuillUndoStack *parent) :
+    QUndoCommand(), m_filter(0), m_stack(parent),
     m_index(0), m_belongsToSession(0), m_sessionId(0),
     m_fullImageSize(QSize()), m_tileMap(0)
 {
@@ -75,14 +75,13 @@ QuillUndoCommand::~QuillUndoCommand()
     // Instead, ThreadManager::calculationFinished() will handle this
     // after the calculation has finished.
 
-    if (m_filter && (!m_core || (m_core->allowDelete(m_filter))))
+    if (m_filter && Core::instance()->allowDelete(m_filter))
         delete m_filter;
 
     // Eject any images from the cache
 
-    if (m_core)
-        for (int level=0; level<m_core->previewLevelCount(); level++)
-            m_core->cache(level)->remove(m_stack->file(), m_id);
+    for (int level=0; level<Core::instance()->previewLevelCount(); level++)
+        Core::instance()->cache(level)->remove(m_stack->file(), m_id);
 
     // The tile map becomes property of the command
 
@@ -139,12 +138,12 @@ QuillUndoCommand *QuillUndoCommand::prev() const
 
 QuillImage QuillUndoCommand::image(int level) const
 {
-    return m_core->cache(level)->image(m_stack->file(), m_id);
+    return Core::instance()->cache(level)->image(m_stack->file(), m_id);
 }
 
 void QuillUndoCommand::setImage(int level, const QuillImage &image)
 {
-    ImageCache *cache = m_core->cache(level);
+    ImageCache *cache = Core::instance()->cache(level);
     ImageCache::ProtectionStatus status = ImageCache::NotProtected;
 
     // An image will be protected if it is:
@@ -166,26 +165,26 @@ void QuillUndoCommand::setImage(int level, const QuillImage &image)
 
 void QuillUndoCommand::protectImages()
 {
-    for (int level=0; level<=m_core->previewLevelCount(); level++)
-        m_core->cache(level)->protect(m_stack->file(), m_id);
+    for (int level=0; level<=Core::instance()->previewLevelCount(); level++)
+        Core::instance()->cache(level)->protect(m_stack->file(), m_id);
 }
 
 QuillImage QuillUndoCommand::fullImage() const
 {
-    return image(m_core->previewLevelCount());
+    return image(Core::instance()->previewLevelCount());
 }
 
-int QuillUndoCommand::bestImageLevel() const
+int QuillUndoCommand::bestImageLevel(int maxLevel) const
 {
-    for (int i=m_core->previewLevelCount(); i>=0; i--)
+    for (int i=maxLevel; i>=0; i--)
         if (!image(i).isNull())
             return i;
     return -1;
 }
 
-QuillImage QuillUndoCommand::bestImage() const
+QuillImage QuillUndoCommand::bestImage(int maxLevel) const
 {
-    int level = bestImageLevel();
+    int level = bestImageLevel(maxLevel);
 
     if (level == -1)
         return QuillImage();
@@ -195,8 +194,8 @@ QuillImage QuillUndoCommand::bestImage() const
 
 QList<QuillImage> QuillUndoCommand::allImageLevels(int maxLevel) const
 {
-    if (maxLevel > m_core->previewLevelCount())
-        maxLevel = m_core->previewLevelCount();
+    if (maxLevel > Core::instance()->previewLevelCount())
+        maxLevel = Core::instance()->previewLevelCount();
     QList<QuillImage> list;
     for (int i=0; i<=maxLevel; i++)
         if (!image(i).isNull())
@@ -217,7 +216,7 @@ QSize QuillUndoCommand::fullImageSize() const
 
 QSize QuillUndoCommand::targetPreviewSize(int level) const
 {
-    QSize previewSize = m_core->previewSize(level);
+    QSize previewSize = Core::instance()->previewSize(level);
     QSize targetSize;
 
     // keep aspect ratio, always round fractions up

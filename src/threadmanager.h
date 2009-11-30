@@ -57,6 +57,7 @@ QThreadPool on the background.
 #include "quill.h"
 
 class QuillImage;
+class File;
 class QtImageFilter;
 class Core;
 class QuillUndoStack;
@@ -69,8 +70,7 @@ class ThreadManager : public QObject
 Q_OBJECT
 
 public:
-    ThreadManager(Core *core,
-                  Quill::ThreadingMode mode = Quill::ThreadingNormal);
+    ThreadManager(Quill::ThreadingMode mode = Quill::ThreadingNormal);
 
     ~ThreadManager();
 
@@ -86,14 +86,14 @@ public:
       background thread.
      */
 
-    bool suggestNewTask(QuillFile *file, int level);
+    bool suggestNewTask(File *file, int level);
 
     /*!
       Used by core to indicate that there may be a save task waiting
       for the background thread.
      */
 
-    bool suggestSaveTask(QuillFile *file);
+    bool suggestSaveTask(File *file);
 
     /*!
       Used by core to indicate that there may be a special
@@ -101,20 +101,20 @@ public:
       based on the full image) waiting for the background thread.
     */
 
-    bool suggestPreviewImprovementTask(QuillFile *file);
+    bool suggestPreviewImprovementTask(File *file);
 
     /*
       Suggest to load a pre-generated thumbnail from a file.
      */
 
-    bool suggestThumbnailLoadTask(QuillFile *file,
+    bool suggestThumbnailLoadTask(File *file,
                                   int level);
 
     /*!
       Suggest to save a thumbnail
      */
 
-    bool suggestThumbnailSaveTask(QuillFile *file, int level);
+    bool suggestThumbnailSaveTask(File *file, int level);
 
     /*!
       @return if the thread manager allows the given filter to be
@@ -163,21 +163,21 @@ private:
       Can start calculations on its own.
     */
 
-    bool suggestTilingTask(QuillFile *file);
+    bool suggestTilingTask(File *file);
 
     /*!
       Helper function for suggestSaveTask(), used for tiling.
       Can start calculations on its own.
     */
 
-    bool suggestTilingSaveTask(QuillFile *file);
+    bool suggestTilingSaveTask(File *file);
 
     /*!
       Helper function for suggestTilingSaveTask(), used for pushing
       tiles into the save buffer. Can start calculations on its own.
     */
 
-    bool suggestTilingOverlayTask(QuillFile *file);
+    bool suggestTilingOverlayTask(File *file);
 
     /*!
       Used by all suggest functions to start a thread.
@@ -186,7 +186,6 @@ private:
     void startThread(int id, int level, int tile,
                      const QuillImage &image, QuillImageFilter *filter);
 
-    Core *core;
     int commandId;
     int commandLevel;
     int tileId;

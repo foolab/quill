@@ -54,6 +54,7 @@ can only be changed if no files have been opened yet.
 
 #include "quill.h"
 
+class File;
 class QuillUndoCommand;
 class QuillUndoStack;
 class ImageCache;
@@ -71,22 +72,62 @@ friend class ut_core;
 
 public:
 
-    Core(const QSize &viewPortSize = Quill::defaultViewPortSize,
-         Quill::ThreadingMode threadingMode = Quill::ThreadingNormal);
+    Core(Quill::ThreadingMode threadingMode = Quill::ThreadingNormal);
     ~Core();
+
+    /*!
+      The initializer is called before instance() is called for the first time,
+      it sets up the core.
+    */
+
+    static void init();
+
+    /*!
+      This initializer is called instead of regular init() when
+      Quill needs to be start up in thread testing mode. If the Core
+      has already been set up, this function will fail.
+    */
+
+    static void initTestingMode();
+
+    /*!
+      This function will destroy the Core and all its related data
+      structures. All instantiated QuillFile objects will have their
+      valid() property set to false.
+     */
+
+    static void cleanup();
+
+    /*!
+      The instance reference for the class.
+     */
+
+    static Core *instance();
+
+    /*!
+      Returns true if there is an instance for the file in Core.
+    */
+
+    bool fileExists(const QString &fileName);
 
     /*!
       Opens new file for viewing and editing.
     */
 
-    QuillFile *file(const QString &fileName,
-                    const QString &fileFormat);
+    File *file(const QString &fileName,
+               const QString &fileFormat);
+
+    /*!
+      Removes a file from the core.
+     */
+
+    void detach(File *file);
 
     /*!
       Inserts a new file.
      */
 
-    void insertFile(QuillFile *file, const QString &key);
+    void insertFile(File *file, const QString &key);
 
     /*!
       Modifies the preview level count. If new previews are created,
@@ -284,18 +325,6 @@ public:
     TileCache *tileCache() const;
 
     /*!
-      The core has received an update of an image.
-     */
-
-    void emitImageAvailable(QuillFile *file, int level);
-
-    /*!
-      The core has received a partial update of an image.
-    */
-
-    void emitTileAvailable(QuillFile *file, int tileId);
-
-    /*!
       Return the number of files which have at least a given display level.
     */
 
@@ -305,12 +334,12 @@ public:
       Sets the temporary file path
       @param fileDir the file path
     */
-    void setTemporaryFileDirectory(const QString fileDir);
+    void setTemporaryFileDirectory(const QString &fileDir);
 
     /*!
       Gets the temporary file path
      */
-    QString temporaryFileDirectory();
+    QString temporaryFileDirectory() const;
 
 private:
 
@@ -318,21 +347,23 @@ private:
       Return one file.
     */
 
-    QuillFile *priorityFile() const;
+    File *priorityFile() const;
 
     /*!
       Return one file.
     */
 
-    QuillFile *prioritySaveFile() const;
+    File *prioritySaveFile() const;
 
     /*!
       Return all existing files.
     */
 
-    QList<QuillFile*> existingFiles() const;
+    QList<File*> existingFiles() const;
 
 private:
+
+    static Core *g_instance;
 
     QList<QSize> m_previewSize;
     QList<ImageCache*> m_cache;
@@ -343,7 +374,7 @@ private:
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
 
-    QMap<QString, QuillFile*> m_files;
+    QMap<QString, File*> m_files;
 
     QSize m_defaultTileSize;
     int m_saveBufferSize;

@@ -44,7 +44,7 @@
 #include <QuillImageFilterFactory>
 
 #include <Quill>
-#include <QuillFile>
+#include "file.h"
 #include "ut_file.h"
 #include "unittests.h"
 
@@ -54,11 +54,20 @@ ut_file::ut_file()
 
 void ut_file::initTestCase()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_file::cleanupTestCase()
 {
+}
+
+void ut_file::init()
+{
+    Quill::initTestingMode();
+}
+
+void ut_file::cleanup()
+{
+    Quill::cleanup();
 }
 
 void ut_file::testRemove()
@@ -67,9 +76,7 @@ void ut_file::testRemove()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    QVERIFY(quill);
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QVERIFY(file);
     QVERIFY(file->exists());
 
@@ -82,7 +89,7 @@ void ut_file::testRemove()
 
     file->runFilter(filter);
     file->save();
-    quill->releaseAndWait(); // for runFilter()
+    Quill::releaseAndWait(); // for runFilter()
 
     file->remove();
 
@@ -90,13 +97,13 @@ void ut_file::testRemove()
     QVERIFY(!QFile::exists(testFile.fileName()));
     QVERIFY(!QFile::exists(originalFileName));
 
-    quill->releaseAndWait(); // for save()
+    Quill::releaseAndWait(); // for save()
 
     QVERIFY(!file->exists());
     QVERIFY(!QFile::exists(testFile.fileName()));
     QVERIFY(!QFile::exists(originalFileName));
 
-    delete quill;
+    delete file;
 }
 
 void ut_file::testOriginal()
@@ -107,10 +114,8 @@ void ut_file::testOriginal()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    QVERIFY(quill);
-    quill->setFileLimit(0, 2);
-    QuillFile *file = quill->file(testFile.fileName(), "png");
+    Quill::setFileLimit(0, 2);
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -128,11 +133,11 @@ void ut_file::testOriginal()
     QVERIFY(!original->canUndo());
 
     file->setDisplayLevel(0);
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     original->setDisplayLevel(0);
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
 
     QCOMPARE(file->image(), processedImage);
     QCOMPARE(original->image(), image);
@@ -141,7 +146,8 @@ void ut_file::testOriginal()
     QVERIFY(!file->exists());
     QVERIFY(!original->exists());
 
-    delete quill;
+    delete file;
+    delete original;
 }
 
 void ut_file::testFileLimit()
@@ -156,21 +162,121 @@ void ut_file::testFileLimit()
     image.save(testFile.fileName(), "png");
     image.save(testFile2.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(8, 2), Quill::ThreadingTest);
-    QVERIFY(quill);
-
-    QuillFile *file = quill->file(testFile.fileName(), "png");
-    QuillFile *file2 = quill->file(testFile2.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile2.fileName(), "png");
 
     QVERIFY(file->setDisplayLevel(0));
     QVERIFY(!file2->setDisplayLevel(0));
 
-    quill->setFileLimit(0, 2);
+    Quill::setFileLimit(0, 2);
     QVERIFY(file2->setDisplayLevel(0));
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
-    delete quill;
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
+    delete file;
+    delete file2;
+}
+
+void ut_file::testMultipleAccess()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillImage imageAfter = filter->apply(image);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
+
+    QVERIFY(file != file2);
+
+    QVERIFY(file->setDisplayLevel(0));
+    QVERIFY(file2->setDisplayLevel(0));
+
+    file->runFilter(filter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), imageAfter));
+    QVERIFY(Unittests::compareImage(file2->image(), imageAfter));
+
+    file2->undo();
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+    QVERIFY(Unittests::compareImage(file2->image(), image));
+
+    delete file2;
+
+    file->redo();
+    Quill::releaseAndWait();
+    QVERIFY(Unittests::compareImage(file->image(), imageAfter));
+
+    delete file;
+}
+
+void ut_file::testDifferentPreviewLevels()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillImage imageAfter = filter->apply(image);
+
+    Quill::setPreviewSize(0, QSize(4, 1));
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
+
+    QSignalSpy spy(file, SIGNAL(imageAvailable(const QuillImageList)));
+    QSignalSpy spy2(file2, SIGNAL(imageAvailable(const QuillImageList)));
+
+    QVERIFY(file != file2);
+
+    QVERIFY(file2->setDisplayLevel(1));
+    QVERIFY(file->setDisplayLevel(0));
+
+    file->runFilter(filter);
+    Quill::releaseAndWait(); // load level 0
+    Quill::releaseAndWait(); // brightness level 0
+
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy2.count(), 1);
+
+    QCOMPARE(file->image().size(), QSize(4, 1));
+    QCOMPARE(file2->image().size(), QSize(4, 1));
+
+    Quill::releaseAndWait(); // load level 1
+    Quill::releaseAndWait(); // brightness level 1
+
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy2.count(), 2);
+
+    QCOMPARE(file->image().size(), QSize(4, 1));
+    QVERIFY(Unittests::compareImage(file2->image(), imageAfter));
+
+    delete file2;
+
+    // Ensure that the display level is kept even if the other image reference
+    // is removed.
+    QCOMPARE(file->image().size(), QSize(4, 1));
+
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

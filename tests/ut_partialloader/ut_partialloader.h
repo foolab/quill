@@ -51,6 +51,8 @@ public:
     ut_partialloader();
 
 private slots:
+    void init();
+    void cleanup();
     void initTestCase();
     void cleanupTestCase();
 
