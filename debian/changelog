@@ -1,3 +1,10 @@
+libquill (1.091130.0) unstable; urgency=low
+
+  * Implemented: SWP#HImag-1402
+  * Major interface rewrite: QuillFile object constructors and destructors.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 30 Nov 2009 13:50:00 +0200
+
 libquill (1.091125.1) unstable; urgency=low
 
   * Implements: Supports setting images and changing the "waiting for data" state for an image.
