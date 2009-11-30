@@ -10,7 +10,7 @@ DEPENDPATH += .
 
 DEFINES     +=
 
-CONFIG += DEBUG
+CONFIG += release
 
 CONFIG += quillimagefilter
 
@@ -23,6 +23,7 @@ QMAKE_PKGCONFIG_REQUIRES = quillimagefilter QtGui
 QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
 QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
+QMAKE_CXXFLAGS += -Werror
 # this is for adding coverage information while doing qmake as "qmake COV_OPTION=on"
 # message is shown when 'make' is executed
 for(OPTION,$$list($$lower($$COV_OPTION))){
