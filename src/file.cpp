@@ -241,25 +241,6 @@ bool File::isSaveInProgress() const
 {
     return priv->saveInProgress;
 }
-/*
-QuillFile *File::exportFile(const QString &newFileName,
-                                 const QString &fileFormat)
-{
-        if (!priv->exists || !priv->supported)
-        return 0;
-
-    const QByteArray dump = HistoryXml::encode(this);
-    QuillFile *file = HistoryXml::decodeOne(dump, priv->core);
-
-    file->setFileName(newFileName);
-    file->setTargetFormat(fileFormat);
-    // todo: saved index needs to be reset to -1
-    file->save();
-
-    return file;
-    return 0;
-}
-*/
 
 void File::runFilter(QuillImageFilter *filter)
 {

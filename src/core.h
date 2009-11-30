@@ -95,7 +95,7 @@ public:
     static Core *instance();
 
     /*!
-      Does Core have the file?
+      Returns true if there is an instance for the file in Core.
     */
 
     bool fileExists(const QString &fileName);
