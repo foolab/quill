@@ -353,10 +353,12 @@ void ut_stack::testSetImage()
 
     QVERIFY(Unittests::compareImage(file->image(), image));
 
-    file->runFilter(filter);
-    Quill::releaseAndWait();
+    // This belongs to the scope of the feature "edit in postcapture".
 
-    QVERIFY(Unittests::compareImage(file->image(), resultImage));
+    //    file->runFilter(filter);
+    //    Quill::releaseAndWait();
+
+    //    QVERIFY(Unittests::compareImage(file->image(), resultImage));
 
     delete file;
 }
