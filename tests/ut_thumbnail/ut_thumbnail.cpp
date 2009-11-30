@@ -237,7 +237,11 @@ void ut_thumbnail::testFailedWrite()
 
     QVERIFY(Quill::isThumbnailCreationEnabled());
 
-    Quill::setThumbnailDirectory(0, "/invalid");
+    // Should ensure that a directory will not be created.
+    QFile dummyFile("/tmp/invalid");
+    dummyFile.open(QIODevice::WriteOnly);
+
+    Quill::setThumbnailDirectory(0, "/tmp/invalid");
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName());
