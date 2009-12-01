@@ -513,6 +513,11 @@ int Core::numFilesAtLevel(int level) const
     return n;
 }
 
+bool Core::isSaveInProgress() const
+{
+    return (prioritySaveFile() != 0);
+}
+
 void Core::setTemporaryFileDirectory(const QString &fileDir)
 {
     m_temporaryFileDirectory = fileDir;

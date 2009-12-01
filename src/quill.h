@@ -365,7 +365,14 @@ public:
       setTemporaryFilePath().
     */
 
-    QString temporaryFilePath() const;
+    static QString temporaryFilePath();
+
+    /*!
+      Returns true if there are any files which are in the progress of
+      saving. Useful for example when an application wants to exit.
+     */
+
+    static bool isSaveInProgress();
 
     /*!
       To make background loading tests easier on fast machines

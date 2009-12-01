@@ -146,9 +146,14 @@ void Quill::setTemporaryFilePath(const QString &tmpFilePath)
     Core::instance()->setTemporaryFileDirectory(tmpFilePath);
 }
 
-QString Quill::temporaryFilePath() const
+QString Quill::temporaryFilePath()
 {
     return Core::instance()->temporaryFileDirectory();
+}
+
+bool Quill::isSaveInProgress()
+{
+    return Core::instance()->isSaveInProgress();
 }
 
 void Quill::releaseAndWait()

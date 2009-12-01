@@ -425,8 +425,13 @@ void ut_quill::testLoadSave()
     Quill::releaseAndWait();
     Quill::releaseAndWait();
 
+    QVERIFY(!Quill::isSaveInProgress());
+
     file->save();
+    QVERIFY(Quill::isSaveInProgress());
+
     Quill::releaseAndWait();
+    QVERIFY(!Quill::isSaveInProgress());
 
     QCOMPARE(spy.count(), 1);
 
