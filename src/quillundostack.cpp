@@ -250,7 +250,7 @@ QuillImage QuillUndoStack::image(int level) const
         return QuillImage();
 }
 
-void QuillUndoStack::setImage(int level, const QuillImage &image) const
+void QuillUndoStack::setImage(int level, const QuillImage &image)
 {
     command()->setImage(level, image);
     command()->setFullImageSize(image.fullImageSize());

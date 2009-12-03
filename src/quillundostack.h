@@ -152,7 +152,7 @@ public:
       Allows forcibly setting an image value from outside.
     */
 
-    void setImage(int level, const QuillImage &image) const;
+    void setImage(int level, const QuillImage &image);
 
     /*!
       Gets the current image in all available image levels.
