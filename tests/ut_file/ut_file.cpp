@@ -279,6 +279,49 @@ void ut_file::testDifferentPreviewLevels()
     delete file;
 }
 
+void ut_file::testSaveAfterDelete()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillImage imageAfter = filter->apply(image);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
+    file->runFilter(filter);
+
+    QVERIFY(!Quill::isSaveInProgress());
+    QVERIFY(!file->isSaveInProgress());
+
+    file->save();
+
+    QVERIFY(Quill::isSaveInProgress());
+    QVERIFY(file->isSaveInProgress());
+
+    delete file;
+
+    QVERIFY(Quill::isSaveInProgress());
+
+    Quill::releaseAndWait(); // load
+    QVERIFY(Quill::isSaveInProgress());
+
+    Quill::releaseAndWait(); // b/c
+    QVERIFY(Quill::isSaveInProgress());
+
+    Quill::releaseAndWait(); // save
+    QVERIFY(!Quill::isSaveInProgress());
+
+    Unittests::compareImage(QImage(testFile.fileName()), imageAfter);
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_file test;

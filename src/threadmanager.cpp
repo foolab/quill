@@ -558,12 +558,16 @@ void ThreadManager::calculationFinished()
     Core::instance()->suggestNewTask();
 
     // If we just got a better version of the active image, emit signal
-    QuillUndoCommand *current = 0;
-    if (command != 0)
-        current = stack->command();
-    if (imageUpdated && current && (current->uniqueId() == previousCommandId)) {
-        image.setZ(previousCommandLevel);
-        stack->file()->emitSingleImage(image, previousCommandLevel);
+
+    if (imageUpdated) {
+        QuillUndoCommand *current = 0;
+        if (command != 0)
+            current = stack->command();
+
+        if (current && (current->uniqueId() == previousCommandId)) {
+            image.setZ(previousCommandLevel);
+            stack->file()->emitSingleImage(image, previousCommandLevel);
+        }
     }
 
     if (threadingMode == Quill::ThreadingTest)
