@@ -252,8 +252,11 @@ QuillImage QuillUndoStack::image(int level) const
 
 void QuillUndoStack::setImage(int level, const QuillImage &image)
 {
-    command()->setImage(level, image);
-    command()->setFullImageSize(image.fullImageSize());
+    QuillUndoCommand *curr = command();
+    if (curr) {
+        curr->setImage(level, image);
+        curr->setFullImageSize(image.fullImageSize());
+    }
 }
 
 QList<QuillImage> QuillUndoStack::allImageLevels(int maxLevel) const
