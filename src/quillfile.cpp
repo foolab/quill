@@ -243,7 +243,7 @@ QuillImage QuillFile::image(int level) const
 
 void QuillFile::setImage(int level, const QuillImage &image)
 {
-    if (priv->m_file)
+    if ((level <= priv->m_displayLevel) && priv->m_file)
         priv->m_file->setImage(level, image);
 }
 
