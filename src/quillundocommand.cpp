@@ -144,6 +144,9 @@ QuillImage QuillUndoCommand::image(int level) const
 void QuillUndoCommand::setImage(int level, const QuillImage &image)
 {
     ImageCache *cache = Core::instance()->cache(level);
+    if (!cache)
+        return;
+
     ImageCache::ProtectionStatus status = ImageCache::NotProtected;
 
     // An image will be protected if it is:
