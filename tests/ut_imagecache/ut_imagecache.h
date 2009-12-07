@@ -61,7 +61,7 @@ private slots:
 
 private:
     QuillImage image;
-    QuillFile *file;
+    File *file;
 };
 
 #endif // TEST_LIBQUILL_UNDO_CACHE_H

@@ -56,7 +56,6 @@ tiles (in TileCache, accessible via tileMap()).
 class QuillUndoStack;
 class QString;
 class QuillImage;
-class Core;
 class Quill;
 class TileMap;
 
@@ -66,7 +65,7 @@ class QuillUndoCommand : public QUndoCommand
 {
 
 public:
-    QuillUndoCommand(QuillUndoStack *parent, Core *core);
+    QuillUndoCommand(QuillUndoStack *parent);
     ~QuillUndoCommand();
 
     QuillImageFilter *filter() const;
@@ -149,13 +148,13 @@ public:
       Gets the resolution level of the best image available in the command.
      */
 
-    int bestImageLevel() const;
+    int bestImageLevel(int maxLevel) const;
 
     /*!
       Gets the best image available in the command.
     */
 
-    QuillImage bestImage() const;
+    QuillImage bestImage(int maxLevel) const;
 
     /*!
       Gets all image levels available in the command.
@@ -216,7 +215,6 @@ private:
     int m_id;
     QuillImageFilter* m_filter;
     QuillUndoStack* m_stack;
-    const Core *m_core;
 
     /*!
       Position of the command in the stack.

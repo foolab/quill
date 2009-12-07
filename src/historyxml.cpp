@@ -47,20 +47,20 @@
 
 #include "core.h"
 #include "historyxml.h"
-#include "quillfile.h"
+#include "file.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 
-QByteArray HistoryXml::encode(QuillFile *file)
+QByteArray HistoryXml::encode(File *file)
 {
-    QList<QuillFile *> files;
+    QList<File *> files;
     files += file;
     return encode(files);
 }
 
-QuillFile *HistoryXml::decodeOne(const QByteArray & array, Core *core)
+File *HistoryXml::decodeOne(const QByteArray & array, Core *core)
 {
-    QList<QuillFile *> fileList = HistoryXml::decode(array, core);
+    QList<File *> fileList = HistoryXml::decode(array, core);
     if (!fileList.isEmpty())
         return fileList.first();
     else
@@ -68,7 +68,7 @@ QuillFile *HistoryXml::decodeOne(const QByteArray & array, Core *core)
 }
 
 
-QByteArray HistoryXml::encode(QList<QuillFile *> files)
+QByteArray HistoryXml::encode(QList<File *> files)
 {
     QByteArray result;
 
@@ -79,7 +79,7 @@ QByteArray HistoryXml::encode(QList<QuillFile *> files)
 
     writer.writeStartElement("", "Core");
 
-    for (QList<QuillFile*>::iterator file = files.begin();
+    for (QList<File*>::iterator file = files.begin();
          file < files.end(); file++)
     {
         QuillUndoStack *stack = (*file)->stack();
@@ -262,11 +262,11 @@ QXmlStreamReader::TokenType HistoryXml::readToken(QXmlStreamReader *reader)
     return tokenType;
 }
 
-QList<QuillFile*> HistoryXml::decode(const QByteArray & array, Core *core)
+QList<File*> HistoryXml::decode(const QByteArray & array, Core *core)
 {
     QXmlStreamReader reader(array);
 
-    QList<QuillFile*> emptyList, files;
+    QList<File*> emptyList, files;
     QXmlStreamReader::TokenType token;
 
     if (readToken(&reader) != QXmlStreamReader::StartDocument)
@@ -327,7 +327,7 @@ QList<QuillFile*> HistoryXml::decode(const QByteArray & array, Core *core)
         if (readToken(&reader) != QXmlStreamReader::EndElement)
             return emptyList;
 
-        QuillFile *file = new QuillFile(core);
+        File *file = new File(core);
         file->setFileName(fileName);
         file->setOriginalFileName(originalFileName);
         file->setFileFormat(fileFormat);

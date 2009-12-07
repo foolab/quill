@@ -62,8 +62,7 @@ concludeSave() which are used to help with these operations.
 #include "quill.h"
 
 class QuillImage;
-class QuillFile;
-class Core;
+class File;
 class QuillUndoCommand;
 class QuillImageFilter;
 class SaveMap;
@@ -75,10 +74,10 @@ class QuillUndoStack : public QObject
 Q_OBJECT
 
 public:
-    QuillUndoStack(Core *core, QuillFile *file);
+    QuillUndoStack(File *file);
     ~QuillUndoStack();
 
-    QuillFile *file();
+    File *file();
 
     void load();
 
@@ -141,7 +140,7 @@ public:
       Gets the current image, best resolution available.
     */
 
-    QuillImage image() const;
+    QuillImage bestImage(int maxLevel) const;
 
     /*!
       Gets the current image, given resolution.
@@ -153,7 +152,7 @@ public:
       Allows forcibly setting an image value from outside.
     */
 
-    void setImage(int level, const QuillImage &image) const;
+    void setImage(int level, const QuillImage &image);
 
     /*!
       Gets the current image in all available image levels.
@@ -270,9 +269,8 @@ private:
     void setInitialLoadFilter(QuillImageFilter *filter);
 
 private:
-    Core *m_core;
     QUndoStack *m_stack;
-    QuillFile *m_file;
+    File *m_file;
     bool m_isSessionRecording;
     int m_recordingSessionId, m_nextSessionId;
     int m_savedIndex;

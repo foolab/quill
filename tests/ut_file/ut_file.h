@@ -49,12 +49,17 @@ public:
     ut_file();
 
 private slots:
+    void init();
+    void cleanup();
     void initTestCase();
     void cleanupTestCase();
 
     void testRemove();
     void testOriginal();
     void testFileLimit();
+    void testMultipleAccess();
+    void testDifferentPreviewLevels();
+    void testSaveAfterDelete();
 };
 
 #endif  // TEST_LIBQUILL_FILE_H
