@@ -1,3 +1,12 @@
+libquill (1.091207.0) unstable; urgency=low
+  * Can query Quill if saving files is in progress.
+  * Sanity checks and other stability fixes.
+  * Fixes: NB#118830 Gallery crashes when edit operations are performed multiple times.
+  * Fixes: NB#124606 Doing edit operations over high resolution images crashes the gallery application
+  * Fixes: NB#146925 Gallery does not save images when /tmp folder is 100%
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 07 Dec 2009 09:05 +0200
+
 libquill (1.091130.0) unstable; urgency=low
 
   * Implemented: SWP#HImag-1402
