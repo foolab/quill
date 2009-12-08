@@ -39,12 +39,3 @@ XB-Maemo-CI-Packages: libquill
 XB-Maemo-CI-Stage: fast, staging, acceptance
 Description: libquill unit tests
  This is the image editor's unit tests and it includes libquill, quillimagefilter and qtimagefilter
-
-Package: libquill-automation-tests
-Section: tests
-Priority: optional
-Architecture: any
-Depends: libquill1, ci-package, ci-testing [armel]
-XB-Maemo-CI-Packages: libquill
-XB-Maemo-CI-Stage: fast, staging, acceptance
-Description: Automated UI Test cases for libquill
