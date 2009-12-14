@@ -94,7 +94,7 @@
       </case>
     </set>
 
-    <set name="quill thumnail tests" feature="xml">
+    <set name="quill thumbnail tests" feature="thumbnail">
       <description>quill thumbnail test</description>
       <case name="ut_thumbnail" type="Functional" level="Component">
 	<step >/usr/lib/libquill-tests/ut_thumbnail </step>
