@@ -1,3 +1,9 @@
+libquill (1.091215.1) unstable; urgency=low
+
+  * Fixes: NB#150785 valgrind report for ut_imagecache, ut_imageloader, ut_stack
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 15 Dec 2009 15:55:00 +0200
+
 libquill (1.091215.0) unstable; urgency=low
 
   * Fixes: NB#150106 libquill: missing doxygen from build dependencies
