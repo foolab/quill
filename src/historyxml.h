@@ -70,8 +70,8 @@ class HistoryXml
 public:
     static QByteArray encode(File *file);
     static QByteArray encode(QList<File *> files);
-    static File *decodeOne(const QByteArray & array, Core *core);
-    static QList<File *> decode(const QByteArray & array, Core *core);
+    static File *decodeOne(const QByteArray & array);
+    static QList<File *> decode(const QByteArray & array);
 
 private:
     static void writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer);

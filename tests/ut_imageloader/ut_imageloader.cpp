@@ -112,6 +112,8 @@ void ut_imageloader::testLoadFilter()
     QImage image = filter->apply(QImage());
 
     QCOMPARE(image, Unittests::generatePaletteImage());
+
+    delete filter;
 }
 
 // Test libquill image loading on setup, size equal with target

@@ -47,10 +47,8 @@
 #include "quill.h"
 #include "quillfile.h"
 
-class QuillImage;
-class QuillImageFilter;
 class QuillUndoStack;
-class QuillFilePrivate;
+class FilePrivate;
 
 class File : public QObject
 {
@@ -59,7 +57,7 @@ Q_OBJECT
     friend class ut_thumbnail;
 
 public:
-    File(QObject *parent);
+    File();
     virtual ~File();
 
     /*!
@@ -497,7 +495,7 @@ private:
 
     void writeEditHistory(const QString &history);
 
-    QuillFilePrivate *priv;
+    FilePrivate *priv;
 
     QList<QuillFile*> m_references;
 };

@@ -261,7 +261,7 @@ void ut_xml::testRecoverVariant()
 void ut_xml::testEmptyDocument()
 {
     // we don't need a core in this one
-    QList<File*> list = HistoryXml::decode(QByteArray(), 0);
+    QList<File*> list = HistoryXml::decode(QByteArray());
 
     QVERIFY(list.isEmpty());
 }
@@ -269,7 +269,7 @@ void ut_xml::testEmptyDocument()
 void ut_xml::testXmlVersionOnly()
 {
     QList<File*> list =
-        HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>"), 0);
+        HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -278,7 +278,7 @@ void ut_xml::testXmlVersionDtd()
 {
     QList<File*> list =
         HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
-                                      <!DOCTYPE QuillEditHistory>"), 0);
+                                      <!DOCTYPE QuillEditHistory>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -288,7 +288,7 @@ void ut_xml::testXmlInvalidTopElement()
     QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
-                                  <Quill/>"), 0);
+                                  <Quill/>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -299,7 +299,7 @@ void ut_xml::testXmlEmptyCore()
     QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
-                                  <Core/>"), 0);
+                                  <Core/>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -309,7 +309,7 @@ void ut_xml::testXmlBadCoreContents()
     QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
-                                  <Core><Stack/></Core>"), 0);
+                                  <Core><Stack/></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -319,7 +319,7 @@ void ut_xml::testXmlEmptyStack()
     QList<File*> list =
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
-                                  <Core><QuillUndoStack/></Core>"), 0);
+                                  <Core><QuillUndoStack/></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -330,7 +330,7 @@ void ut_xml::testXmlBadStackContents()
     HistoryXml::decode(QByteArray("<?xml version=\"1.0\"?>\
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack><Filter/>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -342,7 +342,7 @@ void ut_xml::testXmlBadFileContents()
                                   <!DOCTYPE QuillEditHistory>\
                                   <Core><QuillUndoStack>\
                                   <File>jussi.jpg</File>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -355,7 +355,7 @@ void ut_xml::testXmlNoOriginalFile()
                                   <Core><QuillUndoStack>\
                                   <File name=\"jussi.jpg\"/>\
                                   <TargetIndex>2</TargetIndex>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -368,7 +368,7 @@ void ut_xml::testXmlBadOriginalFileContents()
                                   <Core><QuillUndoStack>\
                                   <File name=\"jussi.jpg\"/>\
                                   <OriginalFile>jussi.jpg</OriginalFile>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -382,7 +382,7 @@ void ut_xml::testXmlNoTargetIndex()
                                   <File name=\"jussi.jpg\"/>\
                                   <OriginalFile name=\"jussi_original.jpg\"/>\
                                   <SavedIndex>2</SavedIndex>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -397,7 +397,7 @@ void ut_xml::testXmlEmptyTargetIndex()
                                   <OriginalFile name=\"jussi_original.jpg\"/>\
                                   <TargetIndex/>\
                                   <SavedIndex>2</SavedIndex>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -413,7 +413,7 @@ void ut_xml::testXmlNoSavedIndex()
                                   <OriginalFile name=\"jussi_original.jpg\"/>\
                                   <TargetIndex>2</TargetIndex>\
                                   <Filter/>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }
@@ -429,7 +429,7 @@ void ut_xml::testXmlEmptySavedIndex()
                                   <TargetIndex>2</TargetIndex>\
                                   <SavedIndex/>\
                                   <Filter/>\
-                                  </QuillUndoStack></Core>"), 0);
+                                  </QuillUndoStack></Core>"));
 
     QVERIFY(list.isEmpty());
 }

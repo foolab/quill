@@ -58,9 +58,9 @@ QByteArray HistoryXml::encode(File *file)
     return encode(files);
 }
 
-File *HistoryXml::decodeOne(const QByteArray & array, Core *core)
+File *HistoryXml::decodeOne(const QByteArray & array)
 {
-    QList<File *> fileList = HistoryXml::decode(array, core);
+    QList<File *> fileList = HistoryXml::decode(array);
     if (!fileList.isEmpty())
         return fileList.first();
     else
@@ -262,7 +262,7 @@ QXmlStreamReader::TokenType HistoryXml::readToken(QXmlStreamReader *reader)
     return tokenType;
 }
 
-QList<File*> HistoryXml::decode(const QByteArray & array, Core *core)
+QList<File*> HistoryXml::decode(const QByteArray & array)
 {
     QXmlStreamReader reader(array);
 
@@ -327,7 +327,7 @@ QList<File*> HistoryXml::decode(const QByteArray & array, Core *core)
         if (readToken(&reader) != QXmlStreamReader::EndElement)
             return emptyList;
 
-        File *file = new File(core);
+        File *file = new File();
         file->setFileName(fileName);
         file->setOriginalFileName(originalFileName);
         file->setFileFormat(fileFormat);

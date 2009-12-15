@@ -353,12 +353,15 @@ void ut_stack::testSetImage()
 
     QVERIFY(Unittests::compareImage(file->image(), image));
 
-    // This belongs to the scope of the feature "edit in postcapture".
+    // This belongs to the scope of the feature "edit in postcapture",
+    // not implemented yet.
 
-    //    file->runFilter(filter);
-    //    Quill::releaseAndWait();
+    file->runFilter(filter);
+    Quill::releaseAndWait();
 
-    //    QVERIFY(Unittests::compareImage(file->image(), resultImage));
+    QEXPECT_FAIL("", "Will be fixed with the feature 'Edit in postcapture'",
+                 Continue);
+    QVERIFY(Unittests::compareImage(file->image(), resultImage));
 
     delete file;
 }

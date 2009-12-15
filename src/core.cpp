@@ -209,7 +209,7 @@ File *Core::file(const QString &fileName,
         return file;
     }
 
-    file = new File(this);
+    file = new File();
     file->setFileName(fileName);
 
     QFileInfo fileInfo(fileName);
@@ -432,7 +432,7 @@ void Core::recover(QByteArray history)
     if (!m_files.isEmpty())
         return;
 
-    QList<File*> fileList = HistoryXml::decode(history, this);
+    QList<File*> fileList = HistoryXml::decode(history);
 
     for (QMap<QString, File*>::iterator file = m_files.begin();
          file != m_files.end(); file++) {

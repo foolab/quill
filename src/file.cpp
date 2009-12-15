@@ -53,11 +53,9 @@
 #include "historyxml.h"
 #include "tilemap.h"
 
-class QuillFilePrivate
+class FilePrivate
 {
 public:
-    Core *core;
-
     bool exists;
     bool supported;
     bool readOnly;
@@ -78,14 +76,13 @@ public:
     QTemporaryFile *temporaryFile;
 };
 
-File::File(QObject *parent)
+File::File()
 {
-    priv = new QuillFilePrivate;
+    priv = new FilePrivate;
     priv->exists = true;
     priv->supported = true;
     priv->readOnly = false;
 
-    priv->core = dynamic_cast<Core*>(parent);
     priv->stack = new QuillUndoStack(this);
     priv->displayLevel = -1;
 
@@ -134,7 +131,7 @@ bool File::allowDelete()
 
 void File::detach()
 {
-    priv->core->detach(this);
+    Core::instance()->detach(this);
     foreach (QuillFile *file, m_references)
         file->invalidate();
 }
@@ -194,7 +191,7 @@ bool File::setDisplayLevel(int level)
     if (level > priv->displayLevel) {
         // Block if trying to raise display level over strict limits
         for (int l=priv->displayLevel+1; l<=level; l++)
-            if (priv->core->numFilesAtLevel(l) >= priv->core->fileLimit(l)) {
+            if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
                 setError(Quill::ErrorFileLimitExceeded);
                 return false;
             }
@@ -208,8 +205,8 @@ bool File::setDisplayLevel(int level)
     // Purge images from cache if lowering display level here
     // Exception: when save is in progress, leave the highest level
     for (int l=priv->displayLevel; l>level; l--)
-        if ((l < priv->core->previewLevelCount()) || (!priv->saveInProgress))
-            priv->core->cache(l)->purge(this);
+        if ((l < Core::instance()->previewLevelCount()) || (!priv->saveInProgress))
+            Core::instance()->cache(l)->purge(this);
 
     priv->displayLevel = level;
 
@@ -217,7 +214,7 @@ bool File::setDisplayLevel(int level)
     if (exists() && (level >= 0) && (priv->stack->count() == 0))
         priv->stack->load();
 
-    priv->core->suggestNewTask();
+    Core::instance()->suggestNewTask();
     return true;
 }
 
@@ -233,7 +230,7 @@ void File::save()
     {
         priv->saveInProgress = true;
         prepareSave();
-        priv->core->suggestNewTask();
+        Core::instance()->suggestNewTask();
     }
 }
 
@@ -252,7 +249,7 @@ void File::runFilter(QuillImageFilter *filter)
     priv->stack->add(filter);
 
     priv->saveInProgress = false;
-    priv->core->suggestNewTask();
+    Core::instance()->suggestNewTask();
 }
 
 void File::startSession()
@@ -286,7 +283,7 @@ void File::undo()
         priv->stack->undo();
 
         priv->saveInProgress = false;
-        priv->core->suggestNewTask();
+        Core::instance()->suggestNewTask();
 
         emitAllImages();
     }
@@ -307,7 +304,7 @@ void File::redo()
         priv->stack->redo();
 
         priv->saveInProgress = false;
-        priv->core->suggestNewTask();
+        Core::instance()->suggestNewTask();
 
         emitAllImages();
     }
@@ -337,7 +334,7 @@ QList<QuillImage> File::allImageLevels(int displayLevel) const
     if (!priv->exists || !priv->stack->command())
         return QList<QuillImage>();
     else if ((!priv->stack->command()->tileMap()) ||
-             (displayLevel < priv->core->previewLevelCount()))
+             (displayLevel < Core::instance()->previewLevelCount()))
         return priv->stack->allImageLevels(displayLevel);
     else
         return priv->stack->allImageLevels(displayLevel) +
@@ -357,10 +354,10 @@ void File::setViewPort(const QRect &viewPort)
     priv->viewPort = viewPort;
 
     // New tiles will only be calculated if the display level allows it
-    if (!priv->exists || (priv->displayLevel < priv->core->previewLevelCount()))
+    if (!priv->exists || (priv->displayLevel < Core::instance()->previewLevelCount()))
         return;
 
-    priv->core->suggestNewTask();
+    Core::instance()->suggestNewTask();
 
     QList<QuillImage> newTiles;
 
@@ -387,7 +384,7 @@ bool File::hasThumbnail(int level) const
     if (!priv->exists)
         return false;
 
-    if (priv->core->thumbnailDirectory(level).isEmpty())
+    if (Core::instance()->thumbnailDirectory(level).isEmpty())
         return false;
 
     return QFile::exists(thumbnailFileName(level));
@@ -408,8 +405,8 @@ QString File::fileNameHash(const QString &fileName)
 QString File::thumbnailFileName(int level) const
 {
     QString hashValueString = fileNameHash(priv->fileName);
-    hashValueString.append("." + priv->core->thumbnailExtension());
-    hashValueString.prepend(priv->core->thumbnailDirectory(level) +
+    hashValueString.append("." + Core::instance()->thumbnailExtension());
+    hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
                             QDir::separator());
 
     return hashValueString;
@@ -443,14 +440,14 @@ File *File::readFromEditHistory(const QString &fileName,
     qDebug() << "Read" << history.size() << "bytes";
     qDebug() << history;
 
-    return HistoryXml::decodeOne(history, core);
+    return HistoryXml::decodeOne(history);
 }
 
 void File::writeEditHistory(const QString &history)
 {
-    QDir().mkpath(priv->core->editHistoryDirectory());
+    QDir().mkpath(Core::instance()->editHistoryDirectory());
     QFile file(editHistoryFileName(priv->fileName,
-                                   priv->core->editHistoryDirectory()));
+                                   Core::instance()->editHistoryDirectory()));
 
     qDebug() << "Writing edit history to" << file.fileName();
 
@@ -469,7 +466,7 @@ void File::emitSingleImage(QuillImage image, int level)
 void File::emitTiles(QList<QuillImage> tiles)
 {
     foreach(QuillFile *file, m_references)
-        if (file->displayLevel() == priv->core->previewLevelCount())
+        if (file->displayLevel() == Core::instance()->previewLevelCount())
             file->emitImageAvailable(tiles);
 }
 
@@ -490,7 +487,7 @@ void File::remove()
     QFile(priv->fileName).remove();
     QFile(priv->originalFileName).remove();
     QFile::remove(editHistoryFileName(priv->fileName,
-                                      priv->core->editHistoryDirectory()));
+                                      Core::instance()->editHistoryDirectory()));
     removeThumbnails();
 
     priv->exists = false;
@@ -538,7 +535,7 @@ void File::overwritingCopy(const QString &fileName,
 
 void File::removeThumbnails()
 {
-    for (int level=0; level<priv->core->previewLevelCount(); level++)
+    for (int level=0; level<Core::instance()->previewLevelCount(); level++)
         if (hasThumbnail(level))
             QFile::remove(thumbnailFileName(level));
 }
@@ -557,10 +554,10 @@ void File::prepareSave()
 
     QString filePath;
 
-    if(priv->core->temporaryFileDirectory().isNull())
+    if(Core::instance()->temporaryFileDirectory().isNull())
         filePath = "/tmp/qt_temp.XXXXXX." + info.fileName();
     else
-        filePath = priv->core->temporaryFileDirectory()+"/qt_temp.XXXXXX." +
+        filePath = Core::instance()->temporaryFileDirectory()+"/qt_temp.XXXXXX." +
             info.fileName();
 
     priv->temporaryFile = new QTemporaryFile(filePath);
@@ -572,8 +569,8 @@ void File::prepareSave()
 void File::concludeSave()
 {
     // If save is concluded, purge any full images still in memory.
-    if (priv->displayLevel < priv->core->previewLevelCount())
-        priv->core->cache(priv->core->previewLevelCount())->purge(this);
+    if (priv->displayLevel < Core::instance()->previewLevelCount())
+        Core::instance()->cache(Core::instance()->previewLevelCount())->purge(this);
 
     const QString temporaryName = priv->temporaryFile->fileName();
     priv->temporaryFile->close();
@@ -609,23 +606,23 @@ void File::concludeSave()
 bool File::hasOriginal()
 {
     QString indexName = QString('\\') + priv->fileName;
-    return priv->core->fileExists(indexName);
+    return Core::instance()->fileExists(indexName);
 }
 
 File *File::original()
 {
     QString indexName = QString('\\') + priv->fileName;
 
-    if (priv->core->fileExists(indexName))
-        return priv->core->file(indexName, "");
+    if (Core::instance()->fileExists(indexName))
+        return Core::instance()->file(indexName, "");
 
-    File *original = new File(priv->core);
+    File *original = new File();
     original->setFileName(priv->fileName);
     original->setFileFormat(priv->fileFormat);
     original->setOriginalFileName(priv->originalFileName);
     original->setReadOnly();
 
-    priv->core->insertFile(original, indexName);
+    Core::instance()->insertFile(original, indexName);
     return original;
 }
 
@@ -636,7 +633,7 @@ void File::setWaitingForData(bool status)
     if (!status) {
         priv->supported = true;
         priv->stack->calculateFullImageSize(priv->stack->command(0));
-        priv->core->suggestNewTask();
+        Core::instance()->suggestNewTask();
     }
 }
 
