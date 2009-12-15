@@ -1,3 +1,9 @@
+libquill (1.091215.0) unstable; urgency=low
+
+  * Fixes: NB#150106 libquill: missing doxygen from build dependencies
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 15 Dec 2009 10:45:00 +0200
+
 libquill (1.091207.0) unstable; urgency=low
   * Can query Quill if saving files is in progress.
   * Sanity checks and other stability fixes.
