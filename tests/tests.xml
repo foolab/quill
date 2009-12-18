@@ -101,13 +101,12 @@
       </case>
     </set>
 
-      <!-- Environments optional - tells where the tests are run -->
-      <set name="my-hardware-tests">
-        <environments>
-          <scratchbox>true</scratchbox>
-          <hardware>true</hardware>
-        </environments>
-      </set>
+    <set name="quill crash recovery tests" feature="crashrecovery">
+      <description>quill crash recovery test</description>
+      <case name="ut_crashrecovery" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_crashrecovery </step>
+      </case>
+    </set>
   </suite>
 </testdefinition>
 
