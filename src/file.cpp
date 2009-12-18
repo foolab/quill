@@ -226,7 +226,7 @@ int File::displayLevel() const
 void File::save()
 {
     if (priv->exists && priv->supported && !priv->readOnly &&
-        !priv->saveInProgress && priv->stack->isDirty())
+        !priv->saveInProgress && isDirty())
     {
         priv->saveInProgress = true;
         prepareSave();
@@ -239,6 +239,14 @@ bool File::isSaveInProgress() const
     return priv->saveInProgress;
 }
 
+bool File::isDirty() const
+{
+    if (priv->stack)
+        return priv->stack->isDirty();
+    else
+        return false;
+}
+
 void File::runFilter(QuillImageFilter *filter)
 {
     if (!priv->exists || !priv->supported || priv->readOnly)
@@ -249,6 +257,7 @@ void File::runFilter(QuillImageFilter *filter)
     priv->stack->add(filter);
 
     priv->saveInProgress = false;
+    Core::instance()->dump();
     Core::instance()->suggestNewTask();
 }
 
@@ -283,6 +292,7 @@ void File::undo()
         priv->stack->undo();
 
         priv->saveInProgress = false;
+        Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
         emitAllImages();
@@ -304,6 +314,7 @@ void File::redo()
         priv->stack->redo();
 
         priv->saveInProgress = false;
+        Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
         emitAllImages();
@@ -594,6 +605,8 @@ void File::concludeSave()
     writeEditHistory(HistoryXml::encode(this));
     removeThumbnails();
     priv->saveInProgress = false;
+
+    Core::instance()->dump();
 
     QFile::remove(temporaryName);
 

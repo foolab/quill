@@ -128,8 +128,8 @@ on its own.
 /*!
   \class Quill
 
-  \brief Class containing all centralized information for LibQuill:
-  global settings and list of open QuillFile objects.
+  \brief Class containing all global settings and other centralized
+  information for LibQuill.
 */
 
 #ifndef QUILL_H
@@ -366,6 +366,57 @@ public:
     */
 
     static QString temporaryFilePath();
+
+    /*!
+      Returns true if it is possible to recover from a previous crash.
+      This will only work if setCrashDumpFile() has been previously
+      called, the physical file is found and actually contains something to
+      recover.
+
+      Crash recovery is only possible on a clean core. Also note that
+      any successful image editing will result in overwriting the
+      crash dump data.
+
+      See also recover().
+     */
+
+    static bool canRecover();
+
+    /*!
+      Recovers all unsaved edits from crash dump data stored in a file
+      specified by crashDumpFile().
+
+      The crash dump data is automatically output to a file after each
+      edit. The data contains all edits which have not been
+      synchronized to the file system, regardless of if
+      QuillFile::save() has been called after them.
+
+      The crash recovery feature will recover all unsaved edits and
+      put them to the saving queue. Any files in the saving queue can
+      be viewed or edited normally.
+
+      This feature will not recreate the list of open files or display
+      levels; an application has to keep a data structure of its own
+      and to explicitly re-open any files it was viewing.
+    */
+
+    static void recover();
+
+    /*!
+      Sets the crash dump file name. Leave as the empty string to
+      disable this feature (default). A directory path will be created
+      for the dump file, if possible.
+
+      See also canRecover() and recover().
+     */
+
+    static void setCrashDumpFile(const QString &fileName);
+
+    /*!
+      Returns the crash dump file name. See setCrashDumpFile();
+     */
+
+    static QString crashDumpFile();
 
     /*!
       Returns true if there are any files which are in the progress of

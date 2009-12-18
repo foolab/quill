@@ -79,21 +79,20 @@ QByteArray HistoryXml::encode(QList<File *> files)
 
     writer.writeStartElement("", "Core");
 
-    for (QList<File*>::iterator file = files.begin();
-         file < files.end(); file++)
+    foreach (File *file, files)
     {
-        QuillUndoStack *stack = (*file)->stack();
+        QuillUndoStack *stack = file->stack();
 
         writer.writeStartElement("", "QuillUndoStack");
 
         writer.writeStartElement("", "File");
-        writer.writeAttribute("name", (*file)->fileName());
-        writer.writeAttribute("format", (*file)->targetFormat());
+        writer.writeAttribute("name", file->fileName());
+        writer.writeAttribute("format", file->targetFormat());
         writer.writeEndElement();
 
         writer.writeStartElement("", "OriginalFile");
-        writer.writeAttribute("name", (*file)->originalFileName());
-        writer.writeAttribute("format", (*file)->fileFormat());
+        writer.writeAttribute("name", file->originalFileName());
+        writer.writeAttribute("format", file->fileFormat());
         writer.writeEndElement();
 
         int targetIndex = stack->command()->index();

@@ -60,7 +60,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
     m_threadManager(new ThreadManager(threadingMode)),
-    m_temporaryFileDirectory(QString())
+    m_temporaryFileDirectory(QString()),
+    m_crashDumpFile(QString())
 {
     m_previewSize.append(Quill::defaultViewPortSize);
     m_thumbnailDirectory.append(QString());
@@ -422,24 +423,63 @@ TileCache* Core::tileCache() const
     return m_tileCache;
 }
 
-QByteArray Core::dump() const
+void Core::dump() const
 {
-    return HistoryXml::encode(m_files.values());
+    QList<File*> fileList;
+
+    foreach (File *file, m_files)
+        if (file->isDirty() || file->isSaveInProgress())
+            fileList.append(file);
+
+    QString history;
+    if (!fileList.isEmpty())
+        history = HistoryXml::encode(fileList);
+
+    QFile file(m_crashDumpFile);
+    file.open(QIODevice::WriteOnly);
+    file.write(history.toAscii());
+    file.close();
 }
 
-void Core::recover(QByteArray history)
+bool Core::canRecover()
 {
     if (!m_files.isEmpty())
+        return false;
+
+    QFile file(m_crashDumpFile);
+    if (file.exists() && file.size() > 0)
+        return true;
+    else
+        return false;
+}
+
+void Core::recover()
+{
+    if (!canRecover())
         return;
+
+    QFile file(m_crashDumpFile);
+    file.open(QIODevice::ReadOnly);
+    const QByteArray history = file.readAll();
 
     QList<File*> fileList = HistoryXml::decode(history);
 
-    for (QMap<QString, File*>::iterator file = m_files.begin();
-         file != m_files.end(); file++) {
-        m_files.insert((*file)->fileName(), *file);
+    foreach (File *file, fileList) {
+        m_files.insert(file->fileName(), file);
+        file->save();
     }
 
     suggestNewTask();
+}
+
+QString Core::crashDumpFile() const
+{
+    return m_crashDumpFile;
+}
+
+void Core::setCrashDumpFile(const QString &fileName)
+{
+    m_crashDumpFile = fileName;
 }
 
 void Core::setEditHistoryDirectory(const QString &directory)

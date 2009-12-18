@@ -78,6 +78,8 @@ ThreadManager::~ThreadManager()
 {
     delete watcher;
     delete resultImage;
+    if (semaphore)
+        semaphore->release();
     delete semaphore;
     delete eventLoop;
 }
@@ -257,7 +259,7 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
 
     if ((Core::instance()->thumbnailDirectory(level).isEmpty()) ||
         (file->image(level).isNull()) ||
-        (file->stack()->isDirty()) ||
+        (file->isDirty()) ||
         (file->hasThumbnail(level)))
         return false;
 

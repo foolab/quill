@@ -222,20 +222,6 @@ public:
 
     int saveBufferSize() const;
 
-    /*!
-      Dumps the image editor state into a byte array which can be
-      saved to the file system.
-    */
-
-    QByteArray dump() const;
-
-    /*!
-      Recovers the state of the image editor after a crash.
-      All files start as closed.
-    */
-
-    void recover(QByteArray history);
-
     /*
       Sets the default directory where to look for edit histories.
       Default is $HOME/.config/quill/history.
@@ -278,6 +264,63 @@ public:
      */
 
     bool isThumbnailCreationEnabled() const;
+
+    /*!
+      Returns true if it is possible to recover from a previous crash.
+      This will only work if setCrashDumpFile() has been previously
+      called, the physical file is found and actually contains something to
+      recover.
+
+      Crash recovery is only possible on a clean core. Also note that
+      any successful image editing will result in overwriting the
+      crash dump data.
+
+      See also recover().
+     */
+
+    bool canRecover();
+
+    /*!
+      Recovers all unsaved edits from crash dump data stored in a file
+      specified by crashDumpFile().
+
+      The crash dump data is automatically output to a file after each
+      edit. The data contains all edits which have not been
+      synchronized to the file system, regardless of if
+      QuillFile::save() has been called after them.
+
+      The crash recovery feature will recover all unsaved edits and
+      put them to the saving queue. Any files in the saving queue can
+      be viewed or edited normally.
+
+      This feature will not recreate the list of open files or display
+      levels; an application has to keep a data structure of its own
+      and to explicitly re-open any files it was viewing.
+    */
+
+    void recover();
+
+    /*!
+      Dumps all unsaved edits to the dump file.
+    */
+
+    void dump() const;
+
+    /*!
+      Sets the crash dump file name. Leave as the empty string to
+      disable this feature (default). A directory path will be created
+      for the dump file, if possible.
+
+      See also canRecover() and recover().
+     */
+
+    void setCrashDumpFile(const QString &fileName);
+
+    /*!
+      Returns the crash dump file name. See setCrashDumpFile();
+     */
+
+    QString crashDumpFile() const;
 
     /*!
       To make background loading tests easier on fast machines
@@ -390,6 +433,7 @@ private:
     ThreadManager *m_threadManager;
 
     QString m_temporaryFileDirectory;
+    QString m_crashDumpFile;
 };
 
 #endif
