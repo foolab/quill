@@ -76,12 +76,17 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
 
 ThreadManager::~ThreadManager()
 {
-    delete watcher;
-    delete resultImage;
-    if (semaphore)
+    // If in test mode, make sure that background thread is not
+    // left hanging on a destroyed semaphore
+    if (threadingMode == Quill::ThreadingTest) {
         semaphore->release();
+        if (isRunning())
+            eventLoop->exec();
+    }
     delete semaphore;
     delete eventLoop;
+    delete watcher;
+    delete resultImage;
 }
 
 bool ThreadManager::isRunning() const
