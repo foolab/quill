@@ -76,10 +76,17 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
 
 ThreadManager::~ThreadManager()
 {
-    delete watcher;
-    delete resultImage;
+    // If in test mode, make sure that background thread is not
+    // left hanging on a destroyed semaphore
+    if (threadingMode == Quill::ThreadingTest) {
+        semaphore->release();
+        if (isRunning())
+            eventLoop->exec();
+    }
     delete semaphore;
     delete eventLoop;
+    delete watcher;
+    delete resultImage;
 }
 
 bool ThreadManager::isRunning() const
@@ -257,7 +264,7 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
 
     if ((Core::instance()->thumbnailDirectory(level).isEmpty()) ||
         (file->image(level).isNull()) ||
-        (file->stack()->isDirty()) ||
+        (file->isDirty()) ||
         (file->hasThumbnail(level)))
         return false;
 

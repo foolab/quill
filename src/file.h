@@ -202,6 +202,12 @@ public:
     virtual bool isSaveInProgress() const;
 
     /*!
+      Returns true if the file has unsaved modifications.
+    */
+
+    virtual bool isDirty() const;
+
+    /*!
       Starts to asynchronously run an operation.
      */
 

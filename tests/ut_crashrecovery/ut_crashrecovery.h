@@ -48,11 +48,14 @@ public:
     ut_crashrecovery();
 
 private slots:
+    void init();
+    void cleanup();
     void initTestCase();
     void cleanupTestCase();
 
+    void testFileName();
     void testBasicRecovery();
-    void testRecoveryImmediateReOpen();
+    void testRecoverSaveInProgress();
     void testRecoveryAfterUndo();
 };
 
