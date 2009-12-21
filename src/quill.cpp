@@ -49,6 +49,8 @@
 #include "core.h"
 #include "threadmanager.h"
 
+static Quill *g_instance = 0;
+
 QSize Quill::defaultViewPortSize = QSize(640, 400);
 
 void Quill::initTestingMode()
@@ -59,6 +61,8 @@ void Quill::initTestingMode()
 void Quill::cleanup()
 {
     Core::cleanup();
+    delete g_instance;
+    g_instance = 0;
 }
 
 void Quill::setDefaultTileSize(const QSize &defaultTileSize)
@@ -184,4 +188,18 @@ void Quill::releaseAndWait()
 void Quill::setDebugDelay(int delay)
 {
     Core::instance()->setDebugDelay(delay);
+}
+
+Quill* Quill::instance()
+{
+    if (g_instance == 0) {
+        g_instance = new Quill;
+        g_instance->connect(Core::instance(),
+                            SIGNAL(saved(QString)),
+                            SIGNAL(saved(QString)));
+        g_instance->connect(Core::instance(),
+                            SIGNAL(error(Quill::Error, QVariant)),
+                            SIGNAL(error(Quill::Error, QVariant)));
+    }
+    return g_instance;
 }

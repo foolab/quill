@@ -391,6 +391,43 @@ public:
      */
     QString temporaryFileDirectory() const;
 
+    /*!
+      Emits a saved signal.
+    */
+    void emitSaved(QString fileName);
+
+    /*!
+      Emits an error signal.
+    */
+    void emitError(Quill::Error errorCode, QVariant data);
+
+signals:
+    /*!
+      Edits to a file have been successfully saved.
+
+      @param fileName the name of the file which has been saved.
+
+      Since it may be that all QuillFile objects related to a save in
+      progress have been deleted already, a successful save triggers
+      both QuillFile::saved() and this signal.
+     */
+
+    void saved(QString fileName);
+
+    /*!
+      Any error not specific to any individual QuillFile is reported
+      by this signal.
+
+      Since it may be that all QuillFile objects related to a save in
+      progress have been deleted already, errors related to saving
+      trigger both QuillFile::error() and this signal.
+
+      @param errorCode The error code enumeration
+      @param data Any other information specific to the error
+    */
+
+    void error(Quill::Error errorCode, QVariant data);
+
 private:
 
     /*!

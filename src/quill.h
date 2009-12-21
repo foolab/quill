@@ -147,9 +147,12 @@ class QuillFile;
 
 class QuillPrivate;
 
-class Quill
+class Quill : public QObject
 {
+Q_OBJECT
+
 public:
+
     /*!
       For testing use only.
     */
@@ -443,6 +446,41 @@ public:
     */
 
     static void setDebugDelay(int delay);
+
+    /*!
+      Returns the singleton instance of Quill. This should only be
+      used for signals of the QObject class. The returned object
+      should never be deleted, use Quill::cleanup() instead.
+    */
+
+    static Quill *instance();
+
+signals:
+    /*!
+      Edits to a file have been successfully saved.
+
+      @param fileName the name of the file which has been saved.
+
+      Since it may be that all QuillFile objects related to a save in
+      progress have been deleted already, a successful save triggers
+      both QuillFile::saved() and this signal.
+     */
+
+    void saved(QString fileName);
+
+    /*!
+      Any error not specific to any individual QuillFile is reported
+      by this signal.
+
+      Since it may be that all QuillFile objects related to a save in
+      progress have been deleted already, errors related to saving
+      trigger both QuillFile::error() and this signal.
+
+      @param errorCode The error code enumeration
+      @param data Any other information specific to the error
+     */
+
+    void error(Quill::Error errorCode, QVariant data);
 
 private:
 

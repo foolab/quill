@@ -571,3 +571,13 @@ QString Core::temporaryFileDirectory() const
 {
     return m_temporaryFileDirectory;
 }
+
+void Core::emitSaved(QString fileName)
+{
+    emit saved(fileName);
+}
+
+void Core::emitError(Quill::Error errorCode, QVariant data)
+{
+    emit error(errorCode, data);
+}
