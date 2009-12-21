@@ -403,20 +403,20 @@ public:
     static void recover();
 
     /*!
-      Sets the crash dump file name. Leave as the empty string to
+      Sets the crash dump path name. Leave as the empty string to
       disable this feature (default). A directory path will be created
       for the dump file, if possible.
 
       See also canRecover() and recover().
      */
 
-    static void setCrashDumpFile(const QString &fileName);
+    static void setCrashDumpPath(const QString &fileName);
 
     /*!
-      Returns the crash dump file name. See setCrashDumpFile();
+      Returns the crash dump path. See setCrashDumpPath();
      */
 
-    static QString crashDumpFile();
+    static QString crashDumpPath();
 
     /*!
       Returns true if there are any files which are in the progress of

@@ -314,13 +314,13 @@ public:
       See also canRecover() and recover().
      */
 
-    void setCrashDumpFile(const QString &fileName);
+    void setCrashDumpPath(const QString &fileName);
 
     /*!
       Returns the crash dump file name. See setCrashDumpFile();
      */
 
-    QString crashDumpFile() const;
+    QString crashDumpPath() const;
 
     /*!
       To make background loading tests easier on fast machines
@@ -433,7 +433,7 @@ private:
     ThreadManager *m_threadManager;
 
     QString m_temporaryFileDirectory;
-    QString m_crashDumpFile;
+    QString m_crashDumpPath;
 };
 
 #endif

@@ -151,14 +151,14 @@ QString Quill::temporaryFilePath()
     return Core::instance()->temporaryFileDirectory();
 }
 
-void Quill::setCrashDumpFile(const QString &fileName)
+void Quill::setCrashDumpPath(const QString &fileName)
 {
-    Core::instance()->setCrashDumpFile(fileName);
+    Core::instance()->setCrashDumpPath(fileName);
 }
 
-QString Quill::crashDumpFile()
+QString Quill::crashDumpPath()
 {
-    return Core::instance()->crashDumpFile();
+    return Core::instance()->crashDumpPath();
 }
 
 bool Quill::canRecover()

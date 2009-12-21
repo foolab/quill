@@ -61,7 +61,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_tileCache(new TileCache(100)),
     m_threadManager(new ThreadManager(threadingMode)),
     m_temporaryFileDirectory(QString()),
-    m_crashDumpFile(QString())
+    m_crashDumpPath(QString())
 {
     m_previewSize.append(Quill::defaultViewPortSize);
     m_thumbnailDirectory.append(QString());
@@ -425,6 +425,9 @@ TileCache* Core::tileCache() const
 
 void Core::dump() const
 {
+    if (m_crashDumpPath.isEmpty())
+        return;
+
     QList<File*> fileList;
 
     foreach (File *file, m_files)
@@ -435,7 +438,8 @@ void Core::dump() const
     if (!fileList.isEmpty())
         history = HistoryXml::encode(fileList);
 
-    QFile file(m_crashDumpFile);
+    QDir().mkpath(m_crashDumpPath);
+    QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
     file.open(QIODevice::WriteOnly);
     file.write(history.toAscii());
     file.close();
@@ -443,10 +447,10 @@ void Core::dump() const
 
 bool Core::canRecover()
 {
-    if (!m_files.isEmpty())
+    if (!m_files.isEmpty() || m_crashDumpPath.isEmpty())
         return false;
 
-    QFile file(m_crashDumpFile);
+    QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
     if (file.exists() && file.size() > 0)
         return true;
     else
@@ -458,7 +462,7 @@ void Core::recover()
     if (!canRecover())
         return;
 
-    QFile file(m_crashDumpFile);
+    QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
     file.open(QIODevice::ReadOnly);
     const QByteArray history = file.readAll();
 
@@ -472,14 +476,14 @@ void Core::recover()
     suggestNewTask();
 }
 
-QString Core::crashDumpFile() const
+QString Core::crashDumpPath() const
 {
-    return m_crashDumpFile;
+    return m_crashDumpPath;
 }
 
-void Core::setCrashDumpFile(const QString &fileName)
+void Core::setCrashDumpPath(const QString &fileName)
 {
-    m_crashDumpFile = fileName;
+    m_crashDumpPath = fileName;
 }
 
 void Core::setEditHistoryDirectory(const QString &directory)

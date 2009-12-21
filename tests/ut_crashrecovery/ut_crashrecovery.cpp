@@ -73,8 +73,8 @@ void ut_crashrecovery::cleanupTestCase()
 
 void ut_crashrecovery::testFileName()
 {
-    Quill::setCrashDumpFile("/tmp/dump.xml");
-    QCOMPARE(Quill::crashDumpFile(), QString("/tmp/dump.xml"));
+    Quill::setCrashDumpPath("/tmp");
+    QCOMPARE(Quill::crashDumpPath(), QString("/tmp"));
 }
 
 /* Test recovery for simple brightness */
@@ -84,12 +84,11 @@ void ut_crashrecovery::testBasicRecovery()
     QTemporaryFile testFile;
     testFile.open();
 
-    QTemporaryFile dumpFile;
-    dumpFile.open();
+    QFile dumpFile("/tmp/dump.xml");
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setCrashDumpFile(dumpFile.fileName());
+    Quill::setCrashDumpPath("/tmp");
 
     QuillFile *file =
         new QuillFile(testFile.fileName(), "png");
@@ -129,7 +128,7 @@ void ut_crashrecovery::testBasicRecovery()
     // Dump file not set - recovery should fail
     QVERIFY(!Quill::canRecover());
 
-    Quill::setCrashDumpFile(dumpFile.fileName());
+    Quill::setCrashDumpPath("/tmp");
 
     // Now that dump file has been set, recovery should succeed
     QVERIFY(Quill::canRecover());
@@ -164,13 +163,12 @@ void ut_crashrecovery::testRecoverSaveInProgress()
     QTemporaryFile testFile;
     testFile.open();
 
-    QTemporaryFile dumpFile;
-    dumpFile.open();
+    QFile dumpFile("/tmp/dump.xml");
 
     QImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill::setCrashDumpFile(dumpFile.fileName());
+    Quill::setCrashDumpPath("/tmp");
 
     QuillFile *file =
         new QuillFile(testFile.fileName(), "png");
@@ -212,7 +210,7 @@ void ut_crashrecovery::testRecoverSaveInProgress()
     // Dump file not set - recovery should fail
     QVERIFY(!Quill::canRecover());
 
-    Quill::setCrashDumpFile(dumpFile.fileName());
+    Quill::setCrashDumpPath("/tmp");
 
     // Now that dump file has been set, recovery should succeed
     QVERIFY(Quill::canRecover());
@@ -251,13 +249,12 @@ void ut_crashrecovery::testRecoveryAfterUndo()
     QTemporaryFile testFile;
     testFile.open();
 
-    QTemporaryFile dumpFile;
-    dumpFile.open();
+    QFile dumpFile("/tmp/dump.xml");
 
     QImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill::setCrashDumpFile(dumpFile.fileName());
+    Quill::setCrashDumpPath("/tmp");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
@@ -306,7 +303,7 @@ void ut_crashrecovery::testRecoveryAfterUndo()
 
     Quill::setPreviewSize(0, QSize(4, 1));
 
-    Quill::setCrashDumpFile(dumpFile.fileName());
+    Quill::setCrashDumpPath("/tmp");
     QVERIFY(Quill::canRecover());
 
     Quill::recover();
