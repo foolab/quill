@@ -1,3 +1,15 @@
+libquill (1.091217.1) unstable; urgency=low
+
+  * Fixes: CITA green
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 17 Dec 2009 14:30:00 +0200
+
+libquill (1.091217.0) unstable; urgency=low
+
+  * Fixes: CITA green
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 17 Dec 2009 14:05:00 +0200
+
 libquill (1.091215.1) unstable; urgency=low
 
   * Fixes: NB#150785 valgrind report for ut_imagecache, ut_imageloader, ut_stack
