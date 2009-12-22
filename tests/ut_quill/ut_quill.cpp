@@ -400,6 +400,7 @@ void ut_quill::testLoadSave()
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(saved()));
+    QSignalSpy generalSpy(Quill::instance(), SIGNAL(saved(QString)));
 
     file->setDisplayLevel(1);
 
@@ -434,6 +435,8 @@ void ut_quill::testLoadSave()
     QVERIFY(!Quill::isSaveInProgress());
 
     QCOMPARE(spy.count(), 1);
+    QCOMPARE(generalSpy.count(), 1);
+    QCOMPARE(generalSpy.at(0).at(0).toString(), testFile.fileName());
 
     QImage loadedImage(testFile.fileName(), "png");
     QImage origImage(file->originalFileName());

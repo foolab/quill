@@ -614,6 +614,7 @@ void File::concludeSave()
     priv->temporaryFile = 0;
 
     emit saved();
+    Core::instance()->emitSaved(priv->fileName);
 }
 
 bool File::hasOriginal()
