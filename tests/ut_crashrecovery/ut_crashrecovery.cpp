@@ -52,13 +52,29 @@ ut_crashrecovery::ut_crashrecovery()
 {
 }
 
+void ut_crashrecovery::init()
+{
+    Quill::initTestingMode();
+    Quill::setPreviewSize(0, QSize(4, 1));
+}
+
+void ut_crashrecovery::cleanup()
+{
+    Quill::cleanup();
+}
+
 void ut_crashrecovery::initTestCase()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_crashrecovery::cleanupTestCase()
 {
+}
+
+void ut_crashrecovery::testFileName()
+{
+    Quill::setCrashDumpPath("/tmp");
+    QCOMPARE(Quill::crashDumpPath(), QString("/tmp"));
 }
 
 /* Test recovery for simple brightness */
@@ -68,15 +84,14 @@ void ut_crashrecovery::testBasicRecovery()
     QTemporaryFile testFile;
     testFile.open();
 
-    QTemporaryFile originFile;
-    originFile.open();
+    QFile dumpFile("/tmp/dump.xml");
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
+    Quill::setCrashDumpPath("/tmp");
 
     QuillFile *file =
-        quill->file(testFile.fileName(), "png");
+        new QuillFile(testFile.fileName(), "png");
     file->setDisplayLevel(1);
 
     QuillImageFilter *brightnessFilter =
@@ -86,67 +101,78 @@ void ut_crashrecovery::testBasicRecovery()
     QImage image = Unittests::generatePaletteImage();
     QImage targetImage = brightnessFilter->apply(image);
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait();
 
     QVERIFY(Unittests::compareImage(file->image(), image));
 
     file->runFilter(brightnessFilter);
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     QVERIFY(Unittests::compareImage(file->image(), targetImage));
 
-    QByteArray dump = quill->dump();
+    // Verify that the dump file has been created
+    QVERIFY(dumpFile.size() > 0);
 
-    // Delete and create a new one to make sure that no data is kept
+    // Simulate crash by calling cleanup here
+    Quill::cleanup();
 
-    delete quill;
+    Quill::initTestingMode();
 
-    quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    file = quill->file(testFile.fileName(), "png");
-    QSignalSpy spy(file, SIGNAL(saved()));
+    // This must be kept after cleanup to keep the changes from being discarded
+    delete file;
 
-    quill->recover(dump);
+    Quill::setPreviewSize(0, QSize(4, 1));
 
-    quill->releaseAndWait(); // load
-    quill->releaseAndWait(); // brightness
-    quill->releaseAndWait(); // save (auto)
+    // Dump file not set - recovery should fail
+    QVERIFY(!Quill::canRecover());
 
-    QCOMPARE(spy.count(), 1);
+    Quill::setCrashDumpPath("/tmp");
+
+    // Now that dump file has been set, recovery should succeed
+    QVERIFY(Quill::canRecover());
+
+    Quill::recover();
+
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // brightness
+    Quill::releaseAndWait(); // save (auto)
 
     QVERIFY(Unittests::compareImage(QImage(testFile.fileName()),
                                     targetImage));
 
-    file = quill->file(testFile.fileName(), "png");
+    // The dump file should now go away
+    QCOMPARE((int)dumpFile.size(), 0);
 
-    quill->releaseAndWait(); // load (preview)
-    quill->releaseAndWait(); // load (full)
+    file = new QuillFile(testFile.fileName(), "png");
+    file->setDisplayLevel(1);
+
+    Quill::releaseAndWait(); // load (preview)
+    Quill::releaseAndWait(); // load (full)
     QVERIFY(Unittests::compareImage(file->image(), targetImage));
 
-    delete quill;
+    delete file;
 }
 
 /* Test recovery for simple brightness, open file in question
    immediately after crash */
 
-void ut_crashrecovery::testRecoveryImmediateReOpen()
+void ut_crashrecovery::testRecoverSaveInProgress()
 {
-    /*    QTemporaryFile testFile;
+    QTemporaryFile testFile;
     testFile.open();
 
-    QTemporaryFile originFile;
-    originFile.open();
-
-    Unittests::generatePaletteImage().save(testFile.fileName(), "png");
-
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
+    QFile dumpFile("/tmp/dump.xml");
 
     QImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
 
-    quill->openFile(testFile.fileName(),
-                    originFile.fileName(),
-                    "", "png");
+    Quill::setCrashDumpPath("/tmp");
+
+    QuillFile *file =
+        new QuillFile(testFile.fileName(), "png");
+    file->setDisplayLevel(1);
 
     QuillImageFilter *brightnessFilter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -155,72 +181,82 @@ void ut_crashrecovery::testRecoveryImmediateReOpen()
 
     QImage targetImage = brightnessFilter->apply(image);
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait();
 
-    QVERIFY(Unittests::compareImage(quill->image(), image));
+    QVERIFY(Unittests::compareImage(file->image(), image));
 
-    quill->runFilter(brightnessFilter);
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    file->runFilter(brightnessFilter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    QVERIFY(Unittests::compareImage(quill->image(), targetImage));
+    QVERIFY(Unittests::compareImage(file->image(), targetImage));
 
-    QByteArray dump = quill->dump();
+    // Verify that the dump file has been created
+    QVERIFY(dumpFile.size() > 0);
 
-    // Delete and create a new one to make sure that no data is kept
+    file->save();
+    delete file;
 
-    delete quill;
+    // Simulate crash by calling cleanup here
+    Quill::cleanup();
 
-    quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
+    Quill::initTestingMode();
 
-    quill->recover(dump);
+    // This must be kept after cleanup to keep the changes from being discarded
 
-    // Re-insert empty edit history as it should be ignored anyway
-    quill->openFile(testFile.fileName(),
-                    originFile.fileName(),
-                    "", "png");
+    Quill::setPreviewSize(0, QSize(4, 1));
 
-    quill->releaseAndWait(); // load
-    quill->releaseAndWait(); // load 2, since stack is lost (for preview)
-    quill->releaseAndWait(); // load 2 (full image)
-    quill->releaseAndWait(); // brightness (preview)
-    quill->releaseAndWait(); // brightness (full)
+    // Dump file not set - recovery should fail
+    QVERIFY(!Quill::canRecover());
 
-    QVERIFY(Unittests::compareImage(quill->image(),
-                                    targetImage));
+    Quill::setCrashDumpPath("/tmp");
 
-    // Verify stack structure
+    // Now that dump file has been set, recovery should succeed
+    QVERIFY(Quill::canRecover());
 
-    quill->undo();
+    Quill::recover();
 
-    QVERIFY(Unittests::compareImage(quill->image(),
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // brightness
+
+    // save should not yet be concluded at this point
+    QVERIFY(Unittests::compareImage(QImage(testFile.fileName()),
                                     image));
 
-    QVERIFY(!quill->canUndo());
+    Quill::releaseAndWait(); // save
 
-    delete quill;*/
+    QVERIFY(Unittests::compareImage(QImage(testFile.fileName()),
+                                    targetImage));
+
+    // The dump file should now go away
+    QCOMPARE((int)dumpFile.size(), 0);
+
+    file = new QuillFile(testFile.fileName(), "png");
+    file->setDisplayLevel(1);
+
+    Quill::releaseAndWait(); // load (preview)
+    Quill::releaseAndWait(); // load (full)
+    QVERIFY(Unittests::compareImage(file->image(), targetImage));
+
+    delete file;
 }
 
 /* Test recovery on stacks with redo history */
 
 void ut_crashrecovery::testRecoveryAfterUndo()
 {
-    /*    QTemporaryFile testFile;
+    QTemporaryFile testFile;
     testFile.open();
 
-    QTemporaryFile originFile;
-    originFile.open();
-
-    Unittests::generatePaletteImage().save(testFile.fileName(), "png");
-
-    Quill *quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
+    QFile dumpFile("/tmp/dump.xml");
 
     QImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
 
-    quill->openFile(testFile.fileName(),
-                    originFile.fileName(),
-                    "", "png");
+    Quill::setCrashDumpPath("/tmp");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     QuillImageFilter *brightnessFilter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -229,76 +265,78 @@ void ut_crashrecovery::testRecoveryAfterUndo()
 
     QuillImageFilter *contrastFilter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
-    brightnessFilter->setOption(QuillImageFilter::Contrast,
-                                QVariant(10));
+    contrastFilter->setOption(QuillImageFilter::Contrast,
+                              QVariant(10));
 
     QImage targetImage = brightnessFilter->apply(image);
     QImage finalImage = contrastFilter->apply(targetImage);
 
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    file->setDisplayLevel(1);
 
-    QVERIFY(Unittests::compareImage(quill->image(), image));
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    quill->runFilter(brightnessFilter);
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    QVERIFY(Unittests::compareImage(file->image(), image));
 
-    QVERIFY(Unittests::compareImage(quill->image(), targetImage));
+    file->runFilter(brightnessFilter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    quill->runFilter(contrastFilter);
-    quill->releaseAndWait();
-    quill->releaseAndWait();
+    QVERIFY(Unittests::compareImage(file->image(), targetImage));
 
-    QVERIFY(Unittests::compareImage(quill->image(), finalImage));
+    file->runFilter(contrastFilter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    quill->undo();
+    QVERIFY(Unittests::compareImage(file->image(), finalImage));
 
-    QByteArray dump = quill->dump();
+    file->undo();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
-    // Delete and create a new one to make sure that no data is kept
+    // Simulate shutdown
+    Quill::cleanup();
+    Quill::initTestingMode();
+    delete file;
 
-    delete quill;
+    Quill::setPreviewSize(0, QSize(4, 1));
 
-    quill = new Quill(QSize(4, 1), Quill::ThreadingTest);
-    QSignalSpy spy(quill, SIGNAL(imageSaved(const QString, const QByteArray)));
+    Quill::setCrashDumpPath("/tmp");
+    QVERIFY(Quill::canRecover());
 
-    quill->recover(dump);
+    Quill::recover();
 
-    quill->releaseAndWait(); // load
-    quill->releaseAndWait(); // brightness
-    quill->releaseAndWait(); // save (auto)
-
-    QCOMPARE(spy.count(), 1);
-    QByteArray editHistory = spy.takeFirst().at(1).toByteArray();
-    QVERIFY(!editHistory.isEmpty());
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // brightness
+    Quill::releaseAndWait(); // save (auto)
 
     QVERIFY(Unittests::compareImage(QImage(testFile.fileName()),
                                     targetImage));
 
-    quill->openFile(testFile.fileName(),
-                    originFile.fileName(),
-                    editHistory, "png");
+    Quill::setPreviewSize(0, QSize(4, 1));
+    file = new QuillFile(testFile.fileName(), "png");
+    file->setDisplayLevel(1);
 
-    quill->releaseAndWait(); // load
-    quill->releaseAndWait(); // load
-    QVERIFY(Unittests::compareImage(quill->image(), targetImage));
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // load
+    QVERIFY(Unittests::compareImage(file->image(), targetImage));
 
-    quill->redo();
-    quill->releaseAndWait(); // load
-    quill->releaseAndWait(); // contrast
+    file->redo();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // contrast
 
-    QVERIFY(Unittests::compareImage(quill->image(), finalImage));
+    QVERIFY(Unittests::compareImage(file->image(), finalImage));
 
-    quill->undo();
-    quill->undo();
-    quill->releaseAndWait(); // release load (preview)
-    quill->releaseAndWait(); // original load (preview)
-    quill->releaseAndWait(); // original load (full)
+    file->undo();
+    file->undo();
+    Quill::releaseAndWait(); // release load (preview)
+    Quill::releaseAndWait(); // original load (preview)
+    Quill::releaseAndWait(); // original load (full)
 
-    QVERIFY(Unittests::compareImage(quill->image(), image));
-
-    delete quill;*/
+    QVERIFY(Unittests::compareImage(file->image(), image));
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

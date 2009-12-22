@@ -529,7 +529,7 @@ class TestParser(object):
         # Store each test set's info in a dict
         self.testset[setIndex]=TestSet()
         self.testset[setIndex].name=set_values['name']
-        self.testset[setIndex].description=set_values['description']
+        self.testset[setIndex].description= 'description' #set_values['description']
         if set_values.has_key('feature'): self.testset[setIndex].feature=set_values['feature']
         if set_values.has_key('type'): self.testset[setIndex].set_type=set_values['type']
         if set_values.has_key('timeout'): self.testset[setIndex].timeout=set_values['timeout']
