@@ -47,7 +47,8 @@ HEADERS += quill.h \
            quillundocommand.h \
            quillundostack.h \
            imagecache.h \
-           historyxml.h
+           historyxml.h \
+           quillerror.h
 
 SOURCES += quill.cpp \
            quillfile.cpp \

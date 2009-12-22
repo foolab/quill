@@ -42,11 +42,12 @@
 
 #include <QMetaType>
 #include <QList>
+#include <QFile>
 #include <QuillImageFilter>
 
 #include "quill.h"
 #include "quillfile.h"
-
+#include "quillerror.h"
 class QuillUndoStack;
 class FilePrivate;
 
@@ -464,6 +465,11 @@ public:
 
     virtual void setError(Quill::Error errorCode);
 
+    QString errorString() const;
+
+    QuillError::QuillFileError errorMessage() const;
+
+
 signals:
 
     /*!
@@ -481,6 +487,7 @@ signals:
      */
     void error(Quill::Error errorCode);
 
+    
 private:
     void prepareSave();
 
@@ -494,6 +501,8 @@ private:
      */
 
     void writeEditHistory(const QString &history);
+
+    void errorMapping(QFile::FileError error);
 
     FilePrivate *priv;
 
