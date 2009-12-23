@@ -1,3 +1,9 @@
+libquill (1.091223.0) unstable; urgency=low
+
+  * Enables crash recovery to taken into use, also has Quill's global signals.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 23 Dec 2009 14:15:00 +0200
+
 libquill (1.091217.1) unstable; urgency=low
 
   * Fixes: CITA green
