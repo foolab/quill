@@ -49,7 +49,7 @@
 #include "core.h"
 #include "threadmanager.h"
 
-static Quill *g_instance = 0;
+Quill* Quill:: g_instance = 0;
 
 QSize Quill::defaultViewPortSize = QSize(640, 400);
 
@@ -198,8 +198,8 @@ Quill* Quill::instance()
                             SIGNAL(saved(QString)),
                             SIGNAL(saved(QString)));
         g_instance->connect(Core::instance(),
-                            SIGNAL(error(Quill::Error, QVariant)),
-                            SIGNAL(error(Quill::Error, QVariant)));
+                            SIGNAL(error(Quill::Error, QString)),
+                            SIGNAL(error(Quill::Error, QString)));
     }
     return g_instance;
 }

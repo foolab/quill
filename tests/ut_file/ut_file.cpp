@@ -40,10 +40,14 @@
 #include <QDebug>
 #include <QtTest/QtTest>
 #include <QImage>
+#include <QSignalSpy>
+#include <QMetaType>
+#include <QTemporaryFile>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
-
 #include <Quill>
+
+#include "core.h"
 #include "file.h"
 #include "ut_file.h"
 #include "unittests.h"
@@ -320,6 +324,57 @@ void ut_file::testSaveAfterDelete()
     QVERIFY(!Quill::isSaveInProgress());
 
     Unittests::compareImage(QImage(testFile.fileName()), imageAfter);
+}
+
+void ut_file::testOverwritingCopy()
+{
+    qRegisterMetaType<Quill::Error>("Quill::Error");
+    QSignalSpy spy(Core::instance(), SIGNAL(error(Quill::Error, QString)));
+    File *file = new File();
+    QTemporaryFile *tempFile = new QTemporaryFile("/tmp/invalidxxxxxx.txt");
+    tempFile->open();
+    file->overwritingCopy(QString(),tempFile->fileName()+tempFile->fileName().remove(0,4));
+    QCOMPARE(spy.isValid(),true);
+    QCOMPARE(spy.count(), 5);
+
+    QList<QVariant> arguments = spy.takeFirst();
+    QCOMPARE(arguments.at(1),QVariant("something wrong"));
+    delete file;
+    delete tempFile;
+}
+
+void ut_file::testReadFromEditHistory()
+{
+    qRegisterMetaType<Quill::Error>("Quill::Error");
+    QSignalSpy spy(Core::instance(), SIGNAL(error(Quill::Error, QString)));
+    File *file = new File();
+    file->readFromEditHistory(QString(),Core::instance());
+    QCOMPARE(spy.isValid(),true);
+    QCOMPARE(spy.count(), 1);
+
+    QList<QVariant> arguments = spy.takeFirst();
+    QCOMPARE(arguments.at(1),QVariant("something wrong"));
+    delete file;
+}
+
+void ut_file::testWriteEditHistory()
+{
+    qRegisterMetaType<Quill::Error>("Quill::Error");
+    QSignalSpy spy(Core::instance(), SIGNAL(error(Quill::Error, QString)));
+    QFile writeFile(Core::instance()->editHistoryDirectory()+"/1ec3bfecf409569cee8f7787388bd40c.xml");
+    qDebug()<<"The write file name is:"<<writeFile.fileName();
+    //(writeFile.*&FooExposer::setOpenMode)(QIODevice::ReadOnly);
+    //writeFile.setPermissions(QFile::ReadOwner);
+    qDebug()<<"The write file open mode is:"<<writeFile.openMode();
+    qDebug()<<"The write file permissions is:"<<writeFile.permissions();
+    File *file = new File();
+    file->writeEditHistory(QString());
+    QCOMPARE(spy.isValid(),true);
+    QCOMPARE(spy.count(), 0);
+
+    QList<QVariant> arguments = spy.takeFirst();
+    QCOMPARE(arguments.at(1),QVariant("something wrong"));
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

@@ -163,18 +163,60 @@ public:
         ThreadingTest
     } ThreadingMode;
 
+    /*
     typedef enum _Error
     {
         ErrorUnspecified = -1,
-        NoError = 0,
-        ErrorFileNonexistent = 1,
+        NoError,
+        ErrorFileNonexistent,
         ErrorFormatUnsupported,
         ErrorFileCorrupt,
         ErrorDirectoryCannotCreate,
         ErrorFileLimitExceeded,
-        ErrorThumbnailWriteFailed
+        ErrorThumbnailWriteFailed,
+        ReadError,
+        WriteError,
+        FatalError,
+        ResourceError,
+        OpenError,
+        AbortError,
+        TimeOutError,
+        UnspecifiedError,
+        RemoveError,
+        RenameError,
+        PositionError,
+        ResizeError,
+        PermissionsError,
+        CopyError,
+        MakePathError,
+        TempFileError
     } Error;
-
+    */
+    enum Error{
+        UnspecifiedError = -1,
+        NoError,
+        FileNonexistentError,
+        FormatUnsupportedError,
+        FileCorruptError,
+        DirectoryCannotCreateError,
+        FileLimitExceededError,
+        ThumbnailWriteFailedError,
+        ReadError,
+        WriteError,
+        FatalError,
+        ResourceError,
+        OpenError,
+        AbortError,
+        TimeOutError,
+        RemoveError,
+        RenameError,
+        PositionError,
+        ResizeError,
+        PermissionsError,
+        CopyError,
+        TempFileError
+    };
+        
     static QSize defaultViewPortSize;
     static int defaultCacheSize;
 
@@ -480,11 +522,12 @@ signals:
       @param data Any other information specific to the error
      */
 
-    void error(Quill::Error errorCode, QVariant data);
+    void error(Quill::Error errorCode, QString data);
 
 private:
 
     QuillPrivate *priv;
+    static Quill *g_instance;
 };
 
 #endif // __QUILL_PUBLIC_INTERFACE_H_

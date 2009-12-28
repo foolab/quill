@@ -399,7 +399,7 @@ public:
     /*!
       Emits an error signal.
     */
-    void emitError(Quill::Error errorCode, QVariant data);
+    void emitError(Quill::Error errorCode, QString data = QString("something wrong")) const;
 
 signals:
     /*!
@@ -426,7 +426,7 @@ signals:
       @param data Any other information specific to the error
     */
 
-    void error(Quill::Error errorCode, QVariant data);
+    void error(Quill::Error errorCode, QString data) const;
 
 private:
 

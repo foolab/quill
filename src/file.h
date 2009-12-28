@@ -47,7 +47,7 @@
 
 #include "quill.h"
 #include "quillfile.h"
-#include "quillerror.h"
+
 class QuillUndoStack;
 class FilePrivate;
 
@@ -56,7 +56,7 @@ class File : public QObject
 Q_OBJECT
 
     friend class ut_thumbnail;
-
+    friend class ut_file;
 public:
     File();
     virtual ~File();
@@ -471,9 +471,9 @@ public:
 
     virtual void setError(Quill::Error errorCode);
 
-    QString errorString() const;
+    // QString errorString() const;
 
-    QuillError::QuillFileError errorMessage() const;
+    Quill::Error errorMessage() const;
 
 
 signals:
@@ -508,11 +508,13 @@ private:
 
     void writeEditHistory(const QString &history);
 
-    void errorMapping(QFile::FileError error);
+    static void errorMapping(QFile::FileError error);
 
     FilePrivate *priv;
 
     QList<QuillFile*> m_references;
+
+    static Quill::Error fileError;
 };
 
 #endif // QUILLFILE_H

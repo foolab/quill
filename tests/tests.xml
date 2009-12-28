@@ -3,105 +3,105 @@
   <suite name="libquill-tests" domain="application-domain">
     <description>Automated test cases for libquill</description>
 
-    <set name="quill filter generator tests" feature="filter generator">
+    <set name="quill-filter-generator-tests" feature="filter generator">
       <description>quill filter generator test</description>
       <case name="ut_filtergenerator" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_filtergenerator </step>
       </case>
     </set>
 
-    <set name="quill iamge loader tests" feature="image loader">
+    <set name="quill-image-loader-tests" feature="image loader">
       <description>quill image loader test</description>
       <case name="ut_imageloader"  type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_imageloader </step>
       </case>
     </set>
 
-    <set name="quill tile map tests" feature="tile map">
+    <set name="quill-tile-map-tests" feature="tile map">
       <description>quill tile map test</description>
       <case name="ut_tilemap"  type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_tilemap </step>
       </case>
     </set>
 
-    <set name="quill save map tests" feature="save map">
+    <set name="quill-save-map-tests" feature="save map">
       <description>quill save map test</description>
-      <case name="ut_save map" type="Functional" level="Component">
+      <case name="ut_savemap" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_savemap </step>
       </case>
     </set>
 
-    <set name="quill command tests" feature="command">
+    <set name="quill-command-tests" feature="command">
       <description>quill command test</description>
       <case name="ut_command" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_command </step>
       </case>
     </set>
 
-    <set name="quill stack tests" feature="stack">
+    <set name="quill-stack-tests" feature="stack">
       <description>quill stack test</description>
       <case name="ut_stack" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_stack </step>
       </case>
     </set>
 
-    <set name="quill image cache tests" feature="stack">
+    <set name="quill-image-cache-tests" feature="stack">
       <description>quill image cache test</description>
       <case name="ut_imagecache" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_imagecache </step>
       </case>
     </set>
 
-    <set name="quill xml tests" feature="xml">
+    <set name="quill-xml-tests" feature="xml">
       <description>quill xml test</description>
       <case name="ut_xml" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_xml </step>
       </case>
       </set>
 
-    <set name="quill partial loader tests" feature="partial loader">
+    <set name="quill-partial-loader-tests" feature="partial loader">
       <description>quill xml test</description>
       <case name="ut_partialloader" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_partialloader </step>
       </case>
     </set>
 
-    <set name="quill quill tests" feature="quill">
+    <set name="quill-quill-tests" feature="quill">
       <description>quill xml test</description>
       <case name="ut_quill" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_quill </step>
       </case>
     </set>
 
-    <set name="quill tiling tests" feature="tiling">
+    <set name="quill-tiling-tests" feature="tiling">
       <description>quill tiling test</description>
       <case name="ut_tiling" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_tiling </step>
       </case>
     </set>
 
-    <set name="quill core tests" feature="core">
+    <set name="quill-core-tests" feature="core">
       <description>quill core test</description>
       <case name="ut_core" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_core </step>
       </case>
     </set>
 
-    <set name="quill file tests" feature="file">
+    <set name="quill-file-tests" feature="file">
       <description>quill file test</description>
       <case name="ut_file" type="Functional" level="Component">
 	<step>/usr/lib/libquill-tests/ut_file </step>
       </case>
     </set>
 
-    <set name="quill thumbnail tests" feature="thumbnail">
+    <set name="quill-thumbnail-tests" feature="thumbnail">
       <description>quill thumbnail test</description>
       <case name="ut_thumbnail" type="Functional" level="Component">
 	<step >/usr/lib/libquill-tests/ut_thumbnail </step>
       </case>
     </set>
 
-    <set name="quill crash recovery tests" feature="crashrecovery">
+    <set name="quill-crash-recovery-tests" feature="crashrecovery">
       <description>quill crash recovery test</description>
       <case name="ut_crashrecovery" type="Functional" level="Component">
 	<step >/usr/lib/libquill-tests/ut_crashrecovery </step>

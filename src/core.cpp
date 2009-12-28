@@ -41,6 +41,7 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterGenerator>
 #include <QDir>
+#include <QDebug>
 #include "quill.h"
 #include "core.h"
 #include "file.h"
@@ -438,10 +439,14 @@ void Core::dump() const
     if (!fileList.isEmpty())
         history = HistoryXml::encode(fileList);
 
-    QDir().mkpath(m_crashDumpPath);
+    if(!QDir().mkpath(m_crashDumpPath))
+        emitError(Quill::DirectoryCannotCreateError);
     QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
-    file.open(QIODevice::WriteOnly);
-    file.write(history.toAscii());
+    if(!file.open(QIODevice::WriteOnly))
+        emitError(Quill::OpenError);
+    qint64 fileSize = file.write(history.toAscii());
+    if(fileSize == -1)
+        emitError(Quill::WriteError);
     file.close();
 }
 
@@ -463,9 +468,11 @@ void Core::recover()
         return;
 
     QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
-    file.open(QIODevice::ReadOnly);
+    if(!file.open(QIODevice::ReadOnly))
+        emitError(Quill::OpenError);
     const QByteArray history = file.readAll();
-
+    if(history.isEmpty())
+        emitError(Quill::ReadError);
     QList<File*> fileList = HistoryXml::decode(history);
 
     foreach (File *file, fileList) {
@@ -577,7 +584,8 @@ void Core::emitSaved(QString fileName)
     emit saved(fileName);
 }
 
-void Core::emitError(Quill::Error errorCode, QVariant data)
+void Core::emitError(Quill::Error errorCode, QString data) const
 {
+    qDebug()<<"Core::emitError:the errorCode is:"<<errorCode<<" the data is:"<<data;
     emit error(errorCode, data);
 }

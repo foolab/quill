@@ -45,14 +45,14 @@
 #include <QDir>
 #include <QDebug>
 #include "file.h"
-#include "quill.h"
 #include "core.h"
 #include "imagecache.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "historyxml.h"
 #include "tilemap.h"
-#include "quillerror.h"
+
+Quill::Error File::fileError = Quill::NoError;
 class FilePrivate
 {
 public:
@@ -74,8 +74,6 @@ public:
     bool waitingForData;
     bool saveInProgress;
     QTemporaryFile *temporaryFile;
-    QuillError::QuillFileError fileError;
-    QString errorString;
 };
 
 File::File()
@@ -97,8 +95,7 @@ File::File()
     priv->waitingForData = false;
     priv->saveInProgress = false;
     priv->temporaryFile = 0;
-    priv->fileError = QuillError::NoError;
-    priv->errorString =  QLatin1String(QT_TRANSLATE_NOOP(QuillError, "No error"));
+    fileError = Quill::NoError;
 }
 
 File::~File()
@@ -196,7 +193,7 @@ bool File::setDisplayLevel(int level)
         // Block if trying to raise display level over strict limits
         for (int l=priv->displayLevel+1; l<=level; l++)
             if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
-                setError(Quill::ErrorFileLimitExceeded);
+                setError(Quill::FileLimitExceededError);
                 return false;
             }
     } else {
@@ -446,10 +443,19 @@ File *File::readFromEditHistory(const QString &fileName,
 
     qDebug() << "Reading edit history from" << file.fileName();
 
-    if (!file.exists())
+    if (!file.exists()){
+        Core::instance()->emitError(Quill::FileNonexistentError);
         return 0;
-    file.open(QIODevice::ReadOnly);
+    }
+    if(!file.open(QIODevice::ReadOnly)){
+        errorMapping(file.error());
+        Core::instance()->emitError(fileError);
+    }
     const QByteArray history = file.readAll();
+    if(history.isEmpty()){
+        errorMapping(file.error());
+        Core::instance()->emitError(fileError);
+    }
     file.close();
 
     qDebug() << "Read" << history.size() << "bytes";
@@ -460,19 +466,21 @@ File *File::readFromEditHistory(const QString &fileName,
 
 void File::writeEditHistory(const QString &history)
 {
-    if(!QDir().mkpath(Core::instance()->editHistoryDirectory())){
-        priv->fileError = QuillError::MakePathError;
-        priv->errorString =  QLatin1String(QT_TRANSLATE_NOOP(QuillError, "Can not create the directory"));
-    }
+    if(!QDir().mkpath(Core::instance()->editHistoryDirectory()))
+        Core::instance()->emitError(Quill::DirectoryCannotCreateError);
     QFile file(editHistoryFileName(priv->fileName,
                                    Core::instance()->editHistoryDirectory()));
 
     qDebug() << "Writing edit history to" << file.fileName();
-
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate)){
         errorMapping(file.error());
-
-    file.write(history.toAscii());
+        Core::instance()->emitError(fileError);
+    }
+    qint64 fileSize = file.write(history.toAscii());
+    if(fileSize == -1){
+        errorMapping(file.error());
+        Core::instance()->emitError(fileError);
+    }
     file.close();
 }
 
@@ -539,48 +547,35 @@ bool File::supported() const
 void File::overwritingCopy(const QString &fileName,
                                 const QString &newName)
 {
-
     if(!QDir().mkpath(QFileInfo(newName).path())){
-       
+        fileError = Quill::DirectoryCannotCreateError;
+        Core::instance()->emitError(fileError);
     }
 
     QFile source(fileName),
         target(newName);
 
     if(!source.open(QIODevice::ReadOnly)){
+        errorMapping(source.error());
+        Core::instance()->emitError(fileError);
     }
     const QByteArray buffer = source.readAll();
+    if(buffer.isEmpty()){
+        errorMapping(source.error());
+        Core::instance()->emitError(fileError);
+    }
     source.close();
 
     if(!target.open(QIODevice::WriteOnly | QIODevice::Truncate)){
+        errorMapping(target.error());
+        Core::instance()->emitError(fileError);
     }
-    
     qint64 fileSize = target.write(buffer);
     if(fileSize == -1){
+        errorMapping(target.error());
+        Core::instance()->emitError(fileError);
     }
-        
     target.close();
-    /*
-    if(!QDir().mkpath(QFileInfo(newName).path())){
-        priv->fileError = QuillError::MakePathError;
-        priv->errorString =  QLatin1String(QT_TRANSLATE_NOOP(QuillError, "Can not create the directory"));
-    }
-
-    QFile source(fileName),
-        target(newName);
-
-    if(!source.open(QIODevice::ReadOnly))
-        File::errorMapping(source.error());
-    const QByteArray buffer = source.readAll();
-    source.close();
-
-    if(!target.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        File::errorMapping(target.error());
-    qint64 fileSize = target.write(buffer);
-    if(fileSize == -1)
-        File::errorMapping(target.error());
-        target.close();
-    */
 }
 
 void File::removeThumbnails()
@@ -611,8 +606,14 @@ void File::prepareSave()
             info.fileName();
 
     priv->temporaryFile = new QTemporaryFile(filePath);
-    priv->temporaryFile->open();
-
+    if(!priv->temporaryFile){
+        fileError = Quill::TempFileError;
+        Core::instance()->emitError(fileError);
+    }
+    if(!priv->temporaryFile->open()){
+        errorMapping(priv->temporaryFile->error());
+        Core::instance()->emitError(fileError);
+    }
     priv->stack->prepareSave(priv->temporaryFile->fileName());
 }
 
@@ -702,31 +703,30 @@ void File::setError(Quill::Error errorCode)
     emit error(errorCode);
 }
 
+/*
 QString File::errorString() const
 {
     return priv->errorString;
 }
-
-QuillError::QuillFileError File::errorMessage() const
+*/
+Quill::Error File::errorMessage() const
 {
-    return priv->fileError;
+    return fileError;
 }
 
 
 void File::errorMapping(QFile::FileError error)
 {
+    qDebug()<<"The file error is:"<<error;
     switch(error){
     case QFile::ReadError:
-        priv-> fileError = QuillError::ReadError;
-        priv->errorString = QLatin1String(QT_TRANSLATE_NOOP(QuillError, "File can not be read"));
+        fileError = Quill::ReadError;
         break;
     case QFile::WriteError:
-        priv-> fileError = QuillError::WriteError;
-        priv->errorString = QLatin1String(QT_TRANSLATE_NOOP(QuillError, "File can not be written"));
+        fileError = Quill::WriteError;
         break;
     case QFile::OpenError:
-        priv-> fileError = QuillError::OpenError;
-        priv->errorString = QLatin1String(QT_TRANSLATE_NOOP(QuillError, "File can not be opened"));
+        fileError = Quill::OpenError;
         break;
     default:
         break;

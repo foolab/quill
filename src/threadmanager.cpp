@@ -272,7 +272,8 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
         file->stack()->command()->targetPreviewSize(level))
         return false;
 
-    QDir().mkpath(Core::instance()->thumbnailDirectory(level));
+    if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
+        Core::instance()->emitError(Quill::DirectoryCannotCreateError);
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
@@ -501,7 +502,7 @@ void ThreadManager::calculationFinished()
 
             // Save failed - disabling thumbnailing
             if (image.isNull()) {
-                stack->file()->setError(Quill::ErrorThumbnailWriteFailed);
+                stack->file()->setError(Quill::ThumbnailWriteFailedError);
                 qDebug() << "Save failed!";
                 Core::instance()->setThumbnailCreationEnabled(false);
             }

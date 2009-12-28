@@ -42,6 +42,7 @@
 
 #include <QObject>
 #include <QImage>
+#include <QIODevice>
 
 class ut_file : public QObject {
 Q_OBJECT
@@ -60,6 +61,10 @@ private slots:
     void testMultipleAccess();
     void testDifferentPreviewLevels();
     void testSaveAfterDelete();
+
+    void testOverwritingCopy();
+    void testReadFromEditHistory();
+    void testWriteEditHistory();
 };
 
 #endif  // TEST_LIBQUILL_FILE_H
