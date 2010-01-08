@@ -160,11 +160,13 @@ void ut_thumbnail::testUpdate()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
+    Quill::setPreviewSize(0, QSize(8, 2));
+
     Quill::setEditHistoryDirectory("/tmp/quill/history");
     Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
     Quill::setThumbnailExtension("png");
 
-    QuillFile *file = new QuillFile(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QString thumbName = file->thumbnailFileName(0);
     image.save(thumbName);
 
@@ -184,6 +186,8 @@ void ut_thumbnail::testUpdate()
     Quill::releaseAndWait();
     Quill::releaseAndWait(); // save, should also clear thumbnails
 
+    QVERIFY(Unittests::compareImage(filter->apply(image),
+                                    QImage(testFile.fileName())));
     QVERIFY(!QFile::exists(thumbName));
 
     Quill::releaseAndWait(); // thumbnail created

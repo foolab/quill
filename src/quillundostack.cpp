@@ -47,6 +47,7 @@
 #include <QuillImageFilterGenerator>
 #include <QDebug>
 
+#include "quillerror.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "file.h"
@@ -107,7 +108,9 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
     QSize fullSize = filter->newFullImageSize(previousFullSize);
 
     if (fullSize.isEmpty()) {
-        m_file->setError(Quill::FormatUnsupportedError);
+        m_file->emitError(QuillError(QuillError::FileFormatUnsupportedError,
+                                     QuillError::ImageFileErrorSource,
+                                     m_file->fileName()));
         m_file->setSupported(false);
         return;
     }

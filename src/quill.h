@@ -137,6 +137,7 @@ on its own.
 
 #include <QObject>
 #include <QuillImageFilter>
+#include "quillerror.h"
 
 class QImage;
 class QString;
@@ -163,60 +164,38 @@ public:
         ThreadingTest
     } ThreadingMode;
 
-    /*
-    typedef enum _Error
-    {
-        ErrorUnspecified = -1,
-        NoError,
-        ErrorFileNonexistent,
-        ErrorFormatUnsupported,
-        ErrorFileCorrupt,
-        ErrorDirectoryCannotCreate,
-        ErrorFileLimitExceeded,
-        ErrorThumbnailWriteFailed,
-        ReadError,
-        WriteError,
-        FatalError,
-        ResourceError,
-        OpenError,
-        AbortError,
-        TimeOutError,
-        UnspecifiedError,
-        RemoveError,
-        RenameError,
-        PositionError,
-        ResizeError,
-        PermissionsError,
-        CopyError,
-        MakePathError,
-        TempFileError
-    } Error;
-    */
-    enum Error{
+    enum Error {
         UnspecifiedError = -1,
-        NoError,
-        FileNonexistentError,
-        FormatUnsupportedError,
+        NoError = 0,
+
+        FileNotFoundError,
+        FileOpenForReadError,
+        FileReadError,
+        FileFormatUnsupportedError,
         FileCorruptError,
-        DirectoryCannotCreateError,
-        FileLimitExceededError,
-        ThumbnailWriteFailedError,
-        ReadError,
-        WriteError,
-        FatalError,
-        ResourceError,
-        OpenError,
-        AbortError,
-        TimeOutError,
-        RemoveError,
-        RenameError,
-        PositionError,
-        ResizeError,
-        PermissionsError,
-        CopyError,
-        TempFileError
+
+        DirCreateError,
+        FileOpenForWriteError,
+        FileWriteError,
+
+        FileRemoveError,
+
+        GlobalFileLimitError,
+        FilterGeneratorError
     };
-        
+
+    enum ErrorSource {
+        UnspecifiedErrorSource = -1,
+        NoErrorSource = 0,
+
+        ImageFileErrorSource,
+        ImageOriginalErrorSource,
+        ThumbnailErrorSource,
+        TemporaryFileErrorSource,
+        EditHistoryErrorSource,
+        CrashDumpErrorSource
+    };
+
     static QSize defaultViewPortSize;
     static int defaultCacheSize;
 
@@ -522,7 +501,7 @@ signals:
       @param data Any other information specific to the error
      */
 
-    void error(Quill::Error errorCode, QString data);
+    void error(QuillError error);
 
 private:
 

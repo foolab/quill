@@ -38,6 +38,7 @@ for(OPTION,$$list($$lower($$COV_OPTION))){
 
 HEADERS += quill.h \
            quillfile.h \
+           quillerror.h \
            file.h \
            core.h \
            tilecache.h \
@@ -51,6 +52,7 @@ HEADERS += quill.h \
 
 SOURCES += quill.cpp \
            quillfile.cpp \
+           quillerror.cpp \
            file.cpp \
            core.cpp \
            tilecache.cpp \

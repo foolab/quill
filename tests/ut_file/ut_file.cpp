@@ -47,6 +47,7 @@
 #include <QuillImageFilterFactory>
 #include <Quill>
 
+#include "quillerror.h"
 #include "core.h"
 #include "file.h"
 #include "ut_file.h"
@@ -326,55 +327,75 @@ void ut_file::testSaveAfterDelete()
     Unittests::compareImage(QImage(testFile.fileName()), imageAfter);
 }
 
-void ut_file::testOverwritingCopy()
+void ut_file::testOverwritingCopyFailed()
 {
-    qRegisterMetaType<Quill::Error>("Quill::Error");
-    QSignalSpy spy(Core::instance(), SIGNAL(error(Quill::Error, QString)));
     File *file = new File();
-    QTemporaryFile *tempFile = new QTemporaryFile("/tmp/invalidxxxxxx.txt");
-    tempFile->open();
-    file->overwritingCopy(QString(),tempFile->fileName()+tempFile->fileName().remove(0,4));
-    QCOMPARE(spy.isValid(),true);
-    QCOMPARE(spy.count(), 5);
+    QTemporaryFile tempFile;
+    tempFile.open();
 
-    QList<QVariant> arguments = spy.takeFirst();
-    QCOMPARE(arguments.at(1),QVariant("something wrong"));
+    QuillError error = file->overwritingCopy(QString(), tempFile.fileName());
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
+
     delete file;
-    delete tempFile;
 }
 
-void ut_file::testReadFromEditHistory()
+void ut_file::testEditHistoryReadFailed()
 {
-    qRegisterMetaType<Quill::Error>("Quill::Error");
-    QSignalSpy spy(Core::instance(), SIGNAL(error(Quill::Error, QString)));
-    File *file = new File();
-    file->readFromEditHistory(QString(),Core::instance());
-    QCOMPARE(spy.isValid(),true);
+    QuillError error;
+
+    File *file = File::readFromEditHistory(QString(), &error);
+
+    QVERIFY(!file);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileNotFoundError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    delete file;
+}
+
+void ut_file::testEditHistoryWriteFailed()
+{
+    // Should ensure that a directory will not be created.
+    QFile dummyFile("/tmp/invalid");
+    dummyFile.open(QIODevice::WriteOnly);
+
+    Quill::setEditHistoryDirectory("/tmp/invalid");
+
+    QuillError error;
+
+    File *file = new File;
+
+    file->writeEditHistory(QString(), &error);
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    delete file;
+}
+
+void ut_file::testForbiddenRead()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+    testFile.setPermissions(0);
+
+    QuillFile *file = new QuillFile(testFile.fileName());
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+
+    QVERIFY(file->image().isNull());
     QCOMPARE(spy.count(), 1);
+    QuillError error = spy.first().first().value<QuillError>();
 
-    QList<QVariant> arguments = spy.takeFirst();
-    QCOMPARE(arguments.at(1),QVariant("something wrong"));
-    delete file;
-}
+    QEXPECT_FAIL("", "Not implemented yet", Continue);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
 
-void ut_file::testWriteEditHistory()
-{
-    qRegisterMetaType<Quill::Error>("Quill::Error");
-    QSignalSpy spy(Core::instance(), SIGNAL(error(Quill::Error, QString)));
-    QFile writeFile(Core::instance()->editHistoryDirectory()+"/1ec3bfecf409569cee8f7787388bd40c.xml");
-    qDebug()<<"The write file name is:"<<writeFile.fileName();
-    //(writeFile.*&FooExposer::setOpenMode)(QIODevice::ReadOnly);
-    //writeFile.setPermissions(QFile::ReadOwner);
-    qDebug()<<"The write file open mode is:"<<writeFile.openMode();
-    qDebug()<<"The write file permissions is:"<<writeFile.permissions();
-    File *file = new File();
-    file->writeEditHistory(QString());
-    QCOMPARE(spy.isValid(),true);
-    QCOMPARE(spy.count(), 0);
-
-    QList<QVariant> arguments = spy.takeFirst();
-    QCOMPARE(arguments.at(1),QVariant("something wrong"));
-    delete file;
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QEXPECT_FAIL("", "Not implemented yet", Continue);
+    QCOMPARE(error.errorData(), QString());
 }
 
 int main ( int argc, char *argv[] ){

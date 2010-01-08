@@ -381,7 +381,7 @@ public:
      */
 
     static File *readFromEditHistory(const QString &fileName,
-                                     QObject *parent);
+                                     QuillError *error);
 
     /*!
       Copies a file over another file in the file system.
@@ -390,8 +390,8 @@ public:
       this has been is implemented for efficiency reasons.
      */
 
-    static void overwritingCopy(const QString &fileName,
-                                const QString &targetName);
+    QuillError overwritingCopy(const QString &fileName,
+                               const QString &targetName);
 
     /*!
       Completely removes a file along with its associated original
@@ -469,7 +469,7 @@ public:
       Triggers an error.
      */
 
-    virtual void setError(Quill::Error errorCode);
+    virtual void emitError(QuillError error);
 
     // QString errorString() const;
 
@@ -491,9 +491,8 @@ signals:
     /*
       There was an error in the file.
      */
-    void error(Quill::Error errorCode);
+    void error(QuillError error);
 
-    
 private:
     void prepareSave();
 
@@ -506,15 +505,11 @@ private:
       Writes the edit history.
      */
 
-    void writeEditHistory(const QString &history);
-
-    static void errorMapping(QFile::FileError error);
+    void writeEditHistory(const QString &history, QuillError *error);
 
     FilePrivate *priv;
 
     QList<QuillFile*> m_references;
-
-    static Quill::Error fileError;
 };
 
 #endif // QUILLFILE_H

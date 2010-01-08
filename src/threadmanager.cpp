@@ -48,6 +48,7 @@
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
 
+#include "quillerror.h"
 #include "file.h"
 #include "core.h"
 #include "quillundocommand.h"
@@ -273,7 +274,9 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
         return false;
 
     if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
-        Core::instance()->emitError(Quill::DirectoryCannotCreateError);
+        Core::instance()->emitError(QuillError(QuillError::DirCreateError,
+                                               QuillError::ThumbnailErrorSource,
+                                               Core::instance()->thumbnailDirectory(level)));
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
@@ -502,7 +505,9 @@ void ThreadManager::calculationFinished()
 
             // Save failed - disabling thumbnailing
             if (image.isNull()) {
-                stack->file()->setError(Quill::ThumbnailWriteFailedError);
+                stack->file()->emitError(QuillError(QuillError::FileWriteError,
+                                                    QuillError::ThumbnailErrorSource,
+                                                    stack->file()->fileName()));
                 qDebug() << "Save failed!";
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
