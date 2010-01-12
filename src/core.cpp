@@ -211,7 +211,8 @@ File *Core::file(const QString &fileName,
 
     // Any errors in reading the edit history will be reported,
     // however they are never fatal so we can always continue
-    if (error.errorCode() != QuillError::NoError)
+    if ((error.errorCode() != QuillError::NoError) &&
+        (error.errorCode() != QuillError::FileNotFoundError))
         emitError(error);
 
     if (file) {

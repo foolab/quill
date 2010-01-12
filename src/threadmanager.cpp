@@ -556,8 +556,39 @@ void ThreadManager::calculationFinished()
         // Ad-hoc filters (preview improvement and thumbnail loading)
         if (command->filter() != filter)
         {
+            // Thumbnail load failed
+            if ((image.isNull()) &&
+                (filter->role() == QuillImageFilter::Role_Load)) {
+                QuillError quillError =
+                    QuillError(QuillError::translateFilterError(filter->error()),
+                               QuillError::ThumbnailErrorSource,
+                               filter->option(QuillImageFilter::FileName).toString());
+                stack->file()->emitError(quillError);
+            }
+
             image = QuillImage(image, command->fullImageSize());
             delete filter;
+        } else if ((image.isNull()) &&
+                   (command->filter()->role() == QuillImageFilter::Role_Load)) {
+            // Normal load failed
+            QuillError::ErrorCode errorCode =
+                QuillError::translateFilterError(filter->error());
+
+            if ((errorCode == QuillError::FileFormatUnsupportedError) ||
+                (errorCode == QuillError::FileCorruptError))
+                stack->file()->setSupported(false);
+            else
+                stack->file()->setExists(false);
+
+            QString fileName = filter->option(QuillImageFilter::FileName).toString();
+            QuillError::ErrorSource errorSource;
+            if (fileName == stack->file()->fileName())
+                errorSource = QuillError::ImageFileErrorSource;
+            else
+                errorSource = QuillError::ImageOriginalErrorSource;
+
+            stack->file()->emitError(QuillError(errorCode, errorSource,
+                                                fileName));
         }
 
         // Normal case: a better version of an image has been calculated.

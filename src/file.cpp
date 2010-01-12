@@ -426,7 +426,7 @@ QString File::thumbnailFileName(int level) const
 }
 
 QString File::editHistoryFileName(const QString &fileName,
-                                       const QString &editHistoryDirectory)
+                                  const QString &editHistoryDirectory)
 {
     QString hashValueString = fileNameHash(fileName);
     hashValueString.append(".xml");
@@ -550,6 +550,11 @@ void File::remove()
 bool File::exists() const
 {
     return priv->exists;
+}
+
+void File::setExists(bool exists)
+{
+    priv->exists = exists;
 }
 
 void File::setSupported(bool supported)

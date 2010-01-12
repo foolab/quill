@@ -2,6 +2,7 @@
 #define __QUILL_ERROR_H__
 
 #include <QMetaType>
+#include <QuillImageFilter>
 
 class QString;
 class QuillErrorPrivate;
@@ -60,6 +61,9 @@ class QuillError
     void setErrorData(QString errorData);
 
     QuillError operator=(const QuillError &quillError);
+
+    static QuillError::ErrorCode
+        translateFilterError(QuillImageFilter::ImageFilterError error);
 
  private:
     QuillErrorPrivate *priv;

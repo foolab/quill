@@ -57,6 +57,7 @@ Q_OBJECT
 
     friend class ut_thumbnail;
     friend class ut_file;
+    friend class ut_error;
 public:
     File();
     virtual ~File();
@@ -356,6 +357,12 @@ public:
      */
 
     virtual bool exists() const;
+
+    /*!
+      Sets file existence status
+     */
+
+    virtual void setExists(bool exists);
 
     /*!
       If the file is supported and has no errors.
