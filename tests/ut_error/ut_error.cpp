@@ -295,10 +295,140 @@ void ut_error::testForbiddenOriginal()
 
 void ut_error::testEmptyOriginal()
 {
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QImage targetImage = filter->apply(image);
+
+    file->runFilter(filter);
+    file->save();
+
+    Quill::releaseAndWait(); // load
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // filter
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // save
+    QCOMPARE(spy.count(), 0);
+
+    QFileInfo fileInfo(testFile.fileName());
+    QFile originalFile(fileInfo.path() + "/.original/" +
+                       fileInfo.fileName());
+    QVERIFY(originalFile.exists());
+    originalFile.open(QIODevice::WriteOnly);
+    originalFile.write("\xFD\x87");
+    originalFile.close();
+
+    delete file;
+    QSignalSpy spy2(Quill::instance(), SIGNAL(error(QuillError)));
+    file = new QuillFile(testFile.fileName(), "png");
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+    QCOMPARE(file->image(), QuillImage(targetImage));
+
+    // force the loading of original here
+    file->undo();
+    Quill::releaseAndWait();
+
+    QCOMPARE(spy2.count(), 1);
+    QuillError error = spy2.first().first().value<QuillError>();
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileFormatUnsupportedError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorData(), originalFile.fileName());
+
+    // Expect that the file can still be used,
+    // just that no images before the current state can be viewed
+
+    QVERIFY(!file->canUndo());
+    QVERIFY(file->image().isNull());
+
+    QVERIFY(file->canRedo());
+    file->redo();
+    QCOMPARE(spy2.count(), 1); // No further errors
+    Quill::releaseAndWait();
+    QCOMPARE(file->image(), QuillImage(targetImage));
+
+    delete file;
 }
 
 void ut_error::testCorruptOriginal()
 {
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QImage targetImage = filter->apply(image);
+
+    file->runFilter(filter);
+    file->save();
+
+    Quill::releaseAndWait(); // load
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // filter
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // save
+    QCOMPARE(spy.count(), 0);
+
+    QFileInfo fileInfo(testFile.fileName());
+    QFile originalFile(fileInfo.path() + "/.original/" +
+                       fileInfo.fileName());
+    QVERIFY(originalFile.exists());
+    QVERIFY(originalFile.resize(originalFile.size()-2));
+
+    delete file;
+    QSignalSpy spy2(Quill::instance(), SIGNAL(error(QuillError)));
+    file = new QuillFile(testFile.fileName(), "png");
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+    QCOMPARE(file->image(), QuillImage(targetImage));
+
+    // force the loading of original here
+    file->undo();
+    Quill::releaseAndWait();
+
+    QCOMPARE(spy2.count(), 1);
+    QuillError error = spy2.first().first().value<QuillError>();
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorData(), originalFile.fileName());
+
+    // Expect that the file can still be used,
+    // just that no images before the current state can be viewed
+
+    QVERIFY(!file->canUndo());
+    QVERIFY(file->image().isNull());
+
+    QVERIFY(file->canRedo());
+    file->redo();
+    Quill::releaseAndWait();
+    QCOMPARE(spy2.count(), 1); // No further errors
+    QCOMPARE(file->image(), QuillImage(targetImage));
+
+    delete file;
 }
 
 void ut_error::testUnreadableEditHistory()

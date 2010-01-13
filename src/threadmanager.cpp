@@ -576,6 +576,9 @@ void ThreadManager::calculationFinished()
                    (command->filter()->role() == QuillImageFilter::Role_Load)) {
             File *file = stack->file();
 
+            // Prevent repeating the faulty operation
+            command->setFullImageSize(QSize());
+
             // Normal load failed
             QuillError::ErrorCode errorCode =
                 QuillError::translateFilterError(filter->error());
