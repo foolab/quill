@@ -431,6 +431,44 @@ void ut_error::testCorruptOriginal()
     delete file;
 }
 
+void ut_error::testTemporaryFileDirectoryCreateFailed()
+{
+    QFile dummyFile("/tmp/invalid");
+    dummyFile.open(QIODevice::WriteOnly);
+
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    Quill::setTemporaryFilePath("/tmp/invalid");
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QImage targetImage = filter->apply(image);
+
+    file->runFilter(filter);
+    QCOMPARE(spy.count(), 0);
+    file->save();
+    QCOMPARE(spy.count(), 1);
+
+    QuillError error = spy.first().first().value<QuillError>();
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::TemporaryFileErrorSource);
+    QCOMPARE(error.errorData(), QString("/tmp/invalid"));
+
+    QCOMPARE(QImage(testFile.fileName()), QImage(image));
+}
+
 void ut_error::testUnreadableEditHistory()
 {
     QTemporaryFile testFile;

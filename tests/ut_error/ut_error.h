@@ -72,6 +72,8 @@ private slots:
     void testEmptyOriginal();
     void testCorruptOriginal();
 
+    void testTemporaryFileDirectoryCreateFailed();
+
     void testUnreadableEditHistory();
     void testEmptyEditHistory();
     void testCorruptEditHistory();

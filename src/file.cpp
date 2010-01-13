@@ -231,7 +231,6 @@ void File::save()
     if (priv->exists && priv->supported && !priv->readOnly &&
         !priv->saveInProgress && isDirty())
     {
-        priv->saveInProgress = true;
         prepareSave();
         Core::instance()->suggestNewTask();
     }
@@ -630,21 +629,34 @@ void File::prepareSave()
     if (path.isNull())
         path = "/tmp";
 
+    if (!QDir().mkpath(path)) {
+        emitError(QuillError(QuillError::DirCreateError,
+                             QuillError::TemporaryFileErrorSource,
+                             path));
+        return;
+    }
+
     const QString filePath =
         path + QDir::separator() + "qt_temp.XXXXXX." + info.fileName();
 
     priv->temporaryFile = new QTemporaryFile(filePath);
-    if (!priv->temporaryFile)
+    if (!priv->temporaryFile) {
         emitError(QuillError(QuillError::FileOpenForReadError,
                              QuillError::TemporaryFileErrorSource,
                              filePath));
+        return;
+    }
 
-    if (!priv->temporaryFile->open())
+    if (!priv->temporaryFile->open()) {
         emitError(QuillError(QuillError::FileOpenForReadError,
                              QuillError::TemporaryFileErrorSource,
                              priv->temporaryFile->fileName()));
+        return;
+    }
 
     priv->stack->prepareSave(priv->temporaryFile->fileName());
+
+    priv->saveInProgress = true;
 }
 
 void File::concludeSave()
