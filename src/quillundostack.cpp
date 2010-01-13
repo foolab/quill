@@ -108,17 +108,7 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
     QSize fullSize = filter->newFullImageSize(previousFullSize);
 
     if (fullSize.isEmpty()) {
-        QuillError::ErrorCode errorCode =
-            QuillError::translateFilterError(filter->error());
-        if ((errorCode == QuillError::FileFormatUnsupportedError) ||
-            (errorCode == QuillError::FileCorruptError))
-            m_file->setSupported(false);
-        else
-            m_file->setExists(false);
-
-        m_file->emitError(QuillError(errorCode,
-                                     QuillError::ImageFileErrorSource,
-                                     m_file->fileName()));
+        m_file->processFilterError(command->filter());
         return;
     }
 

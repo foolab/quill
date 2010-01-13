@@ -213,8 +213,9 @@ bool File::setDisplayLevel(int level)
     priv->displayLevel = level;
 
     // setup stack here
-    if (exists() && (level >= 0) && (priv->stack->count() == 0))
+    if (exists() && (level >= 0) && (priv->stack->count() == 0)) {
         priv->stack->load();
+    }
 
     Core::instance()->suggestNewTask();
     return true;
@@ -726,6 +727,33 @@ File *File::original()
     return original;
 }
 
+void File::processFilterError(QuillImageFilter *filter)
+{
+    if ((fullImageSize().isEmpty()) &&
+        (filter->role() == QuillImageFilter::Role_Load)) {
+        QuillError::ErrorCode errorCode =
+            QuillError::translateFilterError(filter->error());
+
+        QuillError::ErrorSource errorSource;
+
+        if (filter->option(QuillImageFilter::FileName).toString() ==
+            priv->fileName) {
+            errorSource = QuillError::ImageFileErrorSource;
+            if ((errorCode == QuillError::FileFormatUnsupportedError) ||
+                (errorCode == QuillError::FileCorruptError))
+                setSupported(false);
+            else
+                setExists(false);
+        }
+        else {
+            errorSource = QuillError::ImageOriginalErrorSource;
+        }
+
+        emitError(QuillError(errorCode, errorSource,
+                             filter->option(QuillImageFilter::FileName).toString()));
+    }
+}
+
 void File::setWaitingForData(bool status)
 {
     priv->waitingForData = status;
@@ -747,4 +775,5 @@ void File::emitError(QuillError quillError)
     qDebug() << "Error" << quillError.errorCode() << "at source" << quillError.errorSource() << "data" << quillError.errorData();
 
     emit error(quillError);
+    Core::instance()->emitError(quillError);
 }

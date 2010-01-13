@@ -430,6 +430,12 @@ public:
 
     virtual File *original();
 
+    /*!
+      Processes any filter I/O errors related to the file.
+    */
+
+    void processFilterError(QuillImageFilter *filter);
+
     /*
       Sets the waiting-for-data status for this file.
 

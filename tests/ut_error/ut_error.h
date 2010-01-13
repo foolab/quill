@@ -68,6 +68,10 @@ private slots:
     void testEmptyFileRead();
     void testCorruptRead();
 
+    void testForbiddenOriginal();
+    void testEmptyOriginal();
+    void testCorruptOriginal();
+
     void testUnreadableEditHistory();
     void testEmptyEditHistory();
     void testCorruptEditHistory();
