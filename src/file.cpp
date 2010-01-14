@@ -678,7 +678,7 @@ void File::concludeSave()
         QuillError result = File::overwritingCopy(priv->fileName,
                                                   priv->originalFileName);
         if (result.errorCode() != QuillError::NoError) {
-            result.setErrorSource(QuillError::TemporaryFileErrorSource);
+            result.setErrorSource(QuillError::ImageOriginalErrorSource);
             emitError(result);
             return;
         }

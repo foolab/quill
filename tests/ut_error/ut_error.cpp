@@ -431,6 +431,48 @@ void ut_error::testCorruptOriginal()
     delete file;
 }
 
+void ut_error::testOriginalDirectoryCreateFailed()
+{
+    QDir().mkpath("/tmp/quill/no-original/");
+    QFile dummyFile("/tmp/quill/no-original/.original");
+    dummyFile.open(QIODevice::WriteOnly);
+
+    QFile testFile("/tmp/quill/no-original/test.png");
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QImage targetImage = filter->apply(image);
+
+    file->runFilter(filter);
+    file->save();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // filter
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // save
+    QCOMPARE(spy.count(), 1);
+
+    QuillError error = spy.first().first().value<QuillError>();
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorData(), QString("/tmp/quill/no-original/.original"));
+
+    QCOMPARE(QImage(testFile.fileName()), QImage(image));
+    delete file;
+    QFile::remove("/tmp/quill/no-original/test.png");
+}
+
 void ut_error::testForbiddenThumbnail()
 {
     QTemporaryFile testFile;
@@ -580,10 +622,6 @@ void ut_error::testThumbnailDirectoryCreateFailed()
     QVERIFY(!QFile(thumbFileName).exists());
     QVERIFY(Quill::isThumbnailCreationEnabled());
     delete file;
-}
-
-void ut_error::testWriteProtectedThumbnail()
-{
 }
 
 void ut_error::testTemporaryFileDirectoryCreateFailed()

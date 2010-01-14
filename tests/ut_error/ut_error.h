@@ -71,11 +71,11 @@ private slots:
     void testForbiddenOriginal();
     void testEmptyOriginal();
     void testCorruptOriginal();
+    void testOriginalDirectoryCreateFailed();
 
     void testForbiddenThumbnail();
     void testCorruptThumbnail();
     void testThumbnailDirectoryCreateFailed();
-    void testWriteProtectedThumbnail();
 
     void testTemporaryFileDirectoryCreateFailed();
 

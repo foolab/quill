@@ -504,17 +504,17 @@ void ThreadManager::calculationFinished()
     else if (filter->role() == QuillImageFilter::Role_Save)
     {
         if (!stack->file()->isSaveInProgress()) {
-            // Thumbnail saving
-            delete filter;
-
             // Save failed - disabling thumbnailing
             if (image.isNull()) {
                 stack->file()->emitError(QuillError(QuillError::FileWriteError,
                                                     QuillError::ThumbnailErrorSource,
-                                                    stack->file()->fileName()));
-                qDebug() << "Save failed!";
+                                                    filter->option(QuillImageFilter::FileName).toString()));
+                qDebug() << "Thumbnail save failed!";
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
+
+            // Thumbnail saving - delete temporary filter
+            delete filter;
         }
 
         else if (!stack->saveMap() ||
