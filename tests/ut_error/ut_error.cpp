@@ -431,6 +431,71 @@ void ut_error::testCorruptOriginal()
     delete file;
 }
 
+void ut_error::testForbiddenThumbnail()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QString thumbFileName = File::fileNameHash(testFile.fileName());
+    thumbFileName.append(".png");
+    thumbFileName.prepend("/tmp/quill/thumbnails/");
+
+    QImage thumbImage =
+        image.scaled(QSize(4, 1), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    thumbImage.save(thumbFileName);
+
+    QFile qFile(thumbFileName);
+    qFile.setPermissions(0);
+
+    qDebug() << thumbFileName;
+
+    Quill::setPreviewSize(0, QSize(4, 1));
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailExtension("png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+
+    QCOMPARE(spy.count(), 1);
+    QuillError error = spy.first().first().value<QuillError>();
+
+    QEXPECT_FAIL("", "QImageReader does not differentiate between nonexistent and unreadable files", Continue);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ThumbnailErrorSource);
+    QCOMPARE(error.errorData(), thumbFileName);
+
+    // Make sure that the offending thumbnail got deleted
+    QVERIFY(!QFile::exists(thumbFileName));
+
+    // Recreate the bad thumbnail (this is to simulate the situation
+    // where the thumbnail cannot be deleted)
+
+    thumbImage.save(thumbFileName);
+
+    QFile qFile2(thumbFileName);
+    qFile2.setPermissions(0);
+
+    // Instead of reading the bad thumbnail, we should now downscale
+    // from the original image
+
+    Quill::releaseAndWait();
+    QVERIFY(Unittests::compareImage(file->image(), thumbImage));
+}
+
+void ut_error::testEmptyThumbnail()
+{
+}
+
+void ut_error::testCorruptThumbnail()
+{
+}
+
 void ut_error::testTemporaryFileDirectoryCreateFailed()
 {
     QFile dummyFile("/tmp/invalid");

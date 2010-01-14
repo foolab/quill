@@ -457,6 +457,19 @@ public:
     bool isWaitingForData() const;
 
     /*!
+      There are errors in the thumbnail cache for this file,
+      thumbnail reading should be disabled.
+     */
+
+    void setThumbnailError(bool status);
+
+    /*!
+      Returns true if there are any errors in the thumbnails for this file
+     */
+
+    bool hasThumbnailError() const;
+
+    /*!
       A single image is available, instructs all referring QuillFile
       objects with a high enough display level to emit a signal.
      */

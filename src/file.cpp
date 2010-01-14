@@ -59,6 +59,7 @@ public:
     bool exists;
     bool supported;
     bool readOnly;
+    bool hasThumbnailError;
 
     QuillUndoStack *stack;
 
@@ -780,6 +781,16 @@ void File::setWaitingForData(bool status)
 bool File::isWaitingForData() const
 {
     return priv->waitingForData;
+}
+
+void File::setThumbnailError(bool status)
+{
+    priv->hasThumbnailError = status;
+}
+
+bool File::hasThumbnailError() const
+{
+    return priv->hasThumbnailError;
 }
 
 void File::emitError(QuillError quillError)

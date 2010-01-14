@@ -72,6 +72,10 @@ private slots:
     void testEmptyOriginal();
     void testCorruptOriginal();
 
+    void testForbiddenThumbnail();
+    void testEmptyThumbnail();
+    void testCorruptThumbnail();
+
     void testTemporaryFileDirectoryCreateFailed();
 
     void testUnreadableEditHistory();

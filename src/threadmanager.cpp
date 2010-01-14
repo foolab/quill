@@ -568,6 +568,8 @@ void ThreadManager::calculationFinished()
                                QuillError::ThumbnailErrorSource,
                                filter->option(QuillImageFilter::FileName).toString());
                 stack->file()->emitError(quillError);
+                stack->file()->removeThumbnails();
+                stack->file()->setThumbnailError(true);
             }
 
             image = QuillImage(image, command->fullImageSize());
