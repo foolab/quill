@@ -274,9 +274,9 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
         return false;
 
     if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
-        Core::instance()->emitError(QuillError(QuillError::DirCreateError,
-                                               QuillError::ThumbnailErrorSource,
-                                               Core::instance()->thumbnailDirectory(level)));
+        file->emitError(QuillError(QuillError::DirCreateError,
+                                   QuillError::ThumbnailErrorSource,
+                                   Core::instance()->thumbnailDirectory(level)));
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 

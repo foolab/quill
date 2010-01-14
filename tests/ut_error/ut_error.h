@@ -73,8 +73,9 @@ private slots:
     void testCorruptOriginal();
 
     void testForbiddenThumbnail();
-    void testEmptyThumbnail();
     void testCorruptThumbnail();
+    void testThumbnailDirectoryCreateFailed();
+    void testWriteProtectedThumbnail();
 
     void testTemporaryFileDirectoryCreateFailed();
 
