@@ -23,14 +23,15 @@ SUBDIRS += \
            ut_file \
            ut_thumbnail \
            ut_crashrecovery \
+           ut_tileloading \
            benchmark  \
 
 # --- install
 tatam.files = tests.xml
 tatam.path  = $$(DESTDIR)/usr/share/libquill-tests/
 
-tatamimages.files += images/16_color_palette.png
-tatamimages.files += images/benchmark12.jpg
+tatamimages.files += images/image_16x4.jpg
+tatamimages.files += images/image_16x4.png
 
 tatamimages.path  = $$(DESTDIR)/usr/share/libquill-tests/images/
 

@@ -163,35 +163,6 @@ public:
         ThreadingTest
     } ThreadingMode;
 
-    /*
-    typedef enum _Error
-    {
-        ErrorUnspecified = -1,
-        NoError,
-        ErrorFileNonexistent,
-        ErrorFormatUnsupported,
-        ErrorFileCorrupt,
-        ErrorDirectoryCannotCreate,
-        ErrorFileLimitExceeded,
-        ErrorThumbnailWriteFailed,
-        ReadError,
-        WriteError,
-        FatalError,
-        ResourceError,
-        OpenError,
-        AbortError,
-        TimeOutError,
-        UnspecifiedError,
-        RemoveError,
-        RenameError,
-        PositionError,
-        ResizeError,
-        PermissionsError,
-        CopyError,
-        MakePathError,
-        TempFileError
-    } Error;
-    */
     enum Error{
         UnspecifiedError = -1,
         NoError,
@@ -216,7 +187,7 @@ public:
         CopyError,
         TempFileError
     };
-        
+
     static QSize defaultViewPortSize;
     static int defaultCacheSize;
 
