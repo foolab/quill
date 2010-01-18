@@ -67,6 +67,7 @@ private slots:
     void testForbiddenRead();
     void testEmptyFileRead();
     void testCorruptRead();
+    void testWriteProtectedFile();
 
     void testForbiddenOriginal();
     void testEmptyOriginal();
@@ -84,6 +85,7 @@ private slots:
     void testCorruptEditHistory();
 
     void testEditHistoryDirectoryCreateFailed();
+    void testWriteProtectedEditHistory();
 };
 
 #endif  // TEST_LIBQUILL_ERROR_H

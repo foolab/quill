@@ -490,14 +490,14 @@ void File::writeEditHistory(const QString &history, QuillError *error)
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         *error = QuillError(QuillError::FileOpenForWriteError,
                             QuillError::EditHistoryErrorSource,
-                            Core::instance()->editHistoryDirectory());
+                            file.fileName());
         return;
     }
     qint64 fileSize = file.write(history.toAscii());
     if(fileSize == -1) {
         *error = QuillError(QuillError::FileWriteError,
                             QuillError::EditHistoryErrorSource,
-                            Core::instance()->editHistoryDirectory());
+                            file.fileName());
         return;
     }
     file.close();

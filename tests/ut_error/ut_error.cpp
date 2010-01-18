@@ -224,6 +224,44 @@ void ut_error::testCorruptRead()
     delete file;
 }
 
+void ut_error::testWriteProtectedFile()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+    testFile.setPermissions(QFile::ReadOwner);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    file->runFilter(filter);
+    file->save();
+
+    Quill::releaseAndWait(); // load
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // filter
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // save
+
+    QCOMPARE(spy.count(), 1);
+    QuillError error = spy.first().first().value<QuillError>();
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForWriteError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorData(), testFile.fileName());
+
+    QCOMPARE(QImage(testFile.fileName()), QImage(image));
+
+    delete file;
+}
+
 void ut_error::testForbiddenOriginal()
 {
     QTemporaryFile testFile;
@@ -804,6 +842,66 @@ void ut_error::testEditHistoryDirectoryCreateFailed()
 
     QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
     QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    delete file;
+}
+
+void ut_error::testWriteProtectedEditHistory()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    const QString editHistoryDirectory = "/tmp/quill/history";
+    QDir().mkpath(editHistoryDirectory);
+
+    Quill::setEditHistoryDirectory(editHistoryDirectory);
+    const QString editHistoryFileName =
+        File::editHistoryFileName(testFile.fileName(), editHistoryDirectory);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    file->runFilter(filter);
+    file->save();
+
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // filter
+    Quill::releaseAndWait(); // save
+
+    // Make the file write protected
+
+    QFile editHistoryFile(editHistoryFileName);
+    QVERIFY(editHistoryFile.exists());
+    editHistoryFile.setPermissions(QFile::ReadOwner);
+
+    QuillImageFilter *filter2 =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter2);
+    filter2->setOption(QuillImageFilter::Brightness, QVariant(30));
+
+    file->runFilter(filter2);
+    file->save();
+
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // filter
+    Quill::releaseAndWait(); // filter2
+    QCOMPARE(spy.count(), 0);
+    Quill::releaseAndWait(); // save
+
+    QCOMPARE(spy.count(), 1);
+    QuillError error = spy.first().first().value<QuillError>();
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForWriteError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE(error.errorData(), editHistoryFile.fileName());
+
     delete file;
 }
 

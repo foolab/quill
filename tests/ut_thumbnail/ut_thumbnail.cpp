@@ -205,6 +205,7 @@ void ut_thumbnail::testLoadUnsupported()
 
     QTemporaryFile testFile;
     testFile.open();
+    QString fileName = testFile.fileName();
 
     QImage image = Unittests::generatePaletteImage();
 
@@ -213,10 +214,10 @@ void ut_thumbnail::testLoadUnsupported()
     Quill::setThumbnailExtension("png");
 
     QString thumbName = "/tmp/quill/thumbnails/" +
-        File::fileNameHash(testFile.fileName()) + ".png";
+        File::fileNameHash(fileName) + ".png";
     image.save(thumbName, "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName());
+    QuillFile *file = new QuillFile(fileName, "png");
     QVERIFY(file->exists());
 
     file->setDisplayLevel(0);
