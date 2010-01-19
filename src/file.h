@@ -497,11 +497,6 @@ public:
 
     virtual void emitError(QuillError error);
 
-    // QString errorString() const;
-
-    Quill::Error errorMessage() const;
-
-
 signals:
 
     /*!

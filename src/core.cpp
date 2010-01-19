@@ -59,6 +59,7 @@ Core *Core::g_instance = 0;
 Core::Core(Quill::ThreadingMode threadingMode) :
     m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
     m_thumbnailCreationEnabled(true),
+    m_recoveryInProgress(false),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
     m_threadManager(new ThreadManager(threadingMode)),
@@ -446,8 +447,14 @@ void Core::dump()
         if (file->isDirty() || file->isSaveInProgress())
             fileList.append(file);
 
+    // If crash recovery has been in progress but has ended,
+    // clear the recovery flag here
+    if (m_recoveryInProgress && !isSaveInProgress())
+        m_recoveryInProgress = false;
+
+    // If crash recovery is still in progress, crash dumping is disabled
     QString history;
-    if (!fileList.isEmpty())
+    if (!fileList.isEmpty() && !m_recoveryInProgress)
         history = HistoryXml::encode(fileList);
 
     if (!QDir().mkpath(m_crashDumpPath)) {
@@ -508,6 +515,12 @@ void Core::recover()
                              QuillError::CrashDumpErrorSource,
                              file.fileName()));
     }
+    else
+        m_recoveryInProgress = true;
+
+    // dump an error marker for the duration of the recovery to prevent
+    // multiple crashes
+    dump();
 
     foreach (File *file, fileList) {
         m_files.insert(file->fileName(), file);
