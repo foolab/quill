@@ -142,6 +142,11 @@ void ut_error::testFileNotFound()
 
 void ut_error::testForbiddenRead()
 {
+    if (Unittests::isRoot()) {
+        qDebug() << "Running as root, disabling file permissions test!";
+        return;
+    }
+
     QTemporaryFile testFile;
     testFile.open();
 
@@ -226,6 +231,11 @@ void ut_error::testCorruptRead()
 
 void ut_error::testWriteProtectedFile()
 {
+    if (Unittests::isRoot()) {
+        qDebug() << "Running as root, disabling file permissions test!";
+        return;
+    }
+
     QTemporaryFile testFile;
     testFile.open();
 
@@ -264,6 +274,11 @@ void ut_error::testWriteProtectedFile()
 
 void ut_error::testForbiddenOriginal()
 {
+    if (Unittests::isRoot()) {
+        qDebug() << "Running as root, disabling file permissions test!";
+        return;
+    }
+
     QTemporaryFile testFile;
     testFile.open();
 
@@ -513,6 +528,11 @@ void ut_error::testOriginalDirectoryCreateFailed()
 
 void ut_error::testForbiddenThumbnail()
 {
+    if (Unittests::isRoot()) {
+        qDebug() << "Running as root, disabling file permissions test!";
+        return;
+    }
+
     QTemporaryFile testFile;
     testFile.open();
 
@@ -703,6 +723,11 @@ void ut_error::testTemporaryFileDirectoryCreateFailed()
 
 void ut_error::testUnreadableEditHistory()
 {
+    if (Unittests::isRoot()) {
+        qDebug() << "Running as root, disabling file permissions test!";
+        return;
+    }
+
     QTemporaryFile testFile;
     testFile.open();
 
@@ -847,6 +872,11 @@ void ut_error::testEditHistoryDirectoryCreateFailed()
 
 void ut_error::testWriteProtectedEditHistory()
 {
+    if (Unittests::isRoot()) {
+        qDebug() << "Running as root, disabling file permissions test!";
+        return;
+    }
+
     QTemporaryFile testFile;
     testFile.open();
 

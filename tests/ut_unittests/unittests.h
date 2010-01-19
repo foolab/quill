@@ -54,6 +54,13 @@ public:
     void static compareReal(qreal real1, qreal real2);
     void static fuzzyCompareRgb(QRgb rgb1, QRgb rgb2);
     bool static compareImage(QImage image1, QImage image2);
+
+    /*!
+      If for some strange reason we are running as root, we cannot test
+      any "permission denied" tests cases.
+     */
+
+    bool static isRoot();
 };
 
 #endif // __TEST_QUILL_UNIT_COMMON_H__

@@ -37,6 +37,7 @@
 **
 ****************************************************************************/
 
+#include <stdlib.h>
 #include "unittests.h"
 #include <QImage>
 #include <QtTest/QtTest>
@@ -117,4 +118,9 @@ bool Unittests::compareImage(QImage image1, QImage image2)
                  << QString::number(pixel2[i], 16);
 
     return false;
+}
+
+bool Unittests::isRoot()
+{
+    return QString(getenv("USER")) == QString("root");
 }
