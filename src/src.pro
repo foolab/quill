@@ -38,6 +38,7 @@ for(OPTION,$$list($$lower($$COV_OPTION))){
 
 HEADERS += quill.h \
            quillfile.h \
+           quillerror.h \
            file.h \
            core.h \
            tilecache.h \
@@ -47,10 +48,11 @@ HEADERS += quill.h \
            quillundocommand.h \
            quillundostack.h \
            imagecache.h \
-           historyxml.h
+           historyxml.h \
 
 SOURCES += quill.cpp \
            quillfile.cpp \
+           quillerror.cpp \
            file.cpp \
            core.cpp \
            tilecache.cpp \
@@ -65,8 +67,10 @@ SOURCES += quill.cpp \
 INSTALL_HEADERS = \
            Quill \
            QuillFile \
+           QuillError \
            quill.h \
-           quillfile.h
+           quillfile.h \
+           quillerror.h
 
 # --- install
 headers.files = $$INSTALL_HEADERS

@@ -87,8 +87,9 @@ void QuillFile::attach(File *file)
         connect(priv->m_file, SIGNAL(removed()),
                 SIGNAL(removed()));
 
-        connect(priv->m_file, SIGNAL(error(Quill::Error)),
-                SIGNAL(error(Quill::Error)));
+        connect(priv->m_file,
+                SIGNAL(error(QuillError)),
+                SIGNAL(error(QuillError)));
     }
 }
 

@@ -45,13 +45,13 @@
 #include <QDir>
 #include <QDebug>
 #include "file.h"
-#include "quill.h"
 #include "core.h"
 #include "imagecache.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "historyxml.h"
 #include "tilemap.h"
+#include "quillerror.h"
 
 class FilePrivate
 {
@@ -59,6 +59,7 @@ public:
     bool exists;
     bool supported;
     bool readOnly;
+    bool hasThumbnailError;
 
     QuillUndoStack *stack;
 
@@ -192,7 +193,9 @@ bool File::setDisplayLevel(int level)
         // Block if trying to raise display level over strict limits
         for (int l=priv->displayLevel+1; l<=level; l++)
             if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
-                setError(Quill::ErrorFileLimitExceeded);
+                emitError(QuillError(QuillError::GlobalFileLimitError,
+                                     QuillError::NoErrorSource,
+                                     priv->fileName));
                 return false;
             }
     } else {
@@ -211,8 +214,9 @@ bool File::setDisplayLevel(int level)
     priv->displayLevel = level;
 
     // setup stack here
-    if (exists() && (level >= 0) && (priv->stack->count() == 0))
+    if (exists() && (level >= 0) && (priv->stack->count() == 0)) {
         priv->stack->load();
+    }
 
     Core::instance()->suggestNewTask();
     return true;
@@ -228,7 +232,6 @@ void File::save()
     if (priv->exists && priv->supported && !priv->readOnly &&
         !priv->saveInProgress && isDirty())
     {
-        priv->saveInProgress = true;
         prepareSave();
         Core::instance()->suggestNewTask();
     }
@@ -424,7 +427,7 @@ QString File::thumbnailFileName(int level) const
 }
 
 QString File::editHistoryFileName(const QString &fileName,
-                                       const QString &editHistoryDirectory)
+                                  const QString &editHistoryDirectory)
 {
     QString hashValueString = fileNameHash(fileName);
     hashValueString.append(".xml");
@@ -433,37 +436,70 @@ QString File::editHistoryFileName(const QString &fileName,
     return hashValueString;
 }
 
-File *File::readFromEditHistory(const QString &fileName,
-                                          QObject *parent)
+File *File::readFromEditHistory(const QString &fileName, QuillError *error)
 {
-    Core *core = dynamic_cast<Core*>(parent);
-
-    QFile file(editHistoryFileName(fileName, core->editHistoryDirectory()));
+    QFile file(editHistoryFileName(fileName,
+                                   Core::instance()->editHistoryDirectory()));
 
     qDebug() << "Reading edit history from" << file.fileName();
 
-    if (!file.exists())
+    if (!file.exists()) {
+        *error = QuillError(QuillError::FileNotFoundError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
         return 0;
-    file.open(QIODevice::ReadOnly);
+    }
+    if (!file.open(QIODevice::ReadOnly)) {
+        *error = QuillError(QuillError::FileOpenForReadError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
+        return 0;
+    }
     const QByteArray history = file.readAll();
+    if (history.isEmpty()) {
+        *error = QuillError(QuillError::FileReadError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
+        return 0;
+    }
     file.close();
 
     qDebug() << "Read" << history.size() << "bytes";
     qDebug() << history;
 
-    return HistoryXml::decodeOne(history);
+    File *result = HistoryXml::decodeOne(history);
+    if (!result)
+        *error = QuillError(QuillError::FileCorruptError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
+    return result;
 }
 
-void File::writeEditHistory(const QString &history)
+void File::writeEditHistory(const QString &history, QuillError *error)
 {
-    QDir().mkpath(Core::instance()->editHistoryDirectory());
+    if (!QDir().mkpath(Core::instance()->editHistoryDirectory())) {
+        *error = QuillError(QuillError::DirCreateError,
+                            QuillError::EditHistoryErrorSource,
+                            Core::instance()->editHistoryDirectory());
+        return;
+    }
     QFile file(editHistoryFileName(priv->fileName,
                                    Core::instance()->editHistoryDirectory()));
 
     qDebug() << "Writing edit history to" << file.fileName();
-
-    file.open(QIODevice::WriteOnly | QIODevice::Truncate);
-    file.write(history.toAscii());
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        *error = QuillError(QuillError::FileOpenForWriteError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
+        return;
+    }
+    qint64 fileSize = file.write(history.toAscii());
+    if(fileSize == -1) {
+        *error = QuillError(QuillError::FileWriteError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
+        return;
+    }
     file.close();
 }
 
@@ -517,6 +553,11 @@ bool File::exists() const
     return priv->exists;
 }
 
+void File::setExists(bool exists)
+{
+    priv->exists = exists;
+}
+
 void File::setSupported(bool supported)
 {
     priv->supported = supported;
@@ -527,21 +568,46 @@ bool File::supported() const
     return priv->supported;
 }
 
-void File::overwritingCopy(const QString &fileName,
-                                const QString &newName)
+QuillError File::overwritingCopy(const QString &fileName,
+                                 const QString &newName)
 {
-    QDir().mkpath(QFileInfo(newName).path());
+    // Uses NoErrorSource as an error source since this lower-level
+    // function does not know of error sources in a larger context.
+
+    if (!QDir().mkpath(QFileInfo(newName).path()))
+        return QuillError(QuillError::DirCreateError,
+                          QuillError::NoErrorSource,
+                          QFileInfo(newName).path());
 
     QFile source(fileName),
         target(newName);
 
-    source.open(QIODevice::ReadOnly);
+    if (!source.open(QIODevice::ReadOnly))
+        return QuillError(QuillError::FileOpenForReadError,
+                          QuillError::NoErrorSource,
+                          fileName);
+
     const QByteArray buffer = source.readAll();
+    if (buffer.isEmpty())
+        return QuillError(QuillError::FileReadError,
+                          QuillError::NoErrorSource,
+                          fileName);
+
     source.close();
 
-    target.open(QIODevice::WriteOnly | QIODevice::Truncate);
-    target.write(buffer);
+    if (!target.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return QuillError(QuillError::FileOpenForWriteError,
+                          QuillError::NoErrorSource,
+                          newName);
+
+    qint64 fileSize = target.write(buffer);
+    if (fileSize == -1)
+        return QuillError(QuillError::FileWriteError,
+                          QuillError::NoErrorSource,
+                          newName);
+
     target.close();
+    return QuillError();
 }
 
 void File::removeThumbnails()
@@ -563,18 +629,38 @@ void File::prepareSave()
     // extension as the target file, so that the correct format can be
     // deduced by QImageReader.
 
-    QString filePath;
+    QString path = Core::instance()->temporaryFileDirectory();
+    if (path.isNull())
+        path = "/tmp";
 
-    if(Core::instance()->temporaryFileDirectory().isNull())
-        filePath = "/tmp/qt_temp.XXXXXX." + info.fileName();
-    else
-        filePath = Core::instance()->temporaryFileDirectory()+"/qt_temp.XXXXXX." +
-            info.fileName();
+    if (!QDir().mkpath(path)) {
+        emitError(QuillError(QuillError::DirCreateError,
+                             QuillError::TemporaryFileErrorSource,
+                             path));
+        return;
+    }
+
+    const QString filePath =
+        path + QDir::separator() + "qt_temp.XXXXXX." + info.fileName();
 
     priv->temporaryFile = new QTemporaryFile(filePath);
-    priv->temporaryFile->open();
+    if (!priv->temporaryFile) {
+        emitError(QuillError(QuillError::FileOpenForReadError,
+                             QuillError::TemporaryFileErrorSource,
+                             filePath));
+        return;
+    }
+
+    if (!priv->temporaryFile->open()) {
+        emitError(QuillError(QuillError::FileOpenForReadError,
+                             QuillError::TemporaryFileErrorSource,
+                             priv->temporaryFile->fileName()));
+        return;
+    }
 
     priv->stack->prepareSave(priv->temporaryFile->fileName());
+
+    priv->saveInProgress = true;
 }
 
 void File::concludeSave()
@@ -591,18 +677,35 @@ void File::concludeSave()
     // Original file does not exist - backup current into original
     // before replacing with contents of temp file.
 
-    if ((!file.exists()) || (!file.size() > 0))
-        File::overwritingCopy(priv->fileName,
-                                   priv->originalFileName);
+    if ((!file.exists()) || (!file.size() > 0)) {
+        QuillError result = File::overwritingCopy(priv->fileName,
+                                                  priv->originalFileName);
+        if (result.errorCode() != QuillError::NoError) {
+            result.setErrorSource(QuillError::ImageOriginalErrorSource);
+            emitError(result);
+            return;
+        }
+    }
 
     // This is more efficient than renaming between partitions.
 
-    File::overwritingCopy(temporaryName,
-                               priv->fileName);
+    QuillError result = File::overwritingCopy(temporaryName,
+                                              priv->fileName);
+    if (result.errorCode() != QuillError::NoError) {
+        result.setErrorSource(QuillError::ImageFileErrorSource);
+        emitError(result);
+        return;
+    }
 
     priv->stack->concludeSave();
 
-    writeEditHistory(HistoryXml::encode(this));
+    writeEditHistory(HistoryXml::encode(this), &result);
+
+    if (result.errorCode() != QuillError::NoError) {
+        emitError(result);
+        return;
+    }
+
     removeThumbnails();
     priv->saveInProgress = false;
 
@@ -640,6 +743,33 @@ File *File::original()
     return original;
 }
 
+void File::processFilterError(QuillImageFilter *filter)
+{
+    if ((fullImageSize().isEmpty()) &&
+        (filter->role() == QuillImageFilter::Role_Load)) {
+        QuillError::ErrorCode errorCode =
+            QuillError::translateFilterError(filter->error());
+
+        QuillError::ErrorSource errorSource;
+
+        if (filter->option(QuillImageFilter::FileName).toString() ==
+            priv->fileName) {
+            errorSource = QuillError::ImageFileErrorSource;
+            if ((errorCode == QuillError::FileFormatUnsupportedError) ||
+                (errorCode == QuillError::FileCorruptError))
+                setSupported(false);
+            else
+                setExists(false);
+        }
+        else {
+            errorSource = QuillError::ImageOriginalErrorSource;
+        }
+
+        emitError(QuillError(errorCode, errorSource,
+                             filter->option(QuillImageFilter::FileName).toString()));
+    }
+}
+
 void File::setWaitingForData(bool status)
 {
     priv->waitingForData = status;
@@ -656,9 +786,20 @@ bool File::isWaitingForData() const
     return priv->waitingForData;
 }
 
-void File::setError(Quill::Error errorCode)
+void File::setThumbnailError(bool status)
 {
-    qDebug() << "Error" << errorCode << "with file" << priv->fileName << "!";
+    priv->hasThumbnailError = status;
+}
 
-    emit error(errorCode);
+bool File::hasThumbnailError() const
+{
+    return priv->hasThumbnailError;
+}
+
+void File::emitError(QuillError quillError)
+{
+    qDebug() << "Error" << quillError.errorCode() << "at source" << quillError.errorSource() << "data" << quillError.errorData();
+
+    emit error(quillError);
+    Core::instance()->emitError(quillError);
 }

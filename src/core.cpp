@@ -41,7 +41,9 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterGenerator>
 #include <QDir>
+#include <QDebug>
 #include "quill.h"
+#include "quillerror.h"
 #include "core.h"
 #include "file.h"
 #include "quillundostack.h"
@@ -71,6 +73,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_cache.append(new ImageCache(0));
 
     qRegisterMetaType<QuillImageList>("QuillImageList");
+    qRegisterMetaType<QuillError>("QuillError");
 }
 
 Core::~Core()
@@ -196,20 +199,29 @@ bool Core::fileExists(const QString &fileName)
 }
 
 File *Core::file(const QString &fileName,
-                      const QString &fileFormat)
+                 const QString &fileFormat)
 {
     File *file = m_files.value(fileName);
 
     if (file)
         return file;
 
-    file = File::readFromEditHistory(fileName, this);
+    QuillError error;
+    file = File::readFromEditHistory(fileName, &error);
+
+    // Any errors in reading the edit history will be reported,
+    // however they are never fatal so we can always continue
+    if ((error.errorCode() != QuillError::NoError) &&
+        (error.errorCode() != QuillError::FileNotFoundError))
+        emitError(error);
 
     if (file) {
         m_files.insert(fileName, file);
         return file;
     }
 
+    // Even if there are errors, we can create an empty edit history
+    // and try to continue
     file = new File();
     file->setFileName(fileName);
 
@@ -423,7 +435,7 @@ TileCache* Core::tileCache() const
     return m_tileCache;
 }
 
-void Core::dump() const
+void Core::dump()
 {
     if (m_crashDumpPath.isEmpty())
         return;
@@ -438,10 +450,25 @@ void Core::dump() const
     if (!fileList.isEmpty())
         history = HistoryXml::encode(fileList);
 
-    QDir().mkpath(m_crashDumpPath);
-    QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
-    file.open(QIODevice::WriteOnly);
-    file.write(history.toAscii());
+    if (!QDir().mkpath(m_crashDumpPath)) {
+        emitError(QuillError(QuillError::DirCreateError,
+                             QuillError::CrashDumpErrorSource,
+                             m_crashDumpPath));
+        return;
+    }
+    const QString fileName = m_crashDumpPath + QDir::separator() + "dump.xml";
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) {
+        emitError(QuillError(QuillError::FileOpenForWriteError,
+                             QuillError::CrashDumpErrorSource,
+                             fileName));
+        return;
+    }
+    qint64 fileSize = file.write(history.toAscii());
+    if (fileSize == -1)
+        emitError(QuillError(QuillError::FileWriteError,
+                             QuillError::CrashDumpErrorSource,
+                             fileName));
     file.close();
 }
 
@@ -463,10 +490,24 @@ void Core::recover()
         return;
 
     QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
-    file.open(QIODevice::ReadOnly);
+    if (!file.open(QIODevice::ReadOnly)) {
+        emitError(QuillError(QuillError::FileOpenForReadError,
+                             QuillError::CrashDumpErrorSource,
+                             file.fileName()));
+        return;
+    }
     const QByteArray history = file.readAll();
-
+    if (history.isEmpty()) {
+        emitError(QuillError(QuillError::FileReadError,
+                             QuillError::CrashDumpErrorSource,
+                             file.fileName()));
+    }
     QList<File*> fileList = HistoryXml::decode(history);
+    if (fileList.count() == 0) {
+        emitError(QuillError(QuillError::FileCorruptError,
+                             QuillError::CrashDumpErrorSource,
+                             file.fileName()));
+    }
 
     foreach (File *file, fileList) {
         m_files.insert(file->fileName(), file);
@@ -577,7 +618,7 @@ void Core::emitSaved(QString fileName)
     emit saved(fileName);
 }
 
-void Core::emitError(Quill::Error errorCode, QVariant data)
+void Core::emitError(QuillError quillError)
 {
-    emit error(errorCode, data);
+    emit error(quillError);
 }

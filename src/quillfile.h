@@ -69,6 +69,7 @@ to the application using asynchronous QObject signals.
 
 #include <QObject>
 #include "quill.h"
+#include "quillerror.h"
 
 class QuillImage;
 class QuillImageFilter;
@@ -406,7 +407,7 @@ signals:
     /*!
       There was an error in the file.
      */
-    void error(Quill::Error errorCode);
+    void error(QuillError error);
 
 private:
 

@@ -40,10 +40,15 @@
 #include <QDebug>
 #include <QtTest/QtTest>
 #include <QImage>
+#include <QSignalSpy>
+#include <QMetaType>
+#include <QTemporaryFile>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
-
 #include <Quill>
+
+#include "quillerror.h"
+#include "core.h"
 #include "file.h"
 #include "ut_file.h"
 #include "unittests.h"
@@ -320,6 +325,77 @@ void ut_file::testSaveAfterDelete()
     QVERIFY(!Quill::isSaveInProgress());
 
     Unittests::compareImage(QImage(testFile.fileName()), imageAfter);
+}
+
+void ut_file::testOverwritingCopyFailed()
+{
+    File *file = new File();
+    QTemporaryFile tempFile;
+    tempFile.open();
+
+    QuillError error = file->overwritingCopy(QString(), tempFile.fileName());
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
+
+    delete file;
+}
+
+void ut_file::testEditHistoryReadFailed()
+{
+    QuillError error;
+
+    File *file = File::readFromEditHistory(QString(), &error);
+
+    QVERIFY(!file);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileNotFoundError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    delete file;
+}
+
+void ut_file::testEditHistoryWriteFailed()
+{
+    // Should ensure that a directory will not be created.
+    QFile dummyFile("/tmp/invalid");
+    dummyFile.open(QIODevice::WriteOnly);
+
+    Quill::setEditHistoryDirectory("/tmp/invalid");
+
+    QuillError error;
+
+    File *file = new File;
+
+    file->writeEditHistory(QString(), &error);
+
+    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    delete file;
+}
+
+void ut_file::testForbiddenRead()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+    testFile.setPermissions(0);
+
+    QuillFile *file = new QuillFile(testFile.fileName());
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+
+    QVERIFY(file->image().isNull());
+    QCOMPARE(spy.count(), 1);
+    QuillError error = spy.first().first().value<QuillError>();
+
+    QEXPECT_FAIL("", "Not implemented yet", Continue);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
+
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QEXPECT_FAIL("", "Not implemented yet", Continue);
+    QCOMPARE(error.errorData(), QString());
 }
 
 int main ( int argc, char *argv[] ){

@@ -137,6 +137,7 @@ on its own.
 
 #include <QObject>
 #include <QuillImageFilter>
+#include "quillerror.h"
 
 class QImage;
 class QString;
@@ -162,18 +163,6 @@ public:
         ThreadingNormal,
         ThreadingTest
     } ThreadingMode;
-
-    typedef enum _Error
-    {
-        ErrorUnspecified = -1,
-        NoError = 0,
-        ErrorFileNonexistent = 1,
-        ErrorFormatUnsupported,
-        ErrorFileCorrupt,
-        ErrorDirectoryCannotCreate,
-        ErrorFileLimitExceeded,
-        ErrorThumbnailWriteFailed
-    } Error;
 
     static QSize defaultViewPortSize;
     static int defaultCacheSize;
@@ -480,11 +469,12 @@ signals:
       @param data Any other information specific to the error
      */
 
-    void error(Quill::Error errorCode, QVariant data);
+    void error(QuillError error);
 
 private:
 
     QuillPrivate *priv;
+    static Quill *g_instance;
 };
 
 #endif // __QUILL_PUBLIC_INTERFACE_H_

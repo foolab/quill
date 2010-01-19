@@ -42,6 +42,7 @@
 
 #include <QMetaType>
 #include <QList>
+#include <QFile>
 #include <QuillImageFilter>
 
 #include "quill.h"
@@ -55,7 +56,8 @@ class File : public QObject
 Q_OBJECT
 
     friend class ut_thumbnail;
-
+    friend class ut_file;
+    friend class ut_error;
 public:
     File();
     virtual ~File();
@@ -357,6 +359,12 @@ public:
     virtual bool exists() const;
 
     /*!
+      Sets file existence status
+     */
+
+    virtual void setExists(bool exists);
+
+    /*!
       If the file is supported and has no errors.
      */
 
@@ -380,7 +388,7 @@ public:
      */
 
     static File *readFromEditHistory(const QString &fileName,
-                                     QObject *parent);
+                                     QuillError *error);
 
     /*!
       Copies a file over another file in the file system.
@@ -389,8 +397,8 @@ public:
       this has been is implemented for efficiency reasons.
      */
 
-    static void overwritingCopy(const QString &fileName,
-                                const QString &targetName);
+    QuillError overwritingCopy(const QString &fileName,
+                               const QString &targetName);
 
     /*!
       Completely removes a file along with its associated original
@@ -422,6 +430,12 @@ public:
 
     virtual File *original();
 
+    /*!
+      Processes any filter I/O errors related to the file.
+    */
+
+    void processFilterError(QuillImageFilter *filter);
+
     /*
       Sets the waiting-for-data status for this file.
 
@@ -441,6 +455,19 @@ public:
     */
 
     bool isWaitingForData() const;
+
+    /*!
+      There are errors in the thumbnail cache for this file,
+      thumbnail reading should be disabled.
+     */
+
+    void setThumbnailError(bool status);
+
+    /*!
+      Returns true if there are any errors in the thumbnails for this file
+     */
+
+    bool hasThumbnailError() const;
 
     /*!
       A single image is available, instructs all referring QuillFile
@@ -468,7 +495,12 @@ public:
       Triggers an error.
      */
 
-    virtual void setError(Quill::Error errorCode);
+    virtual void emitError(QuillError error);
+
+    // QString errorString() const;
+
+    Quill::Error errorMessage() const;
+
 
 signals:
 
@@ -485,7 +517,7 @@ signals:
     /*
       There was an error in the file.
      */
-    void error(Quill::Error errorCode);
+    void error(QuillError error);
 
 private:
     void prepareSave();
@@ -499,7 +531,7 @@ private:
       Writes the edit history.
      */
 
-    void writeEditHistory(const QString &history);
+    void writeEditHistory(const QString &history, QuillError *error);
 
     FilePrivate *priv;
 

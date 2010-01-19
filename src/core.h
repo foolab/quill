@@ -53,7 +53,9 @@ can only be changed if no files have been opened yet.
 #include <QObject>
 
 #include "quill.h"
+#include "quillerror.h"
 
+class QuillError;
 class File;
 class QuillUndoCommand;
 class QuillUndoStack;
@@ -304,7 +306,7 @@ public:
       Dumps all unsaved edits to the dump file.
     */
 
-    void dump() const;
+    void dump();
 
     /*!
       Sets the crash dump file name. Leave as the empty string to
@@ -399,7 +401,7 @@ public:
     /*!
       Emits an error signal.
     */
-    void emitError(Quill::Error errorCode, QVariant data);
+    void emitError(QuillError error);
 
 signals:
     /*!
@@ -426,7 +428,7 @@ signals:
       @param data Any other information specific to the error
     */
 
-    void error(Quill::Error errorCode, QVariant data);
+    void error(QuillError error);
 
 private:
 
@@ -460,6 +462,7 @@ private:
     QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
+    bool m_recoveryInProgress;
 
     QMap<QString, File*> m_files;
 
