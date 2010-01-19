@@ -67,8 +67,10 @@ SOURCES += quill.cpp \
 INSTALL_HEADERS = \
            Quill \
            QuillFile \
+           QuillError \
            quill.h \
-           quillfile.h
+           quillfile.h \
+           quillerror.h
 
 # --- install
 headers.files = $$INSTALL_HEADERS

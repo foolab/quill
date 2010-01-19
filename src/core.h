@@ -462,6 +462,7 @@ private:
     QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
+    bool m_recoveryInProgress;
 
     QMap<QString, File*> m_files;
 

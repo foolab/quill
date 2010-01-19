@@ -164,38 +164,6 @@ public:
         ThreadingTest
     } ThreadingMode;
 
-    enum Error {
-        UnspecifiedError = -1,
-        NoError = 0,
-
-        FileNotFoundError,
-        FileOpenForReadError,
-        FileReadError,
-        FileFormatUnsupportedError,
-        FileCorruptError,
-
-        DirCreateError,
-        FileOpenForWriteError,
-        FileWriteError,
-
-        FileRemoveError,
-
-        GlobalFileLimitError,
-        FilterGeneratorError
-    };
-
-    enum ErrorSource {
-        UnspecifiedErrorSource = -1,
-        NoErrorSource = 0,
-
-        ImageFileErrorSource,
-        ImageOriginalErrorSource,
-        ThumbnailErrorSource,
-        TemporaryFileErrorSource,
-        EditHistoryErrorSource,
-        CrashDumpErrorSource
-    };
-
     static QSize defaultViewPortSize;
     static int defaultCacheSize;
 

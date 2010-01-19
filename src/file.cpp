@@ -571,6 +571,9 @@ bool File::supported() const
 QuillError File::overwritingCopy(const QString &fileName,
                                  const QString &newName)
 {
+    // Uses NoErrorSource as an error source since this lower-level
+    // function does not know of error sources in a larger context.
+
     if (!QDir().mkpath(QFileInfo(newName).path()))
         return QuillError(QuillError::DirCreateError,
                           QuillError::NoErrorSource,
