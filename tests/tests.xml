@@ -107,6 +107,13 @@
 	<step >/usr/lib/libquill-tests/ut_crashrecovery </step>
       </case>
     </set>
+
+    <set name="quill-error-handling-tests" feature="errorhandling">
+      <description>quill error handling test</description>
+      <case name="ut_error" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_error </step>
+      </case>
+    </set>
   </suite>
 </testdefinition>
 

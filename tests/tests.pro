@@ -24,6 +24,7 @@ SUBDIRS += \
            ut_thumbnail \
            ut_crashrecovery \
            ut_tileloading \
+           ut_error \
            benchmark  \
 
 # --- install

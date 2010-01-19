@@ -37,17 +37,17 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_FILE_H
-#define TEST_LIBQUILL_FILE_H
+#ifndef TEST_LIBQUILL_ERROR_H
+#define TEST_LIBQUILL_ERROR_H
 
 #include <QObject>
 #include <QImage>
 #include <QIODevice>
 
-class ut_file : public QObject {
+class ut_error : public QObject {
 Q_OBJECT
 public:
-    ut_file();
+    ut_error();
 
 private slots:
     void init();
@@ -55,18 +55,37 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
-    void testRemove();
-    void testOriginal();
-    void testFileLimit();
-    void testMultipleAccess();
-    void testDifferentPreviewLevels();
-    void testSaveAfterDelete();
+    // Tests on module failures
 
     void testOverwritingCopyFailed();
     void testEditHistoryReadFailed();
     void testEditHistoryWriteFailed();
 
+    // Higher level tests on system failures
+
+    void testFileNotFound();
     void testForbiddenRead();
+    void testEmptyFileRead();
+    void testCorruptRead();
+    void testWriteProtectedFile();
+
+    void testForbiddenOriginal();
+    void testEmptyOriginal();
+    void testCorruptOriginal();
+    void testOriginalDirectoryCreateFailed();
+
+    void testForbiddenThumbnail();
+    void testCorruptThumbnail();
+    void testThumbnailDirectoryCreateFailed();
+
+    void testTemporaryFileDirectoryCreateFailed();
+
+    void testUnreadableEditHistory();
+    void testEmptyEditHistory();
+    void testCorruptEditHistory();
+
+    void testEditHistoryDirectoryCreateFailed();
+    void testWriteProtectedEditHistory();
 };
 
-#endif  // TEST_LIBQUILL_FILE_H
+#endif  // TEST_LIBQUILL_ERROR_H

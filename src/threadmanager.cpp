@@ -48,6 +48,7 @@
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
 
+#include "quillerror.h"
 #include "file.h"
 #include "core.h"
 #include "quillundocommand.h"
@@ -273,7 +274,9 @@ bool ThreadManager::suggestThumbnailSaveTask(File *file, int level)
         return false;
 
     if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
-        Core::instance()->emitError(Quill::DirectoryCannotCreateError);
+        file->emitError(QuillError(QuillError::DirCreateError,
+                                   QuillError::ThumbnailErrorSource,
+                                   Core::instance()->thumbnailDirectory(level)));
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
@@ -339,6 +342,10 @@ bool ThreadManager::suggestNewTask(File *file, int level)
         else
             prevImage = prev->image(level);
     }
+
+    // Commands with errors should be ignored
+    if (command->fullImageSize().isEmpty())
+        return false;
 
     startThread(command->uniqueId(),
                 level, 0,
@@ -497,15 +504,17 @@ void ThreadManager::calculationFinished()
     else if (filter->role() == QuillImageFilter::Role_Save)
     {
         if (!stack->file()->isSaveInProgress()) {
-            // Thumbnail saving
-            delete filter;
-
             // Save failed - disabling thumbnailing
             if (image.isNull()) {
-                stack->file()->setError(Quill::ThumbnailWriteFailedError);
-                qDebug() << "Save failed!";
+                stack->file()->emitError(QuillError(QuillError::FileWriteError,
+                                                    QuillError::ThumbnailErrorSource,
+                                                    filter->option(QuillImageFilter::FileName).toString()));
+                qDebug() << "Thumbnail save failed!";
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
+
+            // Thumbnail saving - delete temporary filter
+            delete filter;
         }
 
         else if (!stack->saveMap() ||
@@ -551,8 +560,55 @@ void ThreadManager::calculationFinished()
         // Ad-hoc filters (preview improvement and thumbnail loading)
         if (command->filter() != filter)
         {
+            // Thumbnail load failed
+            if ((image.isNull()) &&
+                (filter->role() == QuillImageFilter::Role_Load)) {
+                QuillError quillError =
+                    QuillError(QuillError::translateFilterError(filter->error()),
+                               QuillError::ThumbnailErrorSource,
+                               filter->option(QuillImageFilter::FileName).toString());
+                stack->file()->emitError(quillError);
+                stack->file()->removeThumbnails();
+                stack->file()->setThumbnailError(true);
+            }
+
             image = QuillImage(image, command->fullImageSize());
             delete filter;
+        } else if ((image.isNull()) &&
+                   (command->filter()->role() == QuillImageFilter::Role_Load)) {
+            File *file = stack->file();
+
+            // Prevent repeating the faulty operation
+            command->setFullImageSize(QSize());
+
+            // Normal load failed
+            QuillError::ErrorCode errorCode =
+                QuillError::translateFilterError(filter->error());
+
+            QString fileName = filter->option(QuillImageFilter::FileName).toString();
+            QuillError::ErrorSource errorSource;
+            qDebug() << "Normal load failed!" << fileName << file->fileName();
+
+            if (fileName == file->fileName()) {
+                errorSource = QuillError::ImageFileErrorSource;
+                if ((errorCode == QuillError::FileFormatUnsupportedError) ||
+                    (errorCode == QuillError::FileCorruptError))
+                    file->setSupported(false);
+                else
+                    file->setExists(false);
+            }
+            else {
+                errorSource = QuillError::ImageOriginalErrorSource;
+            }
+
+            file->emitError(QuillError(errorCode, errorSource,
+                                       fileName));
+
+            Core::instance()->suggestNewTask();
+
+            if (threadingMode == Quill::ThreadingTest)
+                eventLoop->exit();
+            return;
         }
 
         // Normal case: a better version of an image has been calculated.

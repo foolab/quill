@@ -198,8 +198,8 @@ Quill* Quill::instance()
                             SIGNAL(saved(QString)),
                             SIGNAL(saved(QString)));
         g_instance->connect(Core::instance(),
-                            SIGNAL(error(Quill::Error, QString)),
-                            SIGNAL(error(Quill::Error, QString)));
+                            SIGNAL(error(QuillError)),
+                            SIGNAL(error(QuillError)));
     }
     return g_instance;
 }
