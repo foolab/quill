@@ -497,9 +497,6 @@ public:
 
     virtual void emitError(QuillError error);
 
-
-signals:
-
     /*!
       Saving a file has been concluded on the background.
     */

@@ -57,6 +57,7 @@ private slots:
     void testBasicRecovery();
     void testRecoverSaveInProgress();
     void testRecoveryAfterUndo();
+    void testDoubleCrash();
 };
 
 #endif  // _UT_CRASH_RECOVERY_H_

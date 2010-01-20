@@ -339,6 +339,74 @@ void ut_crashrecovery::testRecoveryAfterUndo()
     delete file;
 }
 
+/* A crash when recovery is still in progress should result in no
+   further recovery.*/
+
+void ut_crashrecovery::testDoubleCrash()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QFile dumpFile("/tmp/dump.xml");
+
+    Unittests::generatePaletteImage().save(testFile.fileName(), "png");
+
+    Quill::setCrashDumpPath("/tmp");
+
+    QuillFile *file =
+        new QuillFile(testFile.fileName(), "png");
+    file->setDisplayLevel(1);
+
+    QuillImageFilter *brightnessFilter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    brightnessFilter->setOption(QuillImageFilter::Brightness,
+                                QVariant(10));
+    QImage image = Unittests::generatePaletteImage();
+    QImage targetImage = brightnessFilter->apply(image);
+
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+
+    file->runFilter(brightnessFilter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), targetImage));
+
+    // Verify that the dump file has been created
+    QVERIFY(dumpFile.size() > 0);
+
+    // Simulate crash by calling cleanup here
+    Quill::cleanup();
+
+    Quill::initTestingMode();
+
+    // This must be kept after cleanup to keep the changes from being discarded
+    delete file;
+
+    Quill::setPreviewSize(0, QSize(4, 1));
+
+    Quill::setCrashDumpPath("/tmp");
+
+    // Now that dump file has been set, recovery should succeed
+    QVERIFY(Quill::canRecover());
+
+    Quill::recover();
+
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // brightness
+    Quill::cleanup(); // die!
+
+    Quill::initTestingMode();
+
+    Quill::setCrashDumpPath("/tmp");
+
+    // Should no longer be recoverable
+    QVERIFY(!Quill::canRecover());
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_crashrecovery test;
