@@ -49,6 +49,7 @@ HEADERS += quill.h \
            quillundostack.h \
            imagecache.h \
            historyxml.h \
+           logger.h \
 
 SOURCES += quill.cpp \
            quillfile.cpp \
@@ -62,7 +63,8 @@ SOURCES += quill.cpp \
            quillundocommand.cpp \
            quillundostack.cpp \
            imagecache.cpp \
-           historyxml.cpp
+           historyxml.cpp \
+           logger.cpp \
 
 INSTALL_HEADERS = \
            Quill \

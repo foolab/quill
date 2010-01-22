@@ -55,6 +55,8 @@
 #include "tilemap.h"
 #include "savemap.h"
 
+#include "logger.h"
+
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
@@ -146,6 +148,7 @@ void QuillUndoStack::add(QuillImageFilter *filter)
         calculateFullImageSize(cmd);
 
     qDebug() << "Command" << filter->name() << "added to stack.";
+    Logger::log("[stack]"+filter->name()+"added to stack");
 }
 
 bool QuillUndoStack::canUndo() const
