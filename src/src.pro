@@ -44,6 +44,7 @@ HEADERS += quill.h \
            tilecache.h \
            tilemap.h \
            savemap.h \
+           scheduler.h \
            threadmanager.h \
            quillundocommand.h \
            quillundostack.h \
@@ -58,6 +59,7 @@ SOURCES += quill.cpp \
            tilecache.cpp \
            tilemap.cpp \
            savemap.cpp \
+           scheduler.cpp \
            threadmanager.cpp \
            quillundocommand.cpp \
            quillundostack.cpp \
