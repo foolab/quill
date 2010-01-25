@@ -38,27 +38,40 @@
 ****************************************************************************/
 #include <QDateTime>
 #include <QTextStream>
+#include <QDir>
 #include <QDebug>
 #include "logger.h"
 
-QFile* Logger::quillLogFile = 0;
-
-Logger::Logger()
+Logger::Logger():homePath("")
 {
-
+    homePath = QDir::homePath();
+    QDir logPath(homePath+"/.local/share/quill/");
+    if(!logPath.exists()){
+        if(logPath.mkpath(homePath+"/.local/share/quill/")){
+        }
+        else{
+            //we get the error message
+        }
+    }
 }
 
 void Logger::log(const QString logInfo)
 {
 
-    QFile data("output.txt");
-    data.open(QFile::ReadWrite | QFile::Append);
-    QTextStream out(&data);
+    QFile data(homePath+"/.local/share/quill/log.txt");
+    if(data.exists()){
+        data.open(QFile::ReadWrite | QFile::Append);
+        QTextStream out(&data);
 
-    QDateTime timeStamp = QDateTime::currentDateTime();
-    QDate date = timeStamp.date();
-    QTime time = timeStamp.time();
-    out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
+        QDateTime timeStamp = QDateTime::currentDateTime();
+        QDate date = timeStamp.date();
+        QTime time = timeStamp.time();
+        out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
+        data.close();
+    }
+    else{
+
+    }
 }
 
 

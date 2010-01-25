@@ -36,26 +36,87 @@
 ** contact the sales department at qt-sales@nokia.com.
 **
 ****************************************************************************/
-#ifndef __QUILL_LOGGER_H__
-#define __QUILL_LOGGER_H__
-#include <QObject>
+
+#include <QtTest/QtTest>
+#include <QDir>
 #include <QFile>
-class QString;
+#include <QDate>
+#include <QTime>
+#include <QDebug>
+#include "../../src/logger.h"
+#include "ut_logger.h"
 
-class Logger : public QObject
-{Q_OBJECT
+ut_logger::ut_logger()
+{
+}
 
-friend class ut_logger;
+void ut_logger::initTestCase()
+{
 
-public:
+}
 
-    Logger();
+void ut_logger::cleanupTestCase()
+{
+}
 
-    void log(const QString logInfo);
+void ut_logger::init()
+{
+}
 
-private:
-    QString homePath;
+void ut_logger::cleanup()
+{
 
-};
+}
 
-#endif
+void ut_logger::testLogger()
+{
+    Logger *logger = new Logger();
+    QString homePath = QDir::homePath();
+    QDir logPath(homePath+"/.local/share/quill/");
+    QCOMPARE(logPath.exists(),true);
+
+    QFile data(homePath+"/.local/share/quill/log.txt");
+    data.open(QFile::ReadWrite| QFile::Append);
+    data.close();
+    QCOMPARE(data.exists(),true);
+
+    delete logger;
+}
+
+void ut_logger::testLog()
+{
+    Logger *logger = new Logger();
+    QString logString ="this is logging info!"; 
+    logger->log(logString);
+
+    QFile data(QDir::homePath()+"/.local/share/quill/log.txt");
+    data.open(QFile::ReadOnly);
+    QTextStream stream(&data);
+    QString logInfo = "";
+    QString logInfo1 = "";
+    do{
+        logInfo= stream.readLine();
+        if(!logInfo.isNull())
+            logInfo1 = logInfo;
+    }while(!logInfo.isNull());
+    data.close();
+    bool ret = logInfo1.contains(logString);
+    QCOMPARE(ret,true);
+
+    QString dateString = logInfo1.left(10);
+    QDate date = QDate::fromString(dateString,"yyyy-MM-dd");
+    QCOMPARE(date.isValid(),true);
+    QString timeString = logInfo1.mid(11,12);
+    QString timeFormat = "hh:mm:ss:zzz";
+    QTime time = QTime::fromString(timeString,timeFormat);
+    QCOMPARE(time.isValid(),true);
+    delete logger;
+
+}
+
+int main ( int argc, char *argv[] ){
+    QCoreApplication app( argc, argv );
+    ut_logger test;
+    return QTest::qExec( &test, argc, argv );
+
+}

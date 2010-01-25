@@ -36,26 +36,26 @@
 ** contact the sales department at qt-sales@nokia.com.
 **
 ****************************************************************************/
-#ifndef __QUILL_LOGGER_H__
-#define __QUILL_LOGGER_H__
+
+#ifndef _UT_LOGGER_H_
+#define _UT_LOGGER_H_
+
 #include <QObject>
-#include <QFile>
-class QString;
 
-class Logger : public QObject
-{Q_OBJECT
 
-friend class ut_logger;
-
+class ut_logger : public QObject {
+Q_OBJECT
 public:
+    ut_logger();
 
-    Logger();
+private slots:
+    void init();
+    void cleanup();
+    void initTestCase();
+    void cleanupTestCase();
 
-    void log(const QString logInfo);
-
-private:
-    QString homePath;
-
+    void testLogger();
+    void testLog();
 };
 
-#endif
+#endif  // TEST_LIBQUILL_IMAGELOADER_H

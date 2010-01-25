@@ -62,6 +62,7 @@ QuillUndoStack::QuillUndoStack(File *file) :
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
     m_saveCommand(0), m_saveMap(0)
 {
+    m_logger = new Logger();
 }
 
 QuillUndoStack::~QuillUndoStack()
@@ -69,6 +70,7 @@ QuillUndoStack::~QuillUndoStack()
     delete m_stack;
     delete m_saveCommand;
     delete m_saveMap;
+    delete m_logger;
 }
 
 File* QuillUndoStack::file()
@@ -147,8 +149,7 @@ void QuillUndoStack::add(QuillImageFilter *filter)
     if (!m_file->isWaitingForData())
         calculateFullImageSize(cmd);
 
-    qDebug() << "Command" << filter->name() << "added to stack.";
-    Logger::log("[stack]"+filter->name()+"added to stack");
+    m_logger->log("[stack] "+filter->name()+"added to stack");
 }
 
 bool QuillUndoStack::canUndo() const
