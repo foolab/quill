@@ -72,7 +72,7 @@ QuillUndoCommand::~QuillUndoCommand()
 
     // If the background thread is currently running the filter,
     // do not delete it (it would crash the background thread).
-    // Instead, ThreadManager::calculationFinished() will handle this
+    // Instead, Scheduler::processFinishedTask() will handle this
     // after the calculation has finished.
 
     if (m_filter && Core::instance()->allowDelete(m_filter))

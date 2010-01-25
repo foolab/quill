@@ -53,57 +53,21 @@
 #include "tilemap.h"
 #include "quillerror.h"
 
-class FilePrivate
+File::File() : m_exists(true), m_supported(true), m_readOnly(false),
+               m_hasThumbnailError(false), m_displayLevel(-1),
+               m_fileName(""), m_originalFileName(""), m_fileFormat(""),
+               m_targetFormat(""), m_viewPort(QRect()),
+               m_waitingForData(false), m_saveInProgress(false),
+               m_temporaryFile(0)
 {
-public:
-    bool exists;
-    bool supported;
-    bool readOnly;
-    bool hasThumbnailError;
-
-    QuillUndoStack *stack;
-
-    int displayLevel;
-
-    QString fileName;
-    QString originalFileName;
-    QString fileFormat;
-    QString targetFormat;
-
-    QRect viewPort;
-
-    bool waitingForData;
-    bool saveInProgress;
-    QTemporaryFile *temporaryFile;
-};
-
-File::File()
-{
-    priv = new FilePrivate;
-    priv->exists = true;
-    priv->supported = true;
-    priv->readOnly = false;
-
-    priv->stack = new QuillUndoStack(this);
-    priv->displayLevel = -1;
-
-    priv->fileName = "";
-    priv->originalFileName = "";
-    priv->fileFormat = "";
-    priv->targetFormat = "";
-    priv->viewPort = QRect();
-
-    priv->waitingForData = false;
-    priv->saveInProgress = false;
-    priv->temporaryFile = 0;
+    m_stack = new QuillUndoStack(this);
 }
 
 File::~File()
 {
     detach();
-    delete priv->stack;
-    delete priv->temporaryFile;
-    delete priv;
+    delete m_stack;
+    delete m_temporaryFile;
 }
 
 void File::addReference(QuillFile *file)
@@ -119,7 +83,7 @@ void File::removeReference(QuillFile *file)
         // Trying to lower the display level, remaining references will
         // prevent this from happening.
         setDisplayLevel(-1);
-        if (m_references.isEmpty() && !priv->saveInProgress) {
+        if (m_references.isEmpty() && !m_saveInProgress) {
             detach();
         }
     }
@@ -127,7 +91,7 @@ void File::removeReference(QuillFile *file)
 
 bool File::allowDelete()
 {
-    return m_references.isEmpty() && !priv->saveInProgress;
+    return m_references.isEmpty() && !m_saveInProgress;
 }
 
 void File::detach()
@@ -139,63 +103,63 @@ void File::detach()
 
 QString File::fileName() const
 {
-    return priv->fileName;
+    return m_fileName;
 }
 
 QString File::fileFormat() const
 {
-    return priv->fileFormat;
+    return m_fileFormat;
 }
 
 QString File::originalFileName() const
 {
-    return priv->originalFileName;
+    return m_originalFileName;
 }
 
 QString File::targetFormat() const
 {
-    return priv->targetFormat;
+    return m_targetFormat;
 }
 
 void File::setFileName(const QString &fileName)
 {
-    priv->fileName = fileName;
+    m_fileName = fileName;
 }
 
 void File::setFileFormat(const QString &fileFormat)
 {
-    priv->fileFormat = fileFormat;
+    m_fileFormat = fileFormat;
 }
 
 void File::setOriginalFileName(const QString &originalFileName)
 {
-    priv->originalFileName = originalFileName;
+    m_originalFileName = originalFileName;
 }
 
 void File::setTargetFormat(const QString &targetFormat)
 {
-    priv->targetFormat = targetFormat;
+    m_targetFormat = targetFormat;
 }
 
 void File::setReadOnly()
 {
-    priv->readOnly = true;
+    m_readOnly = true;
 }
 
 bool File::isReadOnly() const
 {
-    return priv->readOnly;
+    return m_readOnly;
 }
 
 bool File::setDisplayLevel(int level)
 {
-    if (level > priv->displayLevel) {
+    if (level > m_displayLevel) {
         // Block if trying to raise display level over strict limits
-        for (int l=priv->displayLevel+1; l<=level; l++)
+        for (int l=m_displayLevel+1; l<=level; l++)
             if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
                 emitError(QuillError(QuillError::GlobalFileLimitError,
                                      QuillError::NoErrorSource,
-                                     priv->fileName));
+                                     m_fileName));
                 return false;
             }
     } else {
@@ -207,15 +171,15 @@ bool File::setDisplayLevel(int level)
 
     // Purge images from cache if lowering display level here
     // Exception: when save is in progress, leave the highest level
-    for (int l=priv->displayLevel; l>level; l--)
-        if ((l < Core::instance()->previewLevelCount()) || (!priv->saveInProgress))
+    for (int l=m_displayLevel; l>level; l--)
+        if ((l < Core::instance()->previewLevelCount()) || (!m_saveInProgress))
             Core::instance()->cache(l)->purge(this);
 
-    priv->displayLevel = level;
+    m_displayLevel = level;
 
     // setup stack here
-    if (exists() && (level >= 0) && (priv->stack->count() == 0)) {
-        priv->stack->load();
+    if (exists() && (level >= 0) && (m_stack->count() == 0)) {
+        m_stack->load();
     }
 
     Core::instance()->suggestNewTask();
@@ -224,13 +188,13 @@ bool File::setDisplayLevel(int level)
 
 int File::displayLevel() const
 {
-    return priv->displayLevel;
+    return m_displayLevel;
 }
 
 void File::save()
 {
-    if (priv->exists && priv->supported && !priv->readOnly &&
-        !priv->saveInProgress && isDirty())
+    if (m_exists && m_supported && !m_readOnly &&
+        !m_saveInProgress && isDirty())
     {
         prepareSave();
         Core::instance()->suggestNewTask();
@@ -239,62 +203,62 @@ void File::save()
 
 bool File::isSaveInProgress() const
 {
-    return priv->saveInProgress;
+    return m_saveInProgress;
 }
 
 bool File::isDirty() const
 {
-    if (priv->stack)
-        return priv->stack->isDirty();
+    if (m_stack)
+        return m_stack->isDirty();
     else
         return false;
 }
 
 void File::runFilter(QuillImageFilter *filter)
 {
-    if (!priv->exists || !priv->supported || priv->readOnly)
+    if (!m_exists || !m_supported || m_readOnly)
         return;
 
-    if (priv->stack->count() == 0)
-        priv->stack->load();
-    priv->stack->add(filter);
+    if (m_stack->count() == 0)
+        m_stack->load();
+    m_stack->add(filter);
 
-    priv->saveInProgress = false;
+    m_saveInProgress = false;
     Core::instance()->dump();
     Core::instance()->suggestNewTask();
 }
 
 void File::startSession()
 {
-    if (priv->exists && priv->supported && !priv->readOnly)
-        priv->stack->startSession();
+    if (m_exists && m_supported && !m_readOnly)
+        m_stack->startSession();
 }
 
 void File::endSession()
 {
-    if (priv->stack)
-        priv->stack->endSession();
+    if (m_stack)
+        m_stack->endSession();
 }
 
 bool File::isSession() const
 {
-    return ((priv->stack) && (priv->stack->isSession()));
+    return ((m_stack) && (m_stack->isSession()));
 }
 
 bool File::canUndo() const
 {
-    if (!priv->exists || !priv->supported || priv->readOnly)
+    if (!m_exists || !m_supported || m_readOnly)
         return false;
-    return priv->stack->canUndo();
+    return m_stack->canUndo();
 }
 
 void File::undo()
 {
     if (canUndo())
     {
-        priv->stack->undo();
+        m_stack->undo();
 
-        priv->saveInProgress = false;
+        m_saveInProgress = false;
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
@@ -304,19 +268,19 @@ void File::undo()
 
 bool File::canRedo() const
 {
-    if (!priv->exists || !priv->supported || priv->readOnly)
+    if (!m_exists || !m_supported || m_readOnly)
         return false;
 
-    return priv->stack->canRedo();
+    return m_stack->canRedo();
 }
 
 void File::redo()
 {
     if (canRedo())
     {
-        priv->stack->redo();
+        m_stack->redo();
 
-        priv->saveInProgress = false;
+        m_saveInProgress = false;
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
@@ -326,57 +290,57 @@ void File::redo()
 
 QuillImage File::bestImage(int displayLevel) const
 {
-    if (!priv->exists)
+    if (!m_exists)
         return QuillImage();
-    return priv->stack->bestImage(displayLevel);
+    return m_stack->bestImage(displayLevel);
 }
 
 QuillImage File::image(int level) const
 {
-    if (!priv->exists)
+    if (!m_exists)
         return QuillImage();
-    return priv->stack->image(level);
+    return m_stack->image(level);
 }
 
 void File::setImage(int level, const QuillImage &image)
 {
-    priv->stack->setImage(level, image);
+    m_stack->setImage(level, image);
 }
 
 QList<QuillImage> File::allImageLevels(int displayLevel) const
 {
-    if (!priv->exists || !priv->stack->command())
+    if (!m_exists || !m_stack->command())
         return QList<QuillImage>();
-    else if ((!priv->stack->command()->tileMap()) ||
+    else if ((!m_stack->command()->tileMap()) ||
              (displayLevel < Core::instance()->previewLevelCount()))
-        return priv->stack->allImageLevels(displayLevel);
+        return m_stack->allImageLevels(displayLevel);
     else
-        return priv->stack->allImageLevels(displayLevel) +
-            priv->stack->command()->tileMap()->nonEmptyTiles(priv->viewPort);
+        return m_stack->allImageLevels(displayLevel) +
+            m_stack->command()->tileMap()->nonEmptyTiles(m_viewPort);
 }
 
 QSize File::fullImageSize() const
 {
-    if (!priv->exists)
+    if (!m_exists)
         return QSize();
-    return priv->stack->fullImageSize();
+    return m_stack->fullImageSize();
 }
 
 void File::setViewPort(const QRect &viewPort)
 {
-    const QRect oldPort = priv->viewPort;
-    priv->viewPort = viewPort;
+    const QRect oldPort = m_viewPort;
+    m_viewPort = viewPort;
 
     // New tiles will only be calculated if the display level allows it
-    if (!priv->exists || (priv->displayLevel < Core::instance()->previewLevelCount()))
+    if (!m_exists || (m_displayLevel < Core::instance()->previewLevelCount()))
         return;
 
     Core::instance()->suggestNewTask();
 
     QList<QuillImage> newTiles;
 
-    if ((priv->stack->command()) && (priv->stack->command()->tileMap()))
-        newTiles = priv->stack->command()->tileMap()->
+    if ((m_stack->command()) && (m_stack->command()->tileMap()))
+        newTiles = m_stack->command()->tileMap()->
 	    newTiles(oldPort, viewPort);
 
     if (!newTiles.isEmpty())
@@ -385,17 +349,17 @@ void File::setViewPort(const QRect &viewPort)
 
 QRect File::viewPort() const
 {
-    return priv->viewPort;
+    return m_viewPort;
 }
 
 QuillUndoStack *File::stack() const
 {
-    return priv->stack;
+    return m_stack;
 }
 
 bool File::hasThumbnail(int level) const
 {
-    if (!priv->exists)
+    if (!m_exists)
         return false;
 
     if (Core::instance()->thumbnailDirectory(level).isEmpty())
@@ -418,7 +382,7 @@ QString File::fileNameHash(const QString &fileName)
 
 QString File::thumbnailFileName(int level) const
 {
-    QString hashValueString = fileNameHash(priv->fileName);
+    QString hashValueString = fileNameHash(m_fileName);
     hashValueString.append("." + Core::instance()->thumbnailExtension());
     hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
                             QDir::separator());
@@ -483,7 +447,7 @@ void File::writeEditHistory(const QString &history, QuillError *error)
                             Core::instance()->editHistoryDirectory());
         return;
     }
-    QFile file(editHistoryFileName(priv->fileName,
+    QFile file(editHistoryFileName(m_fileName,
                                    Core::instance()->editHistoryDirectory()));
 
     qDebug() << "Writing edit history to" << file.fileName();
@@ -528,19 +492,19 @@ void File::emitAllImages()
 
 void File::remove()
 {
-    if (!priv->exists)
+    if (!m_exists)
         return;
 
-    QFile(priv->fileName).remove();
-    QFile(priv->originalFileName).remove();
-    QFile::remove(editHistoryFileName(priv->fileName,
+    QFile(m_fileName).remove();
+    QFile(m_originalFileName).remove();
+    QFile::remove(editHistoryFileName(m_fileName,
                                       Core::instance()->editHistoryDirectory()));
     removeThumbnails();
 
-    priv->exists = false;
-    priv->saveInProgress = false;
-    delete priv->stack;
-    priv->stack = 0;
+    m_exists = false;
+    m_saveInProgress = false;
+    delete m_stack;
+    m_stack = 0;
 
     if (hasOriginal())
         original()->remove();
@@ -550,22 +514,22 @@ void File::remove()
 
 bool File::exists() const
 {
-    return priv->exists;
+    return m_exists;
 }
 
 void File::setExists(bool exists)
 {
-    priv->exists = exists;
+    m_exists = exists;
 }
 
 void File::setSupported(bool supported)
 {
-    priv->supported = supported;
+    m_supported = supported;
 }
 
 bool File::supported() const
 {
-    return priv->supported;
+    return m_supported;
 }
 
 QuillError File::overwritingCopy(const QString &fileName,
@@ -619,11 +583,11 @@ void File::removeThumbnails()
 
 void File::prepareSave()
 {
-    delete priv->temporaryFile;
+    delete m_temporaryFile;
 
     // Save filter always operates with temporary files.
 
-    QFileInfo info(priv->fileName);
+    QFileInfo info(m_fileName);
 
     // This guarantees that the temporary file will have the same
     // extension as the target file, so that the correct format can be
@@ -643,43 +607,43 @@ void File::prepareSave()
     const QString filePath =
         path + QDir::separator() + "qt_temp.XXXXXX." + info.fileName();
 
-    priv->temporaryFile = new QTemporaryFile(filePath);
-    if (!priv->temporaryFile) {
+    m_temporaryFile = new QTemporaryFile(filePath);
+    if (!m_temporaryFile) {
         emitError(QuillError(QuillError::FileOpenForReadError,
                              QuillError::TemporaryFileErrorSource,
                              filePath));
         return;
     }
 
-    if (!priv->temporaryFile->open()) {
+    if (!m_temporaryFile->open()) {
         emitError(QuillError(QuillError::FileOpenForReadError,
                              QuillError::TemporaryFileErrorSource,
-                             priv->temporaryFile->fileName()));
+                             m_temporaryFile->fileName()));
         return;
     }
 
-    priv->stack->prepareSave(priv->temporaryFile->fileName());
+    m_stack->prepareSave(m_temporaryFile->fileName());
 
-    priv->saveInProgress = true;
+    m_saveInProgress = true;
 }
 
 void File::concludeSave()
 {
     // If save is concluded, purge any full images still in memory.
-    if (priv->displayLevel < Core::instance()->previewLevelCount())
+    if (m_displayLevel < Core::instance()->previewLevelCount())
         Core::instance()->cache(Core::instance()->previewLevelCount())->purge(this);
 
-    const QString temporaryName = priv->temporaryFile->fileName();
-    priv->temporaryFile->close();
+    const QString temporaryName = m_temporaryFile->fileName();
+    m_temporaryFile->close();
 
-    QFile file(priv->originalFileName);
+    QFile file(m_originalFileName);
 
     // Original file does not exist - backup current into original
     // before replacing with contents of temp file.
 
     if ((!file.exists()) || (!file.size() > 0)) {
-        QuillError result = File::overwritingCopy(priv->fileName,
-                                                  priv->originalFileName);
+        QuillError result = File::overwritingCopy(m_fileName,
+                                                  m_originalFileName);
         if (result.errorCode() != QuillError::NoError) {
             result.setErrorSource(QuillError::ImageOriginalErrorSource);
             emitError(result);
@@ -690,14 +654,14 @@ void File::concludeSave()
     // This is more efficient than renaming between partitions.
 
     QuillError result = File::overwritingCopy(temporaryName,
-                                              priv->fileName);
+                                              m_fileName);
     if (result.errorCode() != QuillError::NoError) {
         result.setErrorSource(QuillError::ImageFileErrorSource);
         emitError(result);
         return;
     }
 
-    priv->stack->concludeSave();
+    m_stack->concludeSave();
 
     writeEditHistory(HistoryXml::encode(this), &result);
 
@@ -707,36 +671,36 @@ void File::concludeSave()
     }
 
     removeThumbnails();
-    priv->saveInProgress = false;
+    m_saveInProgress = false;
 
     Core::instance()->dump();
 
     QFile::remove(temporaryName);
 
-    delete priv->temporaryFile;
-    priv->temporaryFile = 0;
+    delete m_temporaryFile;
+    m_temporaryFile = 0;
 
     emit saved();
-    Core::instance()->emitSaved(priv->fileName);
+    Core::instance()->emitSaved(m_fileName);
 }
 
 bool File::hasOriginal()
 {
-    QString indexName = QString('\\') + priv->fileName;
+    QString indexName = QString('\\') + m_fileName;
     return Core::instance()->fileExists(indexName);
 }
 
 File *File::original()
 {
-    QString indexName = QString('\\') + priv->fileName;
+    QString indexName = QString('\\') + m_fileName;
 
     if (Core::instance()->fileExists(indexName))
         return Core::instance()->file(indexName, "");
 
     File *original = new File();
-    original->setFileName(priv->fileName);
-    original->setFileFormat(priv->fileFormat);
-    original->setOriginalFileName(priv->originalFileName);
+    original->setFileName(m_fileName);
+    original->setFileFormat(m_fileFormat);
+    original->setOriginalFileName(m_originalFileName);
     original->setReadOnly();
 
     Core::instance()->insertFile(original, indexName);
@@ -753,7 +717,7 @@ void File::processFilterError(QuillImageFilter *filter)
         QuillError::ErrorSource errorSource;
 
         if (filter->option(QuillImageFilter::FileName).toString() ==
-            priv->fileName) {
+            m_fileName) {
             errorSource = QuillError::ImageFileErrorSource;
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
                 (errorCode == QuillError::FileCorruptError))
@@ -772,28 +736,28 @@ void File::processFilterError(QuillImageFilter *filter)
 
 void File::setWaitingForData(bool status)
 {
-    priv->waitingForData = status;
+    m_waitingForData = status;
 
     if (!status) {
-        priv->supported = true;
-        priv->stack->calculateFullImageSize(priv->stack->command(0));
+        m_supported = true;
+        m_stack->calculateFullImageSize(m_stack->command(0));
         Core::instance()->suggestNewTask();
     }
 }
 
 bool File::isWaitingForData() const
 {
-    return priv->waitingForData;
+    return m_waitingForData;
 }
 
 void File::setThumbnailError(bool status)
 {
-    priv->hasThumbnailError = status;
+    m_hasThumbnailError = status;
 }
 
 bool File::hasThumbnailError() const
 {
-    return priv->hasThumbnailError;
+    return m_hasThumbnailError;
 }
 
 void File::emitError(QuillError quillError)

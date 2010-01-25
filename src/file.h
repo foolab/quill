@@ -49,7 +49,7 @@
 #include "quillfile.h"
 
 class QuillUndoStack;
-class FilePrivate;
+class QTemporaryFile;
 
 class File : public QObject
 {
@@ -528,9 +528,28 @@ private:
 
     void writeEditHistory(const QString &history, QuillError *error);
 
-    FilePrivate *priv;
-
+private:
     QList<QuillFile*> m_references;
+
+    bool m_exists;
+    bool m_supported;
+    bool m_readOnly;
+    bool m_hasThumbnailError;
+
+    QuillUndoStack *m_stack;
+
+    int m_displayLevel;
+
+    QString m_fileName;
+    QString m_originalFileName;
+    QString m_fileFormat;
+    QString m_targetFormat;
+
+    QRect m_viewPort;
+
+    bool m_waitingForData;
+    bool m_saveInProgress;
+    QTemporaryFile *m_temporaryFile;
 };
 
 #endif // QUILLFILE_H

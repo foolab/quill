@@ -49,6 +49,7 @@
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "imagecache.h"
+#include "scheduler.h"
 #include "threadmanager.h"
 #include "tilemap.h"
 #include "tilecache.h"
@@ -66,6 +67,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_temporaryFileDirectory(QString()),
     m_crashDumpPath(QString())
 {
+    m_scheduler = new Scheduler(m_threadManager);
     m_previewSize.append(Quill::defaultViewPortSize);
     m_thumbnailDirectory.append(QString());
     m_fileLimit.append(1);
@@ -88,6 +90,7 @@ Core::~Core()
     }
     delete m_tileCache;
     delete m_threadManager;
+    delete m_scheduler;
 }
 
 void Core::init()
@@ -323,7 +326,7 @@ void Core::suggestNewTask()
             maxLevel = previewLevelCount()-1;
 
         for (int level=0; level<=maxLevel; level++) {
-            if (m_threadManager->suggestThumbnailLoadTask((*file), level))
+            if (m_scheduler->suggestThumbnailLoadTask((*file), level))
                 return;
         }
     }
@@ -339,7 +342,7 @@ void Core::suggestNewTask()
             maxLevel = previewLevelCount()-1;
 
         for (int level=0; level<=maxLevel; level++)
-            if (m_threadManager->suggestNewTask(priorityFile, level))
+            if (m_scheduler->suggestNewTask(priorityFile, level))
                 return;
     }
 
@@ -349,13 +352,12 @@ void Core::suggestNewTask()
 
     if (prioritySaveFile) {
 
-        if (m_threadManager->suggestNewTask(prioritySaveFile,
-                                            previewLevelCount()))
+        if (m_scheduler->suggestNewTask(prioritySaveFile, previewLevelCount()))
             return;
 
         // Fourth priority (save in progress): saving image
 
-        if (m_threadManager->suggestSaveTask(prioritySaveFile))
+        if (m_scheduler->suggestSaveTask(prioritySaveFile))
             return;
     }
 
@@ -364,8 +366,7 @@ void Core::suggestNewTask()
     if ((priorityFile != 0) &&
         (priorityFile->displayLevel() >= previewLevelCount())) {
 
-        if (m_threadManager->suggestNewTask(priorityFile,
-                                                previewLevelCount()))
+        if (m_scheduler->suggestNewTask(priorityFile, previewLevelCount()))
             return;
     }
 
@@ -375,7 +376,7 @@ void Core::suggestNewTask()
     // full images
 
     if (priorityFile != 0)
-        m_threadManager->suggestPreviewImprovementTask(priorityFile);
+        m_scheduler->suggestPreviewImprovementTask(priorityFile);
 
     // Seventh priority (all others): all preview levels
 
@@ -387,7 +388,7 @@ void Core::suggestNewTask()
                 maxLevel = previewLevelCount()-1;
 
             for (int level=0; level<=maxLevel; level++)
-                if (m_threadManager->suggestNewTask((*file), level))
+                if (m_scheduler->suggestNewTask((*file), level))
                     return;
         }
 
@@ -397,7 +398,7 @@ void Core::suggestNewTask()
         foreach(File *file, allFiles)
             if (file->supported() && !file->isReadOnly())
                 for (int level=0; level<=previewLevelCount()-1; level++)
-                    if (m_threadManager->suggestThumbnailSaveTask(file, level))
+                    if (m_scheduler->suggestThumbnailSaveTask(file, level))
                         return;
 }
 
@@ -588,6 +589,14 @@ bool Core::isThumbnailCreationEnabled() const
 void Core::insertFile(File *file, const QString &key)
 {
     m_files.insert(key, file);
+}
+
+void Core::processFinishedTask(int commandId, int commandLevel, int tileId,
+                               QuillImage image,
+                               QuillImageFilter *filter)
+{
+    m_scheduler->processFinishedTask(commandId, commandLevel, tileId,
+                                     image, filter);
 }
 
 void Core::releaseAndWait()

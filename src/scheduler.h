@@ -38,36 +38,38 @@
 ****************************************************************************/
 
 /*!
-  \class ThreadManager
+  \class Scheduler
 
-  \brief Responsible for running the worker thread on the background.
+  \brief Responsible for selecting the next task for the worker thread
+  on the background.
 
 Contains no explicit thread operations on its own, threading is done
 by the QFuture and QFutureWatcher classes from Qt 4.5, which use
 QThreadPool on the background.
  */
 
-#ifndef THREADMANAGER_H
-#define THREADMANAGER_H
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
-#include <QFuture>
-#include <QFutureWatcher>
+#include <QTemporaryFile>
 #include "quill.h"
 
 class QuillImage;
+class File;
 class QtImageFilter;
 class Core;
-class QSemaphore;
-class QEventLoop;
+class QuillUndoStack;
+class QuillUndoCommand;
+class ThreadManager;
 
-class ThreadManager : public QObject
+class Scheduler : public QObject
 {
 Q_OBJECT
 
 public:
-    ThreadManager(Quill::ThreadingMode mode = Quill::ThreadingNormal);
+    Scheduler(ThreadManager *threadManager);
 
-    ~ThreadManager();
+    ~Scheduler();
 
     /*!
       If the thread manager is currently running a task in the background.
@@ -76,18 +78,61 @@ public:
     bool isRunning() const;
 
     /*!
-      If the thread manager allows to delete the filter in question
-      (meaning that the filter is currently being run.)
+      Processes a finished task with all consequences.
+     */
+
+    void processFinishedTask(int commandId, int commandLevel, int tileId,
+                             QuillImage image,
+                             QuillImageFilter *activeFilter);
+
+    /*!
+      Used to indicate that there may be a normal task (loading or
+      running an image filter) in this stack, waiting for the
+      background thread.
+     */
+
+    bool suggestNewTask(File *file, int level);
+
+    /*!
+      Used by core to indicate that there may be a save task waiting
+      for the background thread.
+     */
+
+    bool suggestSaveTask(File *file);
+
+    /*!
+      Used by core to indicate that there may be a special
+      improvement task (better quality preview image to be created
+      based on the full image) waiting for the background thread.
+    */
+
+    bool suggestPreviewImprovementTask(File *file);
+
+    /*
+      Suggest to load a pre-generated thumbnail from a file.
+     */
+
+    bool suggestThumbnailLoadTask(File *file,
+                                  int level);
+
+    /*!
+      Suggest to save a thumbnail
+     */
+
+    bool suggestThumbnailSaveTask(File *file, int level);
+
+    /*!
+      @return if the thread manager allows the given filter to be
+      deleted (i.e. that it is not currently running it.
      */
 
     bool allowDelete(QuillImageFilter *filter) const;
 
     /*!
-      Used to start a thread.
-     */
+      Sets maximum tile size with tiling filters.
+    */
 
-    void startThread(int id, int level, int tile,
-                     const QuillImage &image, QuillImageFilter *filter);
+    void setMaxPixelsPerTile(int maxPixels);
 
     /*!
       Sets debug delay (artificial delay per backround operation, in seconds).
@@ -103,32 +148,37 @@ public:
 
     void releaseAndWait();
 
-public slots:
-    /*!
-      Used by the future watcher to indicate that
-      an asynchronous calculation has been finished.
+private:
+    /*
+      Helper function for suggestNewTask().
      */
 
-    void taskFinished();
+    QuillUndoCommand *getTask(QuillUndoStack *stack, int level) const;
+
+    /*!
+      Helper function for suggestNewTask(), used for tiling.
+      Can start calculations on its own.
+    */
+
+    bool suggestTilingTask(File *file);
+
+    /*!
+      Helper function for suggestSaveTask(), used for tiling.
+      Can start calculations on its own.
+    */
+
+    bool suggestTilingSaveTask(File *file);
+
+    /*!
+      Helper function for suggestTilingSaveTask(), used for pushing
+      tiles into the save buffer. Can start calculations on its own.
+    */
+
+    bool suggestTilingOverlayTask(File *file);
 
 private:
-    bool m_isRunning;
+    ThreadManager *m_threadManager;
 
-    int commandId;
-    int commandLevel;
-    int tileId;
-
-    QuillImageFilter *activeFilter;
-
-    QFuture<QuillImage> *resultImage;
-    QFutureWatcher<QuillImage> *watcher;
-
-    Quill::ThreadingMode threadingMode;
-
-    QSemaphore *semaphore;
-    QEventLoop *eventLoop;
-
-    int debugDelay;
 };
 
 #endif // __QUILL_THREAD_MANAGER_H_

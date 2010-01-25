@@ -1,3 +1,9 @@
+libquill (1.100122.0) unstable; urgency=low
+
+  * Tagged again to solve integration problems.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 22 Jan 2010 13:10:00 +0200
+
 libquill (1.100120.1) unstable; urgency=low
 
   * Fixed bad merge resolve.

@@ -60,6 +60,7 @@ class File;
 class QuillUndoCommand;
 class QuillUndoStack;
 class ImageCache;
+class Scheduler;
 class ThreadManager;
 class TileCache;
 class CorePrivate;
@@ -130,6 +131,13 @@ public:
      */
 
     void insertFile(File *file, const QString &key);
+
+    /*!
+      Callback from ThreadManager.
+     */
+
+    void processFinishedTask(int commandId, int commandLevel, int tileId,
+                             QuillImage image, QuillImageFilter *filter);
 
     /*!
       Modifies the preview level count. If new previews are created,
@@ -470,6 +478,7 @@ private:
     int m_saveBufferSize;
 
     TileCache *m_tileCache;
+    Scheduler *m_scheduler;
     ThreadManager *m_threadManager;
 
     QString m_temporaryFileDirectory;
