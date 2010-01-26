@@ -14,6 +14,8 @@ CONFIG += release
 
 CONFIG += quillimagefilter
 
+LIBS += -lexif
+
 # Generate pkg-config support by default
 # Note that we HAVE TO also create prl config as QMake implementation
 # mixes both of them together.
@@ -50,6 +52,7 @@ HEADERS += quill.h \
            quillundostack.h \
            imagecache.h \
            historyxml.h \
+           metadata.h
 
 SOURCES += quill.cpp \
            quillfile.cpp \
@@ -64,7 +67,8 @@ SOURCES += quill.cpp \
            quillundocommand.cpp \
            quillundostack.cpp \
            imagecache.cpp \
-           historyxml.cpp
+           historyxml.cpp \
+           metadata.cpp
 
 INSTALL_HEADERS = \
            Quill \

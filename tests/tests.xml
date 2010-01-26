@@ -114,6 +114,13 @@
 	<step >/usr/lib/libquill-tests/ut_error </step>
       </case>
     </set>
+
+    <set name="quill-metadata-tests" feature="metadata">
+      <description>quill error handling test</description>
+      <case name="ut_metadata" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_metadata </step>
+      </case>
+    </set>
   </suite>
 </testdefinition>
 
