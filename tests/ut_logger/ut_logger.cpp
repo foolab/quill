@@ -68,28 +68,23 @@ void ut_logger::cleanup()
 
 }
 
-void ut_logger::testLogger()
+void ut_logger::testLog()
 {
-    Logger *logger = new Logger();
     QString homePath = QDir::homePath();
     QDir logPath(homePath+"/.local/share/quill/");
-    QCOMPARE(logPath.exists(),true);
 
+    if(!logPath.exists()){
+        logPath.mkpath(homePath+"/.local/share/quill/");
+        QCOMPARE(logPath.exists(),true);
+    }
     QFile data(homePath+"/.local/share/quill/log.txt");
     data.open(QFile::ReadWrite| QFile::Append);
     data.close();
     QCOMPARE(data.exists(),true);
 
-    delete logger;
-}
+    QString logString ="this is logging info!";
+    Logger::log(logString);
 
-void ut_logger::testLog()
-{
-    Logger *logger = new Logger();
-    QString logString ="this is logging info!"; 
-    logger->log(logString);
-
-    QFile data(QDir::homePath()+"/.local/share/quill/log.txt");
     data.open(QFile::ReadOnly);
     QTextStream stream(&data);
     QString logInfo = "";
@@ -110,8 +105,6 @@ void ut_logger::testLog()
     QString timeFormat = "hh:mm:ss:zzz";
     QTime time = QTime::fromString(timeString,timeFormat);
     QCOMPARE(time.isValid(),true);
-    delete logger;
-
 }
 
 int main ( int argc, char *argv[] ){

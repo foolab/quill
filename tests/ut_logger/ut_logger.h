@@ -53,8 +53,6 @@ private slots:
     void cleanup();
     void initTestCase();
     void cleanupTestCase();
-
-    void testLogger();
     void testLog();
 };
 

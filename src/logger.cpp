@@ -42,22 +42,15 @@
 #include <QDebug>
 #include "logger.h"
 
-Logger::Logger():homePath("")
+Logger::Logger()
 {
-    homePath = QDir::homePath();
-    QDir logPath(homePath+"/.local/share/quill/");
-    if(!logPath.exists()){
-        if(logPath.mkpath(homePath+"/.local/share/quill/")){
-        }
-        else{
-            //we get the error message
-        }
-    }
+    //empty
 }
 
 void Logger::log(const QString logInfo)
 {
 
+    QString homePath = QDir::homePath();
     QFile data(homePath+"/.local/share/quill/log.txt");
     if(data.exists()){
         data.open(QFile::ReadWrite | QFile::Append);
@@ -68,9 +61,6 @@ void Logger::log(const QString logInfo)
         QTime time = timeStamp.time();
         out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
         data.close();
-    }
-    else{
-
     }
 }
 

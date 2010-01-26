@@ -277,7 +277,6 @@ private:
     int m_savedIndex;
     QuillUndoCommand *m_saveCommand;
     SaveMap *m_saveMap;
-    Logger *m_logger;
 };
 
 #endif // __QUILL_UNDO_STACK_H__

@@ -40,7 +40,6 @@
 #define __QUILL_LOGGER_H__
 #include <QObject>
 #include <QFile>
-class QString;
 
 class Logger : public QObject
 {Q_OBJECT
@@ -51,10 +50,7 @@ public:
 
     Logger();
 
-    void log(const QString logInfo);
-
-private:
-    QString homePath;
+    static void log(const QString logInfo);
 
 };
 
