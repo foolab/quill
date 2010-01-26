@@ -87,7 +87,8 @@ QVariant Metadata::entry(Metadata::Tag tag)
         if (rational.denominator == 0)
             result = QVariant();
         else
-            result = (float)rational.numerator / (float)rational.denominator;
+            result = QVariant((float)rational.numerator /
+                              (float)rational.denominator);
         break;
     }
 
@@ -96,7 +97,8 @@ QVariant Metadata::entry(Metadata::Tag tag)
         if (srational.denominator == 0)
             result = QVariant();
         else
-            result = (float)srational.numerator / (float)srational.denominator;
+            result = QVariant((float)srational.numerator /
+                              (float)srational.denominator);
         break;
     }
 
@@ -110,6 +112,7 @@ QVariant Metadata::entry(Metadata::Tag tag)
 
     default:
         result = QVariant();
+        break;
     }
 
     return result;
