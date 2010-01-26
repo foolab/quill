@@ -58,67 +58,55 @@ void ut_metadata::cleanupTestCase()
 
 void ut_metadata::init()
 {
+    metadata = new Metadata("/usr/share/libquill-tests/images/exif.jpg");
 }
 
 void ut_metadata::cleanup()
 {
+    delete metadata;
 }
 
 void ut_metadata::testCameraMake()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_Make).toString(), QString("Quill"));
-    delete metadata;
 }
 
 void ut_metadata::testCameraModel()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_Model).toString(), QString("Q100125"));
-    delete metadata;
 }
 
 void ut_metadata::testImageWidth()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_ImageWidth).toInt(), 2);
-    delete metadata;
 }
 
 void ut_metadata::testImageHeight()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_ImageHeight).toInt(), 2);
-    delete metadata;
 }
 
 void ut_metadata::testFocalLength()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_FocalLength).toDouble(), 9.9);
-    delete metadata;
 }
 
 void ut_metadata::testExposureTime()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_ExposureTime).toDouble(), 1/200.0);
-    delete metadata;
 }
 
 void ut_metadata::testTimestampOriginal()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_TimestampOriginal).toString(),
              QString("2010:01:25 15:00:00"));
-    delete metadata;
 }
 
 int main ( int argc, char *argv[] ){

@@ -42,6 +42,8 @@
 #ifndef TEST_LIBQUILL_METADATA_H
 #define TEST_LIBQUILL_METADATA_H
 
+class Metadata;
+
 class ut_metadata : public QObject {
 Q_OBJECT
 public:
@@ -62,6 +64,9 @@ private slots:
     void testFocalLength();
     void testExposureTime();
     void testTimestampOriginal();
+
+private:
+    Metadata *metadata;
 };
 
 #endif  // TEST_LIBQUILL_METADATA_H
