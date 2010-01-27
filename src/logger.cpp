@@ -44,6 +44,9 @@
 #include "logger.h"
 
 bool Logger::existFlag = true;
+QFile Logger::data(QDir::homePath()+"/.local/share/quill/log.txt");
+bool Logger::firstTimeFlag = true;
+
 Logger::Logger()
 {
     //empty
@@ -51,28 +54,24 @@ Logger::Logger()
 
 void Logger::log(const QString logInfo)
 {
-
-    QString homePath = QDir::homePath();
-    QFile data(homePath+"/.local/share/quill/log.txt");
-    if(data.exists()){
-        data.open(QFile::ReadWrite | QFile::Append);
-        QTextStream out(&data);
-
-        QDateTime timeStamp = QDateTime::currentDateTime();
-        QDate date = timeStamp.date();
-        QTime time = timeStamp.time();
-        out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
-        data.close();
-        existFlag = true;
+    if(existFlag){
+        if(firstTimeFlag){
+            if(data.exists())
+                data.open(QFile::ReadWrite | QFile::Append);
+            firstTimeFlag = false;
+        }
+        if(data.exists()){
+            QTextStream out(&data);
+            QDateTime timeStamp = QDateTime::currentDateTime();
+            QDate date = timeStamp.date();
+            QTime time = timeStamp.time();
+            out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
+            data.flush();
+            existFlag = true;
+        }
+        else
+            existFlag = false;
     }
-    else
-        existFlag = false;
-}
-
-
-bool Logger::existLog()
-{
-    return existFlag;
 }
 
 QString Logger::intToString(const int value)

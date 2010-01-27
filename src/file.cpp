@@ -765,6 +765,5 @@ void File::emitError(QuillError quillError)
 {
     emit error(quillError);
     Core::instance()->emitError(quillError);
-    if(Logger::existLog())
-        Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+    Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }

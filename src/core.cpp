@@ -638,13 +638,11 @@ QString Core::temporaryFileDirectory() const
 void Core::emitSaved(QString fileName)
 {
     emit saved(fileName);
-    if(Logger::existLog())
-        Logger::log("[Core] "+QString(Q_FUNC_INFO)+fileName);
+    Logger::log("[Core] "+QString(Q_FUNC_INFO)+fileName);
 }
 
 void Core::emitError(QuillError quillError)
 {
     emit error(quillError);
-    if(Logger::existLog())
-        Logger::log("[Core] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+    Logger::log("[Core] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }

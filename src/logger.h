@@ -54,9 +54,6 @@ public:
 
     static void log(const QString logInfo);
 
-    //static void detectLogFile();
-    static bool existLog();
-
     static QString intToString(const int value);
 
     static QString qsizeToString(const QSize size);
@@ -65,6 +62,8 @@ public:
 
 private:
     static bool existFlag;
+    static QFile data;
+    static bool firstTimeFlag;
 };
 
 #endif
