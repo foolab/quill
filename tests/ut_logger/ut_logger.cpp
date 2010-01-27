@@ -105,8 +105,31 @@ void ut_logger::testLog()
     QString timeFormat = "hh:mm:ss:zzz";
     QTime time = QTime::fromString(timeString,timeFormat);
     QCOMPARE(time.isValid(),true);
+
+    QCOMPARE(Logger::existLog(),true);
 }
 
+void ut_logger::testIntToString()
+{
+    int number = 10;
+    QString numberString = Logger::intToString(number);
+    QCOMPARE(numberString,QString(":10"));
+}
+void ut_logger::testQsizeToString()
+{
+    QSize size = QSize(10,20);
+    QString sizeString = Logger::qsizeToString(size);
+    QCOMPARE(sizeString,QString(":QSize(10x20)"));
+}
+void ut_logger::testBoolToString()
+{
+    bool flag = true;
+    QString boolString = Logger::boolToString(flag);
+    QCOMPARE(boolString,QString(":true"));
+    flag = false;
+    boolString = Logger::boolToString(flag);
+    QCOMPARE(boolString,QString(":false"));
+}
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_logger test;

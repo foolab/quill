@@ -58,7 +58,8 @@ QuillFile::QuillFile()
 QuillFile::QuillFile(const QString &fileName,
                      const QString &fileFormat)
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+" file name: "+fileName+" file format: "+fileFormat);
     priv = new QuillFilePrivate;
     priv->m_displayLevel = -1;
 
@@ -67,7 +68,8 @@ QuillFile::QuillFile(const QString &fileName,
 
 QuillFile::~QuillFile()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file) {
         priv->m_file->removeReference(this);
         if (priv->m_file->allowDelete())
@@ -98,7 +100,8 @@ void QuillFile::attach(File *file)
 
 QString QuillFile::fileName() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->fileName();
     else
@@ -107,7 +110,8 @@ QString QuillFile::fileName() const
 
 QString QuillFile::originalFileName() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->originalFileName();
     else
@@ -116,7 +120,8 @@ QString QuillFile::originalFileName() const
 
 QString QuillFile::fileFormat() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->fileFormat();
     else
@@ -125,7 +130,8 @@ QString QuillFile::fileFormat() const
 
 QString QuillFile::targetFormat() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->targetFormat();
     else
@@ -134,7 +140,8 @@ QString QuillFile::targetFormat() const
 
 bool QuillFile::isReadOnly() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->isReadOnly();
     else
@@ -143,14 +150,16 @@ bool QuillFile::isReadOnly() const
 
 void QuillFile::setReadOnly()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->setReadOnly();
 }
 
 bool QuillFile::setDisplayLevel(int level)
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     // This needs to be done since setDisplayLevel checks the display levels
     // of referring QuillFile objects.
     int oldLevel = priv->m_displayLevel;
@@ -165,20 +174,23 @@ bool QuillFile::setDisplayLevel(int level)
 
 int QuillFile::displayLevel() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     return priv->m_displayLevel;
 }
 
 void QuillFile::save()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->save();
 }
 
 bool QuillFile::isSaveInProgress() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->isSaveInProgress();
     else
@@ -187,28 +199,32 @@ bool QuillFile::isSaveInProgress() const
 
 void QuillFile::runFilter(QuillImageFilter *filter)
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->runFilter(filter);
 }
 
 void QuillFile::startSession()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->startSession();
 }
 
 void QuillFile::endSession()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->endSession();
 }
 
 bool QuillFile::isSession() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->isSession();
     else
@@ -217,7 +233,8 @@ bool QuillFile::isSession() const
 
 bool QuillFile::canUndo() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->canUndo();
     else
@@ -226,14 +243,16 @@ bool QuillFile::canUndo() const
 
 void QuillFile::undo()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->undo();
 }
 
 bool QuillFile::canRedo() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->canRedo();
     else
@@ -242,14 +261,16 @@ bool QuillFile::canRedo() const
 
 void QuillFile::redo()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->redo();
 }
 
 QuillImage QuillFile::image() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->bestImage(priv->m_displayLevel);
     else
@@ -258,7 +279,8 @@ QuillImage QuillFile::image() const
 
 QuillImage QuillFile::image(int level) const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     if ((level > priv->m_displayLevel) || !priv->m_file)
         return QuillImage();
     else
@@ -267,14 +289,16 @@ QuillImage QuillFile::image(int level) const
 
 void QuillFile::setImage(int level, const QuillImage &image)
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     if ((level <= priv->m_displayLevel) && priv->m_file)
         priv->m_file->setImage(level, image);
 }
 
 QList<QuillImage> QuillFile::allImageLevels() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->allImageLevels(priv->m_displayLevel);
     else
@@ -283,7 +307,8 @@ QList<QuillImage> QuillFile::allImageLevels() const
 
 QSize QuillFile::fullImageSize() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->fullImageSize();
     else
@@ -292,14 +317,16 @@ QSize QuillFile::fullImageSize() const
 
 void QuillFile::setViewPort(const QRect &viewPort)
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->setViewPort(viewPort);
 }
 
 QRect QuillFile::viewPort() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->viewPort();
     else
@@ -308,7 +335,7 @@ QRect QuillFile::viewPort() const
 
 bool QuillFile::hasThumbnail(int level) const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     if (priv->m_file)
         return priv->m_file->hasThumbnail(level);
     else
@@ -317,7 +344,8 @@ bool QuillFile::hasThumbnail(int level) const
 
 QString QuillFile::thumbnailFileName(int level) const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     if (priv->m_file)
         return priv->m_file->thumbnailFileName(level);
     else
@@ -326,7 +354,8 @@ QString QuillFile::thumbnailFileName(int level) const
 
 bool QuillFile::exists() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->exists();
     else
@@ -335,7 +364,8 @@ bool QuillFile::exists() const
 
 bool QuillFile::supported() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->supported();
     else
@@ -344,28 +374,32 @@ bool QuillFile::supported() const
 
 void QuillFile::setSupported(bool supported)
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::boolToString(supported));
     if (priv->m_file)
         priv->m_file->setSupported(supported);
 }
 
 void QuillFile::remove()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->remove();
 }
 
 void QuillFile::removeThumbnails()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->removeThumbnails();
 }
 
 QuillFile *QuillFile::original()
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     QuillFile *file = new QuillFile();
     file->attach(priv->m_file->original());
     return file;
@@ -378,7 +412,8 @@ void QuillFile::invalidate()
 
 bool QuillFile::isValid() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     return (priv->m_file != 0);
 }
 
@@ -396,14 +431,16 @@ void QuillFile::emitImageAvailable(const QList<QuillImage> &imageList)
 
 void QuillFile::setWaitingForData(bool status)
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::boolToString(status));
     if (priv->m_file)
         priv->m_file->setWaitingForData(status);
 }
 
 bool QuillFile::isWaitingForData() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->isWaitingForData();
     else

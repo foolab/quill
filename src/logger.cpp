@@ -39,9 +39,11 @@
 #include <QDateTime>
 #include <QTextStream>
 #include <QDir>
+#include <QSize>
 #include <QDebug>
 #include "logger.h"
 
+bool Logger::existFlag = true;
 Logger::Logger()
 {
     //empty
@@ -61,7 +63,32 @@ void Logger::log(const QString logInfo)
         QTime time = timeStamp.time();
         out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
         data.close();
+        existFlag = true;
     }
+    else
+        existFlag = false;
 }
 
 
+bool Logger::existLog()
+{
+    return existFlag;
+}
+
+QString Logger::intToString(const int value)
+{
+    return QString(":")+QString::number(value);
+}
+
+QString Logger::qsizeToString(const QSize size)
+{
+    return QString(":")+QString("QSize(")+QString::number(size.width())+QString("x")+QString::number(size.height())+QString(")");
+}
+
+QString Logger::boolToString(const bool value)
+{
+    if(value)
+        return QString(":")+QString("true");
+    else
+        return QString(":")+QString("false");
+}

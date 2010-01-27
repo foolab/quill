@@ -41,6 +41,8 @@
 #include <QObject>
 #include <QFile>
 
+class QSize;
+
 class Logger : public QObject
 {Q_OBJECT
 
@@ -52,6 +54,17 @@ public:
 
     static void log(const QString logInfo);
 
+    //static void detectLogFile();
+    static bool existLog();
+
+    static QString intToString(const int value);
+
+    static QString qsizeToString(const QSize size);
+
+    static QString boolToString(const bool value);
+
+private:
+    static bool existFlag;
 };
 
 #endif

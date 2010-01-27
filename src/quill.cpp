@@ -69,151 +69,176 @@ void Quill::cleanup()
 void Quill::setDefaultTileSize(const QSize &defaultTileSize)
 {
     Core::instance()->setDefaultTileSize(defaultTileSize);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::qsizeToString(defaultTileSize));
     }
 
 void Quill::setTileCacheSize(int size)
 {
     Core::instance()->setTileCacheSize(size);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(size));
 }
 
 void Quill::setSaveBufferSize(int size)
 {
     Core::instance()->setSaveBufferSize(size);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(size));
 }
 
 void Quill::setFileLimit(int level, int limit)
 {
     Core::instance()->setFileLimit(level, limit);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::intToString(limit));
 }
 
 int Quill::fileLimit(int level)
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     return Core::instance()->fileLimit(level);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::setEditHistoryCacheSize(int level, int limit)
 {
     Core::instance()->setEditHistoryCacheSize(level, limit);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::intToString(limit));
 }
 
 int Quill::editHistoryCacheSize(int level)
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     return Core::instance()->editHistoryCacheSize(level);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::setPreviewLevelCount(int count)
 {
     Core::instance()->setPreviewLevelCount(count);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(count));
 }
 
 int Quill::previewLevelCount()
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->previewLevelCount();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::setPreviewSize(int level, const QSize &size)
 {
     Core::instance()->setPreviewSize(level, size);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::qsizeToString(size));
 }
 
 QSize Quill::previewSize(int level)
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
     return Core::instance()->previewSize(level);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::setEditHistoryDirectory(const QString &directory)
 {
     Core::instance()->setEditHistoryDirectory(directory);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+directory);
 }
 
 void Quill::setThumbnailDirectory(int level, const QString &directory)
 {
     Core::instance()->setThumbnailDirectory(level, directory);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+directory);
 }
 
 void Quill::setThumbnailExtension(const QString &extension)
 {
     Core::instance()->setThumbnailExtension(extension);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+extension);
 }
 
 void Quill::setThumbnailCreationEnabled(bool enabled)
 {
     Core::instance()->setThumbnailCreationEnabled(enabled);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::boolToString(enabled));
 }
 
 bool Quill::isThumbnailCreationEnabled()
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->isThumbnailCreationEnabled();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::setTemporaryFilePath(const QString &tmpFilePath)
 {
     Core::instance()->setTemporaryFileDirectory(tmpFilePath);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+tmpFilePath);
 }
 
 QString Quill::temporaryFilePath()
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->temporaryFileDirectory();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::setCrashDumpPath(const QString &fileName)
 {
     Core::instance()->setCrashDumpPath(fileName);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+fileName);
 }
 
 QString Quill::crashDumpPath()
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->crashDumpPath();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 bool Quill::canRecover()
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->canRecover();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::recover()
 {
     Core::instance()->recover();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 bool Quill::isSaveInProgress()
 {
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->isSaveInProgress();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::releaseAndWait()
 {
     Core::instance()->releaseAndWait();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
 void Quill::setDebugDelay(int delay)
 {
     Core::instance()->setDebugDelay(delay);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(delay));
 }
 
 Quill* Quill::instance()
@@ -227,6 +252,7 @@ Quill* Quill::instance()
                             SIGNAL(error(QuillError)),
                             SIGNAL(error(QuillError)));
     }
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    if(Logger::existLog())
+        Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return g_instance;
 }

@@ -52,6 +52,7 @@
 #include "historyxml.h"
 #include "tilemap.h"
 #include "quillerror.h"
+#include "logger.h"
 
 File::File() : m_exists(true), m_supported(true), m_readOnly(false),
                m_hasThumbnailError(false), m_displayLevel(-1),
@@ -762,8 +763,8 @@ bool File::hasThumbnailError() const
 
 void File::emitError(QuillError quillError)
 {
-    qDebug() << "Error" << quillError.errorCode() << "at source" << quillError.errorSource() << "data" << quillError.errorData();
-
     emit error(quillError);
     Core::instance()->emitError(quillError);
+    if(Logger::existLog())
+        Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }

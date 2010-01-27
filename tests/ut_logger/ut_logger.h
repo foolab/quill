@@ -54,6 +54,9 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
     void testLog();
+    void testIntToString();
+    void testQsizeToString();
+    void testBoolToString();
 };
 
 #endif  // TEST_LIBQUILL_IMAGELOADER_H
