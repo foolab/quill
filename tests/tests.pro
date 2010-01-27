@@ -26,6 +26,7 @@ SUBDIRS += \
            ut_tileloading \
            ut_error \
            ut_logger \
+           ut_metadata \
            benchmark  \
 
 # --- install
@@ -34,6 +35,7 @@ tatam.path  = $$(DESTDIR)/usr/share/libquill-tests/
 
 tatamimages.files += images/image_16x4.jpg
 tatamimages.files += images/image_16x4.png
+tatamimages.files += images/exif.jpg
 
 tatamimages.path  = $$(DESTDIR)/usr/share/libquill-tests/images/
 

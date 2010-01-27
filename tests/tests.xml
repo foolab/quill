@@ -124,6 +124,11 @@
       <description>quill logger test</description>
       <case name="ut_logger" type="Functional" level="Component">
 	<step >/usr/lib/libquill-tests/ut_logger </step>
+
+    <set name="quill-metadata-tests" feature="metadata">
+      <description>quill error handling test</description>
+      <case name="ut_metadata" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_metadata </step>
       </case>
     </set>
   </suite>
