@@ -106,7 +106,6 @@ void ut_logger::testLog()
     QTime time = QTime::fromString(timeString,timeFormat);
     QCOMPARE(time.isValid(),true);
 
-    QCOMPARE(Logger::existLog(),true);
 }
 
 void ut_logger::testIntToString()
