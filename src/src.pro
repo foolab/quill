@@ -14,7 +14,7 @@ CONFIG += release
 
 CONFIG += quillimagefilter
 
-LIBS += -lexif
+LIBS += -lexif -lexempi
 
 # Generate pkg-config support by default
 # Note that we HAVE TO also create prl config as QMake implementation

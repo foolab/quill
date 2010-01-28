@@ -62,6 +62,10 @@ private slots:
     void testFocalLength();
     void testExposureTime();
     void testTimestampOriginal();
+    void testSubject();
+    void testCity();
+    void testCountry();
+    void testRating();
 };
 
 #endif  // TEST_LIBQUILL_METADATA_H

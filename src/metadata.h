@@ -41,20 +41,40 @@
 #define QUILL_METADATA_H
 
 #include <libexif/exif-data.h>
+#include <exempi-2.0/exempi/xmp.h>
 #include <QString>
+
+class XmpTag {
+public:
+    XmpTag();
+    XmpTag(const QString &schema, const QString &tag);
+
+    QString schema;
+    QString tag;
+};
 
 class Metadata
 {
     friend class ut_metadata;
 
     enum Tag {
-        Tag_Make = EXIF_TAG_MAKE,
-        Tag_Model = EXIF_TAG_MODEL,
-        Tag_ImageWidth = EXIF_TAG_IMAGE_WIDTH,
-        Tag_ImageHeight = EXIF_TAG_IMAGE_LENGTH,
-        Tag_FocalLength = EXIF_TAG_FOCAL_LENGTH,
-        Tag_ExposureTime = EXIF_TAG_EXPOSURE_TIME,
-        Tag_TimestampOriginal = EXIF_TAG_DATE_TIME_ORIGINAL
+        Tag_Make,
+        Tag_Model,
+        Tag_ImageWidth,
+        Tag_ImageHeight,
+        Tag_FocalLength,
+        Tag_ExposureTime,
+        Tag_TimestampOriginal,
+        Tag_Title,
+        Tag_Copyright,
+        Tag_Creator,
+        Tag_Keywords,
+        Tag_Subject,
+        Tag_City,
+        Tag_Country,
+        Tag_Location,
+        Tag_Rating,
+        Tag_Timestamp
     };
 
  public:
@@ -68,13 +88,29 @@ class Metadata
 
     /*!
       Returns the value of the metadata entry for a given tag.
-      Currently, only two tags are supported for testing purposes.
+      Currently, only some tags are supported for testing purposes.
      */
     QVariant entry(Tag tag);
 
  private:
+
+    /*!
+      Initializes the internal tag list.
+     */
+
+    void initTags();
+
+    QVariant entryExif(Tag tag);
+    QVariant entryXmp(Tag tag);
+
+ private:
+    QHash<Tag,ExifTag> m_exifTags;
+    QHash<Tag,XmpTag> m_xmpTags;
+
     ExifData *m_exifData;
     ExifByteOrder m_exifByteOrder;
+
+    XmpPtr m_xmpPtr;
 };
 
 #endif

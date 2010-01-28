@@ -121,6 +121,38 @@ void ut_metadata::testTimestampOriginal()
     delete metadata;
 }
 
+void ut_metadata::testSubject()
+{
+    Metadata *metadata = new Metadata("xmp.jpg");
+    QVERIFY(metadata->isValid());
+    QCOMPARE(metadata->entry(Metadata::Tag_Subject).toString(),
+             QString("test,quill"));
+}
+
+void ut_metadata::testCity()
+{
+    Metadata *metadata = new Metadata("xmp.jpg");
+    QVERIFY(metadata->isValid());
+    QCOMPARE(metadata->entry(Metadata::Tag_City).toString(),
+             QString("Tapiola"));
+}
+
+void ut_metadata::testCountry()
+{
+    Metadata *metadata = new Metadata("xmp.jpg");
+    QVERIFY(metadata->isValid());
+    QCOMPARE(metadata->entry(Metadata::Tag_Country).toString(),
+             QString("Finland"));
+}
+
+void ut_metadata::testRating()
+{
+    Metadata *metadata = new Metadata("xmp.jpg");
+    QVERIFY(metadata->isValid());
+    QCOMPARE(metadata->entry(Metadata::Tag_Rating).toInt(),
+             5);
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_metadata test;

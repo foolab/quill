@@ -39,13 +39,36 @@
 
 #include <QVariant>
 #include <QDebug>
+#include <exempi-2.0/exempi/xmpconsts.h>
 
 #include "metadata.h"
+
+const QString Schema_DC = NS_DC;
+const QString Schema_Exif = NS_EXIF;
+const QString Schema_Photoshop = NS_PHOTOSHOP;
+const QString Schema_IPTC = NS_IPTC4XMP;
+const QString Schema_XAP = NS_XAP;
+
+XmpTag::XmpTag() : schema(""), tag("")
+{
+}
+
+XmpTag::XmpTag(const QString &schema, const QString &tag) :
+    schema(schema), tag(tag)
+{
+}
 
 Metadata::Metadata(const QString &fileName)
 {
     m_exifData = exif_data_new_from_file(fileName.toAscii().constData());
     m_exifByteOrder = exif_data_get_byte_order(m_exifData);
+
+    xmp_init();
+    XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
+                                               XMP_OPEN_READ);
+    m_xmpPtr = xmp_files_get_new_xmp(xmpFilePtr);
+
+    initTags();
 }
 
 Metadata::~Metadata()
@@ -53,17 +76,57 @@ Metadata::~Metadata()
     exif_data_unref(m_exifData);
 }
 
+void Metadata::initTags()
+{
+    m_exifTags.insert(Tag_Make, EXIF_TAG_MAKE);
+    m_exifTags.insert(Tag_Model, EXIF_TAG_MODEL);
+    m_exifTags.insert(Tag_ImageWidth, EXIF_TAG_IMAGE_WIDTH);
+    m_exifTags.insert(Tag_ImageHeight, EXIF_TAG_IMAGE_LENGTH);
+    m_exifTags.insert(Tag_FocalLength, EXIF_TAG_FOCAL_LENGTH);
+    m_exifTags.insert(Tag_ExposureTime, EXIF_TAG_EXPOSURE_TIME);
+    m_exifTags.insert(Tag_TimestampOriginal, EXIF_TAG_DATE_TIME_ORIGINAL);
+
+    m_xmpTags.insert(Tag_Title, XmpTag(Schema_Exif, "Title"));
+    m_xmpTags.insert(Tag_Copyright, XmpTag(Schema_Exif, "Copyright"));
+    m_xmpTags.insert(Tag_Creator, XmpTag(Schema_DC, "creator"));
+    m_xmpTags.insert(Tag_Keywords, XmpTag(Schema_DC, "keywords"));
+    m_xmpTags.insert(Tag_Subject, XmpTag(Schema_DC, "subject"));
+    m_xmpTags.insert(Tag_City, XmpTag(Schema_Photoshop, "City"));
+    m_xmpTags.insert(Tag_Country, XmpTag(Schema_Photoshop, "Country"));
+    m_xmpTags.insert(Tag_Location, XmpTag(Schema_Photoshop, "Location"));
+    //    m_xmpTags.insert(Tag_City, XmpTag(Schema_IPTC, "City"));
+    //    m_xmpTags.insert(Tag_Country, XmpTag(Schema_IPTC, "Country"));
+    //    m_xmpTags.insert(Tag_Location, XmpTag(Schema_IPTC, "Location"));
+    m_xmpTags.insert(Tag_Rating, XmpTag(Schema_XAP, "Rating"));
+    m_xmpTags.insert(Tag_Timestamp, XmpTag(Schema_XAP, "MetadataDate"));
+}
+
 bool Metadata::isValid()
 {
-    return m_exifData != 0;
+    return ((m_exifData != 0) || (m_xmpPtr != 0));
 }
 
 QVariant Metadata::entry(Metadata::Tag tag)
 {
+    // Prioritize EXIF over XMP as required by metadata working group
+    QVariant exifResult = entryExif(tag);
+    if (!exifResult.isNull())
+        return exifResult;
+    else
+        return entryXmp(tag);
+}
+
+QVariant Metadata::entryExif(Metadata::Tag tag)
+{
     if (!m_exifData)
         return QVariant();
 
-    ExifEntry *entry = exif_data_get_entry(m_exifData, (ExifTag)tag);
+    if (!m_exifTags.contains(tag))
+        return QVariant();
+
+    ExifTag exifTag = m_exifTags[tag];
+
+    ExifEntry *entry = exif_data_get_entry(m_exifData, exifTag);
     if (!entry)
         return QVariant();
 
@@ -115,5 +178,40 @@ QVariant Metadata::entry(Metadata::Tag tag)
         break;
     }
 
+    return result;
+}
+
+QVariant Metadata::entryXmp(Metadata::Tag tag)
+{
+    if (!m_xmpPtr)
+        return QVariant();
+
+    if (!m_xmpTags.contains(tag))
+        return QVariant();
+
+    XmpTag xmpTag = m_xmpTags[tag];
+
+    uint32_t propBits;
+    XmpStringPtr xmpStringPtr = xmp_string_new();
+
+    if (!xmp_get_property(m_xmpPtr,
+                          xmpTag.schema.toAscii().constData(),
+                          xmpTag.tag.toAscii().constData(),
+                          xmpStringPtr,
+                          &propBits))
+        return QVariant();
+
+    if (XMP_IS_PROP_ARRAY(propBits)) {
+        if (!xmp_get_array_item(m_xmpPtr,
+                                xmpTag.schema.toAscii().constData(),
+                                xmpTag.tag.toAscii().constData(),
+                                1,
+                                xmpStringPtr,
+                                &propBits))
+            return QVariant();
+    }
+
+    QVariant result = QVariant(QString(xmp_string_cstr(xmpStringPtr)));
+    xmp_string_free(xmpStringPtr);
     return result;
 }
