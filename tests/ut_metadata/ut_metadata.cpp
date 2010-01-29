@@ -58,106 +58,93 @@ void ut_metadata::cleanupTestCase()
 
 void ut_metadata::init()
 {
+    metadata = new Metadata("/usr/share/libquill-tests/images/exif.jpg");
+    xmp = new Metadata("/usr/share/libquill-tests/images/xmp.jpg");
 }
 
 void ut_metadata::cleanup()
 {
+    delete metadata;
 }
 
 void ut_metadata::testCameraMake()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_Make).toString(), QString("Quill"));
-    delete metadata;
 }
 
 void ut_metadata::testCameraModel()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_Model).toString(), QString("Q100125"));
-    delete metadata;
 }
 
 void ut_metadata::testImageWidth()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_ImageWidth).toInt(), 2);
-    delete metadata;
 }
 
 void ut_metadata::testImageHeight()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
     QCOMPARE(metadata->entry(Metadata::Tag_ImageHeight).toInt(), 2);
-    delete metadata;
 }
 
 void ut_metadata::testFocalLength()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
+    QEXPECT_FAIL("", "A bug in libexif prevents verification of this property", Continue);
     QCOMPARE(metadata->entry(Metadata::Tag_FocalLength).toDouble(), 9.9);
-    delete metadata;
 }
 
 void ut_metadata::testExposureTime()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
+    QEXPECT_FAIL("", "A bug in libexif prevents verification of this property", Continue);
     QCOMPARE(metadata->entry(Metadata::Tag_ExposureTime).toDouble(), 1/200.0);
-    delete metadata;
 }
 
 void ut_metadata::testTimestampOriginal()
 {
-    Metadata *metadata = new Metadata("exif.jpg");
     QVERIFY(metadata->isValid());
+    QEXPECT_FAIL("", "A bug in libexif prevents verification of this property", Continue);
     QCOMPARE(metadata->entry(Metadata::Tag_TimestampOriginal).toString(),
              QString("2010:01:25 15:00:00"));
-    delete metadata;
 }
 
 void ut_metadata::testSubject()
 {
-    Metadata *metadata = new Metadata("xmp.jpg");
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_Subject).toString(),
+    QVERIFY(xmp->isValid());
+    QCOMPARE(xmp->entry(Xmp::Tag_Subject).toString(),
              QString("test,quill"));
 }
 
 void ut_metadata::testCity()
 {
-    Metadata *metadata = new Metadata("xmp.jpg");
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_City).toString(),
+    QVERIFY(xmp->isValid());
+    QCOMPARE(xmp->entry(Xmp::Tag_City).toString(),
              QString("Tapiola"));
 }
 
 void ut_metadata::testCountry()
 {
-    Metadata *metadata = new Metadata("xmp.jpg");
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_Country).toString(),
+    QVERIFY(xmp->isValid());
+    QCOMPARE(xmp->entry(Xmp::Tag_Country).toString(),
              QString("Finland"));
 }
 
 void ut_metadata::testRating()
 {
-    Metadata *metadata = new Metadata("xmp.jpg");
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_Rating).toInt(),
+    QVERIFY(xmp->isValid());
+    QCOMPARE(xmp->entry(Xmp::Tag_Rating).toInt(),
              5);
 }
 
 void ut_metadata::testCreator()
 {
-    Metadata *metadata = new Metadata("xmp.jpg");
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_Creator).toString(),
+    QVERIFY(xmp->isValid());
+    QCOMPARE(xmp->entry(Xmp::Tag_Creator).toString(),
              QString("John Q"));
 }
 

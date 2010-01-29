@@ -37,42 +37,26 @@
 **
 ****************************************************************************/
 
+#ifndef _UT_LOGGER_H_
+#define _UT_LOGGER_H_
+
 #include <QObject>
 
-#ifndef TEST_LIBQUILL_METADATA_H
-#define TEST_LIBQUILL_METADATA_H
 
-class Metadata;
-
-class ut_metadata : public QObject {
+class ut_logger : public QObject {
 Q_OBJECT
 public:
-    ut_metadata();
+    ut_logger();
 
 private slots:
     void init();
     void cleanup();
     void initTestCase();
     void cleanupTestCase();
-
-    // Unit tests for metadata
-
-    void testCameraMake();
-    void testCameraModel();
-    void testImageWidth();
-    void testImageHeight();
-    void testFocalLength();
-    void testExposureTime();
-    void testTimestampOriginal();
-    void testSubject();
-    void testCity();
-    void testCountry();
-    void testRating();
-    void testCreator();
-
-private:
-    Metadata *metadata;
-    Metadata *xmp;
+    void testLog();
+    void testIntToString();
+    void testQsizeToString();
+    void testBoolToString();
 };
 
-#endif  // TEST_LIBQUILL_METADATA_H
+#endif  // TEST_LIBQUILL_IMAGELOADER_H

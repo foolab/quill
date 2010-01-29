@@ -68,6 +68,7 @@ class QuillImageFilter;
 class SaveMap;
 class QuillImageFilterGenerator;
 class QUndoStack;
+class Logger;
 
 class QuillUndoStack : public QObject
 {

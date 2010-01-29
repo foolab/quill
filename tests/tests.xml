@@ -114,7 +114,18 @@
 	<step >/usr/lib/libquill-tests/ut_error </step>
       </case>
     </set>
-
+    <set name="quill-tile-loadingtests" feature="errorhandling">
+      <description>quill tile loading test</description>
+      <case name="ut_tileloading" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_tileloading </step>
+      </case>
+    </set>
+    <set name="quill-logger-tests" feature="errorhandling">
+      <description>quill logger test</description>
+      <case name="ut_logger" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_logger </step>
+      </case>
+    </set>
     <set name="quill-metadata-tests" feature="metadata">
       <description>quill error handling test</description>
       <case name="ut_metadata" type="Functional" level="Component">

@@ -36,43 +36,58 @@
 ** contact the sales department at qt-sales@nokia.com.
 **
 ****************************************************************************/
+#include <QDateTime>
+#include <QTextStream>
+#include <QDir>
+#include <QSize>
+#include <QDebug>
+#include "logger.h"
 
-#include <QObject>
+bool Logger::existFlag = true;
+QFile Logger::data(QDir::homePath()+"/.local/share/quill/log.txt");
+bool Logger::firstTimeFlag = true;
 
-#ifndef TEST_LIBQUILL_METADATA_H
-#define TEST_LIBQUILL_METADATA_H
+Logger::Logger()
+{
+    //empty
+}
 
-class Metadata;
+void Logger::log(const QString logInfo)
+{
+    if(existFlag){
+        if(firstTimeFlag){
+            if(data.exists())
+                data.open(QFile::ReadWrite | QFile::Append);
+            firstTimeFlag = false;
+        }
+        if(data.exists()){
+            QTextStream out(&data);
+            QDateTime timeStamp = QDateTime::currentDateTime();
+            QDate date = timeStamp.date();
+            QTime time = timeStamp.time();
+            out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
+            data.flush();
+            existFlag = true;
+        }
+        else
+            existFlag = false;
+    }
+}
 
-class ut_metadata : public QObject {
-Q_OBJECT
-public:
-    ut_metadata();
+QString Logger::intToString(const int value)
+{
+    return QString(":")+QString::number(value);
+}
 
-private slots:
-    void init();
-    void cleanup();
-    void initTestCase();
-    void cleanupTestCase();
+QString Logger::qsizeToString(const QSize size)
+{
+    return QString(":")+QString("QSize(")+QString::number(size.width())+QString("x")+QString::number(size.height())+QString(")");
+}
 
-    // Unit tests for metadata
-
-    void testCameraMake();
-    void testCameraModel();
-    void testImageWidth();
-    void testImageHeight();
-    void testFocalLength();
-    void testExposureTime();
-    void testTimestampOriginal();
-    void testSubject();
-    void testCity();
-    void testCountry();
-    void testRating();
-    void testCreator();
-
-private:
-    Metadata *metadata;
-    Metadata *xmp;
-};
-
-#endif  // TEST_LIBQUILL_METADATA_H
+QString Logger::boolToString(const bool value)
+{
+    if(value)
+        return QString(":")+QString("true");
+    else
+        return QString(":")+QString("false");
+}

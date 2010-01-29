@@ -52,6 +52,7 @@ HEADERS += quill.h \
            quillundostack.h \
            imagecache.h \
            historyxml.h \
+           logger.h \
            metadata.h
 
 SOURCES += quill.cpp \
@@ -68,6 +69,7 @@ SOURCES += quill.cpp \
            quillundostack.cpp \
            imagecache.cpp \
            historyxml.cpp \
+           logger.cpp \
            metadata.cpp
 
 INSTALL_HEADERS = \

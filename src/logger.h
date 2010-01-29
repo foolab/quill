@@ -36,43 +36,34 @@
 ** contact the sales department at qt-sales@nokia.com.
 **
 ****************************************************************************/
-
+#ifndef __QUILL_LOGGER_H__
+#define __QUILL_LOGGER_H__
 #include <QObject>
+#include <QFile>
 
-#ifndef TEST_LIBQUILL_METADATA_H
-#define TEST_LIBQUILL_METADATA_H
+class QSize;
 
-class Metadata;
+class Logger : public QObject
+{Q_OBJECT
 
-class ut_metadata : public QObject {
-Q_OBJECT
+friend class ut_logger;
+
 public:
-    ut_metadata();
 
-private slots:
-    void init();
-    void cleanup();
-    void initTestCase();
-    void cleanupTestCase();
+    Logger();
 
-    // Unit tests for metadata
+    static void log(const QString logInfo);
 
-    void testCameraMake();
-    void testCameraModel();
-    void testImageWidth();
-    void testImageHeight();
-    void testFocalLength();
-    void testExposureTime();
-    void testTimestampOriginal();
-    void testSubject();
-    void testCity();
-    void testCountry();
-    void testRating();
-    void testCreator();
+    static QString intToString(const int value);
+
+    static QString qsizeToString(const QSize size);
+
+    static QString boolToString(const bool value);
 
 private:
-    Metadata *metadata;
-    Metadata *xmp;
+    static bool existFlag;
+    static QFile data;
+    static bool firstTimeFlag;
 };
 
-#endif  // TEST_LIBQUILL_METADATA_H
+#endif
