@@ -153,6 +153,14 @@ void ut_metadata::testRating()
              5);
 }
 
+void ut_metadata::testCreator()
+{
+    Metadata *metadata = new Metadata("xmp.jpg");
+    QVERIFY(metadata->isValid());
+    QCOMPARE(metadata->entry(Metadata::Tag_Creator).toString(),
+             QString("John Q"));
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_metadata test;

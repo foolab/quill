@@ -66,6 +66,7 @@ private slots:
     void testCity();
     void testCountry();
     void testRating();
+    void testCreator();
 };
 
 #endif  // TEST_LIBQUILL_METADATA_H

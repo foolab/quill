@@ -86,19 +86,18 @@ void Metadata::initTags()
     m_exifTags.insert(Tag_ExposureTime, EXIF_TAG_EXPOSURE_TIME);
     m_exifTags.insert(Tag_TimestampOriginal, EXIF_TAG_DATE_TIME_ORIGINAL);
 
-    m_xmpTags.insert(Tag_Title, XmpTag(Schema_Exif, "Title"));
-    m_xmpTags.insert(Tag_Copyright, XmpTag(Schema_Exif, "Copyright"));
-    m_xmpTags.insert(Tag_Creator, XmpTag(Schema_DC, "creator"));
-    m_xmpTags.insert(Tag_Keywords, XmpTag(Schema_DC, "keywords"));
-    m_xmpTags.insert(Tag_Subject, XmpTag(Schema_DC, "subject"));
-    m_xmpTags.insert(Tag_City, XmpTag(Schema_Photoshop, "City"));
-    m_xmpTags.insert(Tag_Country, XmpTag(Schema_Photoshop, "Country"));
-    m_xmpTags.insert(Tag_Location, XmpTag(Schema_Photoshop, "Location"));
-    //    m_xmpTags.insert(Tag_City, XmpTag(Schema_IPTC, "City"));
-    //    m_xmpTags.insert(Tag_Country, XmpTag(Schema_IPTC, "Country"));
-    //    m_xmpTags.insert(Tag_Location, XmpTag(Schema_IPTC, "Location"));
-    m_xmpTags.insert(Tag_Rating, XmpTag(Schema_XAP, "Rating"));
-    m_xmpTags.insert(Tag_Timestamp, XmpTag(Schema_XAP, "MetadataDate"));
+    m_xmpTags.insertMulti(Tag_Creator, XmpTag(Schema_DC, "creator"));
+    m_xmpTags.insertMulti(Tag_Subject, XmpTag(Schema_DC, "subject"));
+
+    m_xmpTags.insertMulti(Tag_City, XmpTag(Schema_Photoshop, "City"));
+    m_xmpTags.insertMulti(Tag_Country, XmpTag(Schema_Photoshop, "Country"));
+
+    m_xmpTags.insertMulti(Tag_City, XmpTag(Schema_IPTC, "LocationShownCity"));
+    m_xmpTags.insertMulti(Tag_Country, XmpTag(Schema_IPTC, "LocationShownCountry"));
+    m_xmpTags.insertMulti(Tag_Location, XmpTag(Schema_IPTC, "LocationShownSublocation"));
+
+    m_xmpTags.insertMulti(Tag_Rating, XmpTag(Schema_XAP, "Rating"));
+    m_xmpTags.insertMulti(Tag_Timestamp, XmpTag(Schema_XAP, "MetadataDate"));
 }
 
 bool Metadata::isValid()
@@ -189,29 +188,34 @@ QVariant Metadata::entryXmp(Metadata::Tag tag)
     if (!m_xmpTags.contains(tag))
         return QVariant();
 
-    XmpTag xmpTag = m_xmpTags[tag];
+    QList<XmpTag> xmpTags = m_xmpTags.values(tag);
 
-    uint32_t propBits;
     XmpStringPtr xmpStringPtr = xmp_string_new();
 
-    if (!xmp_get_property(m_xmpPtr,
-                          xmpTag.schema.toAscii().constData(),
-                          xmpTag.tag.toAscii().constData(),
-                          xmpStringPtr,
-                          &propBits))
-        return QVariant();
+    foreach (XmpTag xmpTag, xmpTags) {
+        uint32_t propBits;
 
-    if (XMP_IS_PROP_ARRAY(propBits)) {
-        if (!xmp_get_array_item(m_xmpPtr,
-                                xmpTag.schema.toAscii().constData(),
-                                xmpTag.tag.toAscii().constData(),
-                                1,
-                                xmpStringPtr,
-                                &propBits))
-            return QVariant();
+        if (xmp_get_property(m_xmpPtr,
+                             xmpTag.schema.toAscii().constData(),
+                             xmpTag.tag.toAscii().constData(),
+                             xmpStringPtr,
+                             &propBits)) {
+            if (XMP_IS_PROP_ARRAY(propBits)) {
+                xmp_get_array_item(m_xmpPtr,
+                                   xmpTag.schema.toAscii().constData(),
+                                   xmpTag.tag.toAscii().constData(),
+                                   1,
+                                   xmpStringPtr,
+                                   &propBits);
+            }
+            QString string = QString(xmp_string_cstr(xmpStringPtr)).trimmed();
+            if (!string.isEmpty()) {
+                xmp_string_free(xmpStringPtr);
+                return QVariant(string);
+            }
+        }
     }
 
-    QVariant result = QVariant(QString(xmp_string_cstr(xmpStringPtr)));
     xmp_string_free(xmpStringPtr);
-    return result;
+    return QVariant();
 }
