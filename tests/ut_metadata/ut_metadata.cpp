@@ -116,35 +116,35 @@ void ut_metadata::testTimestampOriginal()
 void ut_metadata::testSubject()
 {
     QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Xmp::Tag_Subject).toString(),
+    QCOMPARE(xmp->entry(Metadata::Tag_Subject).toString(),
              QString("test,quill"));
 }
 
 void ut_metadata::testCity()
 {
     QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Xmp::Tag_City).toString(),
+    QCOMPARE(xmp->entry(Metadata::Tag_City).toString(),
              QString("Tapiola"));
 }
 
 void ut_metadata::testCountry()
 {
     QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Xmp::Tag_Country).toString(),
+    QCOMPARE(xmp->entry(Metadata::Tag_Country).toString(),
              QString("Finland"));
 }
 
 void ut_metadata::testRating()
 {
     QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Xmp::Tag_Rating).toInt(),
+    QCOMPARE(xmp->entry(Metadata::Tag_Rating).toInt(),
              5);
 }
 
 void ut_metadata::testCreator()
 {
     QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Xmp::Tag_Creator).toString(),
+    QCOMPARE(xmp->entry(Metadata::Tag_Creator).toString(),
              QString("John Q"));
 }
 
