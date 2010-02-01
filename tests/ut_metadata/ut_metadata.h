@@ -55,7 +55,7 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
-    // Unit tests for metadata
+    // Unit tests for metadata reading
 
     void testCameraMake();
     void testCameraModel();
@@ -69,6 +69,15 @@ private slots:
     void testCountry();
     void testRating();
     void testCreator();
+
+    // Tests for reader
+
+    void testWriteSubject();
+    void testWriteCity();
+
+    // High-level tests for metadata preservation
+
+    void testPreserveXMP();
 
 private:
     Metadata *metadata;

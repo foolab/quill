@@ -39,6 +39,10 @@
 
 #include <QVariant>
 #include <QtTest/QtTest>
+#include <QuillImageFilterFactory>
+
+#include "quill.h"
+#include "quillfile.h"
 
 #include "metadata.h"
 #include "ut_metadata.h"
@@ -145,6 +149,74 @@ void ut_metadata::testCreator()
 {
     QVERIFY(xmp->isValid());
     QCOMPARE(xmp->entry(Metadata::Tag_Creator).toString(),
+             QString("John Q"));
+}
+
+void ut_metadata::testWriteSubject()
+{
+    QTemporaryFile file;
+    file.open();
+    Unittests::generatePaletteImage().save(file.fileName(), "jpg");
+    xmp->write(file.fileName());
+
+    Metadata writtenMetadata(file.fileName());
+    QVERIFY(writtenMetadata.isValid());
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Subject).toString(),
+             QString("test,quill"));
+}
+
+void ut_metadata::testWriteCity()
+{
+    QTemporaryFile file;
+    file.open();
+    Unittests::generatePaletteImage().save(file.fileName(), "jpg");
+    xmp->write(file.fileName());
+
+    Metadata writtenMetadata(file.fileName());
+    QVERIFY(writtenMetadata.isValid());
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_City).toString(),
+             QString("Tapiola"));
+}
+
+void ut_metadata::testPreserveXMP()
+{
+    QTemporaryFile file;
+    file.open();
+
+    // Perform an overwriting copy since Qt does not have such function
+    QFile originalFile("/usr/share/libquill-tests/images/xmp.jpg");
+    originalFile.open(QIODevice::ReadOnly);
+    QByteArray buffer = originalFile.readAll();
+    file.write(buffer);
+    file.flush();
+
+    QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
+
+    Quill::initTestingMode();
+    QuillFile *quillFile = new QuillFile(file.fileName(), "jpg");
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.scale");
+    filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
+    quillFile->runFilter(filter);
+    quillFile->save();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // scale
+    Quill::releaseAndWait(); // save
+
+    // Verify that file image size has changed
+    QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
+    Metadata writtenMetadata(file.fileName());
+    QVERIFY(writtenMetadata.isValid());
+
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Subject).toString(),
+             QString("test,quill"));
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_City).toString(),
+             QString("Tapiola"));
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Country).toString(),
+             QString("Finland"));
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Rating).toInt(),
+             5);
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Creator).toString(),
              QString("John Q"));
 }
 
