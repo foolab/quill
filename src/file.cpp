@@ -53,6 +53,7 @@
 #include "tilemap.h"
 #include "quillerror.h"
 #include "logger.h"
+#include "metadata.h"
 
 File::File() : m_exists(true), m_supported(true), m_readOnly(false),
                m_hasThumbnailError(false), m_displayLevel(-1),
@@ -651,6 +652,11 @@ void File::concludeSave()
             return;
         }
     }
+
+    // Copy metadata from previous version to new one
+
+    Metadata metadata(m_fileName);
+    metadata.write(temporaryName);
 
     // This is more efficient than renaming between partitions.
 

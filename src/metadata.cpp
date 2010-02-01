@@ -58,8 +58,15 @@ XmpTag::XmpTag(const QString &schema, const QString &tag) :
 {
 }
 
+bool Metadata::initialized = false;
+QHash<Metadata::Tag,ExifTag> Metadata::m_exifTags;
+QHash<Metadata::Tag,XmpTag> Metadata::m_xmpTags;
+
 Metadata::Metadata(const QString &fileName)
 {
+    if (!initialized)
+        initTags();
+
     m_exifData = exif_data_new_from_file(fileName.toAscii().constData());
     m_exifByteOrder = exif_data_get_byte_order(m_exifData);
 
@@ -67,8 +74,7 @@ Metadata::Metadata(const QString &fileName)
     XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
                                                XMP_OPEN_READ);
     m_xmpPtr = xmp_files_get_new_xmp(xmpFilePtr);
-
-    initTags();
+    xmp_files_close(xmpFilePtr, XMP_CLOSE_NOOPTION);
 }
 
 Metadata::~Metadata()
@@ -218,4 +224,22 @@ QVariant Metadata::entryXmp(Metadata::Tag tag)
 
     xmp_string_free(xmpStringPtr);
     return QVariant();
+}
+
+bool Metadata::write(const QString &fileName)
+{
+    XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
+                                               XMP_OPEN_FORUPDATE);
+    bool result;
+
+    if (xmp_files_can_put_xmp(xmpFilePtr, m_xmpPtr))
+        result = xmp_files_put_xmp(xmpFilePtr, m_xmpPtr);
+    else
+        result = false;
+
+    // Crash safety can be ignored here by selecting Nooption since
+    // QuillFile already has crash safety measures.
+    xmp_files_close(xmpFilePtr, XMP_CLOSE_NOOPTION);
+
+    return result;
 }
