@@ -69,6 +69,8 @@ private slots:
     void testCountry();
     void testRating();
     void testCreator();
+    void testCityIptc();
+    void testCountryIptc();
 
     // Tests for reader
 
@@ -82,6 +84,7 @@ private slots:
 private:
     Metadata *metadata;
     Metadata *xmp;
+    Metadata *iptc;
 };
 
 #endif  // TEST_LIBQUILL_METADATA_H

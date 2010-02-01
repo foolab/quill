@@ -41,6 +41,7 @@
 #define QUILL_METADATA_H
 
 #include <libexif/exif-data.h>
+#include <libiptcdata/iptc-data.h>
 #include <exempi-2.0/exempi/xmp.h>
 #include <QString>
 
@@ -106,15 +107,19 @@ class Metadata
     void initTags();
 
     QVariant entryExif(Tag tag);
+    QVariant entryIptc(Tag tag);
     QVariant entryXmp(Tag tag);
 
  private:
     static QHash<Tag,ExifTag> m_exifTags;
+    static QHash<Tag,IptcTag> m_iptcTags;
     static QHash<Tag,XmpTag> m_xmpTags;
     static bool initialized;
 
     ExifData *m_exifData;
     ExifByteOrder m_exifByteOrder;
+
+    IptcData *m_iptcData;
 
     XmpPtr m_xmpPtr;
 };
