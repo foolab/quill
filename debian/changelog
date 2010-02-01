@@ -1,3 +1,11 @@
+libquill (1.100201.0) unstable; urgency=low
+
+  * Implemented: SWP#HImag-1605
+  * Implemented: SWP#HImag-1606
+  * Implemented: SWP#HImag-1607
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 01 Feb 2010 12:40:00 +0200
+
 libquill (1.100122.0) unstable; urgency=low
 
   * Tagged again to solve integration problems.
