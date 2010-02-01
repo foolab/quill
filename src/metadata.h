@@ -55,7 +55,7 @@ public:
 
 class Metadata
 {
-    friend class ut_metadata;
+ public:
 
     enum Tag {
         Tag_Make,
@@ -92,6 +92,11 @@ class Metadata
      */
     QVariant entry(Tag tag);
 
+    /*!
+      Writes the metadata into an existing file.
+    */
+    bool write(const QString &fileName);
+
  private:
 
     /*!
@@ -104,8 +109,9 @@ class Metadata
     QVariant entryXmp(Tag tag);
 
  private:
-    QHash<Tag,ExifTag> m_exifTags;
-    QHash<Tag,XmpTag> m_xmpTags;
+    static QHash<Tag,ExifTag> m_exifTags;
+    static QHash<Tag,XmpTag> m_xmpTags;
+    static bool initialized;
 
     ExifData *m_exifData;
     ExifByteOrder m_exifByteOrder;
