@@ -228,6 +228,13 @@ QVariant Metadata::entryXmp(Metadata::Tag tag)
 
 bool Metadata::write(const QString &fileName)
 {
+    if (m_xmpPtr)
+        return writeXmp(fileName);
+    return false;
+}
+
+bool Metadata::writeXmp(const QString &fileName)
+{
     XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
                                                XMP_OPEN_FORUPDATE);
     bool result;

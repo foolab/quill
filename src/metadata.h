@@ -108,6 +108,8 @@ class Metadata
     QVariant entryExif(Tag tag);
     QVariant entryXmp(Tag tag);
 
+    bool writeXmp(const QString &fileName);
+
  private:
     static QHash<Tag,ExifTag> m_exifTags;
     static QHash<Tag,XmpTag> m_xmpTags;
