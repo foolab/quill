@@ -99,13 +99,13 @@ void ut_metadata::testImageHeight()
 void ut_metadata::testFocalLength()
 {
     QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_FocalLength).toDouble(), 9.9);
+    Unittests::compareReal(metadata->entry(Metadata::Tag_FocalLength).toDouble(), 9.9);
 }
 
 void ut_metadata::testExposureTime()
 {
     QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_ExposureTime).toDouble(), 1/200.0);
+    Unittests::compareReal(metadata->entry(Metadata::Tag_ExposureTime).toDouble(), 1/200.0);
 }
 
 void ut_metadata::testTimestampOriginal()

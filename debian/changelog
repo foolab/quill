@@ -1,3 +1,9 @@
+libquill (1.100202.0) unstable; urgency=low
+
+  * IPTC-IIM reading.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 2 Feb 2010 16:35:00 +0200
+
 libquill (1.100201.1) unstable; urgency=low
 
   * Fixed test crash.
