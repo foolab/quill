@@ -64,6 +64,7 @@ void ut_metadata::init()
 {
     metadata = new Metadata("/usr/share/libquill-tests/images/exif.jpg");
     xmp = new Metadata("/usr/share/libquill-tests/images/xmp.jpg");
+    iptc = new Metadata("/usr/share/libquill-tests/images/iptc.jpg");
 }
 
 void ut_metadata::cleanup()
@@ -151,6 +152,21 @@ void ut_metadata::testCreator()
     QCOMPARE(xmp->entry(Metadata::Tag_Creator).toString(),
              QString("John Q"));
 }
+
+void ut_metadata::testCityIptc()
+{
+    QVERIFY(iptc->isValid());
+    QCOMPARE(iptc->entry(Metadata::Tag_City).toString(),
+             QString("Tapiola"));
+}
+
+void ut_metadata::testCountryIptc()
+{
+    QVERIFY(iptc->isValid());
+    QCOMPARE(iptc->entry(Metadata::Tag_Country).toString(),
+             QString("Finland"));
+}
+
 
 void ut_metadata::testWriteSubject()
 {

@@ -60,6 +60,7 @@ XmpTag::XmpTag(const QString &schema, const QString &tag) :
 
 bool Metadata::initialized = false;
 QHash<Metadata::Tag,ExifTag> Metadata::m_exifTags;
+QHash<Metadata::Tag,IptcTag> Metadata::m_iptcTags;
 QHash<Metadata::Tag,XmpTag> Metadata::m_xmpTags;
 
 Metadata::Metadata(const QString &fileName)
@@ -69,6 +70,8 @@ Metadata::Metadata(const QString &fileName)
 
     m_exifData = exif_data_new_from_file(fileName.toAscii().constData());
     m_exifByteOrder = exif_data_get_byte_order(m_exifData);
+
+    m_iptcData = iptc_data_new_from_jpeg(fileName.toAscii().constData());
 
     xmp_init();
     XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
@@ -92,6 +95,9 @@ void Metadata::initTags()
     m_exifTags.insert(Tag_ExposureTime, EXIF_TAG_EXPOSURE_TIME);
     m_exifTags.insert(Tag_TimestampOriginal, EXIF_TAG_DATE_TIME_ORIGINAL);
 
+    m_iptcTags.insert(Tag_City, IPTC_TAG_CITY);
+    m_iptcTags.insert(Tag_Country, IPTC_TAG_COUNTRY_NAME);
+
     m_xmpTags.insertMulti(Tag_Creator, XmpTag(Schema_DC, "creator"));
     m_xmpTags.insertMulti(Tag_Subject, XmpTag(Schema_DC, "subject"));
 
@@ -108,17 +114,19 @@ void Metadata::initTags()
 
 bool Metadata::isValid()
 {
-    return ((m_exifData != 0) || (m_xmpPtr != 0));
+    return ((m_exifData != 0) || (m_iptcData != 0) || (m_xmpPtr != 0));
 }
 
 QVariant Metadata::entry(Metadata::Tag tag)
 {
     // Prioritize EXIF over XMP as required by metadata working group
-    QVariant exifResult = entryExif(tag);
-    if (!exifResult.isNull())
-        return exifResult;
-    else
-        return entryXmp(tag);
+    QVariant result = entryExif(tag);
+    if (result.isNull()) {
+        result = entryXmp(tag);
+        if (result.isNull())
+            result = entryIptc(tag);
+    }
+    return result;
 }
 
 QVariant Metadata::entryExif(Metadata::Tag tag)
@@ -182,6 +190,31 @@ QVariant Metadata::entryExif(Metadata::Tag tag)
         result = QVariant();
         break;
     }
+
+    return result;
+}
+
+QVariant Metadata::entryIptc(Metadata::Tag tag)
+{
+    if (!m_iptcData)
+        return QVariant();
+
+    if (!m_iptcTags.contains(tag))
+        return QVariant();
+
+    IptcTag iptcTag = m_iptcTags[tag];
+
+    IptcDataSet *entry =
+        iptc_data_get_dataset(m_iptcData, IPTC_RECORD_APP_2, iptcTag);
+    if (!entry)
+        return QVariant();
+
+    QVariant result;
+
+    char buf[256];
+    const char *success = iptc_dataset_get_as_str(entry, buf, 255);
+    if (success)
+        result = QVariant(QString(buf));
 
     return result;
 }

@@ -37,6 +37,7 @@ tatamimages.files += images/image_16x4.jpg
 tatamimages.files += images/image_16x4.png
 tatamimages.files += images/exif.jpg
 tatamimages.files += images/xmp.jpg
+tatamimages.files += images/iptc.jpg
 
 tatamimages.path  = $$(DESTDIR)/usr/share/libquill-tests/images/
 
