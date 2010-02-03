@@ -234,6 +234,87 @@ void ut_metadata::testPreserveXMP()
              5);
     QCOMPARE(writtenMetadata.entry(Metadata::Tag_Creator).toString(),
              QString("John Q"));
+    delete quillFile;
+}
+
+void ut_metadata::testPreserveIptc()
+{
+    QTemporaryFile file;
+    file.open();
+
+    // Perform an overwriting copy since Qt does not have such function
+    QFile originalFile("/usr/share/libquill-tests/images/iptc.jpg");
+    originalFile.open(QIODevice::ReadOnly);
+    QByteArray buffer = originalFile.readAll();
+    file.write(buffer);
+    file.flush();
+
+    QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
+
+    Quill::initTestingMode();
+    QuillFile *quillFile = new QuillFile(file.fileName(), "jpg");
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.scale");
+    filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
+    quillFile->runFilter(filter);
+    quillFile->save();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // scale
+    Quill::releaseAndWait(); // save
+
+    // Verify that file image size has changed
+    QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
+    Metadata writtenMetadata(file.fileName());
+    QVERIFY(writtenMetadata.isValid());
+
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_City).toString(),
+             QString("Tapiola"));
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Country).toString(),
+             QString("Finland"));
+    delete quillFile;
+}
+
+void ut_metadata::testPreserveExif()
+{
+    QTemporaryFile file;
+    file.open();
+
+    // Perform an overwriting copy since Qt does not have such function
+    QFile originalFile("/usr/share/libquill-tests/images/exif.jpg");
+    originalFile.open(QIODevice::ReadOnly);
+    QByteArray buffer = originalFile.readAll();
+    file.write(buffer);
+    file.flush();
+
+    QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
+
+    Quill::initTestingMode();
+    QuillFile *quillFile = new QuillFile(file.fileName(), "jpg");
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.scale");
+    filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
+    quillFile->runFilter(filter);
+    quillFile->save();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // scale
+    Quill::releaseAndWait(); // save
+
+    // Verify that file image size has changed
+    QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
+    Metadata writtenMetadata(file.fileName());
+    QVERIFY(writtenMetadata.isValid());
+
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Make).toString(),
+             QString("Quill"));
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Model).toString(),
+             QString("Q100125"));
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_ImageWidth).toInt(), 2);
+    QCOMPARE(writtenMetadata.entry(Metadata::Tag_ImageHeight).toInt(), 2);
+    Unittests::compareReal(writtenMetadata.entry(Metadata::Tag_FocalLength).toDouble(), 9.9);
+    Unittests::compareReal(writtenMetadata.entry(Metadata::Tag_ExposureTime).toDouble(), 1/200.0);
+    QCOMPARE(metadata->entry(Metadata::Tag_TimestampOriginal).toString(),
+             QString("2010:01:25 15:00:00"));
+    delete quillFile;
 }
 
 int main ( int argc, char *argv[] ){

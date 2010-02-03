@@ -237,7 +237,8 @@ public:
       saving uses ad-hoc save filters.
     */
 
-    void prepareSave(const QString &fileName);
+    void prepareSave(const QString &fileName,
+                     const QByteArray &rawExifDump);
 
     /*!
       Concludes saving for the file and cleans up the stack.

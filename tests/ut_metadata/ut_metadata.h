@@ -72,7 +72,7 @@ private slots:
     void testCityIptc();
     void testCountryIptc();
 
-    // Tests for reader
+    // Writer tests using reader
 
     void testWriteSubject();
     void testWriteCity();
@@ -80,6 +80,8 @@ private slots:
     // High-level tests for metadata preservation
 
     void testPreserveXMP();
+    void testPreserveIptc();
+    void testPreserveExif();
 
 private:
     Metadata *metadata;

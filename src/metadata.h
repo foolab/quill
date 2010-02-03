@@ -41,7 +41,6 @@
 #define QUILL_METADATA_H
 
 #include <libexif/exif-data.h>
-#include <libiptcdata/iptc-data.h>
 #include <exempi-2.0/exempi/xmp.h>
 #include <QString>
 
@@ -94,9 +93,17 @@ class Metadata
     QVariant entry(Tag tag);
 
     /*!
-      Writes the metadata into an existing file.
+      Writes the metadata into an existing file. Writes XMP and
+      IPTC-IIM using libexempi, does not write EXIF data which should
+      be written at the start of the save by the save filter.
     */
     bool write(const QString &fileName);
+
+    /*!
+      As libexif does not have a writeback feature, the EXIF block
+      is dumped into a byte array instead to be processed by the save filter.
+     */
+    QByteArray dumpExif();
 
  private:
 
@@ -110,16 +117,16 @@ class Metadata
     QVariant entryIptc(Tag tag);
     QVariant entryXmp(Tag tag);
 
+    bool writeXmp(const QString &fileName);
+    bool writeExif(const QString &fileName);
+
  private:
     static QHash<Tag,ExifTag> m_exifTags;
-    static QHash<Tag,IptcTag> m_iptcTags;
     static QHash<Tag,XmpTag> m_xmpTags;
     static bool initialized;
 
     ExifData *m_exifData;
     ExifByteOrder m_exifByteOrder;
-
-    IptcData *m_iptcData;
 
     XmpPtr m_xmpPtr;
 };

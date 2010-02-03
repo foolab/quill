@@ -99,6 +99,7 @@ void ThreadManager::startThread(int id, int level, int tile,
                                 const QuillImage &image,
                                 QuillImageFilter *filter)
 {
+    qDebug() << "Applying filter" << filter->name();
     m_isRunning = true;
     commandId = id;
     commandLevel = level;
@@ -114,6 +115,7 @@ void ThreadManager::startThread(int id, int level, int tile,
 
 void ThreadManager::taskFinished()
 {
+    qDebug() << "Finished applying" << activeFilter->name();
     QuillImage image = resultImage->result();
     delete resultImage;
     resultImage = 0;
