@@ -1,3 +1,10 @@
+libquill (1.100203.0) unstable; urgency=low
+
+  * EXIF writing.
+  * Implemented: SWP#HImag-235
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 3 Feb 2010 16:50:00 +0200
+
 libquill (1.100202.0) unstable; urgency=low
 
   * IPTC-IIM reading.

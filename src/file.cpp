@@ -624,7 +624,10 @@ void File::prepareSave()
         return;
     }
 
-    m_stack->prepareSave(m_temporaryFile->fileName());
+    Metadata metadata(m_fileName);
+    QByteArray rawExifDump = metadata.dumpExif();
+
+    m_stack->prepareSave(m_temporaryFile->fileName(), rawExifDump);
 
     m_saveInProgress = true;
 }

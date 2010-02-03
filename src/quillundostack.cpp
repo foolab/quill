@@ -355,7 +355,8 @@ bool QuillUndoStack::isSession() const
     return m_isSessionRecording;
 }
 
-void QuillUndoStack::prepareSave(const QString &fileName)
+void QuillUndoStack::prepareSave(const QString &fileName,
+                                 const QByteArray &rawExifDump)
 {
     m_isSessionRecording = false;
 
@@ -375,6 +376,9 @@ void QuillUndoStack::prepareSave(const QString &fileName)
 
     saveFilter->setOption(QuillImageFilter::FileFormat,
                           QVariant(m_file->targetFormat()));
+
+    saveFilter->setOption(QuillImageFilter::RawExifData,
+                          QVariant(rawExifDump));
 
     m_saveCommand = new QuillUndoCommand(this);
     m_saveCommand->setFilter(saveFilter);

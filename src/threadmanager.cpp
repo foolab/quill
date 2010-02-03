@@ -45,6 +45,7 @@
 
 #include "quillerror.h"
 #include "core.h"
+#include "logger.h"
 #include "threadmanager.h"
 
 ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
@@ -99,6 +100,7 @@ void ThreadManager::startThread(int id, int level, int tile,
                                 const QuillImage &image,
                                 QuillImageFilter *filter)
 {
+    Logger::log("[ThreadManager] Applying filter " + filter->name());
     m_isRunning = true;
     commandId = id;
     commandLevel = level;
@@ -114,6 +116,7 @@ void ThreadManager::startThread(int id, int level, int tile,
 
 void ThreadManager::taskFinished()
 {
+    Logger::log("[ThreadManager] Finished applying " + activeFilter->name());
     QuillImage image = resultImage->result();
     delete resultImage;
     resultImage = 0;

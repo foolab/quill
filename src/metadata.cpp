@@ -60,7 +60,6 @@ XmpTag::XmpTag(const QString &schema, const QString &tag) :
 
 bool Metadata::initialized = false;
 QHash<Metadata::Tag,ExifTag> Metadata::m_exifTags;
-QHash<Metadata::Tag,IptcTag> Metadata::m_iptcTags;
 QHash<Metadata::Tag,XmpTag> Metadata::m_xmpTags;
 
 Metadata::Metadata(const QString &fileName)
@@ -70,8 +69,6 @@ Metadata::Metadata(const QString &fileName)
 
     m_exifData = exif_data_new_from_file(fileName.toAscii().constData());
     m_exifByteOrder = exif_data_get_byte_order(m_exifData);
-
-    m_iptcData = iptc_data_new_from_jpeg(fileName.toAscii().constData());
 
     xmp_init();
     XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
@@ -87,6 +84,8 @@ Metadata::~Metadata()
 
 void Metadata::initTags()
 {
+    initialized = true;
+
     m_exifTags.insert(Tag_Make, EXIF_TAG_MAKE);
     m_exifTags.insert(Tag_Model, EXIF_TAG_MODEL);
     m_exifTags.insert(Tag_ImageWidth, EXIF_TAG_IMAGE_WIDTH);
@@ -94,9 +93,6 @@ void Metadata::initTags()
     m_exifTags.insert(Tag_FocalLength, EXIF_TAG_FOCAL_LENGTH);
     m_exifTags.insert(Tag_ExposureTime, EXIF_TAG_EXPOSURE_TIME);
     m_exifTags.insert(Tag_TimestampOriginal, EXIF_TAG_DATE_TIME_ORIGINAL);
-
-    m_iptcTags.insert(Tag_City, IPTC_TAG_CITY);
-    m_iptcTags.insert(Tag_Country, IPTC_TAG_COUNTRY_NAME);
 
     m_xmpTags.insertMulti(Tag_Creator, XmpTag(Schema_DC, "creator"));
     m_xmpTags.insertMulti(Tag_Subject, XmpTag(Schema_DC, "subject"));
@@ -114,18 +110,16 @@ void Metadata::initTags()
 
 bool Metadata::isValid()
 {
-    return ((m_exifData != 0) || (m_iptcData != 0) || (m_xmpPtr != 0));
+    return ((m_exifData != 0) || (m_xmpPtr != 0));
 }
 
 QVariant Metadata::entry(Metadata::Tag tag)
 {
     // Prioritize EXIF over XMP as required by metadata working group
     QVariant result = entryExif(tag);
-    if (result.isNull()) {
+    if (result.isNull())
         result = entryXmp(tag);
-        if (result.isNull())
-            result = entryIptc(tag);
-    }
+
     return result;
 }
 
@@ -194,31 +188,6 @@ QVariant Metadata::entryExif(Metadata::Tag tag)
     return result;
 }
 
-QVariant Metadata::entryIptc(Metadata::Tag tag)
-{
-    if (!m_iptcData)
-        return QVariant();
-
-    if (!m_iptcTags.contains(tag))
-        return QVariant();
-
-    IptcTag iptcTag = m_iptcTags[tag];
-
-    IptcDataSet *entry =
-        iptc_data_get_dataset(m_iptcData, IPTC_RECORD_APP_2, iptcTag);
-    if (!entry)
-        return QVariant();
-
-    QVariant result;
-
-    char buf[256];
-    const char *success = iptc_dataset_get_as_str(entry, buf, 255);
-    if (success)
-        result = QVariant(QString(buf));
-
-    return result;
-}
-
 QVariant Metadata::entryXmp(Metadata::Tag tag)
 {
     if (!m_xmpPtr)
@@ -261,13 +230,14 @@ QVariant Metadata::entryXmp(Metadata::Tag tag)
 
 bool Metadata::write(const QString &fileName)
 {
-    if (m_xmpPtr)
-        return writeXmp(fileName);
-    return false;
+    return writeXmp(fileName);
 }
 
 bool Metadata::writeXmp(const QString &fileName)
 {
+    if (!m_xmpPtr)
+        return false;
+
     XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
                                                XMP_OPEN_FORUPDATE);
     bool result;
@@ -280,6 +250,21 @@ bool Metadata::writeXmp(const QString &fileName)
     // Crash safety can be ignored here by selecting Nooption since
     // QuillFile already has crash safety measures.
     xmp_files_close(xmpFilePtr, XMP_CLOSE_NOOPTION);
+
+    return result;
+}
+
+QByteArray Metadata::dumpExif()
+{
+    if (!m_exifData)
+        return QByteArray();
+
+    unsigned char *d;
+    unsigned int ds;
+
+    exif_data_save_data(m_exifData, &d, &ds);
+
+    QByteArray result = QByteArray((char*)d, ds);
 
     return result;
 }
