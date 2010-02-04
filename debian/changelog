@@ -1,5 +1,11 @@
 libquill (1.100203.0) unstable; urgency=low
 
+  * change version number for tagging
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 4 Feb 2010 10:50:00 +0200
+
+libquill (1.100203.0) unstable; urgency=low
+
   * EXIF writing.
   * Implemented: SWP#HImag-235
 
