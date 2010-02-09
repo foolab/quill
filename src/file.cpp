@@ -126,6 +126,16 @@ QString File::targetFormat() const
 void File::setFileName(const QString &fileName)
 {
     m_fileName = fileName;
+
+    QFile file(fileName);
+    if (!file.exists()) {
+        emitError(QuillError(QuillError::FileNotFoundError,
+                             QuillError::ImageFileErrorSource,
+                             fileName));
+        setExists(false);
+    }
+    else if (!file.open(QIODevice::ReadWrite))
+        setReadOnly();
 }
 
 void File::setFileFormat(const QString &fileFormat)
@@ -218,8 +228,10 @@ bool File::isDirty() const
 
 void File::runFilter(QuillImageFilter *filter)
 {
-    if (!m_exists || !m_supported || m_readOnly)
+    if (!m_exists || !m_supported || m_readOnly) {
+        delete filter;
         return;
+    }
 
     if (m_stack->count() == 0)
         m_stack->load();

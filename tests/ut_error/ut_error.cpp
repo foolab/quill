@@ -124,8 +124,9 @@ void ut_error::testEditHistoryWriteFailed()
 
 void ut_error::testFileNotFound()
 {
+    QSignalSpy spy(Quill::instance(), SIGNAL(error(QuillError)));
+
     QuillFile *file = new QuillFile(QString());
-    QSignalSpy spy(file, SIGNAL(error(QuillError)));
     file->setDisplayLevel(0);
     Quill::releaseAndWait();
 
@@ -241,7 +242,6 @@ void ut_error::testWriteProtectedFile()
 
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
-    testFile.setPermissions(QFile::ReadOwner);
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
@@ -252,10 +252,16 @@ void ut_error::testWriteProtectedFile()
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
     file->runFilter(filter);
+
+    QVERIFY(!file->isReadOnly());
+    // Write protect before save is called
+    testFile.setPermissions(QFile::ReadOwner);
+
     file->save();
 
     Quill::releaseAndWait(); // load
     QCOMPARE(spy.count(), 0);
+
     Quill::releaseAndWait(); // filter
     QCOMPARE(spy.count(), 0);
     Quill::releaseAndWait(); // save

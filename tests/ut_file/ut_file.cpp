@@ -327,6 +327,27 @@ void ut_file::testSaveAfterDelete()
     Unittests::compareImage(QImage(testFile.fileName()), imageAfter);
 }
 
+void ut_file::testReadOnly()
+{
+    if (Unittests::isRoot()) {
+        qDebug() << "Running as root, disabling file permissions test!";
+        return;
+    }
+
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QFile qFile(testFile.fileName());
+    qFile.setPermissions(QFile::ReadOwner);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QVERIFY(file->isReadOnly());
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_file test;

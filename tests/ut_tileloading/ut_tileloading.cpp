@@ -181,12 +181,17 @@ void ut_tileloading::testQuill()
 
 void ut_tileloading::testMultiOperation()
 {
-    QFile testFile("/usr/share/libquill-tests/images/image_16x4.jpg");
+    QTemporaryFile tempFile;
+    tempFile.open();
+
+    // The original file may be write protected and edits are disabled for
+    // such files so we need to make a copy
     QImage originalImage("/usr/share/libquill-tests/images/image_16x4.png");
+    originalImage.save(tempFile.fileName(), "jpg");
     Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file =
-        new QuillFile(testFile.fileName());
+        new QuillFile(tempFile.fileName(), "jpg");
 
     file->setViewPort(QRect(-8, -2, 16, 4));
     file->setDisplayLevel(1);
