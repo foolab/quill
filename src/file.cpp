@@ -414,8 +414,18 @@ QString File::editHistoryFileName(const QString &fileName,
     return hashValueString;
 }
 
-File *File::readFromEditHistory(const QString &fileName, QuillError *error)
+File *File::readFromEditHistory(const QString &fileName,
+                                const QString &originalFileName,
+                                QuillError *error)
 {
+    // If original is not found, we will ignore any edit history.
+    if (!QFile::exists(originalFileName)) {
+        *error = QuillError(QuillError::FileNotFoundError,
+                            QuillError::ImageOriginalErrorSource,
+                            originalFileName);
+        return 0;
+    }
+
     QFile file(editHistoryFileName(fileName,
                                    Core::instance()->editHistoryDirectory()));
 

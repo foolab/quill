@@ -211,7 +211,11 @@ File *Core::file(const QString &fileName,
         return file;
 
     QuillError error;
-    file = File::readFromEditHistory(fileName, &error);
+
+    QFileInfo fileInfo(fileName);
+    QString originalFileName =
+        fileInfo.path() + "/.original/" + fileInfo.fileName();
+    file = File::readFromEditHistory(fileName, originalFileName, &error);
 
     // Any errors in reading the edit history will be reported,
     // however they are never fatal so we can always continue
@@ -229,9 +233,7 @@ File *Core::file(const QString &fileName,
     file = new File();
     file->setFileName(fileName);
 
-    QFileInfo fileInfo(fileName);
-    file->setOriginalFileName(fileInfo.path() + "/.original/" +
-                              fileInfo.fileName());
+    file->setOriginalFileName(originalFileName);
 
     file->setFileFormat(fileFormat);
     file->setTargetFormat(fileFormat);

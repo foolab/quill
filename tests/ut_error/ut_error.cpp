@@ -95,11 +95,11 @@ void ut_error::testEditHistoryReadFailed()
 {
     QuillError error;
 
-    File *file = File::readFromEditHistory(QString(), &error);
+    File *file = File::readFromEditHistory(QString(), QString(), &error);
 
     QVERIFY(!file);
     QCOMPARE((int)error.errorCode(), (int)QuillError::FileNotFoundError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
     delete file;
 }
 
@@ -740,6 +740,13 @@ void ut_error::testUnreadableEditHistory()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
+    // Create original since edit history will be ignored without it
+    QFileInfo fileInfo(testFile.fileName());
+    QString originalFileName =
+        fileInfo.path() + "/.original/" + fileInfo.fileName();
+    QDir().mkpath(fileInfo.path() + "/.original/");
+    image.save(originalFileName, "png");
+
     const QString editHistoryDirectory = "/tmp/quill/history";
     QDir().mkpath(editHistoryDirectory);
 
@@ -777,6 +784,13 @@ void ut_error::testEmptyEditHistory()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
+    // Create original since edit history will be ignored without it
+    QFileInfo fileInfo(testFile.fileName());
+    QString originalFileName =
+        fileInfo.path() + "/.original/" + fileInfo.fileName();
+    QDir().mkpath(fileInfo.path() + "/.original/");
+    image.save(originalFileName, "png");
+
     const QString editHistoryDirectory = "/tmp/quill/history";
     QDir().mkpath(editHistoryDirectory);
 
@@ -809,6 +823,13 @@ void ut_error::testCorruptEditHistory()
 
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
+
+    // Create original since edit history will be ignored without it
+    QFileInfo fileInfo(testFile.fileName());
+    QString originalFileName =
+        fileInfo.path() + "/.original/" + fileInfo.fileName();
+    QDir().mkpath(fileInfo.path() + "/.original/");
+    image.save(originalFileName, "png");
 
     const QString editHistoryDirectory = "/tmp/quill/history";
     QDir().mkpath(editHistoryDirectory);
