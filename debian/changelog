@@ -1,4 +1,12 @@
-libquill (1.100203.0) unstable; urgency=low
+libquill (1.100209.0) unstable; urgency=low
+
+  * Fixes: NB#153985 Read-only images can be edited
+  * Fixes: NB#153984 Undo is allowed even if the original is deleted
+  * Fixes: NB#150875 Memory leak in tests
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 9 Feb 2010 12:30:00 +0200
+
+libquill (1.100204.0) unstable; urgency=low
 
   * change version number for tagging
 
