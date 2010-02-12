@@ -74,19 +74,18 @@ Task *Scheduler::newTask()
     const int previewLevelCount = Core::instance()->previewLevelCount();
 
     // First priority (all files): loading any pre-generated thumbnails
-    foreach (File *file, allFiles) {
-        int maxLevel = file->displayLevel();
-        if (maxLevel >= previewLevelCount)
-            maxLevel = previewLevelCount-1;
+    // (lowest levels first)
+    for (int level=0; level<=previewLevelCount-1; level++)
+        foreach (File *file, allFiles)
+            if (level <= file->displayLevel()) {
+                Task *task = newThumbnailLoadTask(file, level);
 
-        for (int level=0; level<=maxLevel; level++) {
-            Task *task = newThumbnailLoadTask(file, level);
-            if (task)
-                return task;
-        }
-    }
+                if (task)
+                    return task;
+            }
 
     // Second priority (highest display level): all preview levels
+    // This might be historical, can it be dropped?
 
     File *priorityFile = Core::instance()->priorityFile();
 
@@ -103,7 +102,19 @@ Task *Scheduler::newTask()
         }
     }
 
-    // Third priority (save in progress): getting final full image/tiles
+    // Third priority (all other images): all preview levels
+    // (lowest levels first)
+
+    for (int level=0; level<=previewLevelCount-1; level++)
+        foreach (File *file, allFiles)
+            if (file->supported() && (level <= file->displayLevel())) {
+                Task *task = newNormalTask(file, level);
+
+                if (task)
+                    return task;
+            }
+
+    // Fourth priority (save in progress): getting final full image/tiles
 
     File *prioritySaveFile = Core::instance()->prioritySaveFile();
 
@@ -113,7 +124,7 @@ Task *Scheduler::newTask()
         if (task)
             return task;
 
-        // Fourth priority (save in progress): saving image
+        // Fifth priority (save in progress): saving image
 
         task = newSaveTask(prioritySaveFile);
 
@@ -121,7 +132,7 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Fifth priority (highest display level): full image/tiles
+    // Sixth priority (highest display level): full image/tiles
 
     if ((priorityFile != 0) &&
         (priorityFile->displayLevel() >= previewLevelCount)) {
@@ -132,7 +143,7 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Sixth priority (highest display level):
+    // Seventh priority (highest display level):
     // regenerating lower-resolution preview images to
     // better match their respective higher-resolution previews or
     // full images
@@ -144,23 +155,7 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Seventh priority (all others): all preview levels
-
-    foreach (File *file, allFiles)
-        if (file->supported()) {
-            int maxLevel = file->displayLevel();
-            if (maxLevel >= previewLevelCount)
-                maxLevel = previewLevelCount-1;
-
-            for (int level=0; level<=maxLevel; level++) {
-                Task *task = newNormalTask(file, level);
-
-                if (task)
-                    return task;
-            }
-        }
-
-    // Seventh priority (any): saving thumbnails
+    // Eighth priority (any): saving thumbnails
 
     if (Core::instance()->isThumbnailCreationEnabled())
         foreach(File *file, allFiles)
