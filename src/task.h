@@ -38,97 +38,93 @@
 ****************************************************************************/
 
 /*!
-  \class ThreadManager
+  \class Task
 
-  \brief Responsible for running the worker thread on the background.
+  \brief Represents one task to be run on the background by ThreadManager.
 
-Contains no explicit thread operations on its own, threading is done
-by the QFuture and QFutureWatcher classes from Qt 4.5, which use
-QThreadPool on the background.
- */
+  Tasks are created using the scheduling policy in
+  Scheduler::newTask(). Since a task is run by the background thread,
+  it does not contain any complex datatypes like QuillUndoCommands
+  which might simultaneously be changed by the foreground thread.
+*/
 
-#ifndef THREADMANAGER_H
-#define THREADMANAGER_H
+#include <QuillImage>
 
-#include <QFuture>
-#include <QFutureWatcher>
-#include "quill.h"
+class QuillImageFilter;
 
-class QuillImage;
-class Task;
-class QtImageFilter;
-class Core;
-class QSemaphore;
-class QEventLoop;
+class Task {
+ public:
 
-class ThreadManager : public QObject
-{
-Q_OBJECT
+    Task();
 
-public:
-    ThreadManager(Quill::ThreadingMode mode = Quill::ThreadingNormal);
-
-    ~ThreadManager();
+    ~Task();
 
     /*!
-      If the thread manager is currently running a task in the background.
+      Gets the id of the task command (used to identify the command
+      after the calculation, sharing the command would not be thread safe).
      */
 
-    bool isRunning() const;
+    int commandId();
 
     /*!
-      If the thread manager allows to delete the filter in question
-      (meaning that the filter is currently being run.)
+      Sets the task command id.
      */
-
-    bool allowDelete(QuillImageFilter *filter) const;
+    void setCommandId(int commandId);
 
     /*!
-      Used to start a task in background.
+      Gets the display level of the task.
      */
 
-    void run(Task *task);
+    int displayLevel();
 
     /*!
-      Sets debug delay (artificial delay per backround operation, in seconds).
-     */
+      Sets the display level of the task.
+    */
 
-    void setDebugDelay(int delay);
+    void setDisplayLevel(int displayLevel);
 
     /*!
-      Release background thread and wait for its completion.
-
-      Will freeze the calling (foreground) thread, so testing purposes only!
+      Gets the tile id of the task. If the display level is something
+      else than the highest one, this has no effect.
      */
 
-    void releaseAndWait();
+    int tileId();
 
-public slots:
     /*!
-      Used by the future watcher to indicate that
-      an asynchronous calculation has been finished.
+      Sets the tile id of the task.
      */
 
-    void taskFinished();
+    void setTileId(int tileId);
 
-private:
-    bool m_isRunning;
+    /*!
+      Gets the input image of the task.
+     */
 
-    int commandId;
-    int commandLevel;
-    int tileId;
+    QuillImage inputImage();
 
-    QuillImageFilter *activeFilter;
+    /*!
+      Sets the input image of the task.
+     */
 
-    QFuture<QuillImage> *resultImage;
-    QFutureWatcher<QuillImage> *watcher;
+    void setInputImage(const QuillImage &inputImage);
 
-    Quill::ThreadingMode threadingMode;
+    /*!
+      Gets the filter of the task.
+     */
 
-    QSemaphore *semaphore;
-    QEventLoop *eventLoop;
+    QuillImageFilter *filter();
 
-    int debugDelay;
+    /*!
+      Sets the filter of the task. The filter stays the property of the caller,
+      but it must not be destroyed as long as the task exists.
+     */
+
+    void setFilter(QuillImageFilter *filter);
+
+ private:
+    int m_commandId;
+    int m_displayLevel;
+    int m_tileId;
+    QuillImage m_inputImage;
+    QuillImageFilter *m_filter;
 };
-
-#endif // __QUILL_THREAD_MANAGER_H_

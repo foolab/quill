@@ -402,6 +402,24 @@ public:
     QString temporaryFileDirectory() const;
 
     /*!
+      Return one file.
+    */
+
+    File *priorityFile() const;
+
+    /*!
+      Return one file.
+    */
+
+    File *prioritySaveFile() const;
+
+    /*!
+      Return all existing files.
+    */
+
+    QList<File*> existingFiles() const;
+
+    /*!
       Emits a saved signal.
     */
     void emitSaved(QString fileName);
@@ -437,26 +455,6 @@ signals:
     */
 
     void error(QuillError error);
-
-private:
-
-    /*!
-      Return one file.
-    */
-
-    File *priorityFile() const;
-
-    /*!
-      Return one file.
-    */
-
-    File *prioritySaveFile() const;
-
-    /*!
-      Return all existing files.
-    */
-
-    QList<File*> existingFiles() const;
 
 private:
 

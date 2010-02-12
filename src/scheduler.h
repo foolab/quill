@@ -61,13 +61,14 @@ class Core;
 class QuillUndoStack;
 class QuillUndoCommand;
 class ThreadManager;
+class Task;
 
 class Scheduler : public QObject
 {
 Q_OBJECT
 
 public:
-    Scheduler(ThreadManager *threadManager);
+    Scheduler();
 
     ~Scheduler();
 
@@ -86,40 +87,11 @@ public:
                              QuillImageFilter *activeFilter);
 
     /*!
-      Used to indicate that there may be a normal task (loading or
-      running an image filter) in this stack, waiting for the
-      background thread.
+      Used to get a new task to be given to ThreadManager.
+      If no task is available, returns 0.
      */
 
-    bool suggestNewTask(File *file, int level);
-
-    /*!
-      Used by core to indicate that there may be a save task waiting
-      for the background thread.
-     */
-
-    bool suggestSaveTask(File *file);
-
-    /*!
-      Used by core to indicate that there may be a special
-      improvement task (better quality preview image to be created
-      based on the full image) waiting for the background thread.
-    */
-
-    bool suggestPreviewImprovementTask(File *file);
-
-    /*
-      Suggest to load a pre-generated thumbnail from a file.
-     */
-
-    bool suggestThumbnailLoadTask(File *file,
-                                  int level);
-
-    /*!
-      Suggest to save a thumbnail
-     */
-
-    bool suggestThumbnailSaveTask(File *file, int level);
+    Task *newTask();
 
     /*!
       @return if the thread manager allows the given filter to be
@@ -127,12 +99,6 @@ public:
      */
 
     bool allowDelete(QuillImageFilter *filter) const;
-
-    /*!
-      Sets maximum tile size with tiling filters.
-    */
-
-    void setMaxPixelsPerTile(int maxPixels);
 
     /*!
       Sets debug delay (artificial delay per backround operation, in seconds).
@@ -149,8 +115,43 @@ public:
     void releaseAndWait();
 
 private:
+    /*!
+      Used to indicate that there may be a normal task (loading or
+      running an image filter) in this stack, waiting for the
+      background thread.
+     */
+
+    Task *newNormalTask(File *file, int level);
+
+    /*!
+      Used by core to indicate that there may be a save task waiting
+      for the background thread.
+     */
+
+    Task *newSaveTask(File *file);
+
+    /*!
+      Used by core to indicate that there may be a special
+      improvement task (better quality preview image to be created
+      based on the full image) waiting for the background thread.
+    */
+
+    Task *newPreviewImprovementTask(File *file);
+
     /*
-      Helper function for suggestNewTask().
+      Suggest to load a pre-generated thumbnail from a file.
+     */
+
+    Task *newThumbnailLoadTask(File *file, int level);
+
+    /*!
+      Suggest to save a thumbnail
+     */
+
+    Task *newThumbnailSaveTask(File *file, int level);
+
+    /*
+      Helper function for newNormalTask().
      */
 
     QuillUndoCommand *getTask(QuillUndoStack *stack, int level) const;
@@ -160,21 +161,21 @@ private:
       Can start calculations on its own.
     */
 
-    bool suggestTilingTask(File *file);
+    Task *newTilingTask(File *file);
 
     /*!
       Helper function for suggestSaveTask(), used for tiling.
       Can start calculations on its own.
     */
 
-    bool suggestTilingSaveTask(File *file);
+    Task *newTilingSaveTask(File *file);
 
     /*!
       Helper function for suggestTilingSaveTask(), used for pushing
       tiles into the save buffer. Can start calculations on its own.
     */
 
-    bool suggestTilingOverlayTask(File *file);
+    Task *newTilingOverlayTask(File *file);
 
 private:
     ThreadManager *m_threadManager;

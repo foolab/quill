@@ -63,11 +63,11 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_recoveryInProgress(false),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
+    m_scheduler(new Scheduler()),
     m_threadManager(new ThreadManager(threadingMode)),
     m_temporaryFileDirectory(QString()),
     m_crashDumpPath(QString())
 {
-    m_scheduler = new Scheduler(m_threadManager);
     m_previewSize.append(Quill::defaultViewPortSize);
     m_thumbnailDirectory.append(QString());
     m_fileLimit.append(1);
@@ -312,96 +312,10 @@ void Core::suggestNewTask()
     if (m_threadManager->isRunning())
         return;
 
-    // No files means no operation
+    Task *task = m_scheduler->newTask();
 
-    if (m_files.isEmpty())
-        return;
-
-    QList<File*> allFiles = existingFiles();
-
-    // First priority (all files): loading any pre-generated thumbnails
-    for (QList<File*>::iterator file = allFiles.begin();
-         file != allFiles.end(); file++) {
-
-        int maxLevel = (*file)->displayLevel();
-        if (maxLevel >= previewLevelCount())
-            maxLevel = previewLevelCount()-1;
-
-        for (int level=0; level<=maxLevel; level++) {
-            if (m_scheduler->suggestThumbnailLoadTask((*file), level))
-                return;
-        }
-    }
-
-    // Second priority (highest display level): all preview levels
-
-    File *priorityFile = this->priorityFile();
-
-    if (priorityFile) {
-
-        int maxLevel = priorityFile->displayLevel();
-        if (maxLevel >= previewLevelCount())
-            maxLevel = previewLevelCount()-1;
-
-        for (int level=0; level<=maxLevel; level++)
-            if (m_scheduler->suggestNewTask(priorityFile, level))
-                return;
-    }
-
-    // Third priority (save in progress): getting final full image/tiles
-
-    File *prioritySaveFile = this->prioritySaveFile();
-
-    if (prioritySaveFile) {
-
-        if (m_scheduler->suggestNewTask(prioritySaveFile, previewLevelCount()))
-            return;
-
-        // Fourth priority (save in progress): saving image
-
-        if (m_scheduler->suggestSaveTask(prioritySaveFile))
-            return;
-    }
-
-    // Fifth priority (highest display level): full image/tiles
-
-    if ((priorityFile != 0) &&
-        (priorityFile->displayLevel() >= previewLevelCount())) {
-
-        if (m_scheduler->suggestNewTask(priorityFile, previewLevelCount()))
-            return;
-    }
-
-    // Sixth priority (highest display level):
-    // regenerating lower-resolution preview images to
-    // better match their respective higher-resolution previews or
-    // full images
-
-    if (priorityFile != 0)
-        m_scheduler->suggestPreviewImprovementTask(priorityFile);
-
-    // Seventh priority (all others): all preview levels
-
-    for (QList<File*>::iterator file = allFiles.begin();
-         file != allFiles.end(); file++)
-        if ((*file)->supported()) {
-            int maxLevel = (*file)->displayLevel();
-            if (maxLevel >= previewLevelCount())
-                maxLevel = previewLevelCount()-1;
-
-            for (int level=0; level<=maxLevel; level++)
-                if (m_scheduler->suggestNewTask((*file), level))
-                    return;
-        }
-
-    // Seventh priority (any): saving thumbnails
-
-    if (m_thumbnailCreationEnabled)
-        foreach(File *file, allFiles)
-            if (file->supported() && !file->isReadOnly())
-                for (int level=0; level<=previewLevelCount()-1; level++)
-                    if (m_scheduler->suggestThumbnailSaveTask(file, level))
-                        return;
+    if (task)
+        m_threadManager->run(task);
 }
 
 bool Core::allowDelete(QuillImageFilter *filter) const

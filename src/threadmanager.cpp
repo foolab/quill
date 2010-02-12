@@ -45,6 +45,7 @@
 
 #include "quillerror.h"
 #include "core.h"
+#include "task.h"
 #include "logger.h"
 #include "threadmanager.h"
 
@@ -95,23 +96,23 @@ QuillImage applyFilter(QuillImageFilter *filter, QuillImage image,
     return filter->apply(image);
 }
 
-
-void ThreadManager::startThread(int id, int level, int tile,
-                                const QuillImage &image,
-                                QuillImageFilter *filter)
+void ThreadManager::run(Task *task)
 {
-    Logger::log("[ThreadManager] Applying filter " + filter->name());
+    Logger::log("[ThreadManager] Applying filter " + task->filter()->name());
     m_isRunning = true;
-    commandId = id;
-    commandLevel = level;
-    tileId = tile;
-    activeFilter = filter;
+
+    commandId = task->commandId();
+    commandLevel = task->displayLevel();
+    tileId = task->tileId();
+    activeFilter = task->filter();
 
     resultImage = new QFuture<QuillImage>;
     *resultImage =
-        QtConcurrent::run(applyFilter, filter, image,
+        QtConcurrent::run(applyFilter, activeFilter, task->inputImage(),
                           semaphore, debugDelay);
     watcher->setFuture(*resultImage);
+
+    delete task;
 }
 
 void ThreadManager::taskFinished()

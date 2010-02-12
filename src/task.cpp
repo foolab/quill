@@ -37,98 +37,63 @@
 **
 ****************************************************************************/
 
-/*!
-  \class ThreadManager
+#include "task.h"
 
-  \brief Responsible for running the worker thread on the background.
-
-Contains no explicit thread operations on its own, threading is done
-by the QFuture and QFutureWatcher classes from Qt 4.5, which use
-QThreadPool on the background.
- */
-
-#ifndef THREADMANAGER_H
-#define THREADMANAGER_H
-
-#include <QFuture>
-#include <QFutureWatcher>
-#include "quill.h"
-
-class QuillImage;
-class Task;
-class QtImageFilter;
-class Core;
-class QSemaphore;
-class QEventLoop;
-
-class ThreadManager : public QObject
+Task::Task() : m_commandId(0), m_displayLevel(0), m_tileId(0),
+               m_inputImage(QuillImage()), m_filter(0)
 {
-Q_OBJECT
+}
 
-public:
-    ThreadManager(Quill::ThreadingMode mode = Quill::ThreadingNormal);
+Task::~Task()
+{
+}
 
-    ~ThreadManager();
+int Task::commandId()
+{
+    return m_commandId;
+}
 
-    /*!
-      If the thread manager is currently running a task in the background.
-     */
+void Task::setCommandId(int commandId)
+{
+    m_commandId = commandId;
+}
 
-    bool isRunning() const;
+int Task::displayLevel()
+{
+    return m_displayLevel;
+}
 
-    /*!
-      If the thread manager allows to delete the filter in question
-      (meaning that the filter is currently being run.)
-     */
+void Task::setDisplayLevel(int displayLevel)
+{
+    m_displayLevel = displayLevel;
+}
 
-    bool allowDelete(QuillImageFilter *filter) const;
+int Task::tileId()
+{
+    return m_tileId;
+}
 
-    /*!
-      Used to start a task in background.
-     */
+void Task::setTileId(int tileId)
+{
+    m_tileId = tileId;
+}
 
-    void run(Task *task);
+QuillImage Task::inputImage()
+{
+    return m_inputImage;
+}
 
-    /*!
-      Sets debug delay (artificial delay per backround operation, in seconds).
-     */
+void Task::setInputImage(const QuillImage &inputImage)
+{
+    m_inputImage = inputImage;
+}
 
-    void setDebugDelay(int delay);
+QuillImageFilter *Task::filter()
+{
+    return m_filter;
+}
 
-    /*!
-      Release background thread and wait for its completion.
-
-      Will freeze the calling (foreground) thread, so testing purposes only!
-     */
-
-    void releaseAndWait();
-
-public slots:
-    /*!
-      Used by the future watcher to indicate that
-      an asynchronous calculation has been finished.
-     */
-
-    void taskFinished();
-
-private:
-    bool m_isRunning;
-
-    int commandId;
-    int commandLevel;
-    int tileId;
-
-    QuillImageFilter *activeFilter;
-
-    QFuture<QuillImage> *resultImage;
-    QFutureWatcher<QuillImage> *watcher;
-
-    Quill::ThreadingMode threadingMode;
-
-    QSemaphore *semaphore;
-    QEventLoop *eventLoop;
-
-    int debugDelay;
-};
-
-#endif // __QUILL_THREAD_MANAGER_H_
+void Task::setFilter(QuillImageFilter *filter)
+{
+    m_filter = filter;
+}

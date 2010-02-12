@@ -45,6 +45,7 @@
 
 #include "scheduler.h"
 #include "quillerror.h"
+#include "task.h"
 #include "file.h"
 #include "core.h"
 #include "quillundocommand.h"
@@ -53,14 +54,130 @@
 #include "tilemap.h"
 #include "savemap.h"
 
-Scheduler::Scheduler(ThreadManager *threadManager) :
-    m_threadManager(threadManager)
+Scheduler::Scheduler()
 {
 }
 
 Scheduler::~Scheduler()
 {
 }
+
+Task *Scheduler::newTask()
+{
+    QList<File*> allFiles = Core::instance()->existingFiles();
+
+    // No files means no operation
+
+    if (allFiles.isEmpty())
+        return 0;
+
+    const int previewLevelCount = Core::instance()->previewLevelCount();
+
+    // First priority (all files): loading any pre-generated thumbnails
+    for (QList<File*>::iterator file = allFiles.begin();
+         file != allFiles.end(); file++) {
+
+        int maxLevel = (*file)->displayLevel();
+        if (maxLevel >= previewLevelCount)
+            maxLevel = previewLevelCount-1;
+
+        for (int level=0; level<=maxLevel; level++) {
+            Task *task = newThumbnailLoadTask((*file), level);
+            if (task)
+                return task;
+        }
+    }
+
+    // Second priority (highest display level): all preview levels
+
+    File *priorityFile = Core::instance()->priorityFile();
+
+    if (priorityFile) {
+
+        int maxLevel = priorityFile->displayLevel();
+        if (maxLevel >= previewLevelCount)
+            maxLevel = previewLevelCount-1;
+
+        for (int level=0; level<=maxLevel; level++) {
+            Task *task = newNormalTask(priorityFile, level);
+            if (task)
+                return task;
+        }
+    }
+
+    // Third priority (save in progress): getting final full image/tiles
+
+    File *prioritySaveFile = Core::instance()->prioritySaveFile();
+
+    if (prioritySaveFile) {
+
+        Task *task = newNormalTask(prioritySaveFile, previewLevelCount);
+        if (task)
+            return task;
+
+        // Fourth priority (save in progress): saving image
+
+        task = newSaveTask(prioritySaveFile);
+
+        if (task)
+            return task;
+    }
+
+    // Fifth priority (highest display level): full image/tiles
+
+    if ((priorityFile != 0) &&
+        (priorityFile->displayLevel() >= previewLevelCount)) {
+
+        Task *task = newNormalTask(priorityFile, previewLevelCount);
+
+        if (task)
+            return task;
+    }
+
+    // Sixth priority (highest display level):
+    // regenerating lower-resolution preview images to
+    // better match their respective higher-resolution previews or
+    // full images
+
+    if (priorityFile != 0) {
+        Task *task = newPreviewImprovementTask(priorityFile);
+
+        if (task)
+            return task;
+    }
+
+    // Seventh priority (all others): all preview levels
+
+    for (QList<File*>::iterator file = allFiles.begin();
+         file != allFiles.end(); file++)
+        if ((*file)->supported()) {
+            int maxLevel = (*file)->displayLevel();
+            if (maxLevel >= previewLevelCount)
+                maxLevel = previewLevelCount-1;
+
+            for (int level=0; level<=maxLevel; level++) {
+                Task *task = newNormalTask((*file), level);
+
+                if (task)
+                    return task;
+            }
+        }
+
+    // Seventh priority (any): saving thumbnails
+
+    if (Core::instance()->isThumbnailCreationEnabled())
+        foreach(File *file, allFiles)
+            if (file->supported() && !file->isReadOnly())
+                for (int level=0; level<=previewLevelCount-1; level++) {
+                    Task *task = newThumbnailSaveTask(file, level);
+
+                    if (task)
+                        return task;
+                }
+
+    return 0;
+}
+
 
 QuillUndoCommand *Scheduler::getTask(QuillUndoStack *stack, int level) const
 {
@@ -83,7 +200,7 @@ QuillUndoCommand *Scheduler::getTask(QuillUndoStack *stack, int level) const
     return stack->command(index + 1);
 }
 
-bool Scheduler::suggestTilingTask(File *file)
+Task *Scheduler::newTilingTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
     int tileIndex;
@@ -92,11 +209,11 @@ bool Scheduler::suggestTilingTask(File *file)
     {
         // If we can run the actual save filter
         if (stack->saveMap()->isBufferComplete())
-            return false;
+            return 0;
 
         // If we already have tiles to push to the save buffer
         if (stack->saveMap()->processNext(stack->command()->tileMap()) != -1)
-            return false;
+            return 0;
         else
             // Ask save map about which tile to fetch.
             tileIndex = stack->saveMap()->prioritize();
@@ -111,7 +228,7 @@ bool Scheduler::suggestTilingTask(File *file)
         if (stack->command()->tileMap()->
             nonEmptyTiles(file->viewPort()).count() >=
             stack->command()->tileMap()->cacheCost())
-            return false;
+            return 0;
 
         tileIndex = stack->command()->tileMap()->
             prioritize(file->viewPort());
@@ -119,7 +236,7 @@ bool Scheduler::suggestTilingTask(File *file)
 
     // We have all the tiles we want already
     if (tileIndex == -1)
-        return false;
+        return 0;
 
     int index;
 
@@ -145,100 +262,104 @@ bool Scheduler::suggestTilingTask(File *file)
     else
         prevImage = command->prev()->tileMap()->tile(tileIndex);
 
-    m_threadManager->startThread(command->uniqueId(),
-                                 Core::instance()->previewLevelCount(),
-                                 tileIndex,
-                                 prevImage,
-                                 command->filter());
+    Task *task = new Task();
+    task->setCommandId(command->uniqueId());
+    task->setDisplayLevel(Core::instance()->previewLevelCount());
+    task->setTileId(tileIndex);
+    task->setFilter(command->filter());
+    task->setInputImage(prevImage);
 
-    return true;
+    return task;
 }
 
-bool Scheduler::suggestTilingSaveTask(File *file)
+Task *Scheduler::newTilingSaveTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
     if (stack->saveMap()->isBufferComplete())
     {
-        m_threadManager->startThread(stack->saveCommand()->uniqueId(),
-                                     Core::instance()->previewLevelCount(), 0,
-                                     stack->saveMap()->buffer(),
-                                     stack->saveCommand()->filter());
-        return true;
+        Task *task = new Task();
+        task->setCommandId(stack->saveCommand()->uniqueId());
+        task->setDisplayLevel(Core::instance()->previewLevelCount());
+        task->setFilter(stack->saveCommand()->filter());
+        task->setInputImage(stack->saveMap()->buffer());
+
+        return task;
     }
     else
-        return suggestTilingOverlayTask(file);
+        return newTilingOverlayTask(file);
 }
 
-bool Scheduler::suggestTilingOverlayTask(File *file)
+Task *Scheduler::newTilingOverlayTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
     int tileId = stack->saveMap()->processNext(stack->command()->tileMap());
 
     if(tileId < 0)
-        return false;
+        return 0;
     // Should never happen.
     if (stack->command()->tileMap()->tile(tileId) == QuillImage())
-        return false;
+        return 0;
 
     QuillImageFilter *filter = stack->saveMap()->addToBuffer(tileId);
 
     QuillImage prevImage = stack->command()->tileMap()->tile(tileId);
 
-    m_threadManager->startThread(stack->saveCommand()->uniqueId(),
-                                 Core::instance()->previewLevelCount(),
-                                 tileId,
-                                 prevImage,
-                                 filter);
+    Task *task = new Task();
+    task->setCommandId(stack->saveCommand()->uniqueId());
+    task->setDisplayLevel(Core::instance()->previewLevelCount());
+    task->setTileId(tileId);
+    task->setFilter(filter);
+    task->setInputImage(prevImage);
 
-    return true;
+    return task;
 }
 
-bool Scheduler::suggestThumbnailLoadTask(File *file,
-                                             int level)
+Task *Scheduler::newThumbnailLoadTask(File *file,
+                                      int level)
 {
     if (!file->stack())
-        return false;
+        return 0;
 
     if (file->stack()->image(level) != QuillImage())
         // Image already exists - no need to recalculate
-        return false;
+        return 0;
 
     QuillUndoCommand *command = getTask(file->stack(), level);
 
     if ((command->filter()->role() != QuillImageFilter::Role_Load) ||
         (command->index() != command->stack()->savedIndex()) ||
         (!file->hasThumbnail(level)))
-        return false;
+        return 0;
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
 
-    m_threadManager->startThread(command->uniqueId(),
-                                 level, 0,
-                                 QuillImage(),
-                                 filter);
+    Task *task = new Task();
+    task->setCommandId(command->uniqueId());
+    task->setDisplayLevel(level);
+    task->setFilter(filter);
 
-    return true;
+    return task;
 }
 
-bool Scheduler::suggestThumbnailSaveTask(File *file, int level)
+Task *Scheduler::newThumbnailSaveTask(File *file, int level)
 {
     QuillUndoStack *stack = file->stack();
 
     if ((!stack) || (!stack->command()))
-        return false;
+        return 0;
 
     if ((Core::instance()->thumbnailDirectory(level).isEmpty()) ||
         (file->image(level).isNull()) ||
         (file->isDirty()) ||
         (file->hasThumbnail(level)))
-        return false;
+        return 0;
 
     if (file->image(level).size() !=
         file->stack()->command()->targetPreviewSize(level))
-        return false;
+        return 0;
 
     if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
         file->emitError(QuillError(QuillError::DirCreateError,
@@ -250,29 +371,30 @@ bool Scheduler::suggestThumbnailSaveTask(File *file, int level)
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
 
-    m_threadManager->startThread(file->stack()->command()->uniqueId(),
-                                 level, 0,
-                                 file->image(level),
-                                 filter);
+    Task *task = new Task();
+    task->setCommandId(file->stack()->command()->uniqueId());
+    task->setDisplayLevel(level);
+    task->setFilter(filter);
+    task->setInputImage(file->image(level));
 
-    return true;
+    return task;
 }
 
-bool Scheduler::suggestNewTask(File *file, int level)
+Task *Scheduler::newNormalTask(File *file, int level)
 {
     QuillUndoStack *stack = file->stack();
 
     if (!stack->command())
         // Empty stack command - should never happen
-        return false;
+        return 0;
 
     if (stack->image(level) != QuillImage())
         // Image already exists - no need to recalculate
-        return false;
+        return 0;
 
     if ((level == Core::instance()->previewLevelCount()) &&
         (!Core::instance()->defaultTileSize().isEmpty()))
-        return suggestTilingTask(file);
+        return newTilingTask(file);
 
     // The given resolution level is missing
 
@@ -281,7 +403,7 @@ bool Scheduler::suggestNewTask(File *file, int level)
     // If a file is currently waiting for data, load should not be tried
     if ((command->filter()->role() == QuillImageFilter::Role_Load) &&
         (file->isWaitingForData()))
-        return false;
+        return 0;
 
     QuillUndoCommand *prev = 0;
     if (command->filter()->role() != QuillImageFilter::Role_Load)
@@ -312,37 +434,37 @@ bool Scheduler::suggestNewTask(File *file, int level)
 
     // Commands with errors should be ignored
     if (command->fullImageSize().isEmpty())
-        return false;
+        return 0;
 
-    m_threadManager->startThread(command->uniqueId(),
-                                 level, 0,
-                                 prevImage,
-                                 command->filter());
-
-    return true;
+    Task *task = new Task();
+    task->setCommandId(command->uniqueId());
+    task->setDisplayLevel(level);
+    task->setFilter(command->filter());
+    task->setInputImage(prevImage);
+    return task;
 }
 
-bool Scheduler::suggestSaveTask(File *file)
+Task *Scheduler::newSaveTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
 
     // If the current command has an image which has not been saved before.
     if (!stack->isDirty())
-        return false;
+        return 0;
 
     // Tiling save variant
     if (!Core::instance()->defaultTileSize().isEmpty())
-        return suggestTilingSaveTask(file);
+        return newTilingSaveTask(file);
 
-    m_threadManager->startThread(stack->saveCommand()->uniqueId(),
-                                 Core::instance()->previewLevelCount(), 0,
-                                 stack->image(Core::instance()->previewLevelCount()),
-                                 stack->saveCommand()->filter());
-
-    return true;
+    Task *task = new Task();
+    task->setCommandId(stack->saveCommand()->uniqueId());
+    task->setDisplayLevel(Core::instance()->previewLevelCount());
+    task->setFilter(stack->saveCommand()->filter());
+    task->setInputImage(stack->image(Core::instance()->previewLevelCount()));
+    return task;
 }
 
-bool Scheduler::suggestPreviewImprovementTask(File *file)
+Task *Scheduler::newPreviewImprovementTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
 
@@ -374,7 +496,7 @@ bool Scheduler::suggestPreviewImprovementTask(File *file)
                 prevImage = command->image(Core::instance()->previewLevelCount() - 1);
 
             if (prevImage == QuillImage())
-                return false;
+                return 0;
         }
 
         // Create ad-hoc filter for preview re-calculation
@@ -384,18 +506,18 @@ bool Scheduler::suggestPreviewImprovementTask(File *file)
         scaleFilter->setOption(QuillImageFilter::SizeAfter,
                                QVariant(targetSize));
 
+        Task *task = new Task();
+        task->setCommandId(command->uniqueId());
+        task->setDisplayLevel(level);
+        task->setFilter(scaleFilter);
         // Treat image as a full image
+        task->setInputImage(QuillImage(QImage(prevImage)));
 
-        m_threadManager->startThread(command->uniqueId(),
-                                     level, 0,
-                                     QuillImage(QImage(prevImage)),
-                                     scaleFilter);
-
-        return true;
+        return task;
 
     }
     // This should never happen
-    return false;
+    return 0;
 }
 
 void Scheduler::processFinishedTask(int commandId, int commandLevel, int tileId,
