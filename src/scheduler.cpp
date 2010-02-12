@@ -74,15 +74,13 @@ Task *Scheduler::newTask()
     const int previewLevelCount = Core::instance()->previewLevelCount();
 
     // First priority (all files): loading any pre-generated thumbnails
-    for (QList<File*>::iterator file = allFiles.begin();
-         file != allFiles.end(); file++) {
-
-        int maxLevel = (*file)->displayLevel();
+    foreach (File *file, allFiles) {
+        int maxLevel = file->displayLevel();
         if (maxLevel >= previewLevelCount)
             maxLevel = previewLevelCount-1;
 
         for (int level=0; level<=maxLevel; level++) {
-            Task *task = newThumbnailLoadTask((*file), level);
+            Task *task = newThumbnailLoadTask(file, level);
             if (task)
                 return task;
         }
@@ -148,15 +146,14 @@ Task *Scheduler::newTask()
 
     // Seventh priority (all others): all preview levels
 
-    for (QList<File*>::iterator file = allFiles.begin();
-         file != allFiles.end(); file++)
-        if ((*file)->supported()) {
-            int maxLevel = (*file)->displayLevel();
+    foreach (File *file, allFiles)
+        if (file->supported()) {
+            int maxLevel = file->displayLevel();
             if (maxLevel >= previewLevelCount)
                 maxLevel = previewLevelCount-1;
 
             for (int level=0; level<=maxLevel; level++) {
-                Task *task = newNormalTask((*file), level);
+                Task *task = newNormalTask(file, level);
 
                 if (task)
                     return task;

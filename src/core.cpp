@@ -251,10 +251,9 @@ QuillUndoCommand *Core::findInAllStacks(int id) const
 {
     QuillUndoCommand *command = 0;
 
-    for (QMap<QString, File*>::const_iterator file = m_files.begin();
-         file != m_files.end(); file++)
-        if ((*file)->exists()) {
-            command = (*file)->stack()->find(id);
+    foreach (File *file, m_files)
+        if (file->exists()) {
+            command = file->stack()->find(id);
             if (command)
                 break;
         }
@@ -266,14 +265,12 @@ File *Core::priorityFile() const
     QString name;
     int level = -1;
 
-    for (QMap<QString, File*>::const_iterator file = m_files.begin();
-         file != m_files.end(); file++) {
-        if ((*file)->exists() && (*file)->supported() &&
-            ((*file)->displayLevel() > level)) {
-            name = (*file)->fileName();
-            level = (*file)->displayLevel();
+    foreach (File *file, m_files)
+        if (file->exists() && file->supported() &&
+            (file->displayLevel() > level)) {
+            name = file->fileName();
+            level = file->displayLevel();
         }
-    }
 
     if (!name.isEmpty())
         return m_files[name];
@@ -283,10 +280,9 @@ File *Core::priorityFile() const
 
 File *Core::prioritySaveFile() const
 {
-    for (QMap<QString, File*>::const_iterator file = m_files.begin();
-         file != m_files.end(); file++) {
-        if ((*file)->isSaveInProgress())
-            return *file;
+    foreach (File *file, m_files) {
+        if (file->isSaveInProgress())
+            return file;
     }
 
     return 0;
@@ -296,11 +292,9 @@ QList<File*> Core::existingFiles() const
 {
     QList<File*> files;
 
-    for (QMap<QString, File*>::const_iterator file = m_files.begin();
-         file != m_files.end(); file++)
-    {
-        if ((*file)->exists())
-            files += *file;
+    foreach (File *file, m_files) {
+        if (file->exists())
+            files += file;
     }
     return files;
 }
@@ -528,11 +522,10 @@ void Core::setDebugDelay(int delay)
 int Core::numFilesAtLevel(int level) const
 {
     int n = 0;
-    for (QMap<QString, File*>::const_iterator file = m_files.begin();
-         file != m_files.end(); file++) {
-        if ((*file)->displayLevel() >= level)
+    foreach (File *file, m_files)
+        if (file->displayLevel() >= level)
             n++;
-    }
+
     return n;
 }
 
