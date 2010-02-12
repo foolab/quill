@@ -48,7 +48,7 @@ Task::~Task()
 {
 }
 
-int Task::commandId()
+int Task::commandId() const
 {
     return m_commandId;
 }
@@ -58,7 +58,7 @@ void Task::setCommandId(int commandId)
     m_commandId = commandId;
 }
 
-int Task::displayLevel()
+int Task::displayLevel() const
 {
     return m_displayLevel;
 }
@@ -68,7 +68,7 @@ void Task::setDisplayLevel(int displayLevel)
     m_displayLevel = displayLevel;
 }
 
-int Task::tileId()
+int Task::tileId() const
 {
     return m_tileId;
 }
@@ -78,7 +78,7 @@ void Task::setTileId(int tileId)
     m_tileId = tileId;
 }
 
-QuillImage Task::inputImage()
+QuillImage Task::inputImage() const
 {
     return m_inputImage;
 }
@@ -88,7 +88,7 @@ void Task::setInputImage(const QuillImage &inputImage)
     m_inputImage = inputImage;
 }
 
-QuillImageFilter *Task::filter()
+QuillImageFilter *Task::filter() const
 {
     return m_filter;
 }

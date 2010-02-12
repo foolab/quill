@@ -60,6 +60,7 @@ class File;
 class QuillUndoCommand;
 class QuillUndoStack;
 class ImageCache;
+class Task;
 class Scheduler;
 class ThreadManager;
 class TileCache;
@@ -136,8 +137,7 @@ public:
       Callback from ThreadManager.
      */
 
-    void processFinishedTask(int commandId, int commandLevel, int tileId,
-                             QuillImage image, QuillImageFilter *filter);
+    void processFinishedTask(Task *task, QuillImage resultImage);
 
     /*!
       Modifies the preview level count. If new previews are created,

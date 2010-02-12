@@ -50,8 +50,7 @@
 #include "threadmanager.h"
 
 ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
-    m_isRunning(false), commandId(0), commandLevel(0),
-    tileId(0), activeFilter(0), resultImage(0),
+    m_isRunning(false), m_task(0), resultImage(0),
     watcher(new QFutureWatcher<QuillImage>),
     threadingMode(mode),
     semaphore(0), eventLoop(0), debugDelay(0)
@@ -100,31 +99,27 @@ void ThreadManager::run(Task *task)
 {
     Logger::log("[ThreadManager] Applying filter " + task->filter()->name());
     m_isRunning = true;
-
-    commandId = task->commandId();
-    commandLevel = task->displayLevel();
-    tileId = task->tileId();
-    activeFilter = task->filter();
+    m_task = task;
 
     resultImage = new QFuture<QuillImage>;
     *resultImage =
-        QtConcurrent::run(applyFilter, activeFilter, task->inputImage(),
+        QtConcurrent::run(applyFilter, task->filter(), task->inputImage(),
                           semaphore, debugDelay);
     watcher->setFuture(*resultImage);
 
-    delete task;
+    // To save memory, clear the input image here since it is not needed.
+    task->setInputImage(QuillImage());
 }
 
 void ThreadManager::taskFinished()
 {
-    Logger::log("[ThreadManager] Finished applying " + activeFilter->name());
+    Logger::log("[ThreadManager] Finished applying " + m_task->filter()->name());
     QuillImage image = resultImage->result();
     delete resultImage;
     resultImage = 0;
     m_isRunning = false;
 
-    Core::instance()->processFinishedTask(commandId, commandLevel, tileId,
-                                          image, activeFilter);
+    Core::instance()->processFinishedTask(m_task, image);
 
     if (threadingMode == Quill::ThreadingTest)
         eventLoop->exit();
@@ -132,7 +127,7 @@ void ThreadManager::taskFinished()
 
 bool ThreadManager::allowDelete(QuillImageFilter *filter) const
 {
-    return (filter != activeFilter);
+    return ((!m_task) || (filter != m_task->filter()));
 }
 
 void ThreadManager::setDebugDelay(int delay)

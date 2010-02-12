@@ -64,7 +64,7 @@ class Task {
       after the calculation, sharing the command would not be thread safe).
      */
 
-    int commandId();
+    int commandId() const;
 
     /*!
       Sets the task command id.
@@ -75,7 +75,7 @@ class Task {
       Gets the display level of the task.
      */
 
-    int displayLevel();
+    int displayLevel() const;
 
     /*!
       Sets the display level of the task.
@@ -88,7 +88,7 @@ class Task {
       else than the highest one, this has no effect.
      */
 
-    int tileId();
+    int tileId() const;
 
     /*!
       Sets the tile id of the task.
@@ -100,7 +100,7 @@ class Task {
       Gets the input image of the task.
      */
 
-    QuillImage inputImage();
+    QuillImage inputImage() const;
 
     /*!
       Sets the input image of the task.
@@ -112,7 +112,7 @@ class Task {
       Gets the filter of the task.
      */
 
-    QuillImageFilter *filter();
+    QuillImageFilter *filter() const;
 
     /*!
       Sets the filter of the task. The filter stays the property of the caller,

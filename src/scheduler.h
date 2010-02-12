@@ -82,9 +82,7 @@ public:
       Processes a finished task with all consequences.
      */
 
-    void processFinishedTask(int commandId, int commandLevel, int tileId,
-                             QuillImage image,
-                             QuillImageFilter *activeFilter);
+    void processFinishedTask(Task *task, QuillImage image);
 
     /*!
       Used to get a new task to be given to ThreadManager.

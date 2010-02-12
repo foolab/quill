@@ -49,6 +49,7 @@
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "imagecache.h"
+#include "task.h"
 #include "scheduler.h"
 #include "threadmanager.h"
 #include "tilemap.h"
@@ -501,12 +502,10 @@ void Core::insertFile(File *file, const QString &key)
     m_files.insert(key, file);
 }
 
-void Core::processFinishedTask(int commandId, int commandLevel, int tileId,
-                               QuillImage image,
-                               QuillImageFilter *filter)
+void Core::processFinishedTask(Task *task, QuillImage resultImage)
 {
-    m_scheduler->processFinishedTask(commandId, commandLevel, tileId,
-                                     image, filter);
+    m_scheduler->processFinishedTask(task, resultImage);
+    suggestNewTask();
 }
 
 void Core::releaseAndWait()

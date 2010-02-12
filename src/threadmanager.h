@@ -113,12 +113,7 @@ public slots:
 
 private:
     bool m_isRunning;
-
-    int commandId;
-    int commandLevel;
-    int tileId;
-
-    QuillImageFilter *activeFilter;
+    Task *m_task;
 
     QFuture<QuillImage> *resultImage;
     QFutureWatcher<QuillImage> *watcher;

@@ -517,23 +517,22 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
     return 0;
 }
 
-void Scheduler::processFinishedTask(int commandId, int commandLevel, int tileId,
-                                    QuillImage image,
-                                    QuillImageFilter *activeFilter)
+void Scheduler::processFinishedTask(Task *task, QuillImage image)
 {
     bool imageUpdated = false;
 
     // See if the command is still in the stack.
 
-    QuillUndoCommand *command = Core::instance()->findInAllStacks(commandId);
+    QuillUndoCommand *command =
+        Core::instance()->findInAllStacks(task->commandId());
     QuillUndoStack *stack = 0;
     if (command != 0)
         stack = command->stack();
 
     // Set active filter to zero (so that we do not block its deletion)
 
-    QuillImageFilter *filter = activeFilter;
-    activeFilter = 0;
+    QuillImageFilter *filter = task->filter();
+    task->setFilter(0);
 
     QuillImageFilterGenerator *generator =
         dynamic_cast<QuillImageFilterGenerator*>(filter);
@@ -600,12 +599,12 @@ void Scheduler::processFinishedTask(int commandId, int commandLevel, int tileId,
         delete generator;
         command->setFilter(filter);
     }
-    else if ((commandLevel >= Core::instance()->previewLevelCount()) &&
+    else if ((task->displayLevel() >= Core::instance()->previewLevelCount()) &&
              !Core::instance()->defaultTileSize().isEmpty())
     {
         // A fragment of the full image has been calculated
 
-        command->tileMap()->setTile(tileId, image);
+        command->tileMap()->setTile(task->tileId(), image);
         imageUpdated = true;
     }
     else
@@ -662,13 +661,9 @@ void Scheduler::processFinishedTask(int commandId, int commandLevel, int tileId,
 
         // Normal case: a better version of an image has been calculated.
 
-        command->setImage(commandLevel, image);
+        command->setImage(task->displayLevel(), image);
         imageUpdated = true;
     }
-
-    // since this might be altered by suggestNewTask
-    int previousCommandLevel = commandLevel;
-    Core::instance()->suggestNewTask();
 
     // If we just got a better version of the active image, emit signal
 
@@ -677,9 +672,11 @@ void Scheduler::processFinishedTask(int commandId, int commandLevel, int tileId,
         if (command != 0)
             current = stack->command();
 
-        if (current && (current->uniqueId() == commandId)) {
-            image.setZ(previousCommandLevel);
-            stack->file()->emitSingleImage(image, previousCommandLevel);
+        if (current && (current->uniqueId() == task->commandId())) {
+            image.setZ(task->displayLevel());
+            stack->file()->emitSingleImage(image, task->displayLevel());
         }
     }
+
+    delete task;
 }
