@@ -1,3 +1,9 @@
+libquill (1.100212.0) unstable; urgency=low
+
+  * Fixes: NB#155857 Saving blocks other edits
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 12 Feb 2010 12:30:00 +0200
+
 libquill (1.100209.0) unstable; urgency=low
 
   * Fixes: NB#153985 Read-only images can be edited
