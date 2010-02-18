@@ -127,7 +127,7 @@ void ThreadManager::taskFinished()
 
 bool ThreadManager::allowDelete(QuillImageFilter *filter) const
 {
-    return ((!m_task) || (filter != m_task->filter()));
+    return (!m_isRunning || !m_task || (filter != m_task->filter()));
 }
 
 void ThreadManager::setDebugDelay(int delay)

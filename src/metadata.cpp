@@ -80,6 +80,7 @@ Metadata::Metadata(const QString &fileName)
 Metadata::~Metadata()
 {
     exif_data_unref(m_exifData);
+    xmp_terminate();
 }
 
 void Metadata::initTags()
