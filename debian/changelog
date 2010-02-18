@@ -1,3 +1,7 @@
+libquill (1.100218.0) unstable; urgency=low
+
+  * Fixes: NB#156561 Defects from static analysis
+
 libquill (1.100212.0) unstable; urgency=low
 
   * Fixes: NB#155857 Saving blocks other edits

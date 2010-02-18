@@ -80,8 +80,9 @@ QuillUndoCommand::~QuillUndoCommand()
 
     // Eject any images from the cache
 
-    for (int level=0; level<Core::instance()->previewLevelCount(); level++)
-        Core::instance()->cache(level)->remove(m_stack->file(), m_id);
+    if (m_stack)
+        for (int level=0; level<Core::instance()->previewLevelCount(); level++)
+            Core::instance()->cache(level)->remove(m_stack->file(), m_id);
 
     // The tile map becomes property of the command
 
