@@ -1,3 +1,9 @@
+libquill (1.100219.0) unstable; urgency=low
+
+  * Fixes: NB#157603 Libquill crashes when waiting for data
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 19 Feb 2010 15:30:00 +0200
+
 libquill (1.100218.0) unstable; urgency=low
 
   * Fixes: NB#156561 Defects from static analysis
