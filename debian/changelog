@@ -2,6 +2,8 @@ libquill (1.100218.0) unstable; urgency=low
 
   * Fixes: NB#156561 Defects from static analysis
 
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 18 Feb 2010 15:30:00 +0200
+
 libquill (1.100212.0) unstable; urgency=low
 
   * Fixes: NB#155857 Saving blocks other edits

@@ -159,7 +159,7 @@ Task *Scheduler::newTask()
 
     if (Core::instance()->isThumbnailCreationEnabled())
         foreach(File *file, allFiles)
-            if (file->supported() && !file->isReadOnly())
+            if (file->supported() && !file->isReadOnly() && !file->isWaitingForData())
                 for (int level=0; level<=previewLevelCount-1; level++) {
                     Task *task = newThumbnailSaveTask(file, level);
 
