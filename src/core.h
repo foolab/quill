@@ -64,6 +64,7 @@ class Task;
 class Scheduler;
 class ThreadManager;
 class TileCache;
+class DBusThumbnailer;
 class CorePrivate;
 
 class Core : public QObject
@@ -429,6 +430,13 @@ public:
     */
     void emitError(QuillError error);
 
+private:
+
+    /*!
+      Activates the D-Bus thumbnailer with a task if there is any.
+    */
+    void activateDBusThumbnailer();
+
 signals:
     /*!
       Edits to a file have been successfully saved.
@@ -456,6 +464,11 @@ signals:
 
     void error(QuillError error);
 
+private slots:
+    void processDBusThumbnailerGenerated(const QString fileName);
+    void processDBusThumbnailerError(const QString fileName, uint errorCode,
+                                     const QString message);
+
 private:
 
     static Core *g_instance;
@@ -481,6 +494,8 @@ private:
 
     QString m_temporaryFileDirectory;
     QString m_crashDumpPath;
+
+    DBusThumbnailer *m_dBusThumbnailer;
 };
 
 #endif

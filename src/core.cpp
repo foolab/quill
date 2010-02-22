@@ -56,6 +56,8 @@
 #include "tilecache.h"
 #include "historyxml.h"
 #include "logger.h"
+#include "dbus-thumbnailer/dbusthumbnailer.h"
+
 Core *Core::g_instance = 0;
 
 Core::Core(Quill::ThreadingMode threadingMode) :
@@ -78,6 +80,15 @@ Core::Core(Quill::ThreadingMode threadingMode) :
 
     qRegisterMetaType<QuillImageList>("QuillImageList");
     qRegisterMetaType<QuillError>("QuillError");
+
+    m_dBusThumbnailer = new DBusThumbnailer;
+    connect(m_dBusThumbnailer,
+            SIGNAL(thumbnailGenerated(const QString)),
+            SLOT(processDBusThumbnailerGenerated(const QString)));
+
+    connect(m_dBusThumbnailer,
+            SIGNAL(thumbnailError(const QString, uint, const QString)),
+            SLOT(processDBusThumbnailerError(const QString, uint, const QString)));
 }
 
 Core::~Core()
@@ -92,6 +103,7 @@ Core::~Core()
     delete m_tileCache;
     delete m_threadManager;
     delete m_scheduler;
+    delete m_dBusThumbnailer;
 }
 
 void Core::init()
@@ -302,6 +314,10 @@ QList<File*> Core::existingFiles() const
 
 void Core::suggestNewTask()
 {
+    // The D-Bus thumbnailer runs on a different process instead of
+    // Quill's background thread so it can always be invoked.
+    activateDBusThumbnailer();
+
     // Make sure that nothing is already running on the background.
 
     if (m_threadManager->isRunning())
@@ -541,6 +557,52 @@ void Core::setTemporaryFileDirectory(const QString &fileDir)
 QString Core::temporaryFileDirectory() const
 {
     return m_temporaryFileDirectory;
+}
+
+void Core::activateDBusThumbnailer()
+{
+    if (m_dBusThumbnailer->isRunning())
+        return;
+
+    for (int level=0; level<=previewLevelCount()-1; level++)
+        foreach (File *file, existingFiles())
+            if (!file->supported() &&
+                (file->displayLevel() <= level) &&
+                file->stack() &&
+                file->stack()->image(level).isNull() &&
+                m_dBusThumbnailer->supports(file->fileFormat())) {
+
+                // This is hackish, should instead move "flavor" to the public
+                // interface.
+                QString flavor =
+                    QDir(thumbnailDirectory(level)).dirName();
+
+                Logger::log("[Core] Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
+
+                m_dBusThumbnailer->newThumbnailerTask(file->fileName(),
+                                                      file->fileFormat(),
+                                                      flavor);
+                return;
+            }
+}
+
+void Core::processDBusThumbnailerGenerated(const QString fileName)
+{
+    Logger::log("[Core] D-Bus thumbnailer finished with "+ fileName);
+    suggestNewTask();
+}
+
+void Core::processDBusThumbnailerError(const QString fileName,
+                                       uint errorCode,
+                                       const QString message)
+{
+    Q_UNUSED(errorCode);
+    Q_UNUSED(message);
+
+    Logger::log("[Core] D-Bus thumbnailer error with "+ fileName);
+
+    // Nullify the file format to specify a complete failure.
+    file(fileName, "")->setFileFormat("");
 }
 
 void Core::emitSaved(QString fileName)

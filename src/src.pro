@@ -10,6 +10,8 @@ DEPENDPATH += .
 
 DEFINES     +=
 
+QT += dbus
+
 CONFIG += release
 
 CONFIG += quillimagefilter
@@ -54,7 +56,12 @@ HEADERS += quill.h \
            imagecache.h \
            historyxml.h \
            logger.h \
-           metadata.h
+           metadata.h \
+           dbus-thumbnailer/dbusthumbnailer.h \
+           dbus-thumbnailer/dbus-services.h \
+           dbus-thumbnailer/dbus_types.h \
+           dbus-thumbnailer/thumbnailer_generic.h \
+           dbus-thumbnailer/tumbler_cache.h
 
 SOURCES += quill.cpp \
            quillfile.cpp \
@@ -72,7 +79,12 @@ SOURCES += quill.cpp \
            imagecache.cpp \
            historyxml.cpp \
            logger.cpp \
-           metadata.cpp
+           metadata.cpp \
+           dbus-thumbnailer/dbusthumbnailer.cpp \
+           dbus-thumbnailer/dbus-services.cpp \
+           dbus-thumbnailer/dbus_types.cpp \
+           dbus-thumbnailer/thumbnailer_generic.cpp \
+           dbus-thumbnailer/tumbler_cache.cpp
 
 INSTALL_HEADERS = \
            Quill \

@@ -56,6 +56,7 @@ class File : public QObject
 Q_OBJECT
 
     friend class ut_thumbnail;
+    friend class ut_dbusthumbnail;
     friend class ut_file;
     friend class ut_error;
 public:
