@@ -773,6 +773,10 @@ void File::setWaitingForData(bool status)
     if (!status) {
         m_supported = true;
         m_stack->calculateFullImageSize(m_stack->command(0));
+
+        // purge cache of temporary images
+        for (int l=0; l<=m_displayLevel; l++)
+            Core::instance()->cache(l)->purge(this);
         Core::instance()->suggestNewTask();
     }
 }
