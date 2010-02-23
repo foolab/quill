@@ -7,6 +7,7 @@
 class DBusThumbnailer : public QObject {
 Q_OBJECT
 
+friend class ut_dbusthumbnailer;
  public:
     DBusThumbnailer();
     ~DBusThumbnailer();
@@ -29,6 +30,8 @@ Q_OBJECT
 
     void errorHandler(uint handle, const QStringList failedUris,
                       int errorCode, const QString message);
+    void StartedHandler(uint handle);
+    void ReadyHandler(uint handle, const QStringList &uris);
 
  private:
     bool m_taskInProgress;

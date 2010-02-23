@@ -5,11 +5,17 @@
 DBusThumbnailer::DBusThumbnailer() : m_taskInProgress(false)
 {
 	connect( DBusServices::instance(),
-                 SIGNAL(FinishedHandler(uint)),
-                 SLOT(finishedHandler(uint)));
+             SIGNAL(FinishedHandler(uint)),
+             SLOT(finishedHandler(uint)));
 	connect( DBusServices::instance(),
-                 SIGNAL(ErrorHandler(uint,const QStringList,int,const QString&)),
-                 SLOT(errorHandler(uint,const QStringList,int,const QString)));
+             SIGNAL(ErrorHandler(uint,const QStringList,int,const QString&)),
+             SLOT(errorHandler(uint,const QStringList,int,const QString)));
+    connect( DBusServices::instance(),
+             SIGNAL(ReadyHandler(uint, const QStringList&)),
+             SLOT(ReadyHandler(uint, const QStringList&)));
+    connect( DBusServices::instance(),
+             SIGNAL(StartedHandler(uint)),
+             SLOT(StartedHandler(uint)));
 }
 
 DBusThumbnailer::~DBusThumbnailer()
@@ -58,8 +64,7 @@ void DBusThumbnailer::finishedHandler(uint handle)
 {
     qDebug() << "Finishedhandler" << handle;
 
-    if (handle == 0)
-        emit thumbnailGenerated(m_taskFileName);
+    emit thumbnailGenerated(m_taskFileName);
 
     m_taskInProgress = false;
 }
@@ -67,8 +72,20 @@ void DBusThumbnailer::finishedHandler(uint handle)
 void DBusThumbnailer::errorHandler(uint handle, const QStringList failedUris,
                                    int errorCode, const QString message)
 {
-    if (handle == 0)
-        emit thumbnailError(failedUris.first(), errorCode, message);
-
+    qDebug() << "errorHandler" << handle;
+    emit thumbnailError(failedUris.first(), errorCode, message);
     m_taskInProgress = false;
+}
+
+void DBusThumbnailer::StartedHandler(uint handle)
+{
+    Q_UNUSED(handle);
+    qDebug()<<"+++VideoThumbnailer::StartedHandler:it catches the started signal";
+}
+
+void DBusThumbnailer::ReadyHandler(uint handle, const QStringList &uris)
+{
+    Q_UNUSED(handle);
+    Q_UNUSED(uris);
+    qDebug()<<"+++VideoThumbnailer::StartedHandler:it catches the ready signal";
 }
