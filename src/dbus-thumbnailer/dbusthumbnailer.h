@@ -30,9 +30,6 @@ friend class ut_dbusthumbnailer;
 
     void errorHandler(uint handle, const QStringList failedUris,
                       int errorCode, const QString message);
-    void StartedHandler(uint handle);
-    void ReadyHandler(uint handle, const QStringList &uris);
-
  private:
     bool m_taskInProgress;
     QString m_taskFileName;
