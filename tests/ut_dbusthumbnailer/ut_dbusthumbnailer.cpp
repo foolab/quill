@@ -40,15 +40,11 @@
 #include <QDebug>
 #include <QtTest/QtTest>
 #include <QSignalSpy>
+#include "thumbnailer_generic.h"
+#include "dbus-services.h"
 #include "ut_dbusthumbnailer.h"
 #include "dbusthumbnailer.h"
 
-/*
-#define WAIT_FOR_FINISH(spy,target,maxTime) static int _counter = 0;    \
-    while(spy.count()<target && _counter <= maxTime/50) {               \
-        ++_counter; QTest::qWait(50);                                   \
-    }
-*/
 ut_dbusthumbnailer::ut_dbusthumbnailer()
 {
 }
@@ -91,29 +87,25 @@ void ut_dbusthumbnailer::testNewThumbnailerTask()
     QSignalSpy spy(dbusThumbnailer,SIGNAL(thumbnailGenerated(const QString)));
     QSignalSpy spy1(dbusThumbnailer,SIGNAL(thumbnailError(const QString, int,
                                                          const QString)));
-    QEventLoop loop;
-    qDebug()<<"the loop is running?"<<loop.isRunning();
-    QObject::connect(dbusThumbnailer, SIGNAL(thumbnailGenerated(const QString)),
-      &loop, SLOT(quit()));
-
-    QObject::connect(dbusThumbnailer, SIGNAL(thumbnailError(const QString,int, const QString)),
-                     &loop, SLOT(quit()));
     dbusThumbnailer->newThumbnailerTask("/usr/share/libquill-tests/video/Alvin_2.mp4","video/mp4","normal");
-    loop.exec();
-    qDebug()<<"the loop is running1?"<<loop.isRunning();
+    DBusServices::instance()-> tumblerFinishedHandler(2);
+
     QCOMPARE(spy.count(), 1);
     QList<QVariant> arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(),QString("/usr/share/libquill-tests/video/Alvin_2.mp4"));
-
+    qDebug()<<"it creates a thumbnail and finishes";
     dbusThumbnailer->newThumbnailerTask("/usr/share/libquill-tests/video/Alvin.mp4","video/mp4","normal");
-    loop.exec();
-    qDebug()<<"the loop is running1?"<<loop.isRunning();
+    QStringList error;
+    error<<"error1"<<"error2";
+    DBusServices::instance()->tumblerErrorHandler(4,error,5,"this is an error");
+    qDebug()<<"it emits an error signal";
+
     QCOMPARE(spy1.count(), 1);
     arguments = spy1.takeFirst();
-    QCOMPARE(arguments.at(0).toString(),QString("file:"));
+    QCOMPARE(arguments.at(0).toString(),QString("error1"));
     delete dbusThumbnailer;
-    qDebug()<<"it deletes the object of dbusthumbnailer";
 }
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_dbusthumbnailer test;

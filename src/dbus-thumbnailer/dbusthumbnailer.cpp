@@ -31,6 +31,7 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
                                          const QString &mimeType,
                                          const QString &flavor)
 {
+    qDebug()<<"+++DBusThumbnailer::newThumbnailerTask() is called";
     if (isRunning())
         return;
 
@@ -53,17 +54,20 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
 
 void DBusThumbnailer::finishedHandler(uint handle)
 {
+    qDebug()<<"DBusThumbnailer::finishedHandler";
     Q_UNUSED(handle);
     emit thumbnailGenerated(m_taskFileName);
-
+    qDebug()<<"DBusThumbnailer::finishedHandler():it emits the signal";
     m_taskInProgress = false;
 }
 
 void DBusThumbnailer::errorHandler(uint handle, const QStringList failedUris,
                                    int errorCode, const QString message)
 {
+    qDebug()<<"DBusThumbnailer::errorHandler";
     Q_UNUSED(handle);
     emit thumbnailError(failedUris.first(), errorCode, message);
+    qDebug()<<"DBusThumbnailer::errorHandler():it emits the signal";
     m_taskInProgress = false;
 }
 
