@@ -22,7 +22,7 @@ friend class ut_dbusthumbnailer;
 
  signals:
     void thumbnailGenerated(const QString fileName);
-    void thumbnailError(const QString fileName, int errorCode,
+    void thumbnailError(const QString fileName, uint errorCode,
                         const QString message);
 
  private slots:
