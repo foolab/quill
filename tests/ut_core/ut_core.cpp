@@ -38,8 +38,6 @@
 ****************************************************************************/
 
 #include <QtTest/QtTest>
-#include <QImage>
-
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
