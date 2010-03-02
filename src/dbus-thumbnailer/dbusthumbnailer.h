@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QStringList>
 
+class ThumbnailerGenericProxy;
+
 class DBusThumbnailer : public QObject {
 Q_OBJECT
 
@@ -30,9 +32,14 @@ friend class ut_dbusthumbnailer;
 
     void errorHandler(uint handle, const QStringList failedUris,
                       int errorCode, const QString message);
+
+ private:
+    void connectDBus();
+
  private:
     bool m_taskInProgress;
     QString m_taskFileName;
+    ThumbnailerGenericProxy *m_tumbler;
 };
 
 #endif

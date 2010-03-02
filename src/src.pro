@@ -58,8 +58,6 @@ HEADERS += quill.h \
            logger.h \
            metadata.h \
            dbus-thumbnailer/dbusthumbnailer.h \
-           dbus-thumbnailer/dbus-services.h \
-           dbus-thumbnailer/dbus_types.h \
            dbus-thumbnailer/thumbnailer_generic.h \
 
 SOURCES += quill.cpp \
@@ -80,8 +78,6 @@ SOURCES += quill.cpp \
            logger.cpp \
            metadata.cpp \
            dbus-thumbnailer/dbusthumbnailer.cpp \
-           dbus-thumbnailer/dbus-services.cpp \
-           dbus-thumbnailer/dbus_types.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
 
 INSTALL_HEADERS = \

@@ -1,19 +1,30 @@
-#include "thumbnailer_generic.h"
-#include "dbus-services.h"
 #include "dbusthumbnailer.h"
+#include "thumbnailer_generic.h"
 
-DBusThumbnailer::DBusThumbnailer() : m_taskInProgress(false)
+QString tumblerService = "org.freedesktop.thumbnails.Thumbnailer1";
+QString tumblerCache = "/org/freedesktop/thumbnails/Thumbnailer1";
+
+DBusThumbnailer::DBusThumbnailer() : m_taskInProgress(false),
+                                     m_tumbler(0)
 {
-	connect( DBusServices::instance(),
-             SIGNAL(FinishedHandler(uint)),
-             SLOT(finishedHandler(uint)));
-	connect( DBusServices::instance(),
-             SIGNAL(ErrorHandler(uint,const QStringList,int,const QString&)),
-             SLOT(errorHandler(uint,const QStringList,int,const QString)));
+    connectDBus();
 }
 
 DBusThumbnailer::~DBusThumbnailer()
 {
+}
+
+void DBusThumbnailer::connectDBus()
+{
+    delete m_tumbler;
+    m_tumbler = new ThumbnailerGenericProxy(tumblerService, tumblerCache,
+                                            QDBusConnection::sessionBus());
+    connect(m_tumbler,
+            SIGNAL(Finished(uint)),
+            SLOT(finishedHandler(uint)));
+    connect(m_tumbler,
+            SIGNAL(Error(uint,const QStringList,int,const QString)),
+            SLOT(errorHandler(uint,const QStringList,int,const QString)));
 }
 
 bool DBusThumbnailer::supports(const QString mimeType)
@@ -47,26 +58,25 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
     mimes.append(mimeType);
 
     QDBusPendingReply<uint> reply;
-    reply = DBusServices::tumbler()->Queue(uris, mimes, flavor, "default", 0);
 
+    if ((!m_tumbler) || (!m_tumbler->isValid()))
+        connectDBus();
+
+    if (m_tumbler)
+        reply = m_tumbler->Queue(uris, mimes, flavor, "default", 0);
 }
 
 void DBusThumbnailer::finishedHandler(uint handle)
 {
-    qDebug()<<"DBusThumbnailer::finishedHandler";
     Q_UNUSED(handle);
     emit thumbnailGenerated(m_taskFileName);
-    qDebug()<<"DBusThumbnailer::finishedHandler():it emits the signal";
     m_taskInProgress = false;
 }
 
 void DBusThumbnailer::errorHandler(uint handle, const QStringList failedUris,
                                    int errorCode, const QString message)
 {
-    qDebug()<<"DBusThumbnailer::errorHandler";
     Q_UNUSED(handle);
     emit thumbnailError(failedUris.first(), errorCode, message);
-    qDebug()<<"DBusThumbnailer::errorHandler():it emits the signal";
     m_taskInProgress = false;
 }
-

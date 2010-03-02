@@ -85,20 +85,20 @@ void ut_dbusthumbnailer::testNewThumbnailerTask()
 {
     DBusThumbnailer* dbusThumbnailer = new DBusThumbnailer();
     QSignalSpy spy(dbusThumbnailer,SIGNAL(thumbnailGenerated(const QString)));
-    QSignalSpy spy1(dbusThumbnailer,SIGNAL(thumbnailError(const QString, int,
-                                                         const QString)));
+    QSignalSpy spy1(dbusThumbnailer,SIGNAL(thumbnailError(const QString, uint,
+                                                          const QString)));
     dbusThumbnailer->newThumbnailerTask("/usr/share/libquill-tests/video/Alvin_2.mp4","video/mp4","normal");
-    DBusServices::instance()-> tumblerFinishedHandler(2);
+
+    dbusThumbnailer->finishedHandler(2);
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).toString(),QString("/usr/share/libquill-tests/video/Alvin_2.mp4"));
-    qDebug()<<"it creates a thumbnail and finishes";
+
     dbusThumbnailer->newThumbnailerTask("/usr/share/libquill-tests/video/Alvin.mp4","video/mp4","normal");
     QStringList error;
     error<<"error1"<<"error2";
-    DBusServices::instance()->tumblerErrorHandler(4,error,5,"this is an error");
-    qDebug()<<"it emits an error signal";
+    dbusThumbnailer->errorHandler(4,error,5,"this is an error");
 
     QCOMPARE(spy1.count(), 1);
     arguments = spy1.takeFirst();
