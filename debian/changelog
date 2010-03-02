@@ -1,3 +1,9 @@
+libquill (1.100226.0) unstable; urgency=low
+
+  * change version number for testing
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 16 Feb 2010 12:30:00 +0200
+
 libquill (1.100212.0) unstable; urgency=low
 
   * Fixes: NB#155857 Saving blocks other edits

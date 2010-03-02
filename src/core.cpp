@@ -561,12 +561,13 @@ QString Core::temporaryFileDirectory() const
 
 void Core::activateDBusThumbnailer()
 {
+    Logger::log("[Core]"+QString(Q_FUNC_INFO));
     if (m_dBusThumbnailer->isRunning())
         return;
 
     for (int level=0; level<=previewLevelCount()-1; level++)
-        foreach (File *file, existingFiles())
-            if (!file->supported() &&
+        foreach (File *file, existingFiles()){
+            if (file->supported() &&
                 (file->displayLevel() <= level) &&
                 file->stack() &&
                 file->stack()->image(level).isNull() &&
@@ -574,8 +575,10 @@ void Core::activateDBusThumbnailer()
 
                 // This is hackish, should instead move "flavor" to the public
                 // interface.
-                QString flavor =
-                    QDir(thumbnailDirectory(level)).dirName();
+                /*QString flavor =
+                  QDir(thumbnailDirectory(level)).dirName();
+                */
+            QString flavor = "normal";
 
                 Logger::log("[Core] Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
 
@@ -583,7 +586,8 @@ void Core::activateDBusThumbnailer()
                                                       file->fileFormat(),
                                                       flavor);
                 return;
-            }
+                }
+        }
 }
 
 void Core::processDBusThumbnailerGenerated(const QString fileName)

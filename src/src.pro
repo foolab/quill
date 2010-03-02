@@ -61,7 +61,6 @@ HEADERS += quill.h \
            dbus-thumbnailer/dbus-services.h \
            dbus-thumbnailer/dbus_types.h \
            dbus-thumbnailer/thumbnailer_generic.h \
-           dbus-thumbnailer/tumbler_cache.h
 
 SOURCES += quill.cpp \
            quillfile.cpp \
@@ -84,7 +83,6 @@ SOURCES += quill.cpp \
            dbus-thumbnailer/dbus-services.cpp \
            dbus-thumbnailer/dbus_types.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
-           dbus-thumbnailer/tumbler_cache.cpp
 
 INSTALL_HEADERS = \
            Quill \

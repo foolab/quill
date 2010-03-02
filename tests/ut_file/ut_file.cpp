@@ -348,6 +348,14 @@ void ut_file::testReadOnly()
     delete file;
 }
 
+
+void ut_file::testActivateDBusThumbnailer()
+{
+    QuillFile *file = new QuillFile("/usr/share/libquill-tests/video/Alvin_2.mp4","video/mp4");
+    Core::instance()->suggestNewTask();
+    delete file;
+    }
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_file test;

@@ -31,7 +31,6 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
                                          const QString &mimeType,
                                          const QString &flavor)
 {
-    qDebug()<<"+++DBusThumbnailer::newThumbnailerTask() is called";
     if (isRunning())
         return;
 
