@@ -1,3 +1,9 @@
+libquill (1.100302.0) unstable; urgency=low
+
+  * Fixes: NB#158664 XMP metadata caused memory leaks
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 02 Mar 2010 16:30:00 +0200
+
 libquill (1.100222.0) unstable; urgency=low
 
   * Fixes: NB#157603 Libquill crashes when waiting for data
