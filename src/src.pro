@@ -92,12 +92,21 @@ INSTALL_HEADERS = \
 headers.files = $$INSTALL_HEADERS
 headers.path = $$[QT_INSTALL_HEADERS]/$$TARGET
 target.path = $$[QT_INSTALL_LIBS]
+target.depends += generateproxy
 pkgconfig.files = quill.pc
 pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig
 prf.files = quill.prf
 prf.path = $$[QMAKE_MKSPECS]/features
 INSTALLS += target headers pkgconfig prf
 
+generateproxy.target = dbus-thumbnailer/thumbnailer_generic.h
+generateproxy.depends = dbus-thumbnailer/tumbler-service-dbus.xml
+generateproxy.commands = qdbusxml2cpp -c ThumbnailerGenericProxy -p dbus-thumbnailer/thumbnailer_generic.h:dbus-thumbnailer/thumbnailer_generic.cpp dbus-thumbnailer/tumbler-service-dbus.xml org.freedesktop.thumbnails.Thumbnailer1
+
 # ---clean
-QMAKE_CLEAN += \
-	*.gcov *.gcno *.log *.moc_* *.gcda
+QMAKE_CLEAN += *.gcov *.gcno *.log *.moc_* *.gcda \
+               dbus-thumbnailer/thumbnailer_generic.h \
+               dbus-thumbnailer/thumbnailer_generic.cpp \
+
+QMAKE_EXTRA_TARGETS += generateproxy
+
