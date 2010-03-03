@@ -41,7 +41,6 @@
 #include <QtTest/QtTest>
 #include <QSignalSpy>
 #include "thumbnailer_generic.h"
-#include "dbus-services.h"
 #include "ut_dbusthumbnailer.h"
 #include "dbusthumbnailer.h"
 
