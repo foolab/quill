@@ -104,9 +104,9 @@ generateproxy.depends = dbus-thumbnailer/tumbler-service-dbus.xml
 generateproxy.commands = qdbusxml2cpp -c ThumbnailerGenericProxy -p dbus-thumbnailer/thumbnailer_generic.h:dbus-thumbnailer/thumbnailer_generic.cpp dbus-thumbnailer/tumbler-service-dbus.xml org.freedesktop.thumbnails.Thumbnailer1
 
 # ---clean
-QMAKE_CLEAN += *.gcov *.gcno *.log *.moc_* *.gcda \
-               dbus-thumbnailer/thumbnailer_generic.h \
-               dbus-thumbnailer/thumbnailer_generic.cpp \
+QMAKE_CLEAN += *.gcov *.gcno *.log *.moc_* *.gcda
+#               dbus-thumbnailer/thumbnailer_generic.h \
+#               dbus-thumbnailer/thumbnailer_generic.cpp
 
 QMAKE_EXTRA_TARGETS += generateproxy
 

@@ -62,7 +62,6 @@ private slots:
     void testDifferentPreviewLevels();
     void testSaveAfterDelete();
     void testReadOnly();
-    void testActivateDBusThumbnailer();
 };
 
 #endif  // TEST_LIBQUILL_FILE_H
