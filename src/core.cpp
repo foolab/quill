@@ -567,18 +567,17 @@ void Core::activateDBusThumbnailer()
 
     for (int level=0; level<=previewLevelCount()-1; level++)
         foreach (File *file, existingFiles()){
-            if (file->supported() &&
-                (file->displayLevel() <= level) &&
+            if (file->exists() &&
+                !file->supported() &&
+                (level <= file->displayLevel()) &&
+                !thumbnailDirectory(level).isNull() &&
                 file->stack() &&
                 file->stack()->image(level).isNull() &&
+                !file->hasThumbnail(level) &&
                 m_dBusThumbnailer->supports(file->fileFormat())) {
 
-                // This is hackish, should instead move "flavor" to the public
-                // interface.
-                /*QString flavor =
-                  QDir(thumbnailDirectory(level)).dirName();
-                */
-            QString flavor = "normal";
+                QString flavor =
+                    QDir(thumbnailDirectory(level)).dirName();
 
                 Logger::log("[Core] Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
 
