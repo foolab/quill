@@ -437,6 +437,18 @@ private:
     */
     void activateDBusThumbnailer();
 
+    /*!
+      Converts a preview level to a D-bus thumbnailer flavor.
+    */
+
+    QString flavorFromLevel(int level);
+
+    /*!
+      Converts a D-bus thumbnailer flavor to a preview level.
+    */
+
+    int levelFromFlavor(QString flavor);
+
 signals:
     /*!
       Edits to a file have been successfully saved.
@@ -465,7 +477,8 @@ signals:
     void error(QuillError error);
 
 private slots:
-    void processDBusThumbnailerGenerated(const QString fileName);
+    void processDBusThumbnailerGenerated(const QString fileName,
+                                         const QString flavor);
     void processDBusThumbnailerError(const QString fileName, uint errorCode,
                                      const QString message);
 

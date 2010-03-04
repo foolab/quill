@@ -55,10 +55,10 @@
 #include "logger.h"
 #include "metadata.h"
 
-File::File() : m_exists(true), m_supported(true), m_readOnly(false),
-               m_hasThumbnailError(false), m_displayLevel(-1),
-               m_fileName(""), m_originalFileName(""), m_fileFormat(""),
-               m_targetFormat(""), m_viewPort(QRect()),
+File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(false),
+               m_readOnly(false), m_hasThumbnailError(false),
+               m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
+               m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_waitingForData(false), m_saveInProgress(false),
                m_temporaryFile(0)
 {
@@ -554,6 +554,16 @@ void File::setSupported(bool supported)
 bool File::supported() const
 {
     return m_supported;
+}
+
+void File::setThumbnailSupported(bool supported)
+{
+    m_thumbnailSupported = supported;
+}
+
+bool File::thumbnailSupported() const
+{
+    return m_thumbnailSupported;
 }
 
 QuillError File::overwritingCopy(const QString &fileName,

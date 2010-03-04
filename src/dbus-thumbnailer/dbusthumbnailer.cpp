@@ -12,6 +12,7 @@ DBusThumbnailer::DBusThumbnailer() : m_taskInProgress(false),
 
 DBusThumbnailer::~DBusThumbnailer()
 {
+    delete m_tumbler;
 }
 
 void DBusThumbnailer::connectDBus()
@@ -46,8 +47,8 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
         return;
 
     m_taskInProgress = true;
-
     m_taskFileName = fileName;
+    m_flavor = flavor;
 
     const QUrl uri =
         QUrl::fromLocalFile(QFileInfo(fileName).canonicalFilePath());
@@ -69,7 +70,7 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
 void DBusThumbnailer::finishedHandler(uint handle)
 {
     Q_UNUSED(handle);
-    emit thumbnailGenerated(m_taskFileName);
+    emit thumbnailGenerated(m_taskFileName, m_flavor);
     m_taskInProgress = false;
 }
 

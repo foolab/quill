@@ -83,8 +83,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
 
     m_dBusThumbnailer = new DBusThumbnailer;
     connect(m_dBusThumbnailer,
-            SIGNAL(thumbnailGenerated(const QString)),
-            SLOT(processDBusThumbnailerGenerated(const QString)));
+            SIGNAL(thumbnailGenerated(const QString, const QString)),
+            SLOT(processDBusThumbnailerGenerated(const QString, const QString)));
 
     connect(m_dBusThumbnailer,
             SIGNAL(thumbnailError(const QString, uint, const QString)),
@@ -559,6 +559,19 @@ QString Core::temporaryFileDirectory() const
     return m_temporaryFileDirectory;
 }
 
+QString Core::flavorFromLevel(int level)
+{
+    return QDir(thumbnailDirectory(level)).dirName();
+}
+
+int Core::levelFromFlavor(QString flavor)
+{
+    for (int level=0; level<=previewLevelCount()-1; level++)
+        if (flavorFromLevel(level) == flavor)
+            return level;
+    return -1;
+}
+
 void Core::activateDBusThumbnailer()
 {
     Logger::log("[Core]"+QString(Q_FUNC_INFO));
@@ -569,6 +582,7 @@ void Core::activateDBusThumbnailer()
         foreach (File *file, existingFiles()){
             if (file->exists() &&
                 !file->supported() &&
+                file->thumbnailSupported() &&
                 (level <= file->displayLevel()) &&
                 !thumbnailDirectory(level).isNull() &&
                 file->stack() &&
@@ -576,8 +590,7 @@ void Core::activateDBusThumbnailer()
                 !file->hasThumbnail(level) &&
                 m_dBusThumbnailer->supports(file->fileFormat())) {
 
-                QString flavor =
-                    QDir(thumbnailDirectory(level)).dirName();
+                QString flavor = flavorFromLevel(level);
 
                 Logger::log("[Core] Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
 
@@ -589,9 +602,14 @@ void Core::activateDBusThumbnailer()
         }
 }
 
-void Core::processDBusThumbnailerGenerated(const QString fileName)
+void Core::processDBusThumbnailerGenerated(const QString fileName,
+                                           const QString flavor)
 {
     Logger::log("[Core] D-Bus thumbnailer finished with "+ fileName);
+    int level = levelFromFlavor(flavor);
+    if (!file(fileName, "")->hasThumbnail(level))
+        processDBusThumbnailerError(fileName, -1, "No thumbnail found");
+
     suggestNewTask();
 }
 
@@ -604,8 +622,8 @@ void Core::processDBusThumbnailerError(const QString fileName,
 
     Logger::log("[Core] D-Bus thumbnailer error with "+ fileName);
 
-    // Nullify the file format to specify a complete failure.
-    file(fileName, "")->setFileFormat("");
+    // Do not try to do any more thumbnailing for this file.
+    file(fileName, "")->setThumbnailSupported(false);
 }
 
 void Core::emitSaved(QString fileName)

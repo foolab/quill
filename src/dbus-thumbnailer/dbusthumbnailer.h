@@ -23,7 +23,7 @@ friend class ut_dbusthumbnailer;
                             const QString &flavor);
 
  signals:
-    void thumbnailGenerated(const QString fileName);
+    void thumbnailGenerated(const QString fileName, const QString flavor);
     void thumbnailError(const QString fileName, uint errorCode,
                         const QString message);
 
@@ -39,6 +39,7 @@ friend class ut_dbusthumbnailer;
  private:
     bool m_taskInProgress;
     QString m_taskFileName;
+    QString m_flavor;
     ThumbnailerGenericProxy *m_tumbler;
 };
 

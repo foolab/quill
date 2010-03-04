@@ -381,6 +381,19 @@ public:
     virtual void setSupported(bool supported);
 
     /*!
+      Returns true either if the file is supported() directly by Quill,
+      or if the file can be thumbnailed using the D-Bus thumbnailer.
+     */
+
+    virtual bool thumbnailSupported() const;
+
+    /*!
+      See thumbnailSupported().
+     */
+
+    virtual void setThumbnailSupported(bool format);
+
+    /*!
       Reads a complete file object from edit history.
 
       @param parent a Quill Core object.
@@ -535,6 +548,7 @@ private:
 
     bool m_exists;
     bool m_supported;
+    bool m_thumbnailSupported;
     bool m_readOnly;
     bool m_hasThumbnailError;
 
