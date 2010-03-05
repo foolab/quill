@@ -56,7 +56,8 @@ private slots:
 
     void testSupports();
     void testIsRunning();
-    void testNewThumbnailerTask();
+    void testSuccess();
+    void testError();
 };
 
 #endif  // TEST_LIBQUILL_DBUS_THUMBNAIL_H

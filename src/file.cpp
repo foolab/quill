@@ -55,7 +55,7 @@
 #include "logger.h"
 #include "metadata.h"
 
-File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(false),
+File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
                m_readOnly(false), m_hasThumbnailError(false),
                m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),

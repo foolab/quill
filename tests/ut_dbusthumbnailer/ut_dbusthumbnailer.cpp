@@ -80,29 +80,38 @@ void ut_dbusthumbnailer::testIsRunning()
     delete dbusThumbnailer;
 }
 
-void ut_dbusthumbnailer::testNewThumbnailerTask()
+void ut_dbusthumbnailer::testSuccess()
 {
-    DBusThumbnailer* dbusThumbnailer = new DBusThumbnailer();
-    QSignalSpy spy(dbusThumbnailer,SIGNAL(thumbnailGenerated(const QString)));
-    QSignalSpy spy1(dbusThumbnailer,SIGNAL(thumbnailError(const QString, uint,
-                                                          const QString)));
-    dbusThumbnailer->newThumbnailerTask("/usr/share/libquill-tests/video/Alvin_2.mp4","video/mp4","normal");
+    DBusThumbnailer dbusThumbnailer;
+    QSignalSpy spy(&dbusThumbnailer,SIGNAL(thumbnailGenerated(const QString,
+                                                              const QString)));
 
-    dbusThumbnailer->finishedHandler(2);
+    dbusThumbnailer.newThumbnailerTask("/usr/share/libquill-tests/video/Alvin_2.mp4","video/mp4","normal");
+
+    dbusThumbnailer.finishedHandler(2);
 
     QCOMPARE(spy.count(), 1);
-    QList<QVariant> arguments = spy.takeFirst();
+    QList<QVariant> arguments = spy.first();
     QCOMPARE(arguments.at(0).toString(),QString("/usr/share/libquill-tests/video/Alvin_2.mp4"));
+    QCOMPARE(arguments.at(1).toString(),QString("normal"));
+}
 
-    dbusThumbnailer->newThumbnailerTask("/usr/share/libquill-tests/video/Alvin.mp4","video/mp4","normal");
+void ut_dbusthumbnailer::testError()
+{
+    DBusThumbnailer dbusThumbnailer;
+    QSignalSpy spy(&dbusThumbnailer,SIGNAL(thumbnailError(const QString, uint,
+                                                          const QString)));
+    dbusThumbnailer.newThumbnailerTask("invalid.mp4","invalid","normal");
+
+    qDebug() << "Hello!";
     QStringList error;
-    error<<"error1"<<"error2";
-    dbusThumbnailer->errorHandler(4,error,5,"this is an error");
+    dbusThumbnailer.errorHandler(4,error,5,"this is an error");
 
-    QCOMPARE(spy1.count(), 1);
-    arguments = spy1.takeFirst();
+    qDebug() << "Hello2!";
+
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> arguments = spy.first();
     QCOMPARE(arguments.at(0).toString(),QString("error1"));
-    delete dbusThumbnailer;
 }
 
 int main ( int argc, char *argv[] ){
