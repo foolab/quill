@@ -345,6 +345,23 @@ public:
     static bool isThumbnailCreationEnabled();
 
     /*!
+      Enables or disables thumbnail creation using an external D-Bus
+      thumbnailer (in cases of files which are not directly supported
+      by Quill). The external thumbnailer must be configured to
+      support all the preview levels that are specified using
+      setThumbnailDirectory(). This option is true by default.
+    */
+
+    static void setDBusThumbnailingEnabled(bool enabled);
+
+    /*!
+      Returns true if the external D-Bus thumbnailer has been selected to be
+      used.
+    */
+
+    static bool isDBusThumbnailingEnabled();
+
+    /*!
       Sets the path where Quill will store its temporary files.
       The temporary files are currently not autocleaned in case of
       crash, so it is recommended to use a temporary partition for

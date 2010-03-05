@@ -63,6 +63,7 @@ Core *Core::g_instance = 0;
 Core::Core(Quill::ThreadingMode threadingMode) :
     m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
     m_thumbnailCreationEnabled(true),
+    m_dBusThumbnailingEnabled(true),
     m_recoveryInProgress(false),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
@@ -316,7 +317,8 @@ void Core::suggestNewTask()
 {
     // The D-Bus thumbnailer runs on a different process instead of
     // Quill's background thread so it can always be invoked.
-    activateDBusThumbnailer();
+    if (m_dBusThumbnailingEnabled)
+        activateDBusThumbnailer();
 
     // Make sure that nothing is already running on the background.
 
@@ -511,6 +513,16 @@ void Core::setThumbnailCreationEnabled(bool enabled)
 bool Core::isThumbnailCreationEnabled() const
 {
     return m_thumbnailCreationEnabled;
+}
+
+void Core::setDBusThumbnailingEnabled(bool enabled)
+{
+    m_dBusThumbnailingEnabled = enabled;
+}
+
+bool Core::isDBusThumbnailingEnabled() const
+{
+    return m_dBusThumbnailingEnabled;
 }
 
 void Core::insertFile(File *file, const QString &key)
