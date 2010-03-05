@@ -37,6 +37,8 @@ friend class ut_dbusthumbnailer;
     void connectDBus();
 
  private:
+    static QString tumblerService, tumblerCache;
+
     bool m_taskInProgress;
     QString m_taskFileName;
     QString m_flavor;
