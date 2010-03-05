@@ -337,7 +337,7 @@ bool QuillFile::supported() const
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
-        return priv->m_file->supported();
+        return priv->m_file->thumbnailSupported();
     else
         return false;
 }
@@ -345,8 +345,10 @@ bool QuillFile::supported() const
 void QuillFile::setSupported(bool supported)
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::boolToString(supported));
-    if (priv->m_file)
+    if (priv->m_file) {
         priv->m_file->setSupported(supported);
+        priv->m_file->setThumbnailSupported(supported);
+    }
 }
 
 void QuillFile::remove()

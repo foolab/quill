@@ -47,7 +47,6 @@
 #include <QuillImageFilterGenerator>
 #include <QDebug>
 
-#include "quillerror.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
 #include "file.h"

@@ -1,3 +1,9 @@
+libquill (1.100305.0) unstable; urgency=low
+
+  * Implemented: SWP#HImag-1290
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 05 Mar 2010 15:20:00 +0200
+
 libquill (1.100302.0) unstable; urgency=low
 
   * Fixes: NB#158664 XMP metadata caused memory leaks

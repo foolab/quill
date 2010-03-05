@@ -177,6 +177,10 @@ void ut_error::testEmptyFileRead()
     QTemporaryFile testFile;
     testFile.open();
 
+    // Disable this or we will not get the error message as Quill will
+    // wait for the D-Bus thumbnailer to finish first.
+    Quill::setDBusThumbnailingEnabled(false);
+
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
