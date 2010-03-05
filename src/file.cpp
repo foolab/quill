@@ -563,7 +563,10 @@ void File::setThumbnailSupported(bool supported)
 
 bool File::thumbnailSupported() const
 {
-    return m_thumbnailSupported;
+    if (Core::instance()->isDBusThumbnailingEnabled())
+        return m_thumbnailSupported;
+    else
+        return m_supported;
 }
 
 QuillError File::overwritingCopy(const QString &fileName,
@@ -762,8 +765,13 @@ void File::processFilterError(QuillImageFilter *filter)
             m_fileName) {
             errorSource = QuillError::ImageFileErrorSource;
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
-                (errorCode == QuillError::FileCorruptError))
+                (errorCode == QuillError::FileCorruptError)) {
                 setSupported(false);
+                if (Core::instance()->isDBusThumbnailingEnabled())
+                    // Not emitting an error yet, as D-Bus thumbnailer might
+                    // still find an use for the file
+                    return;
+            }
             else
                 setExists(false);
         }

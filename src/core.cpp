@@ -634,6 +634,10 @@ void Core::processDBusThumbnailerError(const QString fileName,
 
     Logger::log("[Core] D-Bus thumbnailer error with "+ fileName);
 
+    file(fileName, "")->emitError(QuillError(QuillError::FileFormatUnsupportedError,
+                                             QuillError::ImageFileErrorSource,
+                                             fileName));
+
     // Do not try to do any more thumbnailing for this file.
     file(fileName, "")->setThumbnailSupported(false);
 }

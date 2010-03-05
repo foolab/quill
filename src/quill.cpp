@@ -164,14 +164,14 @@ bool Quill::isThumbnailCreationEnabled()
 
 void Quill::setDBusThumbnailingEnabled(bool enabled)
 {
-    Core::instance()->setThumbnailCreationEnabled(enabled);
+    Core::instance()->setDBusThumbnailingEnabled(enabled);
     Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::boolToString(enabled));
 }
 
 bool Quill::isDBusThumbnailingEnabled()
 {
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
-    return Core::instance()->isThumbnailCreationEnabled();
+    return Core::instance()->isDBusThumbnailingEnabled();
 }
 
 void Quill::setTemporaryFilePath(const QString &tmpFilePath)
