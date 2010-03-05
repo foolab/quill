@@ -1,8 +1,8 @@
 #include "dbusthumbnailer.h"
 #include "thumbnailer_generic.h"
 
-QString tumblerService = "org.freedesktop.thumbnails.Thumbnailer1";
-QString tumblerCache = "/org/freedesktop/thumbnails/Thumbnailer1";
+QString DBusThumbnailer::tumblerService = "org.freedesktop.thumbnails.Thumbnailer1";
+QString DBusThumbnailer::tumblerCache = "/org/freedesktop/thumbnails/Thumbnailer1";
 
 DBusThumbnailer::DBusThumbnailer() : m_taskInProgress(false),
                                      m_tumbler(0)
