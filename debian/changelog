@@ -1,3 +1,9 @@
+libquill (1.100308.0) unstable; urgency=low
+
+  * Fixed failing test case.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 08 Mar 2010 15:50:00 +0200
+
 libquill (1.100305.0) unstable; urgency=low
 
   * Implemented: SWP#HImag-1290
