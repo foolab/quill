@@ -299,18 +299,18 @@ void ut_tileloading::testCenterTilePriority()
     QFile testFile("/usr/share/libquill-tests/images/image_16x4.jpg");
     QImage originalImage("/usr/share/libquill-tests/images/image_16x4.png");
 
-    Quill::setDefaultTileSize(QSize(1, 1));
+    Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file =
         new QuillFile(testFile.fileName());
-    file->setViewPort(QRect(0, 0, 3, 2));
+    file->setViewPort(QRect(0, 0, 6, 4));
     file->setDisplayLevel(1);
 
     Quill::releaseAndWait();
     Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 2);
-    QCOMPARE(file->allImageLevels().at(1).area(), QRect(1, 0, 1, 1));
+    QCOMPARE(file->allImageLevels().at(1).area(), QRect(2, 0, 2, 2));
 
     // Immediate surroundings
 
@@ -319,10 +319,14 @@ void ut_tileloading::testCenterTilePriority()
     Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 5);
-    QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 1, 1));
-    QCOMPARE(file->allImageLevels().at(2).area(), QRect(1, 0, 1, 1));
-    QCOMPARE(file->allImageLevels().at(3).area(), QRect(2, 0, 1, 1));
-    QCOMPARE(file->allImageLevels().at(4).area(), QRect(1, 1, 1, 1));
+    QCOMPARE(file->allImageLevels().at(1).size(), QSize(2, 2));
+    QCOMPARE(file->allImageLevels().at(2).size(), QSize(2, 2));
+    QCOMPARE(file->allImageLevels().at(3).size(), QSize(2, 2));
+    QCOMPARE(file->allImageLevels().at(4).size(), QSize(2, 2));
+    QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 2, 2));
+    QCOMPARE(file->allImageLevels().at(2).area(), QRect(2, 0, 2, 2));
+    QCOMPARE(file->allImageLevels().at(3).area(), QRect(0, 2, 2, 2));
+    QCOMPARE(file->allImageLevels().at(4).area(), QRect(2, 2, 2, 2));
 
     // Whole image
 
@@ -330,12 +334,12 @@ void ut_tileloading::testCenterTilePriority()
     Quill::releaseAndWait();
 
     QCOMPARE(file->allImageLevels().count(), 7);
-    QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 1, 1));
-    QCOMPARE(file->allImageLevels().at(2).area(), QRect(1, 0, 1, 1));
-    QCOMPARE(file->allImageLevels().at(3).area(), QRect(2, 0, 1, 1));
-    QCOMPARE(file->allImageLevels().at(4).area(), QRect(0, 1, 1, 1));
-    QCOMPARE(file->allImageLevels().at(5).area(), QRect(1, 1, 1, 1));
-    QCOMPARE(file->allImageLevels().at(6).area(), QRect(2, 1, 1, 1));
+    QCOMPARE(file->allImageLevels().at(1).area(), QRect(0, 0, 2, 2));
+    QCOMPARE(file->allImageLevels().at(2).area(), QRect(2, 0, 2, 2));
+    QCOMPARE(file->allImageLevels().at(3).area(), QRect(4, 0, 2, 2));
+    QCOMPARE(file->allImageLevels().at(4).area(), QRect(0, 2, 2, 2));
+    QCOMPARE(file->allImageLevels().at(5).area(), QRect(2, 2, 2, 2));
+    QCOMPARE(file->allImageLevels().at(6).area(), QRect(4, 2, 2, 2));
 
     delete file;
 }
