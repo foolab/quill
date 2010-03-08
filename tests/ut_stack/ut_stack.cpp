@@ -391,8 +391,11 @@ void ut_stack::testSourceChanged()
 
     file->setWaitingForData(false);
     QCOMPARE(file->displayLevel(), 1);
+    QVERIFY(file->image(0).isNull()); // Temporary images are thrown away
+    QVERIFY(file->image(1).isNull());
 
-    Quill::releaseAndWait();
+    Quill::releaseAndWait(); // 0
+    Quill::releaseAndWait(); // 1
 
     QVERIFY(Unittests::compareImage(file->image(0), image));
     QVERIFY(Unittests::compareImage(file->image(1), image));

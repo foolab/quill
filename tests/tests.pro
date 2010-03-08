@@ -27,6 +27,7 @@ SUBDIRS += \
            ut_error \
            ut_logger \
            ut_metadata \
+           ut_dbusthumbnailer \
            benchmark  \
 
 # --- install
@@ -38,7 +39,9 @@ tatamimages.files += images/image_16x4.png
 tatamimages.files += images/exif.jpg
 tatamimages.files += images/xmp.jpg
 tatamimages.files += images/iptc.jpg
+tatamvideo.files += video/Alvin_2.mp4
 
 tatamimages.path  = $$(DESTDIR)/usr/share/libquill-tests/images/
+tatamvideo.path  = $$(DESTDIR)/usr/share/libquill-tests/video/
 
-INSTALLS += tatam tatamimages
+INSTALLS += tatam tatamimages tatamvideo

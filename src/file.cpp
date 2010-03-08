@@ -55,10 +55,10 @@
 #include "logger.h"
 #include "metadata.h"
 
-File::File() : m_exists(true), m_supported(true), m_readOnly(false),
-               m_hasThumbnailError(false), m_displayLevel(-1),
-               m_fileName(""), m_originalFileName(""), m_fileFormat(""),
-               m_targetFormat(""), m_viewPort(QRect()),
+File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
+               m_readOnly(false), m_hasThumbnailError(false),
+               m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
+               m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_waitingForData(false), m_saveInProgress(false),
                m_temporaryFile(0)
 {
@@ -556,6 +556,19 @@ bool File::supported() const
     return m_supported;
 }
 
+void File::setThumbnailSupported(bool supported)
+{
+    m_thumbnailSupported = supported;
+}
+
+bool File::thumbnailSupported() const
+{
+    if (Core::instance()->isDBusThumbnailingEnabled())
+        return m_thumbnailSupported;
+    else
+        return m_supported;
+}
+
 QuillError File::overwritingCopy(const QString &fileName,
                                  const QString &newName)
 {
@@ -752,8 +765,13 @@ void File::processFilterError(QuillImageFilter *filter)
             m_fileName) {
             errorSource = QuillError::ImageFileErrorSource;
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
-                (errorCode == QuillError::FileCorruptError))
+                (errorCode == QuillError::FileCorruptError)) {
                 setSupported(false);
+                if (Core::instance()->isDBusThumbnailingEnabled())
+                    // Not emitting an error yet, as D-Bus thumbnailer might
+                    // still find an use for the file
+                    return;
+            }
             else
                 setExists(false);
         }
@@ -772,7 +790,12 @@ void File::setWaitingForData(bool status)
 
     if (!status) {
         m_supported = true;
-        m_stack->calculateFullImageSize(m_stack->command(0));
+        if (!m_stack->isClean())
+            m_stack->calculateFullImageSize(m_stack->command(0));
+
+        // purge cache of temporary images
+        for (int l=0; l<=m_displayLevel; l++)
+            Core::instance()->cache(l)->purge(this);
         Core::instance()->suggestNewTask();
     }
 }

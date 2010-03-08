@@ -37,53 +37,85 @@
 **
 ****************************************************************************/
 
+#include <QDebug>
 #include <QtTest/QtTest>
-#include <QuillImageFilter>
-#include <QuillImageFilterFactory>
-#include <QuillImageFilterGenerator>
+#include <QSignalSpy>
+#include "thumbnailer_generic.h"
+#include "ut_dbusthumbnailer.h"
+#include "dbusthumbnailer.h"
 
-#include "core.h"
-#include "unittests.h"
-#include "ut_core.h"
-
-ut_core::ut_core()
+ut_dbusthumbnailer::ut_dbusthumbnailer()
 {
 }
 
-void ut_core::initTestCase()
+void ut_dbusthumbnailer::initTestCase()
+{
+
+}
+
+void ut_dbusthumbnailer::cleanupTestCase()
 {
 }
 
-void ut_core::cleanupTestCase()
+void ut_dbusthumbnailer::init()
 {
 }
 
-void ut_core::testSetPreviewLevelCount()
+void ut_dbusthumbnailer::cleanup()
 {
-    Core* core = new Core();
-    core->setPreviewLevelCount(3);
-    core->setPreviewSize(0, QSize(3, 4));
-    core->setPreviewSize(1, QSize(5, 6));
-    core->setPreviewSize(2, QSize(7, 8));
+}
 
-    QCOMPARE(core->previewLevelCount(), 3);
-    QCOMPARE(core->previewSize(0), QSize(3, 4));
-    QCOMPARE(core->previewSize(1), QSize(5, 6));
-    QCOMPARE(core->previewSize(2), QSize(7, 8));
+void ut_dbusthumbnailer::testSupports()
+{
+    DBusThumbnailer* dbusThumbnailer = new DBusThumbnailer();
+    QCOMPARE(dbusThumbnailer->supports("video/mp4"),true);
+    QCOMPARE(dbusThumbnailer->supports("image/jpeg"),true);
+    QCOMPARE(dbusThumbnailer->supports("image/jpeg3"),false);
+    delete dbusThumbnailer;
+}
+void ut_dbusthumbnailer::testIsRunning()
+{
+    DBusThumbnailer* dbusThumbnailer = new DBusThumbnailer();
+    QCOMPARE(dbusThumbnailer->isRunning(),false);
+    delete dbusThumbnailer;
+}
 
-    core->setPreviewLevelCount(1);
+void ut_dbusthumbnailer::testSuccess()
+{
+    DBusThumbnailer dbusThumbnailer;
+    QSignalSpy spy(&dbusThumbnailer,SIGNAL(thumbnailGenerated(const QString,
+                                                              const QString)));
 
-    QCOMPARE(core->previewLevelCount(), 1);
-    QCOMPARE(core->previewSize(0), QSize(3, 4));
-    QCOMPARE(core->previewSize(1), QSize());
-    QCOMPARE(core->previewSize(2), QSize());
+    dbusThumbnailer.newThumbnailerTask("/usr/share/libquill-tests/video/Alvin_2.mp4","video/mp4","normal");
 
-    delete core;
+    dbusThumbnailer.finishedHandler(2);
+
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> arguments = spy.first();
+    QCOMPARE(arguments.at(0).toString(),QString("/usr/share/libquill-tests/video/Alvin_2.mp4"));
+    QCOMPARE(arguments.at(1).toString(),QString("normal"));
+}
+
+void ut_dbusthumbnailer::testError()
+{
+    DBusThumbnailer dbusThumbnailer;
+    QSignalSpy spy(&dbusThumbnailer,SIGNAL(thumbnailError(const QString, uint,
+                                                          const QString)));
+    dbusThumbnailer.newThumbnailerTask("invalid.mp4","invalid","normal");
+
+    qDebug() << "Hello!";
+    QStringList error;
+    dbusThumbnailer.errorHandler(4,error,5,"this is an error");
+
+    qDebug() << "Hello2!";
+
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> arguments = spy.first();
+    QCOMPARE(arguments.at(0).toString(),QString("error1"));
 }
 
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
-    ut_core test;
+    ut_dbusthumbnailer test;
     return QTest::qExec( &test, argc, argv );
-
 }

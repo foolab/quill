@@ -64,6 +64,7 @@ class Task;
 class Scheduler;
 class ThreadManager;
 class TileCache;
+class DBusThumbnailer;
 class CorePrivate;
 
 class Core : public QObject
@@ -276,6 +277,23 @@ public:
     bool isThumbnailCreationEnabled() const;
 
     /*!
+      Enables or disables thumbnail creation using an external D-Bus
+      thumbnailer (in cases of files which are not directly supported
+      by Quill). The external thumbnailer must be configured to
+      support all the preview levels that are specified using
+      setThumbnailDirectory(). This option is true by default.
+    */
+
+    void setDBusThumbnailingEnabled(bool enabled);
+
+    /*!
+      Returns true if the external D-Bus thumbnailer has been selected to be
+      used.
+    */
+
+    bool isDBusThumbnailingEnabled() const;
+
+    /*!
       Returns true if it is possible to recover from a previous crash.
       This will only work if setCrashDumpFile() has been previously
       called, the physical file is found and actually contains something to
@@ -429,6 +447,25 @@ public:
     */
     void emitError(QuillError error);
 
+private:
+
+    /*!
+      Activates the D-Bus thumbnailer with a task if there is any.
+    */
+    void activateDBusThumbnailer();
+
+    /*!
+      Converts a preview level to a D-bus thumbnailer flavor.
+    */
+
+    QString flavorFromLevel(int level);
+
+    /*!
+      Converts a D-bus thumbnailer flavor to a preview level.
+    */
+
+    int levelFromFlavor(QString flavor);
+
 signals:
     /*!
       Edits to a file have been successfully saved.
@@ -456,6 +493,12 @@ signals:
 
     void error(QuillError error);
 
+private slots:
+    void processDBusThumbnailerGenerated(const QString fileName,
+                                         const QString flavor);
+    void processDBusThumbnailerError(const QString fileName, uint errorCode,
+                                     const QString message);
+
 private:
 
     static Core *g_instance;
@@ -468,6 +511,7 @@ private:
     QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
+    bool m_dBusThumbnailingEnabled;
     bool m_recoveryInProgress;
 
     QMap<QString, File*> m_files;
@@ -481,6 +525,8 @@ private:
 
     QString m_temporaryFileDirectory;
     QString m_crashDumpPath;
+
+    DBusThumbnailer *m_dBusThumbnailer;
 };
 
 #endif

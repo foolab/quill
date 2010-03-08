@@ -37,53 +37,27 @@
 **
 ****************************************************************************/
 
-#include <QtTest/QtTest>
-#include <QuillImageFilter>
-#include <QuillImageFilterFactory>
-#include <QuillImageFilterGenerator>
+#ifndef TEST_LIBQUILL_DBUS_THUMBNAIL_H
+#define TEST_LIBQUILL_DBUS_THUMBNAIL_H
 
-#include "core.h"
-#include "unittests.h"
-#include "ut_core.h"
+#include <QObject>
 
-ut_core::ut_core()
-{
-}
 
-void ut_core::initTestCase()
-{
-}
+class ut_dbusthumbnailer : public QObject {
+Q_OBJECT
+public:
+    ut_dbusthumbnailer();
 
-void ut_core::cleanupTestCase()
-{
-}
+private slots:
+    void init();
+    void cleanup();
+    void initTestCase();
+    void cleanupTestCase();
 
-void ut_core::testSetPreviewLevelCount()
-{
-    Core* core = new Core();
-    core->setPreviewLevelCount(3);
-    core->setPreviewSize(0, QSize(3, 4));
-    core->setPreviewSize(1, QSize(5, 6));
-    core->setPreviewSize(2, QSize(7, 8));
+    void testSupports();
+    void testIsRunning();
+    void testSuccess();
+    void testError();
+};
 
-    QCOMPARE(core->previewLevelCount(), 3);
-    QCOMPARE(core->previewSize(0), QSize(3, 4));
-    QCOMPARE(core->previewSize(1), QSize(5, 6));
-    QCOMPARE(core->previewSize(2), QSize(7, 8));
-
-    core->setPreviewLevelCount(1);
-
-    QCOMPARE(core->previewLevelCount(), 1);
-    QCOMPARE(core->previewSize(0), QSize(3, 4));
-    QCOMPARE(core->previewSize(1), QSize());
-    QCOMPARE(core->previewSize(2), QSize());
-
-    delete core;
-}
-
-int main ( int argc, char *argv[] ){
-    QCoreApplication app( argc, argv );
-    ut_core test;
-    return QTest::qExec( &test, argc, argv );
-
-}
+#endif  // TEST_LIBQUILL_DBUS_THUMBNAIL_H

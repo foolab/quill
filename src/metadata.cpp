@@ -75,11 +75,13 @@ Metadata::Metadata(const QString &fileName)
                                                XMP_OPEN_READ);
     m_xmpPtr = xmp_files_get_new_xmp(xmpFilePtr);
     xmp_files_close(xmpFilePtr, XMP_CLOSE_NOOPTION);
+    xmp_files_free(xmpFilePtr);
 }
 
 Metadata::~Metadata()
 {
     exif_data_unref(m_exifData);
+    xmp_free(m_xmpPtr);
     xmp_terminate();
 }
 
@@ -251,6 +253,7 @@ bool Metadata::writeXmp(const QString &fileName)
     // Crash safety can be ignored here by selecting Nooption since
     // QuillFile already has crash safety measures.
     xmp_files_close(xmpFilePtr, XMP_CLOSE_NOOPTION);
+    xmp_files_free(xmpFilePtr);
 
     return result;
 }
