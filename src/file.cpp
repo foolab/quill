@@ -821,3 +821,54 @@ void File::emitError(QuillError quillError)
     Core::instance()->emitError(quillError);
     Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }
+
+bool File::canRevert() const
+{
+    if (!m_exists || !m_supported || m_readOnly)
+        return false;
+    return m_stack->canUndo();
+}
+
+void File::revert()
+{
+    if (canRevert()){
+        do {
+            m_stack->undo();
+            qDebug()<<"File::revert():the command index is:"<<m_stack->index();
+            qDebug()<<"File::revert():the number of command is:"<<m_stack->count();
+        }
+        while(canRevert());
+        m_saveInProgress = false;
+        Core::instance()->dump();
+        Core::instance()->suggestNewTask();
+
+        emitAllImages();
+    }
+}
+
+bool File::canRestore() const
+{
+    if (!m_exists || !m_supported || m_readOnly){
+        qDebug()<<"File::canRestore():returns false";
+        return false;
+    }
+    qDebug()<<"File::canRestore():returns from canRedo()";
+    return m_stack->canRedo();
+}
+
+void File::restore()
+{
+    qDebug()<<"File::restore():enters";
+    if(canRestore()){
+        do{
+            m_stack->redo();
+            qDebug()<<"File::restore():the command index is:"<<m_stack->index();
+            qDebug()<<"File::restore():the number of command is:"<<m_stack->count();
+        }
+        while(canRestore());
+        m_saveInProgress = false;
+        Core::instance()->dump();
+        Core::instance()->suggestNewTask();
+        emitAllImages();
+    }
+}

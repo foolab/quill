@@ -41,7 +41,7 @@
 #include "logger.h"
 #include "quillfile.h"
 #include "file.h"
-
+#include <QDebug>
 class QuillFilePrivate {
 public:
     File *m_file;
@@ -410,4 +410,42 @@ bool QuillFile::isWaitingForData() const
         return priv->m_file->isWaitingForData();
     else
         return false;
+}
+
+bool QuillFile::canRevert() const
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->canRevert();
+    else
+        return false;
+}
+
+void QuillFile::revert()
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    qDebug()<<"QuillFile::revert()";
+    if (priv->m_file)
+        priv->m_file->revert();
+}
+
+bool QuillFile::canRestore() const
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->canRestore();
+    else
+        return false;
+}
+
+void QuillFile::restore()
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    qDebug()<<"QuillFile::restore():enters";
+    if (priv->m_file){
+        priv->m_file->restore();
+        qDebug()<<"QuillFile::restore():m_file exist";
+    }
+    else
+        qDebug()<<"QuillFile::restore():m_file is null";
 }

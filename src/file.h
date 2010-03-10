@@ -512,6 +512,26 @@ public:
 
     virtual void emitError(QuillError error);
 
+     /*!
+      If we can revert to the original operation
+     */
+    bool canRevert() const;
+
+    /*!
+      Reverts to the original operation
+     */
+    void revert();
+
+    /*!
+      If we can restore to the pre-revert operation
+     */
+    bool canRestore() const;
+
+    /*!
+      Restors to the pre-revert operation
+     */
+    void restore();
+
 signals:
 
     /*!
