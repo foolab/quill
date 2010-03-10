@@ -373,12 +373,6 @@ void ut_stack::testSourceChanged()
 
     QImage image = Unittests::generatePaletteImage();
 
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
-    QVERIFY(filter);
-    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
-    QuillImage resultImage = filter->apply(image);
-
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setWaitingForData(true);
 

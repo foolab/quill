@@ -269,6 +269,7 @@ QByteArray Metadata::dumpExif()
     exif_data_save_data(m_exifData, &d, &ds);
 
     QByteArray result = QByteArray((char*)d, ds);
+    delete d;
 
     return result;
 }

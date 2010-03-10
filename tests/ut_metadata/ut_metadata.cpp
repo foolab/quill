@@ -70,6 +70,8 @@ void ut_metadata::init()
 void ut_metadata::cleanup()
 {
     delete metadata;
+    delete xmp;
+    delete iptc;
 }
 
 void ut_metadata::testCameraMake()
