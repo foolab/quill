@@ -65,6 +65,8 @@ private slots:
 
     void testSetImage();
     void testSourceChanged();
+
+    void testImmediateSizeQuery();
 };
 
 #endif  // TEST_LIBQUILL_UNDO_COMMAND_STACK_H

@@ -397,6 +397,20 @@ void ut_stack::testSourceChanged()
     delete file;
 }
 
+void ut_stack::testImmediateSizeQuery()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QCOMPARE(file->fullImageSize(), QSize(8, 2));
+
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_stack test;
