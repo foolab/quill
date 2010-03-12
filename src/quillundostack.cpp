@@ -424,3 +424,14 @@ int QuillUndoStack::revertIndex() const
 {
     return m_revertIndex;
 }
+
+
+void QuillUndoStack::revert()
+{
+    undo();
+}
+
+void QuillUndoStack::restore()
+{
+    redo();
+}

@@ -835,7 +835,7 @@ void File::revert()
         m_stack->setRevertIndex(m_stack->index());
 
         do{
-            m_stack->undo();
+            m_stack->revert();
         }
         while(canRevert());
         m_saveInProgress = false;
@@ -851,18 +851,19 @@ bool File::canRestore() const
     if (!m_exists || !m_supported || m_readOnly)
         return false;
 
-    return m_stack->canRedo();
+    return m_stack->revertIndex()>0? true:false;
 }
 
 void File::restore()
 {
     if(canRestore()){
         while(canRestore()&&((m_stack->index())!=m_stack->revertIndex())){
-            m_stack->redo();
+            m_stack->restore();
         }
         m_saveInProgress = false;
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
         emitAllImages();
+        m_stack->setRevertIndex(0);
     }
 }

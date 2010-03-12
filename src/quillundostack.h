@@ -272,7 +272,15 @@ public:
      */
     int revertIndex() const;
 
+    /*!
+      Reverts the editing operations to the beginning
+     */
+    void revert();
 
+    /*!
+      Restores the editing operations to the state before reverting
+     */
+    void restore();
 private:
 
     /*!
