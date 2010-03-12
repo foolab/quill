@@ -261,17 +261,15 @@ public:
      */
 
     SaveMap *saveMap();
-
     /*!
       Sets the index of the stack command that is currently used before reverting.
-     */
+    */
     void setRevertIndex(int index);
 
     /*!
       Gets the stack command id before it is reverted.
      */
     int revertIndex() const;
-
     /*!
       Reverts the editing operations to the beginning
      */
@@ -281,6 +279,16 @@ public:
       Restores the editing operations to the state before reverting
      */
     void restore();
+
+    /*!
+      Checks if the operations are reverted.
+     */
+    bool canRevert() const;
+
+    /*!
+      Checks if the operations are restored
+     */
+    bool canRestore() const;
 private:
 
     /*!

@@ -428,10 +428,26 @@ int QuillUndoStack::revertIndex() const
 
 void QuillUndoStack::revert()
 {
-    undo();
+    setRevertIndex(index());
+    do{
+        undo();
+    }
+    while(canRevert());
 }
-
 void QuillUndoStack::restore()
 {
-    redo();
+    while(canRestore()&&((index())!=revertIndex())){
+        redo();
+    }
+    setRevertIndex(0);
+}
+
+bool QuillUndoStack::canRevert() const
+{
+    return canUndo();
+}
+
+bool QuillUndoStack::canRestore() const
+{
+    return revertIndex()>0? true:false;
 }
