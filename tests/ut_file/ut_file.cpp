@@ -155,6 +155,43 @@ void ut_file::testOriginal()
     delete original;
 }
 
+void ut_file::testOriginalAfterSave()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    Quill::setFileLimit(0, 2);
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *original = file->original();
+    // This makes us to setup the original's undo stack
+    QCOMPARE(original->fullImageSize(), image.size());
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillImage processedImage = filter->apply(image);
+
+    file->runFilter(filter);
+
+    file->save();
+
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
+    original->setDisplayLevel(0);
+    Quill::releaseAndWait();
+    QCOMPARE(original->image(), image);
+
+    delete file;
+    delete original;
+}
+
 void ut_file::testFileLimit()
 {
     QTemporaryFile testFile;

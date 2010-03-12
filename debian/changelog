@@ -1,3 +1,10 @@
+libquill (1.100312.0) unstable; urgency=low
+
+  * Fixes: NB#160062 Memory leaks from Valgrind
+  * Fixes: NB#160273 Original image is not correct with already edited images
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 12 Mar 2010 10:50:00 +0200
+
 libquill (1.100308.0) unstable; urgency=low
 
   * Fixed failing test case.
