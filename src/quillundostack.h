@@ -262,6 +262,17 @@ public:
 
     SaveMap *saveMap();
 
+    /*!
+      Sets the index of the stack command that is currently used before reverting.
+     */
+    void setRevertIndex(int index);
+
+    /*!
+      Gets the stack command id before it is reverted.
+     */
+    int revertIndex() const;
+
+
 private:
 
     /*!
@@ -278,6 +289,8 @@ private:
     int m_savedIndex;
     QuillUndoCommand *m_saveCommand;
     SaveMap *m_saveMap;
+    int m_revertIndex;
+
 };
 
 #endif // __QUILL_UNDO_STACK_H__

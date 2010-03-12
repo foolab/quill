@@ -348,6 +348,145 @@ void ut_file::testReadOnly()
     delete file;
 }
 
+void ut_file::testCanRevert()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
+    file->runFilter(filter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
+    QuillImageFilter *filter1 =
+        QuillImageFilterFactory::createImageFilter("Rotate");
+
+    filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
+
+    file->runFilter(filter1);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    QCOMPARE(file->canRevert(),true);
+    delete file;
+}
+
+void ut_file::testRevert()
+{
+   QTemporaryFile testFile;
+   testFile.open();
+
+   QuillImage image = Unittests::generatePaletteImage();
+   image.save(testFile.fileName(), "png");
+
+   QuillImageFilter *filter =
+       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+   QVERIFY(filter);
+   filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+   QuillFile *file = new QuillFile(testFile.fileName(), "png");
+   QVERIFY(file->setDisplayLevel(0));
+   file->runFilter(filter);
+   Quill::releaseAndWait();
+   Quill::releaseAndWait();
+   QuillImageFilter *filter1 =
+       QuillImageFilterFactory::createImageFilter("Rotate");
+
+   filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
+
+   file->runFilter(filter1);
+   Quill::releaseAndWait();
+   Quill::releaseAndWait();
+   file->revert();
+   Quill::releaseAndWait();
+   Quill::releaseAndWait();
+
+   QVERIFY(Unittests::compareImage(file->image(), image));
+   delete file;
+}
+
+void ut_file::testCanRestore()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QVERIFY(file->setDisplayLevel(0));
+    file->runFilter(filter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    QuillImageFilter *filter1 =
+        QuillImageFilterFactory::createImageFilter("Rotate");
+
+    filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
+
+    file->runFilter(filter1);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    file->revert();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    QCOMPARE(file->canRestore(),true);
+    delete file;
+}
+void ut_file::testRestore()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillImage imageAfter = filter->apply(image);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QVERIFY(file->setDisplayLevel(0));
+    file->runFilter(filter);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    QuillImageFilter *filter1 =
+        QuillImageFilterFactory::createImageFilter("Rotate");
+
+    filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
+
+    QuillImage imageAfter1 = filter1->apply(imageAfter);
+
+    file->runFilter(filter1);
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    file->revert();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
+    file->restore();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), imageAfter1));
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_file test;

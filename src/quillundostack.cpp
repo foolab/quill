@@ -58,7 +58,7 @@
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
-    m_saveCommand(0), m_saveMap(0)
+    m_saveCommand(0), m_saveMap(0),m_revertIndex(0)
 {
 }
 
@@ -413,4 +413,14 @@ QuillUndoCommand *QuillUndoStack::saveCommand()
 SaveMap *QuillUndoStack::saveMap()
 {
     return m_saveMap;
+}
+
+void QuillUndoStack::setRevertIndex(int index)
+{
+    m_revertIndex = index;
+}
+
+int QuillUndoStack::revertIndex() const
+{
+    return m_revertIndex;
 }

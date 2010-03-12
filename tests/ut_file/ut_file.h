@@ -62,6 +62,11 @@ private slots:
     void testDifferentPreviewLevels();
     void testSaveAfterDelete();
     void testReadOnly();
+
+    void testCanRevert();
+    void testRevert();
+    void testCanRestore();
+    void testRestore();
 };
 
 #endif  // TEST_LIBQUILL_FILE_H

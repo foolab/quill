@@ -97,7 +97,9 @@ QByteArray HistoryXml::encode(QList<File *> files)
 
         int targetIndex = stack->command()->index();
         int saveIndex = stack->savedIndex();
-
+        //for revert
+        int revertIndex = stack->revertIndex();
+        //end
         // Load filters are not saved and do not affect indexes in the dump.
 
         for (int i = 1; i < stack->index(); i++)
@@ -112,7 +114,10 @@ QByteArray HistoryXml::encode(QList<File *> files)
 
         writer.writeTextElement("", "SavedIndex",
                                 QString::number(saveIndex));
-
+        //for revert
+        writer.writeTextElement("", "RevertIndex",
+                                QString::number(revertIndex));
+        //end
         bool isSession = false;;
         int sessionId = 0;
 
@@ -326,6 +331,17 @@ QList<File*> HistoryXml::decode(const QByteArray & array)
         if (readToken(&reader) != QXmlStreamReader::EndElement)
             return emptyList;
 
+        if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
+            (reader.name() != "RevertIndex"))
+            return emptyList;
+
+        if (readToken(&reader) != QXmlStreamReader::Characters)
+            return emptyList;
+        int revertIndex = reader.text().toString().toInt();
+
+        if (readToken(&reader) != QXmlStreamReader::EndElement)
+            return emptyList;
+
         File *file = new File();
         file->setFileName(fileName);
         file->setOriginalFileName(originalFileName);
@@ -347,7 +363,7 @@ QList<File*> HistoryXml::decode(const QByteArray & array)
             stack->setSavedIndex(savedIndex+1);
         else
             stack->setSavedIndex(0);
-
+        stack->setRevertIndex(revertIndex);
         files.append(file);
 
         token = readToken(&reader);

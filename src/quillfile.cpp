@@ -424,7 +424,6 @@ bool QuillFile::canRevert() const
 void QuillFile::revert()
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    qDebug()<<"QuillFile::revert()";
     if (priv->m_file)
         priv->m_file->revert();
 }
@@ -441,11 +440,6 @@ bool QuillFile::canRestore() const
 void QuillFile::restore()
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    qDebug()<<"QuillFile::restore():enters";
-    if (priv->m_file){
+    if (priv->m_file)
         priv->m_file->restore();
-        qDebug()<<"QuillFile::restore():m_file exist";
-    }
-    else
-        qDebug()<<"QuillFile::restore():m_file is null";
 }

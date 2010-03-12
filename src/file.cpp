@@ -832,10 +832,10 @@ bool File::canRevert() const
 void File::revert()
 {
     if (canRevert()){
-        do {
+        m_stack->setRevertIndex(m_stack->index());
+
+        do{
             m_stack->undo();
-            qDebug()<<"File::revert():the command index is:"<<m_stack->index();
-            qDebug()<<"File::revert():the number of command is:"<<m_stack->count();
         }
         while(canRevert());
         m_saveInProgress = false;
@@ -848,24 +848,18 @@ void File::revert()
 
 bool File::canRestore() const
 {
-    if (!m_exists || !m_supported || m_readOnly){
-        qDebug()<<"File::canRestore():returns false";
+    if (!m_exists || !m_supported || m_readOnly)
         return false;
-    }
-    qDebug()<<"File::canRestore():returns from canRedo()";
+
     return m_stack->canRedo();
 }
 
 void File::restore()
 {
-    qDebug()<<"File::restore():enters";
     if(canRestore()){
-        do{
+        while(canRestore()&&((m_stack->index())!=m_stack->revertIndex())){
             m_stack->redo();
-            qDebug()<<"File::restore():the command index is:"<<m_stack->index();
-            qDebug()<<"File::restore():the number of command is:"<<m_stack->count();
         }
-        while(canRestore());
         m_saveInProgress = false;
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
