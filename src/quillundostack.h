@@ -306,6 +306,7 @@ private:
     QuillUndoCommand *m_saveCommand;
     SaveMap *m_saveMap;
     int m_revertIndex;
+    bool m_canRestoreFlag;
 
 };
 

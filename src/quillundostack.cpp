@@ -58,7 +58,7 @@
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
-    m_saveCommand(0), m_saveMap(0),m_revertIndex(0)
+    m_saveCommand(0), m_saveMap(0),m_revertIndex(0),m_canRestoreFlag(false)
 {
 }
 
@@ -188,6 +188,10 @@ void QuillUndoStack::undo()
         // This is here instead of command::undo() so that intermediate steps
         // need not be protected.
         command()->protectImages();
+         if(m_canRestoreFlag){
+            setRevertIndex(0);
+            m_canRestoreFlag = false;
+         }
     }
 }
 
@@ -229,9 +233,12 @@ void QuillUndoStack::redo()
         // This is here instead of command::redo() so that intermediate steps
         // need not be protected.
         command()->protectImages();
+        if(m_canRestoreFlag){
+            setRevertIndex(0);
+            m_canRestoreFlag = false;
+        }
     }
 }
-
 QuillImage QuillUndoStack::bestImage(int maxLevel) const
 {
     QuillUndoCommand *curr = command();
@@ -433,9 +440,12 @@ void QuillUndoStack::revert()
         undo();
     }
     while(canRevert());
+    m_canRestoreFlag = true;
 }
+
 void QuillUndoStack::restore()
 {
+    m_canRestoreFlag = false;
     while(canRestore()&&((index())!=revertIndex())){
         redo();
     }
@@ -451,3 +461,10 @@ bool QuillUndoStack::canRestore() const
 {
     return revertIndex()>0? true:false;
 }
+
+/*
+void QuillUndoStack::setRestoreFlag(bool flag)
+{
+    m_canRestoreFlag = flag;
+}
+*/

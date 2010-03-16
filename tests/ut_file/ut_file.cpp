@@ -412,13 +412,6 @@ void ut_file::testRevertRestore()
    QCOMPARE(file->canRevert(),false);
    QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
    file->redo();
-   QCOMPARE(file->canRestore(),true);
-   QCOMPARE(file->canRevert(),true);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
-   file->restore();
-   Quill::releaseAndWait();
-   Quill::releaseAndWait();
-   QVERIFY(Unittests::compareImage(file->image(), imageAfter1));
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
    QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
@@ -429,7 +422,7 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),2);
    QuillImageFilter *filter2 =
        QuillImageFilterFactory::createImageFilter("Rotate");
 
