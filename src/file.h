@@ -47,8 +47,8 @@
 
 #include "quill.h"
 #include "quillfile.h"
+#include "quillundostack.h"
 
-class QuillUndoStack;
 class QTemporaryFile;
 
 class File : public QObject

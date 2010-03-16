@@ -52,6 +52,7 @@
 #include "file.h"
 #include "ut_file.h"
 #include "unittests.h"
+#include "quillfile.h"
 
 ut_file::ut_file()
 {
@@ -361,6 +362,7 @@ void ut_file::testRevertRestore()
    QVERIFY(filter);
    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
    QuillImage imageAfter = filter->apply(image);
+
    QuillFile *file = new QuillFile(testFile.fileName(), "png");
    QVERIFY(file->setDisplayLevel(0));
    QCOMPARE(file->canRestore(),false);
@@ -380,18 +382,62 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
+
+   //Test revert
    file->revert();
    Quill::releaseAndWait();
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
    QVERIFY(Unittests::compareImage(file->image(), image));
+   file->save();
+   Quill::releaseAndWait();
+   Quill::releaseAndWait();
+
+   //Test restore
    file->restore();
    Quill::releaseAndWait();
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
    QVERIFY(Unittests::compareImage(file->image(), imageAfter1));
+
+   //Test redo with revert and restore
+   file->revert();
+   Quill::releaseAndWait();
+   Quill::releaseAndWait();
+   QCOMPARE(file->canRestore(),true);
+   QCOMPARE(file->canRevert(),false);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   file->redo();
+   QCOMPARE(file->canRestore(),true);
+   QCOMPARE(file->canRevert(),true);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   file->restore();
+   Quill::releaseAndWait();
+   Quill::releaseAndWait();
+   QVERIFY(Unittests::compareImage(file->image(), imageAfter1));
+   QCOMPARE(file->canRestore(),false);
+   QCOMPARE(file->canRevert(),true);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
+
+   //Test one additional operation after revert
+   file->revert();
+   Quill::releaseAndWait();
+   Quill::releaseAndWait();
+   QCOMPARE(file->canRestore(),true);
+   QCOMPARE(file->canRevert(),false);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   QuillImageFilter *filter2 =
+       QuillImageFilterFactory::createImageFilter("Rotate");
+
+   filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
+   file->runFilter(filter2);
+   QCOMPARE(file->canRestore(),false);
+   QCOMPARE(file->canRevert(),true);
+   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
 
    delete file;
 }

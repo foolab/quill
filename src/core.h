@@ -58,7 +58,6 @@ can only be changed if no files have been opened yet.
 class QuillError;
 class File;
 class QuillUndoCommand;
-class QuillUndoStack;
 class ImageCache;
 class Task;
 class Scheduler;

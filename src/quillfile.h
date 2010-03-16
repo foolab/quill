@@ -73,10 +73,15 @@ to the application using asynchronous QObject signals.
 
 class QuillImage;
 class QuillImageFilter;
-class QuillFilePrivate;
 class QSize;
 class QRect;
 class File;
+
+class QuillFilePrivate {
+public:
+    File *m_file;
+    int m_displayLevel;
+};
 
 typedef QList<QuillImage> QuillImageList;
 Q_DECLARE_METATYPE(QuillImageList)
@@ -86,7 +91,7 @@ class QuillFile : public QObject
 Q_OBJECT
 
     friend class File;
-
+    friend class ut_file;
 public:
     /*!
       Provides access to a file object. The object will be created

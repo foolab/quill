@@ -47,7 +47,6 @@
 #include "file.h"
 #include "core.h"
 #include "imagecache.h"
-#include "quillundostack.h"
 #include "quillundocommand.h"
 #include "historyxml.h"
 #include "tilemap.h"

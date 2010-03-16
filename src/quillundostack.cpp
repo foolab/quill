@@ -144,7 +144,7 @@ void QuillUndoStack::add(QuillImageFilter *filter)
     // full image size
     if (!m_file->isWaitingForData())
         calculateFullImageSize(cmd);
-
+    setRevertIndex(0);
     Logger::log("[Stack] "+filter->name()+" added to stack");
 }
 

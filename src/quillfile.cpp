@@ -42,11 +42,6 @@
 #include "quillfile.h"
 #include "file.h"
 #include <QDebug>
-class QuillFilePrivate {
-public:
-    File *m_file;
-    int m_displayLevel;
-};
 
 QuillFile::QuillFile()
 {
