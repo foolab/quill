@@ -115,8 +115,9 @@ QByteArray HistoryXml::encode(QList<File *> files)
         writer.writeTextElement("", "SavedIndex",
                                 QString::number(saveIndex));
         //for revert
-        writer.writeTextElement("", "RevertIndex",
-                                QString::number(revertIndex));
+        if(revertIndex>0)
+            writer.writeTextElement("", "RevertIndex",
+                                    QString::number(revertIndex));
         //end
         bool isSession = false;;
         int sessionId = 0;
