@@ -462,9 +462,3 @@ bool QuillUndoStack::canRestore() const
     return revertIndex()>0? true:false;
 }
 
-/*
-void QuillUndoStack::setRestoreFlag(bool flag)
-{
-    m_canRestoreFlag = flag;
-}
-*/
