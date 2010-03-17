@@ -1,3 +1,9 @@
+libquill (1.100317.1) unstable; urgency=low
+
+  * Fixed: failing unit tests due to optional revert index
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 17 Mar 2010 12:40:00 +0200
+
 libquill (1.100317.0) unstable; urgency=low
 
   * Implemented: SWP#HImag-1874
