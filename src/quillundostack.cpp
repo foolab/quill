@@ -319,8 +319,11 @@ bool QuillUndoStack::isClean() const
     return m_stack->isClean();
 }
 
-QSize QuillUndoStack::fullImageSize() const
+QSize QuillUndoStack::fullImageSize()
 {
+    if (isClean())
+        load();
+
     if (command())
         return command()->fullImageSize();
     else

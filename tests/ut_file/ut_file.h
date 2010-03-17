@@ -57,6 +57,7 @@ private slots:
 
     void testRemove();
     void testOriginal();
+    void testOriginalAfterSave();
     void testFileLimit();
     void testMultipleAccess();
     void testDifferentPreviewLevels();

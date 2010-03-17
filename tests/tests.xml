@@ -132,6 +132,13 @@
 	<step >/usr/lib/libquill-tests/ut_metadata </step>
       </case>
     </set>
+
+    <set name="quill-dbus-thumbnail-tests" feature="dbusthumbnail">
+      <description>d-bus thumbnailer test</description>
+      <case name="ut_dbusthumbnailer" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_dbusthumbnailer </step>
+      </case>
+    </set>
   </suite>
 </testdefinition>
 

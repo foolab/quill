@@ -103,15 +103,15 @@ void ut_dbusthumbnailer::testError()
                                                           const QString)));
     dbusThumbnailer.newThumbnailerTask("invalid.mp4","invalid","normal");
 
-    qDebug() << "Hello!";
     QStringList error;
+    error << "invalid.mp4";
     dbusThumbnailer.errorHandler(4,error,5,"this is an error");
-
-    qDebug() << "Hello2!";
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> arguments = spy.first();
-    QCOMPARE(arguments.at(0).toString(),QString("error1"));
+    QCOMPARE(arguments.at(0).toString(), QString("invalid.mp4"));
+    QCOMPARE(arguments.at(1).toInt(), 5);
+    QCOMPARE(arguments.at(2).toString(), QString("this is an error"));
 }
 
 int main ( int argc, char *argv[] ){

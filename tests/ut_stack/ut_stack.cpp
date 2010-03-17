@@ -373,12 +373,6 @@ void ut_stack::testSourceChanged()
 
     QImage image = Unittests::generatePaletteImage();
 
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
-    QVERIFY(filter);
-    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
-    QuillImage resultImage = filter->apply(image);
-
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     file->setWaitingForData(true);
 
@@ -399,6 +393,20 @@ void ut_stack::testSourceChanged()
 
     QVERIFY(Unittests::compareImage(file->image(0), image));
     QVERIFY(Unittests::compareImage(file->image(1), image));
+
+    delete file;
+}
+
+void ut_stack::testImmediateSizeQuery()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QCOMPARE(file->fullImageSize(), QSize(8, 2));
 
     delete file;
 }

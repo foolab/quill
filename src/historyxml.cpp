@@ -423,6 +423,9 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(name);
 
+    if (!filter)
+        return 0;
+
     QXmlStreamReader::TokenType token = reader->readNext();
     while (token != QXmlStreamReader::EndElement)
     {

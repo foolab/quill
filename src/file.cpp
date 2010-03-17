@@ -706,6 +706,8 @@ void File::concludeSave()
     }
 
     m_stack->concludeSave();
+    if (hasOriginal())
+        original()->stack()->concludeSave();
 
     writeEditHistory(HistoryXml::encode(this), &result);
 

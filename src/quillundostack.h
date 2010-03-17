@@ -164,7 +164,7 @@ public:
       Gets the pre-calculated full image size for the current image.
     */
 
-    QSize fullImageSize() const;
+    QSize fullImageSize();
 
     /*!
       Pre-calculates the full image size for the current image.
