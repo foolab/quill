@@ -302,7 +302,9 @@ void ut_file::testDifferentPreviewLevels()
     QCOMPARE(spy2.count(), 1);
 
     QCOMPARE(file->image().size(), QSize(4, 1));
+    QCOMPARE(file->image().z(), 0);
     QCOMPARE(file2->image().size(), QSize(4, 1));
+    QCOMPARE(file2->image().z(), 0);
 
     Quill::releaseAndWait(); // load level 1
     Quill::releaseAndWait(); // brightness level 1
@@ -311,13 +313,16 @@ void ut_file::testDifferentPreviewLevels()
     QCOMPARE(spy2.count(), 2);
 
     QCOMPARE(file->image().size(), QSize(4, 1));
+    QCOMPARE(file->image().z(), 0);
     QVERIFY(Unittests::compareImage(file2->image(), imageAfter));
+    QCOMPARE(file2->image().z(), 1);
 
     delete file2;
 
     // Ensure that the display level is kept even if the other image reference
     // is removed.
     QCOMPARE(file->image().size(), QSize(4, 1));
+    QCOMPARE(file->image().z(), 0);
 
     delete file;
 }
@@ -470,6 +475,37 @@ void ut_file::testRevertRestore()
    QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
 
    delete file;
+}
+
+void ut_file::testDoubleRevertRestore()
+{
+    // Tests that revert and restore still work after a previous revert.
+
+   QTemporaryFile testFile;
+   testFile.open();
+
+   QuillImage image = Unittests::generatePaletteImage();
+   image.save(testFile.fileName(), "png");
+
+   QuillImageFilter *filter =
+       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+   QVERIFY(filter);
+   filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+   QuillImageFilter *filter2 =
+       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+   QVERIFY(filter2);
+   filter2->setOption(QuillImageFilter::Brightness, QVariant(-20));
+
+   QuillFile *file = new QuillFile(testFile.fileName(), "png");
+   file->runFilter(filter);
+   QVERIFY(file->canRevert());
+   file->revert();
+   QVERIFY(file->canRestore());
+   file->runFilter(filter2);
+   QVERIFY(file->canRevert());
+   file->revert();
+   QVERIFY(file->canRestore());
 }
 
 int main ( int argc, char *argv[] ){

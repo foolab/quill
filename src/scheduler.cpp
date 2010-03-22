@@ -515,6 +515,7 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
 void Scheduler::processFinishedTask(Task *task, QuillImage image)
 {
     bool imageUpdated = false;
+    image.setZ(task->displayLevel());
 
     // See if the command is still in the stack.
 
@@ -668,7 +669,6 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             current = stack->command();
 
         if (current && (current->uniqueId() == task->commandId())) {
-            image.setZ(task->displayLevel());
             stack->file()->emitSingleImage(image, task->displayLevel());
         }
     }
