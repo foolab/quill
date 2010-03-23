@@ -108,7 +108,14 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
     QSize fullSize = filter->newFullImageSize(previousFullSize);
 
     if (fullSize.isEmpty()) {
-        m_file->processFilterError(command->filter());
+        if (filter->role() == QuillImageFilter::Role_Load)
+            m_file->processFilterError(filter);
+        else if (previousFullSize.isValid()) {
+            // Any new command which would make the image 0x0 is rejected
+            undo();
+            command->setFilter(0);
+            delete filter;
+        }
         return;
     }
 
@@ -141,11 +148,12 @@ void QuillUndoStack::add(QuillImageFilter *filter)
     // add to stack
     m_stack->push(cmd);
 
+    Logger::log("[Stack] "+filter->name()+" added to stack");
+
     // full image size
     if (!m_file->isWaitingForData())
         calculateFullImageSize(cmd);
     setRevertIndex(0);
-    Logger::log("[Stack] "+filter->name()+" added to stack");
 }
 
 bool QuillUndoStack::canUndo() const
@@ -194,6 +202,10 @@ void QuillUndoStack::undo()
 bool QuillUndoStack::canRedo() const
 {
     if (!m_stack->canRedo())
+        return false;
+
+    // Invalid filters cannot be redone
+    if (!command(index())->filter())
         return false;
 
     // Session mode: cannot redo outside session

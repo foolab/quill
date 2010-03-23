@@ -103,7 +103,8 @@ QByteArray HistoryXml::encode(QList<File *> files)
         // Load filters are not saved and do not affect indexes in the dump.
 
         for (int i = 1; i < stack->index(); i++)
-            if (stack->command(i)->filter()->role() == QuillImageFilter::Role_Load)
+            if (!stack->command(i)->filter() ||
+                stack->command(i)->filter()->role() == QuillImageFilter::Role_Load)
             {
                 targetIndex--;
                 saveIndex--;
@@ -122,7 +123,8 @@ QByteArray HistoryXml::encode(QList<File *> files)
         int sessionId = 0;
 
         for (int i = 0; i < stack->count(); i++)
-            if (stack->command(i)->filter()->role() != QuillImageFilter::Role_Load)
+            if (stack->command(i)->filter() &&
+                stack->command(i)->filter()->role() != QuillImageFilter::Role_Load)
             {
                 if (isSession &&
                     !stack->command(i)->belongsToSession(sessionId)) {
