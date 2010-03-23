@@ -693,7 +693,13 @@ void File::concludeSave()
     // Copy metadata from previous version to new one
 
     Metadata metadata(m_fileName);
-    metadata.write(temporaryName);
+    if (!metadata.write(temporaryName)) {
+        // If metadata write failed, the temp file is likely corrupt
+        emitError(QuillError(QuillError::FileWriteError,
+                             QuillError::TemporaryFileErrorSource,
+                             m_fileName));
+        return;
+    }
 
     // This is more efficient than renaming between partitions.
 
