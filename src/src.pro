@@ -12,7 +12,7 @@ DEFINES     +=
 
 QT += dbus
 
-CONFIG += debug
+CONFIG += release
 
 CONFIG += quillimagefilter
 
