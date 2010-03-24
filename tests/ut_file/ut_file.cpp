@@ -431,7 +431,7 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),3);
    QVERIFY(Unittests::compareImage(file->image(), image));
    file->save();
    Quill::releaseAndWait();
@@ -443,7 +443,7 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),0);
    QVERIFY(Unittests::compareImage(file->image(), imageAfter1));
 
    //Test redo with revert and restore
@@ -452,11 +452,11 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),3);
    file->redo();
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),0);
 
    //Test one additional operation after revert
    file->revert();
@@ -464,7 +464,7 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),2);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),2);
    QuillImageFilter *filter2 =
        QuillImageFilterFactory::createImageFilter("Rotate");
 
@@ -472,7 +472,7 @@ void ut_file::testRevertRestore()
    file->runFilter(filter2);
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),0);
 
    delete file;
 }

@@ -1,3 +1,9 @@
+libquill (1.100323.1) unstable; urgency=low
+
+  * Cleanup of public interface
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 24 Mar 2010 13:20:00 +0200
+
 libquill (1.100323.0) unstable; urgency=low
 
   * Fixes: NB#161274 Image corruption due to XMP writeback problems
@@ -5,7 +11,7 @@ libquill (1.100323.0) unstable; urgency=low
   * Fixes: NB#161125 QuillImage::z() always returns zero
   * Fixes: NB#161238 Restore not working after two calls to revert
 
- -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 17 Mar 2010 12:40:00 +0200
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 24 Mar 2010 09:20:00 +0200
 
 libquill (1.100317.1) unstable; urgency=low
 
