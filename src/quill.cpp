@@ -210,6 +210,12 @@ void Quill::recover()
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
+bool Quill::isCalculationInProgress()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->isCalculationInProgress();
+}
+
 bool Quill::isSaveInProgress()
 {
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));

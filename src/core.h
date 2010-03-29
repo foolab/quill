@@ -401,6 +401,12 @@ public:
     int numFilesAtLevel(int level) const;
 
     /*!
+      Returns true if there is any calculation in progress.
+     */
+
+    bool isCalculationInProgress() const;
+
+    /*!
       Returns true if there are any files which are in the progress of
       saving. Useful for example when an application wants to exit.
      */

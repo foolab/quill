@@ -556,6 +556,11 @@ int Core::numFilesAtLevel(int level) const
     return n;
 }
 
+bool Core::isCalculationInProgress() const
+{
+    return (m_threadManager->isRunning());
+}
+
 bool Core::isSaveInProgress() const
 {
     return (prioritySaveFile() != 0);

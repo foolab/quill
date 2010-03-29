@@ -826,7 +826,7 @@ void File::emitError(QuillError quillError)
 {
     emit error(quillError);
     Core::instance()->emitError(quillError);
-    Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+    Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }
 
 bool File::canRevert() const
