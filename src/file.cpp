@@ -164,9 +164,11 @@ bool File::isReadOnly() const
 
 bool File::setDisplayLevel(int level)
 {
-    if (level > m_displayLevel) {
+    int originalDisplayLevel = m_displayLevel;
+
+    if (level > originalDisplayLevel) {
         // Block if trying to raise display level over strict limits
-        for (int l=m_displayLevel+1; l<=level; l++)
+        for (int l=originalDisplayLevel+1; l<=level; l++)
             if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
                 emitError(QuillError(QuillError::GlobalFileLimitError,
                                      QuillError::NoErrorSource,
@@ -182,7 +184,7 @@ bool File::setDisplayLevel(int level)
 
     // Purge images from cache if lowering display level here
     // Exception: when save is in progress, leave the highest level
-    for (int l=m_displayLevel; l>level; l--)
+    for (int l=originalDisplayLevel; l>level; l--)
         if ((l < Core::instance()->previewLevelCount()) || (!m_saveInProgress))
             Core::instance()->cache(l)->purge(this);
 
@@ -193,7 +195,8 @@ bool File::setDisplayLevel(int level)
         m_stack->load();
     }
 
-    Core::instance()->suggestNewTask();
+    if (level > originalDisplayLevel)
+        Core::instance()->suggestNewTask();
     return true;
 }
 
