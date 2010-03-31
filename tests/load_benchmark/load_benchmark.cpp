@@ -39,6 +39,7 @@ int main(int argc, char **argv)
         origFile.close();
 
         for (int i=0; i<numFiles; i++) {
+            file[i].setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX.jpeg");
             file[i].open();
             fileName[i] = file[i].fileName();
             file[i].write(buf);
