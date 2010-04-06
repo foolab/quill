@@ -1,8 +1,8 @@
-libquill (1.100323.1) unstable; urgency=low
+libquill (1.100406.0) unstable; urgency=low
 
-  * Cleanup of public interface
+  * Testing meego repository
 
- -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 24 Mar 2010 13:20:00 +0200
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 06 Apr 2010 09:30:00 +0200
 
 libquill (1.100323.0) unstable; urgency=low
 
