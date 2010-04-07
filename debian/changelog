@@ -1,3 +1,9 @@
+libquill (1.100407.0) unstable; urgency=low
+
+  * Quill will also emit removed() signals.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 07 Apr 2010 11:50:00 +0200
+
 libquill (1.100406.0) unstable; urgency=low
 
   * Testing meego repository
