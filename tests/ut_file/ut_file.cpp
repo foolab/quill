@@ -82,6 +82,9 @@ void ut_file::testRemove()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
+    QSignalSpy spy(Quill::instance(),
+                   SIGNAL(removed(const QString)));
+
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QVERIFY(file);
     QVERIFY(file->exists());
@@ -108,6 +111,9 @@ void ut_file::testRemove()
     QVERIFY(!file->exists());
     QVERIFY(!QFile::exists(testFile.fileName()));
     QVERIFY(!QFile::exists(originalFileName));
+
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.first().first().toString(), testFile.fileName());
 
     delete file;
 }

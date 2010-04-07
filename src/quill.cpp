@@ -242,6 +242,9 @@ Quill* Quill::instance()
                             SIGNAL(saved(QString)),
                             SIGNAL(saved(QString)));
         g_instance->connect(Core::instance(),
+                            SIGNAL(removed(QString)),
+                            SIGNAL(removed(QString)));
+        g_instance->connect(Core::instance(),
                             SIGNAL(error(QuillError)),
                             SIGNAL(error(QuillError)));
     }

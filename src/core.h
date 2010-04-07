@@ -448,6 +448,11 @@ public:
     void emitSaved(QString fileName);
 
     /*!
+      Emits a removed signal.
+    */
+    void emitRemoved(QString fileName);
+
+    /*!
       Emits an error signal.
     */
     void emitError(QuillError error);
@@ -483,6 +488,15 @@ signals:
      */
 
     void saved(QString fileName);
+
+    /*
+      A file has been removed.
+
+      This currently applies only if the file has been explicitly removed
+      with QuillFile::remove().
+     */
+
+    void removed(QString fileName);
 
     /*!
       Any error not specific to any individual QuillFile is reported

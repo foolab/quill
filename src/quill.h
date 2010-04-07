@@ -480,6 +480,15 @@ signals:
 
     void saved(QString fileName);
 
+    /*
+      A file has been removed.
+
+      This currently applies only if the file has been explicitly removed
+      with QuillFile::remove().
+     */
+
+    void removed(QString fileName);
+
     /*!
       Any error not specific to any individual QuillFile is reported
       by this signal.

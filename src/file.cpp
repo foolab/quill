@@ -535,6 +535,7 @@ void File::remove()
     if (hasOriginal())
         original()->remove();
 
+    Core::instance()->emitRemoved(m_fileName);
     emit removed();
 }
 

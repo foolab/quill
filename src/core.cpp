@@ -653,6 +653,12 @@ void Core::emitSaved(QString fileName)
     Logger::log("[Core] "+QString(Q_FUNC_INFO)+fileName);
 }
 
+void Core::emitRemoved(QString fileName)
+{
+    emit removed(fileName);
+    Logger::log("[Core] "+QString(Q_FUNC_INFO)+fileName);
+}
+
 void Core::emitError(QuillError quillError)
 {
     emit error(quillError);
