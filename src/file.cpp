@@ -55,7 +55,7 @@
 #include "metadata.h"
 
 File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
-               m_readOnly(false), m_hasThumbnailError(false),
+               m_readOnly(false), m_hasThumbnailError(false), m_isClone(false),
                m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_waitingForData(false), m_saveInProgress(false),
@@ -164,9 +164,11 @@ bool File::isReadOnly() const
 
 bool File::setDisplayLevel(int level)
 {
-    if (level > m_displayLevel) {
+    int originalDisplayLevel = m_displayLevel;
+
+    if (level > originalDisplayLevel) {
         // Block if trying to raise display level over strict limits
-        for (int l=m_displayLevel+1; l<=level; l++)
+        for (int l=originalDisplayLevel+1; l<=level; l++)
             if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
                 emitError(QuillError(QuillError::GlobalFileLimitError,
                                      QuillError::NoErrorSource,
@@ -182,7 +184,7 @@ bool File::setDisplayLevel(int level)
 
     // Purge images from cache if lowering display level here
     // Exception: when save is in progress, leave the highest level
-    for (int l=m_displayLevel; l>level; l--)
+    for (int l=originalDisplayLevel; l>level; l--)
         if ((l < Core::instance()->previewLevelCount()) || (!m_saveInProgress))
             Core::instance()->cache(l)->purge(this);
 
@@ -193,7 +195,8 @@ bool File::setDisplayLevel(int level)
         m_stack->load();
     }
 
-    Core::instance()->suggestNewTask();
+    if (level > originalDisplayLevel)
+        Core::instance()->suggestNewTask();
     return true;
 }
 
@@ -212,6 +215,25 @@ void File::save()
     }
 }
 
+void File::saveAs(const QString &fileName, const QString &fileFormat)
+{
+    if (m_exists && m_supported && !Core::instance()->fileExists(fileName)) {
+        QByteArray history = HistoryXml::encode(this);
+        File *file = HistoryXml::decodeOne(history);
+
+        file->setOriginalFileName(m_fileName);
+        file->setFileFormat(m_fileFormat);
+
+        file->setFileName(fileName);
+        file->setTargetFormat(fileFormat);
+
+        file->setClone(true);
+        file->prepareSave();
+        Core::instance()->attach(file);
+        Core::instance()->suggestNewTask();
+    }
+}
+
 bool File::isSaveInProgress() const
 {
     return m_saveInProgress;
@@ -219,7 +241,9 @@ bool File::isSaveInProgress() const
 
 bool File::isDirty() const
 {
-    if (m_stack)
+    if (m_isClone)
+        return true;
+    else if (m_stack)
         return m_stack->isDirty();
     else
         return false;
@@ -709,7 +733,8 @@ void File::concludeSave()
     if (hasOriginal())
         original()->stack()->concludeSave();
 
-    writeEditHistory(HistoryXml::encode(this), &result);
+    if (!m_isClone)
+        writeEditHistory(HistoryXml::encode(this), &result);
 
     if (result.errorCode() != QuillError::NoError) {
         emitError(result);
@@ -859,3 +884,14 @@ void File::restore()
         emitAllImages();
     }
 }
+
+bool File::isClone()
+{
+    return m_isClone;
+}
+
+void File::setClone(bool status)
+{
+    m_isClone = status;
+}
+

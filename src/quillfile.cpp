@@ -41,6 +41,7 @@
 #include "logger.h"
 #include "quillfile.h"
 #include "file.h"
+#include "historyxml.h"
 #include <QDebug>
 
 QuillFile::QuillFile()
@@ -58,6 +59,13 @@ QuillFile::QuillFile(const QString &fileName,
     priv->m_displayLevel = -1;
 
     attach(Core::instance()->file(fileName, fileFormat));
+}
+
+QuillFile::QuillFile(File *file)
+{
+    priv = new QuillFilePrivate;
+    priv->m_displayLevel = -1;
+    attach(file);
 }
 
 QuillFile::~QuillFile()
@@ -162,6 +170,14 @@ int QuillFile::displayLevel() const
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     return priv->m_displayLevel;
+}
+
+void QuillFile::saveAs(const QString &fileName,
+                       const QString &fileFormat)
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->saveAs(fileName, fileFormat);
 }
 
 void QuillFile::save()

@@ -37,8 +37,8 @@
 **
 ****************************************************************************/
 
-#ifndef _UT_QUILL_H_
-#define _UT_QUILL_H_
+#ifndef _UT_EXPORT_H_
+#define _UT_EXPORT_H_
 
 #include <QObject>
 #include <QImage>
@@ -47,10 +47,10 @@ class QuillUndoCommand;
 class QtImageFilter;
 class Quill;
 
-class ut_quill: public QObject {
+class ut_export: public QObject {
 Q_OBJECT
 public:
-    ut_quill();
+    ut_export();
 
 private slots:
     void init();
@@ -59,22 +59,8 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
-    void testQuill();
-    void testQuillFile();
-    void testDisableCache();
-    void testSignals();
-
-    void testLoadSave();
-    void testMultiSave();
-    void testNoSave();
-    void testSaveIndex();
-
-    void testBackgroundPriority();
-    void testReOpen();
-
-    void testLoadSaveSmallPicture();
-
-    void testUseAfterSave();
+    void testBasicExport();
+    void testExportIgnoringEditHistory();
 };
 
-#endif  // _UT_QUILL_H_
+#endif  // _UT_EXPORT_H_

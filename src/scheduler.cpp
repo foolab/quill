@@ -440,10 +440,6 @@ Task *Scheduler::newSaveTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
 
-    // If the current command has an image which has not been saved before.
-    if (!stack->isDirty())
-        return 0;
-
     // Tiling save variant
     if (!Core::instance()->defaultTileSize().isEmpty())
         return newTilingSaveTask(file);

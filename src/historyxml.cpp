@@ -95,7 +95,9 @@ QByteArray HistoryXml::encode(QList<File *> files)
         writer.writeAttribute("format", file->fileFormat());
         writer.writeEndElement();
 
-        int targetIndex = stack->command()->index();
+        int targetIndex = 0;
+        if (stack->command())
+            targetIndex = stack->command()->index();
         int saveIndex = stack->savedIndex();
         //for revert
         int revertIndex = stack->revertIndex();
