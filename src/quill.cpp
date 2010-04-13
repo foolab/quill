@@ -132,6 +132,42 @@ QSize Quill::previewSize(int level)
     return Core::instance()->previewSize(level);
 }
 
+void Quill::setImageSizeLimit(const QSize &size)
+{
+    Core::instance()->setImageSizeLimit(size);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::qsizeToString(size));
+}
+
+QSize Quill::imageSizeLimit()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->imageSizeLimit();
+}
+
+void Quill::setImagePixelsLimit(int pixels)
+{
+    Core::instance()->setImagePixelsLimit(pixels);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(pixels));
+}
+
+int Quill::imagePixelsLimit()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->imagePixelsLimit();
+}
+
+void Quill::setNonTiledImagePixelsLimit(int pixels)
+{
+    Core::instance()->setNonTiledImagePixelsLimit(pixels);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(pixels));
+}
+
+int Quill::nonTiledImagePixelsLimit()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->nonTiledImagePixelsLimit();
+}
+
 void Quill::setEditHistoryDirectory(const QString &directory)
 {
     Core::instance()->setEditHistoryDirectory(directory);

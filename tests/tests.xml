@@ -115,6 +115,13 @@
       </case>
     </set>
 
+    <set name="quill-image-format-tests" feature="formats">
+      <description>quill image formats test</description>
+      <case name="ut_format" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_format </step>
+      </case>
+    </set>
+
     <set name="quill-error-handling-tests" feature="errorhandling">
       <description>quill error handling test</description>
       <case name="ut_error" type="Functional" level="Component">

@@ -61,6 +61,9 @@
 Core *Core::g_instance = 0;
 
 Core::Core(Quill::ThreadingMode threadingMode) :
+    m_imageSizeLimit(QSize()),
+    m_imagePixelsLimit(0),
+    m_nonTiledImagePixelsLimit(0),
     m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
     m_thumbnailCreationEnabled(true),
     m_dBusThumbnailingEnabled(true),
@@ -196,6 +199,36 @@ int Core::fileLimit(int level) const
         return m_fileLimit[level];
     else
         return 0;
+}
+
+void Core::setImageSizeLimit(const QSize &size)
+{
+    m_imageSizeLimit = size;
+}
+
+QSize Core::imageSizeLimit() const
+{
+    return m_imageSizeLimit;
+}
+
+void Core::setImagePixelsLimit(int pixels)
+{
+    m_imagePixelsLimit = pixels;
+}
+
+int Core::imagePixelsLimit() const
+{
+    return m_imagePixelsLimit;
+}
+
+void Core::setNonTiledImagePixelsLimit(int pixels)
+{
+    m_nonTiledImagePixelsLimit = pixels;
+}
+
+int Core::nonTiledImagePixelsLimit() const
+{
+    return m_nonTiledImagePixelsLimit;
 }
 
 void Core::setEditHistoryCacheSize(int level, int limit)

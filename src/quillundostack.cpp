@@ -112,6 +112,9 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
         return;
     }
 
+    if (!m_file->checkImageSize(fullSize))
+        m_file->imageSizeError();
+
     command->setFullImageSize(fullSize);
 
     // tile map

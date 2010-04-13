@@ -389,6 +389,28 @@ QRect File::viewPort() const
     return m_viewPort;
 }
 
+bool File::checkImageSize(const QSize &fullImageSize)
+{
+    const QSize imageSizeLimit = Core::instance()->imageSizeLimit();
+    if (imageSizeLimit.isValid() &&
+        (fullImageSize.boundedTo(imageSizeLimit) != fullImageSize))
+        return false;
+
+    int imagePixelsLimit = 0;
+    if (m_fileFormat != "jpeg" && m_fileFormat != "jpg" &&
+        m_fileFormat != "image/jpeg")
+        imagePixelsLimit = Core::instance()->nonTiledImagePixelsLimit();
+
+    if (imagePixelsLimit == 0)
+        imagePixelsLimit = Core::instance()->imagePixelsLimit();
+
+    if ((imagePixelsLimit > 0) &&
+        (fullImageSize.width() * fullImageSize.height() > imagePixelsLimit))
+        return false;
+    else
+        return true;
+}
+
 QuillUndoStack *File::stack() const
 {
     return m_stack;
@@ -808,6 +830,14 @@ void File::processFilterError(QuillImageFilter *filter)
         emitError(QuillError(errorCode, errorSource,
                              filter->option(QuillImageFilter::FileName).toString()));
     }
+}
+
+void File::imageSizeError()
+{
+    emitError(QuillError(QuillError::ImageSizeLimitError,
+                         QuillError::ImageFileErrorSource,
+                         m_fileName));
+    m_supported = false;
 }
 
 void File::setWaitingForData(bool status)
