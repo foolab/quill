@@ -1,3 +1,11 @@
+libquill (1.100415.0) unstable; urgency=low
+
+  * Implemented: SWP#HImag-1930
+  * Implemented: SWP#HImag-1925
+  * Implemented: SWP#HImag-1913
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 15 Apr 2010 09:50:00 +0200
+
 libquill (1.100407.0) unstable; urgency=low
 
   * Quill will also emit removed() signals.
