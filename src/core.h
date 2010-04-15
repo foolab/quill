@@ -122,6 +122,12 @@ public:
                const QString &fileFormat);
 
     /*!
+      Inserts a file into the core file list.
+     */
+
+    void attach(File *file);
+
+    /*!
       Removes a file from the core.
      */
 

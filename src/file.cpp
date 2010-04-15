@@ -55,7 +55,7 @@
 #include "metadata.h"
 
 File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
-               m_readOnly(false), m_hasThumbnailError(false),
+               m_readOnly(false), m_hasThumbnailError(false), m_isClone(false),
                m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_waitingForData(false), m_saveInProgress(false),
@@ -215,6 +215,25 @@ void File::save()
     }
 }
 
+void File::saveAs(const QString &fileName, const QString &fileFormat)
+{
+    if (m_exists && m_supported && !Core::instance()->fileExists(fileName)) {
+        QByteArray history = HistoryXml::encode(this);
+        File *file = HistoryXml::decodeOne(history);
+
+        file->setOriginalFileName(m_fileName);
+        file->setFileFormat(m_fileFormat);
+
+        file->setFileName(fileName);
+        file->setTargetFormat(fileFormat);
+
+        file->setClone(true);
+        file->prepareSave();
+        Core::instance()->attach(file);
+        Core::instance()->suggestNewTask();
+    }
+}
+
 bool File::isSaveInProgress() const
 {
     return m_saveInProgress;
@@ -222,7 +241,9 @@ bool File::isSaveInProgress() const
 
 bool File::isDirty() const
 {
-    if (m_stack)
+    if (m_isClone)
+        return true;
+    else if (m_stack)
         return m_stack->isDirty();
     else
         return false;
@@ -719,7 +740,8 @@ void File::concludeSave()
     if (hasOriginal())
         original()->stack()->concludeSave();
 
-    writeEditHistory(HistoryXml::encode(this), &result);
+    if (!m_isClone)
+        writeEditHistory(HistoryXml::encode(this), &result);
 
     if (result.errorCode() != QuillError::NoError) {
         emitError(result);
@@ -869,3 +891,14 @@ void File::restore()
         emitAllImages();
     }
 }
+
+bool File::isClone()
+{
+    return m_isClone;
+}
+
+void File::setClone(bool status)
+{
+    m_isClone = status;
+}
+

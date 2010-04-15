@@ -256,6 +256,11 @@ File *Core::file(const QString &fileName,
     return file;
 }
 
+void Core::attach(File *file)
+{
+    m_files.insert(file->fileName(), file);
+}
+
 void Core::detach(File *file)
 {
     m_files.remove(m_files.key(file));
