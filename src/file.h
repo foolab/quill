@@ -341,6 +341,12 @@ public:
     virtual QRect viewPort() const;
 
     /*!
+      Check if an image size passes the maximum image size constraints.
+     */
+
+    bool checkImageSize(const QSize &fullImageSize);
+
+    /*!
       If a related thumbnail has been cached to the file system.
      */
 
@@ -461,6 +467,12 @@ public:
     */
 
     void processFilterError(QuillImageFilter *filter);
+
+    /*!
+      Trigger an error if a full image size violates the set limits.
+    */
+
+    void imageSizeError();
 
     /*
       Sets the waiting-for-data status for this file.

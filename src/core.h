@@ -208,6 +208,67 @@ public:
     int fileLimit(int level) const;
 
     /*!
+      Sets the maximum allowed dimensions for an image. If either
+      dimension of an image overflows its respective limit set here,
+      the image will not be handled by Quill.
+
+      This limit will not prevent image filters from resizing an image
+      into bigger than the given size.
+
+      The default is no limit, which is represented by an invalid
+      size.
+
+      See also setImagePixelsLimit().
+     */
+
+    void setImageSizeLimit(const QSize &size);
+
+    /*!
+      Returns the maximum allowed dimensions for an image. See
+      setImageSizeLimit().
+    */
+
+    QSize imageSizeLimit() const;
+
+    /*!
+      Sets the maximum number of allowed pixels for an image. Images
+      which have more pixels than this number will not be handled by
+      Quill. This does not replace imageSizeLimit(); both limits
+      are checked separately.
+
+      The default is no limit, which is represented by the value 0.
+     */
+
+    void setImagePixelsLimit(int pixels);
+
+    /*!
+      Returns the maximum number of allowed dimensions for an image. See
+      setImagePixelsLimit().
+    */
+
+    int imagePixelsLimit() const;
+
+    /*!
+      Sets the maximum number of allowed pixels for image formats which
+      do not support tiling. (Currently, this means all formats except Jpeg.)
+      Images which have more pixels than this number will not be handled by
+      Quill. If tiling is not enabled with setDefaultTileSize(), this
+      maximum size applies to all images.
+
+      The default is no limit, which means that the generic image pixels limit
+      will be used (see setImagePixelsLimit() ).
+     */
+
+    void setNonTiledImagePixelsLimit(int pixels);
+
+    /*!
+      Returns the maximum number of allowed pixels for image formats which
+      do not support tiling. See setNonTilingImagePixelsLimit().
+    */
+
+    int nonTiledImagePixelsLimit() const;
+
+    /*!
       Sets the edit history cache size for a given level.
      */
 
@@ -531,6 +592,9 @@ private:
     QList<QSize> m_previewSize;
     QList<ImageCache*> m_cache;
     QList<int> m_fileLimit;
+
+    QSize m_imageSizeLimit;
+    int m_imagePixelsLimit, m_nonTiledImagePixelsLimit;
 
     QString m_editHistoryDirectory;
     QList<QString> m_thumbnailDirectory;

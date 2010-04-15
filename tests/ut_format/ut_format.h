@@ -37,79 +37,32 @@
 **
 ****************************************************************************/
 
-#ifndef __QUILL_ERROR_H__
-#define __QUILL_ERROR_H__
+#ifndef _UT_FORMAT_H_
+#define _UT_FORMAT_H_
 
-#include <QMetaType>
-#include <QuillImageFilter>
+#include <QObject>
+#include <QImage>
 
-class QString;
-class QuillErrorPrivate;
+class QuillUndoCommand;
+class QtImageFilter;
+class Quill;
 
-class QuillError
-{
- public:
-    enum ErrorCode {
-        UnspecifiedError = -1,
-        NoError = 0,
+class ut_format: public QObject {
+Q_OBJECT
+public:
+    ut_format();
 
-        FileNotFoundError,
-        FileOpenForReadError,
-        FileReadError,
-        FileFormatUnsupportedError,
-        FileCorruptError,
+private slots:
+    void init();
+    void cleanup();
 
-        DirCreateError,
-        FileOpenForWriteError,
-        FileWriteError,
+    void initTestCase();
+    void cleanupTestCase();
 
-        FileRemoveError,
-
-        GlobalFileLimitError,
-        FilterGeneratorError,
-
-        ImageSizeLimitError //! The image dimensions are too big to be shown.
-    };
-
-    enum ErrorSource {
-        UnspecifiedErrorSource = -1,
-        NoErrorSource = 0,
-
-        ImageFileErrorSource,
-        ImageOriginalErrorSource,
-        ThumbnailErrorSource,
-        TemporaryFileErrorSource,
-        EditHistoryErrorSource,
-        CrashDumpErrorSource
-    };
-
- public:
-    QuillError(ErrorCode errorCode = NoError);
-    QuillError(ErrorCode errorCode,
-               ErrorSource errorSource,
-               const QString &errorData);
-    QuillError(const QuillError &quillError);
-
-    ~QuillError();
-
-    ErrorCode errorCode() const;
-    void setErrorCode(ErrorCode errorCode);
-
-    ErrorSource errorSource() const;
-    void setErrorSource(ErrorSource errorSource);
-
-    QString errorData() const;
-    void setErrorData(QString errorData);
-
-    QuillError operator=(const QuillError &quillError);
-
-    static QuillError::ErrorCode
-        translateFilterError(QuillImageFilter::ImageFilterError error);
-
- private:
-    QuillErrorPrivate *priv;
+    void testSizeLimit();
+    void testPixelsLimit();
+    void testNonTiledPixelsLimit();
+    void testMultipleLimits();
 };
 
-Q_DECLARE_METATYPE(QuillError)
-
-#endif //__QUILL_ERROR_H__
+#endif  // _UT_FORMAT_H_
