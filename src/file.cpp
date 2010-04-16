@@ -218,6 +218,10 @@ void File::save()
 void File::saveAs(const QString &fileName, const QString &fileFormat)
 {
     if (m_exists && m_supported && !Core::instance()->fileExists(fileName)) {
+        // Create placeholder
+        QFile qFile(fileName);
+        qFile.open(QIODevice::WriteOnly);
+
         QByteArray history = HistoryXml::encode(this);
         File *file = HistoryXml::decodeOne(history);
 
@@ -704,8 +708,12 @@ void File::prepareSave()
         return;
     }
 
-    Metadata metadata(m_fileName);
-    QByteArray rawExifDump = metadata.dumpExif();
+
+    QByteArray rawExifDump;
+    if (!m_isClone) {
+        Metadata metadata(m_fileName);
+        rawExifDump = metadata.dumpExif();
+    }
 
     m_stack->prepareSave(m_temporaryFile->fileName(), rawExifDump);
 
@@ -738,8 +746,10 @@ void File::concludeSave()
 
     // Copy metadata from previous version to new one
 
-    Metadata metadata(m_fileName);
-    metadata.write(temporaryName);
+    if (!m_isClone) {
+        Metadata metadata(m_fileName);
+        metadata.write(temporaryName);
+    }
 
     // This is more efficient than renaming between partitions.
 
