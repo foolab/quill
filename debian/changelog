@@ -1,3 +1,9 @@
+libquill (1.100416.0) unstable; urgency=low
+
+  * Small fixes to export feature.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 16 Apr 2010 15:15:00 +0200
+
 libquill (1.100415.0) unstable; urgency=low
 
   * Implemented: SWP#HImag-1930
