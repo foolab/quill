@@ -59,7 +59,7 @@
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
-    m_saveCommand(0), m_saveMap(0),m_revertIndex(0),m_canRestoreFlag(false)
+    m_saveCommand(0), m_saveMap(0),m_revertIndex(0)
 {
 }
 
@@ -121,7 +121,14 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
     QSize fullSize = filter->newFullImageSize(previousFullSize);
 
     if (fullSize.isEmpty()) {
-        m_file->processFilterError(command->filter());
+        if (filter->role() == QuillImageFilter::Role_Load)
+            m_file->processFilterError(filter);
+        else if (previousFullSize.isValid()) {
+            // Any new command which would make the image 0x0 is rejected
+            undo();
+            command->setFilter(0);
+            delete filter;
+        }
         return;
     }
 
@@ -157,11 +164,12 @@ void QuillUndoStack::add(QuillImageFilter *filter)
     // add to stack
     m_stack->push(cmd);
 
+    Logger::log("[Stack] "+filter->name()+" added to stack");
+
     // full image size
     if (!m_file->isWaitingForData())
         calculateFullImageSize(cmd);
     setRevertIndex(0);
-    Logger::log("[Stack] "+filter->name()+" added to stack");
 }
 
 bool QuillUndoStack::canUndo() const
@@ -204,16 +212,16 @@ void QuillUndoStack::undo()
         // This is here instead of command::undo() so that intermediate steps
         // need not be protected.
         command()->protectImages();
-         if(m_canRestoreFlag){
-            setRevertIndex(0);
-            m_canRestoreFlag = false;
-         }
     }
 }
 
 bool QuillUndoStack::canRedo() const
 {
     if (!m_stack->canRedo())
+        return false;
+
+    // Invalid filters cannot be redone
+    if (!command(index())->filter())
         return false;
 
     // Session mode: cannot redo outside session
@@ -249,10 +257,8 @@ void QuillUndoStack::redo()
         // This is here instead of command::redo() so that intermediate steps
         // need not be protected.
         command()->protectImages();
-        if(m_canRestoreFlag){
-            setRevertIndex(0);
-            m_canRestoreFlag = false;
-        }
+
+        setRevertIndex(0);
     }
 }
 QuillImage QuillUndoStack::bestImage(int maxLevel) const
@@ -458,16 +464,15 @@ void QuillUndoStack::revert()
     do{
         undo();
     }
-    while(canRevert());
-    m_canRestoreFlag = true;
+    while(canUndo());
 }
 
 void QuillUndoStack::restore()
 {
-    m_canRestoreFlag = false;
-    while(canRestore()&&((index())!=revertIndex())){
+    int revertIndex = m_revertIndex;
+    while(canRedo() && (index() < revertIndex))
         redo();
-    }
+
     setRevertIndex(0);
 }
 
@@ -478,6 +483,6 @@ bool QuillUndoStack::canRevert() const
 
 bool QuillUndoStack::canRestore() const
 {
-    return revertIndex()>0? true:false;
+    return revertIndex() > 0;
 }
 

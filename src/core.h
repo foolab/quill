@@ -468,6 +468,12 @@ public:
     int numFilesAtLevel(int level) const;
 
     /*!
+      Returns true if there is any calculation in progress.
+     */
+
+    bool isCalculationInProgress() const;
+
+    /*!
       Returns true if there are any files which are in the progress of
       saving. Useful for example when an application wants to exit.
      */
@@ -509,6 +515,11 @@ public:
     void emitSaved(QString fileName);
 
     /*!
+      Emits a removed signal.
+    */
+    void emitRemoved(QString fileName);
+
+    /*!
       Emits an error signal.
     */
     void emitError(QuillError error);
@@ -544,6 +555,15 @@ signals:
      */
 
     void saved(QString fileName);
+
+    /*
+      A file has been removed.
+
+      This currently applies only if the file has been explicitly removed
+      with QuillFile::remove().
+     */
+
+    void removed(QString fileName);
 
     /*!
       Any error not specific to any individual QuillFile is reported

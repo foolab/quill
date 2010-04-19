@@ -44,6 +44,12 @@
 #include "historyxml.h"
 #include <QDebug>
 
+class QuillFilePrivate {
+public:
+    File *m_file;
+    int m_displayLevel;
+};
+
 QuillFile::QuillFile()
 {
     priv = new QuillFilePrivate;
@@ -453,4 +459,9 @@ void QuillFile::restore()
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->restore();
+}
+
+File* QuillFile::internalFile()
+{
+    return priv->m_file;
 }

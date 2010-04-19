@@ -246,6 +246,12 @@ void Quill::recover()
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
 }
 
+bool Quill::isCalculationInProgress()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->isCalculationInProgress();
+}
+
 bool Quill::isSaveInProgress()
 {
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
@@ -271,6 +277,9 @@ Quill* Quill::instance()
         g_instance->connect(Core::instance(),
                             SIGNAL(saved(QString)),
                             SIGNAL(saved(QString)));
+        g_instance->connect(Core::instance(),
+                            SIGNAL(removed(QString)),
+                            SIGNAL(removed(QString)));
         g_instance->connect(Core::instance(),
                             SIGNAL(error(QuillError)),
                             SIGNAL(error(QuillError)));

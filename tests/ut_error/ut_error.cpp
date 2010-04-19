@@ -965,6 +965,30 @@ void ut_error::testWriteProtectedEditHistory()
     delete file;
 }
 
+void ut_error::testDestructiveFilter()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.crop");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::CropRectangle, QVariant(QRect()));
+
+    file->runFilter(filter);
+
+    // Verify that the filter was rejected
+    QVERIFY(!file->canUndo());
+    QVERIFY(!file->canRedo());
+
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_error test;

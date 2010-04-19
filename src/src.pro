@@ -9,7 +9,7 @@ INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter
 DEPENDPATH += .
 
 DEFINES     +=
-
+MOC_DIR = .moc
 QT += dbus
 
 CONFIG += release

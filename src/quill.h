@@ -489,6 +489,12 @@ public:
     static QString crashDumpPath();
 
     /*!
+      Returns true if there is any calculation in progress.
+     */
+
+    static bool isCalculationInProgress();
+
+    /*!
       Returns true if there are any files which are in the progress of
       saving. Useful for example when an application wants to exit.
      */
@@ -534,6 +540,15 @@ signals:
      */
 
     void saved(QString fileName);
+
+    /*
+      A file has been removed.
+
+      This currently applies only if the file has been explicitly removed
+      with QuillFile::remove().
+     */
+
+    void removed(QString fileName);
 
     /*!
       Any error not specific to any individual QuillFile is reported

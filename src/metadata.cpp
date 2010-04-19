@@ -239,7 +239,7 @@ bool Metadata::write(const QString &fileName)
 bool Metadata::writeXmp(const QString &fileName)
 {
     if (!m_xmpPtr)
-        return false;
+        return true;
 
     XmpFilePtr xmpFilePtr = xmp_files_open_new(fileName.toAscii().constData(),
                                                XMP_OPEN_FORUPDATE);
@@ -252,7 +252,8 @@ bool Metadata::writeXmp(const QString &fileName)
 
     // Crash safety can be ignored here by selecting Nooption since
     // QuillFile already has crash safety measures.
-    xmp_files_close(xmpFilePtr, XMP_CLOSE_NOOPTION);
+    if (result)
+        result = xmp_files_close(xmpFilePtr, XMP_CLOSE_NOOPTION);
     xmp_files_free(xmpFilePtr);
 
     return result;

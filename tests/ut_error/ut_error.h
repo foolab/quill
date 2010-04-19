@@ -86,6 +86,8 @@ private slots:
 
     void testEditHistoryDirectoryCreateFailed();
     void testWriteProtectedEditHistory();
+
+    void testDestructiveFilter();
 };
 
 #endif  // TEST_LIBQUILL_ERROR_H

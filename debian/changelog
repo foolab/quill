@@ -1,3 +1,38 @@
+libquill (1.100416.0) unstable; urgency=low
+
+  * Small fixes to export feature.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 16 Apr 2010 15:15:00 +0200
+
+libquill (1.100415.0) unstable; urgency=low
+
+  * Implemented: SWP#HImag-1930
+  * Implemented: SWP#HImag-1925
+  * Implemented: SWP#HImag-1913
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 15 Apr 2010 09:50:00 +0200
+
+libquill (1.100407.0) unstable; urgency=low
+
+  * Quill will also emit removed() signals.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 07 Apr 2010 11:50:00 +0200
+
+libquill (1.100406.0) unstable; urgency=low
+
+  * Testing meego repository
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 06 Apr 2010 09:30:00 +0200
+
+libquill (1.100323.0) unstable; urgency=low
+
+  * Fixes: NB#161274 Image corruption due to XMP writeback problems
+  * Fixes: NB#161592 Application crash after repeated free rotate
+  * Fixes: NB#161125 QuillImage::z() always returns zero
+  * Fixes: NB#161238 Restore not working after two calls to revert
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 24 Mar 2010 09:20:00 +0200
+
 libquill (1.100317.1) unstable; urgency=low
 
   * Fixed: failing unit tests due to optional revert index

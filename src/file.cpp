@@ -584,6 +584,7 @@ void File::remove()
     if (hasOriginal())
         original()->remove();
 
+    Core::instance()->emitRemoved(m_fileName);
     emit removed();
 }
 
@@ -749,7 +750,13 @@ void File::concludeSave()
 
     if (!m_isClone) {
         Metadata metadata(m_fileName);
-        metadata.write(temporaryName);
+        if (!metadata.write(temporaryName)) {
+            // If metadata write failed, the temp file is likely corrupt
+            emitError(QuillError(QuillError::FileWriteError,
+                                 QuillError::TemporaryFileErrorSource,
+                                 m_fileName));
+            return;
+        }
     }
 
     // This is more efficient than renaming between partitions.

@@ -82,6 +82,9 @@ void ut_file::testRemove()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
+    QSignalSpy spy(Quill::instance(),
+                   SIGNAL(removed(const QString)));
+
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QVERIFY(file);
     QVERIFY(file->exists());
@@ -108,6 +111,9 @@ void ut_file::testRemove()
     QVERIFY(!file->exists());
     QVERIFY(!QFile::exists(testFile.fileName()));
     QVERIFY(!QFile::exists(originalFileName));
+
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.first().first().toString(), testFile.fileName());
 
     delete file;
 }
@@ -302,7 +308,9 @@ void ut_file::testDifferentPreviewLevels()
     QCOMPARE(spy2.count(), 1);
 
     QCOMPARE(file->image().size(), QSize(4, 1));
+    QCOMPARE(file->image().z(), 0);
     QCOMPARE(file2->image().size(), QSize(4, 1));
+    QCOMPARE(file2->image().z(), 0);
 
     Quill::releaseAndWait(); // load level 1
     Quill::releaseAndWait(); // brightness level 1
@@ -311,13 +319,16 @@ void ut_file::testDifferentPreviewLevels()
     QCOMPARE(spy2.count(), 2);
 
     QCOMPARE(file->image().size(), QSize(4, 1));
+    QCOMPARE(file->image().z(), 0);
     QVERIFY(Unittests::compareImage(file2->image(), imageAfter));
+    QCOMPARE(file2->image().z(), 1);
 
     delete file2;
 
     // Ensure that the display level is kept even if the other image reference
     // is removed.
     QCOMPARE(file->image().size(), QSize(4, 1));
+    QCOMPARE(file->image().z(), 0);
 
     delete file;
 }
@@ -426,7 +437,7 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),3);
    QVERIFY(Unittests::compareImage(file->image(), image));
    file->save();
    Quill::releaseAndWait();
@@ -438,7 +449,7 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),0);
    QVERIFY(Unittests::compareImage(file->image(), imageAfter1));
 
    //Test redo with revert and restore
@@ -447,11 +458,11 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),3);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),3);
    file->redo();
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),0);
 
    //Test one additional operation after revert
    file->revert();
@@ -459,7 +470,7 @@ void ut_file::testRevertRestore()
    Quill::releaseAndWait();
    QCOMPARE(file->canRestore(),true);
    QCOMPARE(file->canRevert(),false);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),2);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),2);
    QuillImageFilter *filter2 =
        QuillImageFilterFactory::createImageFilter("Rotate");
 
@@ -467,9 +478,40 @@ void ut_file::testRevertRestore()
    file->runFilter(filter2);
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
-   QCOMPARE((file->priv)->m_file->m_stack->revertIndex(),0);
+   QCOMPARE(file->internalFile()->m_stack->revertIndex(),0);
 
    delete file;
+}
+
+void ut_file::testDoubleRevertRestore()
+{
+    // Tests that revert and restore still work after a previous revert.
+
+   QTemporaryFile testFile;
+   testFile.open();
+
+   QuillImage image = Unittests::generatePaletteImage();
+   image.save(testFile.fileName(), "png");
+
+   QuillImageFilter *filter =
+       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+   QVERIFY(filter);
+   filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+   QuillImageFilter *filter2 =
+       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+   QVERIFY(filter2);
+   filter2->setOption(QuillImageFilter::Brightness, QVariant(-20));
+
+   QuillFile *file = new QuillFile(testFile.fileName(), "png");
+   file->runFilter(filter);
+   QVERIFY(file->canRevert());
+   file->revert();
+   QVERIFY(file->canRestore());
+   file->runFilter(filter2);
+   QVERIFY(file->canRevert());
+   file->revert();
+   QVERIFY(file->canRestore());
 }
 
 int main ( int argc, char *argv[] ){

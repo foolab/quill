@@ -594,6 +594,11 @@ int Core::numFilesAtLevel(int level) const
     return n;
 }
 
+bool Core::isCalculationInProgress() const
+{
+    return (m_threadManager->isRunning());
+}
+
 bool Core::isSaveInProgress() const
 {
     return (prioritySaveFile() != 0);
@@ -683,6 +688,12 @@ void Core::processDBusThumbnailerError(const QString fileName,
 void Core::emitSaved(QString fileName)
 {
     emit saved(fileName);
+    Logger::log("[Core] "+QString(Q_FUNC_INFO)+fileName);
+}
+
+void Core::emitRemoved(QString fileName)
+{
+    emit removed(fileName);
     Logger::log("[Core] "+QString(Q_FUNC_INFO)+fileName);
 }
 

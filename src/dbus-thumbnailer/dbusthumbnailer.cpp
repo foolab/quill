@@ -58,13 +58,11 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
     QStringList mimes;
     mimes.append(mimeType);
 
-    QDBusPendingReply<uint> reply;
-
     if ((!m_tumbler) || (!m_tumbler->isValid()))
         connectDBus();
 
     if (m_tumbler)
-        reply = m_tumbler->Queue(uris, mimes, flavor, "default", 0);
+        m_tumbler->Queue(uris, mimes, flavor, "default", 0);
 }
 
 void DBusThumbnailer::finishedHandler(uint handle)

@@ -76,12 +76,7 @@ class QuillImageFilter;
 class QSize;
 class QRect;
 class File;
-
-class QuillFilePrivate {
-public:
-    File *m_file;
-    int m_displayLevel;
-};
+class QuillFilePrivate;
 
 typedef QList<QuillImage> QuillImageList;
 Q_DECLARE_METATYPE(QuillImageList)
@@ -479,6 +474,12 @@ private:
      */
 
     void emitImageAvailable(const QList<QuillImage> &imageList);
+
+    /*!
+      Returns the internal file object.
+     */
+
+    File *internalFile();
 
 private:
     QuillFilePrivate *priv;
