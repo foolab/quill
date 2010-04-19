@@ -205,6 +205,8 @@ void ut_thumbnail::testLoadUnsupported()
 
     QTemporaryFile testFile;
     testFile.open();
+    testFile.write("/FF/D8");
+    testFile.flush();
     QString fileName = testFile.fileName();
 
     QImage image = Unittests::generatePaletteImage();
@@ -217,15 +219,17 @@ void ut_thumbnail::testLoadUnsupported()
         File::fileNameHash(fileName) + ".png";
     image.save(thumbName, "png");
 
-    QuillFile *file = new QuillFile(fileName, "png");
+    QuillFile *file = new QuillFile(fileName, "");
     QVERIFY(file->exists());
 
     file->setDisplayLevel(0);
+    QVERIFY(file->exists());
     Quill::releaseAndWait();
 
     // We should now see the "thumbnail" even if the original file
     // does not exist.
 
+    QVERIFY(file->exists());
     QVERIFY(Unittests::compareImage(file->image(), image));
 
     delete file;

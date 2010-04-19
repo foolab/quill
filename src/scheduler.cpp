@@ -53,6 +53,7 @@
 #include "threadmanager.h"
 #include "tilemap.h"
 #include "savemap.h"
+#include "logger.h"
 
 Scheduler::Scheduler()
 {
@@ -552,7 +553,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 stack->file()->emitError(QuillError(QuillError::FileWriteError,
                                                     QuillError::ThumbnailErrorSource,
                                                     filter->option(QuillImageFilter::FileName).toString()));
-                qDebug() << "Thumbnail save failed!";
+                Logger::log("[Scheduler] Thumbnail save failed!");
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
 
@@ -630,7 +631,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
             QString fileName = filter->option(QuillImageFilter::FileName).toString();
             QuillError::ErrorSource errorSource;
-            qDebug() << "Normal load failed!" << fileName << file->fileName();
+            Logger::log("[Scheduler] Normal load failed from file " +
+                        file->fileName());
 
             if (fileName == file->fileName()) {
                 errorSource = QuillError::ImageFileErrorSource;

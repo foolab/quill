@@ -42,6 +42,7 @@
 #include <QFileInfo>
 #include <QBuffer>
 #include <QDataStream>
+#include <QImageWriter>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
@@ -77,12 +78,24 @@ File* QuillUndoStack::file()
 void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 {
     QFile loadFile(m_file->originalFileName());
-    if (loadFile.exists() && (loadFile.size() > 0))
+    if (loadFile.exists() && (loadFile.size() > 0)) {
         filter->setOption(QuillImageFilter::FileName,
                           m_file->originalFileName());
-    else
+        filter->setOption(QuillImageFilter::FileFormat,
+                          m_file->fileFormat());
+    }
+    else {
         filter->setOption(QuillImageFilter::FileName,
                           m_file->fileName());
+        filter->setOption(QuillImageFilter::FileFormat,
+                          m_file->targetFormat());
+    }
+
+    QByteArray format = filter->option(QuillImageFilter::FileFormat).toByteArray();
+
+    if (!format.isNull() &&
+        !QImageWriter::supportedImageFormats().contains(format))
+        m_file->setReadOnly();
 }
 
 void QuillUndoStack::load()

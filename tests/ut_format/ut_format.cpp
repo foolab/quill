@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include <QtTest/QtTest>
+#include <QFile>
 #include <QImage>
 #include <QDebug>
 #include <QuillImageFilter>
@@ -169,6 +170,20 @@ void ut_format::testMultipleLimits()
     QVERIFY(!file->supported());
 
     delete file;
+}
+
+void ut_format::testReadOnlyFormat()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QFile originalFile("/usr/share/libquill-tests/images/image_16x4.gif");
+    QByteArray buffer = originalFile.readAll();
+    testFile.write(buffer);
+    testFile.flush();
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "gif");
+    QVERIFY(file->isReadOnly());
 }
 
 int main ( int argc, char *argv[] ){

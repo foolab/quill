@@ -344,7 +344,7 @@ void ut_stack::testSetImage()
     Quill::setEditHistoryDirectory("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 2);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "");
 
     file->setDisplayLevel(0);
     QuillImage quillImage(image);

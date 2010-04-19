@@ -43,7 +43,6 @@
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
-#include <QDebug>
 #include "file.h"
 #include "core.h"
 #include "imagecache.h"
@@ -159,6 +158,9 @@ void File::setReadOnly()
 
 bool File::isReadOnly() const
 {
+    // the stack needs to be set up to get this value
+    if (exists() && (m_stack->count() == 0))
+          m_stack->load();
     return m_readOnly;
 }
 
@@ -191,9 +193,8 @@ bool File::setDisplayLevel(int level)
     m_displayLevel = level;
 
     // setup stack here
-    if (exists() && (level >= 0) && (m_stack->count() == 0)) {
+    if (exists() && (level >= 0) && (m_stack->count() == 0))
         m_stack->load();
-    }
 
     if (level > originalDisplayLevel)
         Core::instance()->suggestNewTask();
@@ -218,6 +219,10 @@ void File::save()
 void File::saveAs(const QString &fileName, const QString &fileFormat)
 {
     if (m_exists && m_supported && !Core::instance()->fileExists(fileName)) {
+        // Create placeholder
+        QFile qFile(fileName);
+        qFile.open(QIODevice::WriteOnly);
+
         QByteArray history = HistoryXml::encode(this);
         File *file = HistoryXml::decodeOne(history);
 
@@ -474,7 +479,7 @@ File *File::readFromEditHistory(const QString &fileName,
     QFile file(editHistoryFileName(fileName,
                                    Core::instance()->editHistoryDirectory()));
 
-    qDebug() << "Reading edit history from" << file.fileName();
+    Logger::log("[File] Reading edit history from "+file.fileName());
 
     if (!file.exists()) {
         *error = QuillError(QuillError::FileNotFoundError,
@@ -497,8 +502,9 @@ File *File::readFromEditHistory(const QString &fileName,
     }
     file.close();
 
-    qDebug() << "Read" << history.size() << "bytes";
-    qDebug() << history;
+    Logger::log("[File] Edit history size is "+QString::number(history.size())+
+                " bytes");
+    Logger::log("[File] Edit history dump: "+history);
 
     File *result = HistoryXml::decodeOne(history);
     if (!result)
@@ -519,7 +525,7 @@ void File::writeEditHistory(const QString &history, QuillError *error)
     QFile file(editHistoryFileName(m_fileName,
                                    Core::instance()->editHistoryDirectory()));
 
-    qDebug() << "Writing edit history to" << file.fileName();
+    Logger::log("[File] Writing edit history to "+file.fileName());
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         *error = QuillError(QuillError::FileOpenForWriteError,
                             QuillError::EditHistoryErrorSource,
@@ -704,8 +710,11 @@ void File::prepareSave()
         return;
     }
 
-    Metadata metadata(m_fileName);
-    QByteArray rawExifDump = metadata.dumpExif();
+    QByteArray rawExifDump;
+    if (!m_isClone) {
+        Metadata metadata(m_fileName);
+        rawExifDump = metadata.dumpExif();
+    }
 
     m_stack->prepareSave(m_temporaryFile->fileName(), rawExifDump);
 
@@ -738,8 +747,10 @@ void File::concludeSave()
 
     // Copy metadata from previous version to new one
 
-    Metadata metadata(m_fileName);
-    metadata.write(temporaryName);
+    if (!m_isClone) {
+        Metadata metadata(m_fileName);
+        metadata.write(temporaryName);
+    }
 
     // This is more efficient than renaming between partitions.
 
@@ -875,7 +886,7 @@ void File::emitError(QuillError quillError)
 {
     emit error(quillError);
     Core::instance()->emitError(quillError);
-    Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+    Logger::log("[File] "+QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }
 
 bool File::canRevert() const

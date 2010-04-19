@@ -191,8 +191,7 @@ void ut_error::testEmptyFileRead()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    // This will provide an unsupported format error instead of a read error
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileFormatUnsupportedError);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
     QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
     QCOMPARE(error.errorData(), testFile.fileName());
 
@@ -407,7 +406,7 @@ void ut_error::testEmptyOriginal()
     QCOMPARE(spy2.count(), 1);
     QuillError error = spy2.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileFormatUnsupportedError);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
     QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
     QCOMPARE(error.errorData(), originalFile.fileName());
 

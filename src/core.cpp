@@ -689,5 +689,5 @@ void Core::emitSaved(QString fileName)
 void Core::emitError(QuillError quillError)
 {
     emit error(quillError);
-    Logger::log("[Core] "+QString(Q_FUNC_INFO)+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+    Logger::log("[Core] "+QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }
