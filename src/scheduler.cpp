@@ -618,6 +618,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             }
 
             image = QuillImage(image, command->fullImageSize());
+            image.setZ(task->displayLevel());
             delete filter;
         } else if ((image.isNull()) &&
                    (command->filter()->role() == QuillImageFilter::Role_Load)) {
