@@ -1,3 +1,9 @@
+libquill (1.100420.0) unstable; urgency=low
+
+  * change version no and make tag
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 10 Apr 2010 15:00:00 +0200
+
 libquill (1.100416.0) unstable; urgency=low
 
   * Small fixes to export feature.
