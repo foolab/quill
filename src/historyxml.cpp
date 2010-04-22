@@ -404,6 +404,8 @@ void HistoryXml::readEditSession(QXmlStreamReader *reader,
                     filter =
                         QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
                     filter->setOption(QuillImageFilter::FileName, fileName);
+                    filter->setOption(QuillImageFilter::BackgroundColor,
+                                      Core::instance()->backgroundRenderingColor());
                     stack->add(filter);
                     (*targetIndex)++;
                 }

@@ -627,6 +627,16 @@ int Core::levelFromFlavor(QString flavor)
     return -1;
 }
 
+void Core::setBackgroundRenderingColor(const QColor &color)
+{
+    m_backgroundRenderingColor = color;
+}
+
+QColor Core::backgroundRenderingColor() const
+{
+    return m_backgroundRenderingColor;
+}
+
 void Core::activateDBusThumbnailer()
 {
     Logger::log("[Core]"+QString(Q_FUNC_INFO));

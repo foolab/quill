@@ -51,6 +51,7 @@ can only be changed if no files have been opened yet.
 #define __QUILL_CORE_H_
 
 #include <QObject>
+#include <QColor>
 
 #include "quill.h"
 #include "quillerror.h"
@@ -492,6 +493,24 @@ public:
     QString temporaryFileDirectory() const;
 
     /*!
+      Sets the default color for alpha channel rendering.
+
+      As Quill does not support alpha channel editing, the alpha
+      channel is immediately and permanently rendered as the
+      background rendering color.
+     */
+
+    void setBackgroundRenderingColor(const QColor &color);
+
+    /*!
+      Gets the default color for alpha channel rendering.
+
+      See setBackgroundRenderingColor().
+    */
+
+    QColor backgroundRenderingColor() const;
+
+    /*!
       Return one file.
     */
 
@@ -614,6 +633,8 @@ private:
 
     QString m_temporaryFileDirectory;
     QString m_crashDumpPath;
+
+    QColor m_backgroundRenderingColor;
 
     DBusThumbnailer *m_dBusThumbnailer;
 };

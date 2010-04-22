@@ -41,6 +41,7 @@
 #include <QImageReader>
 #include <QCryptographicHash>
 #include <QByteArray>
+#include <QColor>
 #include <QDir>
 #include <QuillImageFilter>
 #include <QDebug>
@@ -208,6 +209,18 @@ bool Quill::isDBusThumbnailingEnabled()
 {
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->isDBusThumbnailingEnabled();
+}
+
+void Quill::setBackgroundRenderingColor(const QColor &color)
+{
+    Core::instance()->setBackgroundRenderingColor(color);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+}
+
+QColor Quill::backgroundRenderingColor()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->backgroundRenderingColor();
 }
 
 void Quill::setTemporaryFilePath(const QString &tmpFilePath)

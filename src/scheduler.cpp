@@ -325,9 +325,10 @@ Task *Scheduler::newThumbnailLoadTask(File *file,
         return 0;
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
-
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
+    filter->setOption(QuillImageFilter::BackgroundColor,
+                      Core::instance()->backgroundRenderingColor());
 
     Task *task = new Task();
     task->setCommandId(command->uniqueId());

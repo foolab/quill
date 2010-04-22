@@ -438,6 +438,24 @@ public:
     static QString temporaryFilePath();
 
     /*!
+      Sets the default color for alpha channel rendering.
+
+      As Quill does not support alpha channel editing, the alpha
+      channel is immediately and permanently rendered as the
+      background rendering color.
+     */
+
+    static void setBackgroundRenderingColor(const QColor &color);
+
+    /*!
+      Gets the default color for alpha channel rendering.
+
+      See setBackgroundRenderingColor().
+    */
+
+    static QColor backgroundRenderingColor();
+
+    /*!
       Returns true if it is possible to recover from a previous crash.
       This will only work if setCrashDumpFile() has been previously
       called, the physical file is found and actually contains something to

@@ -102,6 +102,8 @@ void QuillUndoStack::load()
 {
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
+    filter->setOption(QuillImageFilter::BackgroundColor,
+                      Core::instance()->backgroundRenderingColor());
     setInitialLoadFilter(filter);
     add(filter);
 }
