@@ -637,6 +637,16 @@ QColor Core::backgroundRenderingColor() const
     return m_backgroundRenderingColor;
 }
 
+void Core::setVectorGraphicsRenderingSize(const QSize &size)
+{
+    m_vectorGraphicsRenderingSize = size;
+}
+
+QSize Core::vectorGraphicsRenderingSize() const
+{
+    return m_vectorGraphicsRenderingSize;
+}
+
 void Core::activateDBusThumbnailer()
 {
     Logger::log("[Core]"+QString(Q_FUNC_INFO));

@@ -223,6 +223,18 @@ QColor Quill::backgroundRenderingColor()
     return Core::instance()->backgroundRenderingColor();
 }
 
+void Quill::setVectorGraphicsRenderingSize(const QSize &size)
+{
+    Core::instance()->setVectorGraphicsRenderingSize(size);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+}
+
+QSize Quill::vectorGraphicsRenderingSize()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->vectorGraphicsRenderingSize();
+}
+
 void Quill::setTemporaryFilePath(const QString &tmpFilePath)
 {
     Core::instance()->setTemporaryFileDirectory(tmpFilePath);

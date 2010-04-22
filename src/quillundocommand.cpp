@@ -220,23 +220,29 @@ QSize QuillUndoCommand::fullImageSize() const
 
 QSize QuillUndoCommand::targetPreviewSize(int level) const
 {
-    QSize previewSize = Core::instance()->previewSize(level);
+    return scaleBounding(m_fullImageSize,
+                         Core::instance()->previewSize(level)).
+        boundedTo(m_fullImageSize);
+}
+
+QSize QuillUndoCommand::scaleBounding(QSize size, QSize boundingBox)
+{
     QSize targetSize;
 
     // keep aspect ratio, always round fractions up
-    int targetWidth = (previewSize.height() * m_fullImageSize.width()
-        + m_fullImageSize.height() - 1) / m_fullImageSize.height();
+    int targetWidth = (boundingBox.height() * size.width()
+        + size.height() - 1) / size.height();
 
-    if (targetWidth <= previewSize.width())
-        targetSize = QSize(targetWidth, previewSize.height());
+    if (targetWidth <= boundingBox.width())
+        targetSize = QSize(targetWidth, boundingBox.height());
     else {
         // keep aspect ratio, always round fractions up
-        int targetHeight = (previewSize.width() * m_fullImageSize.height()
-        + m_fullImageSize.width() - 1) / m_fullImageSize.width();
-        targetSize = QSize(previewSize.width(), targetHeight);
+        int targetHeight = (boundingBox.width() * size.height()
+        + size.width() - 1) / size.width();
+        targetSize = QSize(boundingBox.width(), targetHeight);
     }
 
-    return targetSize.boundedTo(m_fullImageSize);
+    return targetSize;
 }
 
 void QuillUndoCommand::setSessionId(int id)

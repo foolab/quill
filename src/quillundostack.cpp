@@ -46,7 +46,6 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
-#include <QDebug>
 
 #include "quillundostack.h"
 #include "quillundocommand.h"
@@ -136,6 +135,14 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
 
     if (!m_file->checkImageSize(fullSize))
         m_file->imageSizeError();
+
+    // Vector graphics are always rendered to a fixed size
+    if ((m_file->fileFormat() == "image/svg+xml") &&
+        Core::instance()->vectorGraphicsRenderingSize().isValid()) {
+        QSize maximumSize = Core::instance()->vectorGraphicsRenderingSize().
+            boundedTo(Core::instance()->previewSize(Core::instance()->previewLevelCount()-1));
+        fullSize = QuillUndoCommand::scaleBounding(fullSize, maximumSize);
+    }
 
     command->setFullImageSize(fullSize);
 

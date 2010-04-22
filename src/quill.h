@@ -456,6 +456,27 @@ public:
     static QColor backgroundRenderingColor();
 
     /*!
+      Sets the bounding box for vector graphics rendering.
+
+      Vector graphics (mimetype "image/svg+xml") will be
+      rendered to this size, preserving aspect ratio. This
+      size cannot be bigger than the biggest preview level.
+
+      Default is an invalid QSize, which means that all
+      vector graphics is rendered into their intended size.
+     */
+
+    static void setVectorGraphicsRenderingSize(const QSize &size);
+
+    /*!
+      Returns the bounding box for vector graphics rendering.
+
+      See setVectorGraphicsRenderingSize().
+    */
+
+    static QSize vectorGraphicsRenderingSize();
+
+    /*!
       Returns true if it is possible to recover from a previous crash.
       This will only work if setCrashDumpFile() has been previously
       called, the physical file is found and actually contains something to

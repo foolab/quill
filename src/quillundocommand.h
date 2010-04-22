@@ -211,6 +211,12 @@ public:
 
     TileMap *tileMap() const;
 
+    /*!
+      Helper function to scale a size into a bounding box.
+     */
+
+    static QSize scaleBounding(QSize size, QSize boundingBox);
+
 private:
     int m_id;
     QuillImageFilter* m_filter;

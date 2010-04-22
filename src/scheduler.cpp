@@ -386,6 +386,13 @@ Task *Scheduler::newNormalTask(File *file, int level)
         // Image already exists - no need to recalculate
         return 0;
 
+    // For read-only images, we stop loading if we already have
+    // an equivalent of the full image
+    if (file->isReadOnly() &&
+        (level > 0) &&
+        (file->image(level-1).size() == file->fullImageSize()))
+        return 0;
+
     if ((level == Core::instance()->previewLevelCount()) &&
         (!Core::instance()->defaultTileSize().isEmpty()))
         return newTilingTask(file);

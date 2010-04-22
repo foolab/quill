@@ -511,6 +511,27 @@ public:
     QColor backgroundRenderingColor() const;
 
     /*!
+      Sets the bounding box for vector graphics rendering.
+
+      Vector graphics (mimetype "image/svg+xml") will be
+      rendered to this size, preserving aspect ratio.
+
+      Default is an invalid QSize, which means that all
+      vector graphics is rendered into their intended size.
+     */
+
+    void setVectorGraphicsRenderingSize(const QSize &size);
+
+    /*!
+      Returns the bounding box for vector graphics rendering.
+
+      Vector graphics (mimetype "image/svg+xml") will be
+      rendered to this size, preserving aspect ratio.
+    */
+
+    QSize vectorGraphicsRenderingSize() const;
+
+    /*!
       Return one file.
     */
 
@@ -614,6 +635,7 @@ private:
 
     QSize m_imageSizeLimit;
     int m_imagePixelsLimit, m_nonTiledImagePixelsLimit;
+    QSize m_vectorGraphicsRenderingSize;
 
     QString m_editHistoryDirectory;
     QList<QString> m_thumbnailDirectory;
