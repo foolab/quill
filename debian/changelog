@@ -1,3 +1,20 @@
+libquill (1.100423.0) unstable; urgency=low
+
+  * Support for image formats, rendering of transparency and vector graphics.
+  * Implemented: SWP#HImag-1925
+  * Implemented: SWP#HImag-1928
+  * Implemented: SWP#HImag-1922
+  * Implemented: SWP#HImag-1927
+  * Implemented: SWP#HImag-1926
+  * Implemented: SWP#HImag-1930
+  * Implemented: SWP#HImag-1913
+  * Implemented: SWP#HImag-1931
+  * Fixes: NB#161125 QuillImage::z() returns always zero
+  * Fixes: NB#165305 <MemLeak> valgrind report
+  * Fixes: NB#164289 image covered with dark green color background
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 23 Apr 2010 10:55:00 +0200
+
 libquill (1.100420.0) unstable; urgency=low
 
   * change version no and make tag
