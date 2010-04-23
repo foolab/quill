@@ -225,7 +225,8 @@ QSize QuillUndoCommand::targetPreviewSize(int level) const
         boundedTo(m_fullImageSize);
 }
 
-QSize QuillUndoCommand::scaleBounding(QSize size, QSize boundingBox)
+QSize QuillUndoCommand::scaleBounding(const QSize &size,
+                                      const QSize &boundingBox)
 {
     QSize targetSize;
 
