@@ -502,6 +502,17 @@ File *File::readFromEditHistory(const QString &fileName,
     }
     file.close();
 
+    // If a file is write protected, set the state to read-only.
+    bool readOnly = false;
+
+    if (!file.open(QIODevice::ReadWrite)) {
+        *error = QuillError(QuillError::FileOpenForWriteError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
+        readOnly = true;
+    }
+    file.close();
+
     Logger::log("[File] Edit history size is "+QString::number(history.size())+
                 " bytes");
     Logger::log("[File] Edit history dump: "+history);
@@ -511,6 +522,9 @@ File *File::readFromEditHistory(const QString &fileName,
         *error = QuillError(QuillError::FileCorruptError,
                             QuillError::EditHistoryErrorSource,
                             file.fileName());
+    if (result && readOnly)
+        result->setReadOnly();
+
     return result;
 }
 
@@ -742,7 +756,7 @@ void File::concludeSave()
         if (result.errorCode() != QuillError::NoError) {
             result.setErrorSource(QuillError::ImageOriginalErrorSource);
             emitError(result);
-            return;
+            goto cleanup;
         }
     }
 
@@ -755,33 +769,40 @@ void File::concludeSave()
             emitError(QuillError(QuillError::FileWriteError,
                                  QuillError::TemporaryFileErrorSource,
                                  m_fileName));
-            return;
+            goto cleanup;
         }
     }
 
     // This is more efficient than renaming between partitions.
 
-    QuillError result = File::overwritingCopy(temporaryName,
-                                              m_fileName);
-    if (result.errorCode() != QuillError::NoError) {
-        result.setErrorSource(QuillError::ImageFileErrorSource);
-        emitError(result);
-        return;
-    }
+    {
+        QuillError result = File::overwritingCopy(temporaryName,
+                                                  m_fileName);
+        if (result.errorCode() != QuillError::NoError) {
+            result.setErrorSource(QuillError::ImageFileErrorSource);
+            emitError(result);
+            goto cleanup;
+        }
 
-    m_stack->concludeSave();
-    if (hasOriginal())
-        original()->stack()->concludeSave();
+        m_stack->concludeSave();
+        if (hasOriginal())
+            original()->stack()->concludeSave();
 
-    if (!m_isClone)
-        writeEditHistory(HistoryXml::encode(this), &result);
+        if (!m_isClone)
+            writeEditHistory(HistoryXml::encode(this), &result);
 
-    if (result.errorCode() != QuillError::NoError) {
-        emitError(result);
-        return;
+        if (result.errorCode() != QuillError::NoError) {
+            emitError(result);
+            goto cleanup;
+        }
     }
 
     removeThumbnails();
+
+    emit saved();
+    Core::instance()->emitSaved(m_fileName);
+
+ cleanup:
     m_saveInProgress = false;
 
     Core::instance()->dump();
@@ -790,9 +811,6 @@ void File::concludeSave()
 
     delete m_temporaryFile;
     m_temporaryFile = 0;
-
-    emit saved();
-    Core::instance()->emitSaved(m_fileName);
 }
 
 bool File::hasOriginal()

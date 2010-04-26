@@ -952,7 +952,6 @@ void ut_error::testWriteProtectedEditHistory()
     Quill::releaseAndWait(); // load
     Quill::releaseAndWait(); // filter
     Quill::releaseAndWait(); // filter2
-    QCOMPARE(spy.count(), 0);
     Quill::releaseAndWait(); // save
 
     QCOMPARE(spy.count(), 1);
@@ -961,6 +960,15 @@ void ut_error::testWriteProtectedEditHistory()
     QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForWriteError);
     QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
     QCOMPARE(error.errorData(), editHistoryFile.fileName());
+
+    delete file;
+
+    // The file should be immediately be recognized as write protected
+    QSignalSpy spy2(Quill::instance(), SIGNAL(error(QuillError)));
+    file = new QuillFile(testFile.fileName(), "png");
+
+    QCOMPARE(spy2.count(), 1);
+    QVERIFY(file->isReadOnly());
 
     delete file;
 }
