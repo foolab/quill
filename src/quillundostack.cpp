@@ -95,6 +95,8 @@ void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
     if (!format.isNull() &&
         !QImageWriter::supportedImageFormats().contains(format))
         m_file->setReadOnly();
+
+    m_file->setFileFormat(filter->option(QuillImageFilter::MimeType).toByteArray());
 }
 
 void QuillUndoStack::load()
