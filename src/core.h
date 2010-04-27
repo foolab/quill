@@ -78,7 +78,6 @@ friend class ut_core;
 public:
 
     Core(Quill::ThreadingMode threadingMode = Quill::ThreadingNormal);
-    ~Core();
 
     /*!
       The initializer is called before instance() is called for the first time,
@@ -565,6 +564,7 @@ public:
     void emitError(QuillError error);
 
 private:
+    ~Core();
 
     /*!
       Activates the D-Bus thumbnailer with a task if there is any.

@@ -168,7 +168,7 @@ void HistoryXml::writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer)
     {
         if (filter->supportsOption(option))
         {
-            QVariant value = filter->option(option);
+            const QVariant value = filter->option(option);
 
             writer->writeStartElement("", "FilterOption");
             writer->writeAttribute("name", QString::number(option));
@@ -183,7 +183,7 @@ void HistoryXml::writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer)
     writer->writeEndElement();
 }
 
-bool HistoryXml::writeComplexType(QVariant variant, QXmlStreamWriter *writer)
+bool HistoryXml::writeComplexType(const QVariant &variant, QXmlStreamWriter *writer)
 {
     switch (variant.type())
     {
@@ -234,7 +234,7 @@ bool HistoryXml::writeComplexType(QVariant variant, QXmlStreamWriter *writer)
 
     case QVariant::Polygon:
     {
-        QPolygon poly = variant.value<QPolygon>();
+        const QPolygon poly = variant.value<QPolygon>();
         writer->writeStartElement("", "QPolygon");
         for (int i=0; i<poly.count(); i++)
             writeComplexType(QVariant(poly.at(i)), writer);
@@ -298,8 +298,8 @@ QList<File*> HistoryXml::decode(const QByteArray & array)
             (reader.name() != "File"))
             return emptyList;
 
-        QString fileName = reader.attributes().value("", "name").toString();
-        QString targetFormat = reader.attributes().value("", "format").toString();
+        const QString fileName = reader.attributes().value("", "name").toString();
+        const QString targetFormat = reader.attributes().value("", "format").toString();
 
         if (readToken(&reader) != QXmlStreamReader::EndElement)
             return emptyList;
@@ -307,8 +307,8 @@ QList<File*> HistoryXml::decode(const QByteArray & array)
         if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
             (reader.name() != "OriginalFile"))
             return emptyList;
-        QString originalFileName = reader.attributes().value("", "name").toString();
-        QString fileFormat = reader.attributes().value("", "format").toString();
+        const QString originalFileName = reader.attributes().value("", "name").toString();
+        const QString fileFormat = reader.attributes().value("", "format").toString();
 
         if (readToken(&reader) != QXmlStreamReader::EndElement)
             return emptyList;
@@ -424,7 +424,7 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
 {
     bool success = true;
 
-    QString name = reader->attributes().value("", "name").toString();
+    const QString name = reader->attributes().value("", "name").toString();
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(name);
 
@@ -498,7 +498,7 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
     return filter;
 }
 
-QVariant HistoryXml::recoverVariant(QVariant::Type variantType, QString string)
+QVariant HistoryXml::recoverVariant(QVariant::Type variantType, const QString &string)
 {
     bool ok;
     int toInt = string.toInt(&ok);
