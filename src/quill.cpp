@@ -312,3 +312,11 @@ Quill* Quill::instance()
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return g_instance;
 }
+
+Quill::Quill()
+{
+}
+
+Quill::~Quill()
+{
+}

@@ -605,6 +605,14 @@ signals:
 
 private:
 
+    /*!
+      This class is a static class, so no constructors should not be invoked
+      from the outside.
+    */
+
+    Quill();
+    ~Quill();
+
     QuillPrivate *priv;
     static Quill *g_instance;
 };
