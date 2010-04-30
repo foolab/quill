@@ -40,6 +40,7 @@
 #include <QuillImage>
 #include <QuillImageFilter>
 #include <QuillImageFilterGenerator>
+#include <QImageWriter>
 #include <QDir>
 #include <QDebug>
 #include "quill.h"
@@ -645,6 +646,13 @@ void Core::setVectorGraphicsRenderingSize(const QSize &size)
 QSize Core::vectorGraphicsRenderingSize() const
 {
     return m_vectorGraphicsRenderingSize;
+}
+
+QList<QByteArray> Core::writableImageFormats()
+{
+    if (m_writableImageFormats.isEmpty())
+        m_writableImageFormats = QImageWriter::supportedImageFormats();
+    return m_writableImageFormats;
 }
 
 void Core::activateDBusThumbnailer()

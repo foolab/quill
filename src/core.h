@@ -531,6 +531,15 @@ public:
     QSize vectorGraphicsRenderingSize() const;
 
     /*!
+      Returns the list of writable image formats. Internal use only.
+
+      QImageWriter::supportedImageFormats() was shown to be a
+      particularly heavy operation and was thus optimized with this.
+    */
+
+    QList<QByteArray> writableImageFormats();
+
+    /*!
       Return one file.
     */
 
@@ -657,6 +666,8 @@ private:
     QString m_crashDumpPath;
 
     QColor m_backgroundRenderingColor;
+
+    QList<QByteArray> m_writableImageFormats;
 
     DBusThumbnailer *m_dBusThumbnailer;
 };

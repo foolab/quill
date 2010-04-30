@@ -42,7 +42,6 @@
 #include <QFileInfo>
 #include <QBuffer>
 #include <QDataStream>
-#include <QImageWriter>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
@@ -93,7 +92,7 @@ void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
     QByteArray format = filter->option(QuillImageFilter::FileFormat).toByteArray();
 
     if (!format.isNull() &&
-        !QImageWriter::supportedImageFormats().contains(format))
+        !Core::instance()->writableImageFormats().contains(format))
         m_file->setReadOnly();
 
     m_file->setFileFormat(filter->option(QuillImageFilter::MimeType).toByteArray());
