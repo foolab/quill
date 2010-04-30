@@ -662,10 +662,12 @@ void Core::activateDBusThumbnailer()
         return;
 
     for (int level=0; level<=previewLevelCount()-1; level++)
-        foreach (File *file, existingFiles()){
-            if (file->exists() &&
-                !file->supported() &&
+        // using m_files instead of existingFiles() since this will potentially
+        // be called often and the existing file list creation is a slow task.
+        foreach (File *file, m_files){
+            if (!file->supported() &&
                 file->thumbnailSupported() &&
+                file->exists() &&
                 (level <= file->displayLevel()) &&
                 !thumbnailDirectory(level).isNull() &&
                 file->stack() &&
