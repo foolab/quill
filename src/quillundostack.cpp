@@ -152,7 +152,7 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
     if (!Core::instance()->defaultTileSize().isEmpty() && !command->tileMap()) {
         TileMap *tileMap;
         if (filter->role() == QuillImageFilter::Role_Load)
-            tileMap = new TileMap(filter->newFullImageSize(QSize()),
+            tileMap = new TileMap(fullSize,
                                   Core::instance()->defaultTileSize(),
                                   Core::instance()->tileCache());
         else
