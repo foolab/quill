@@ -1,3 +1,14 @@
+libquill (1.100503.0) unstable; urgency=low
+
+  * Fixes: NB#165752 Code review
+  * Fixes: NB#165757 Code review
+  * Implemented: SWP#HImag-1918
+  * Implemented: SWP#HImag-1919
+  * Implemented: SWP#HImag-1920
+  * Implemented: SWP#HImag-1921
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 03 May 2010 13:15:00 +0200
+
 libquill (1.100423.0) unstable; urgency=low
 
   * Support for image formats, rendering of transparency and vector graphics.
