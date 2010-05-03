@@ -153,6 +153,13 @@
 	<step >/usr/lib/libquill-tests/ut_dbusthumbnailer </step>
       </case>
     </set>
+
+    <set name="quill-util-autoclean-tests" feature="autoclean">
+      <description>automatic cleanup of unused files test</description>
+      <case name="ut_autoclean" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_autoclean </step>
+      </case>
+    </set>
   </suite>
 </testdefinition>
 
