@@ -30,6 +30,7 @@ SUBDIRS += \
            ut_logger \
            ut_metadata \
            ut_dbusthumbnailer \
+           ut_autoclean \
            benchmark  \
 
 # --- install
