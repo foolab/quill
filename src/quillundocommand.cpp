@@ -267,6 +267,22 @@ bool QuillUndoCommand::belongsToSession(int id) const
     return (m_belongsToSession && m_sessionId == id);
 }
 
+void QuillUndoCommand::createTileMap()
+{
+    if (m_tileMap || !m_filter)
+        return;
+
+    if (m_filter->role() == QuillImageFilter::Role_Load)
+        m_tileMap = new TileMap(m_fullImageSize,
+                                Core::instance()->defaultTileSize(),
+                                Core::instance()->tileCache());
+    else {
+        if (!prev()->tileMap())
+            prev()->createTileMap();
+        m_tileMap = new TileMap(prev()->tileMap(), m_filter);
+    }
+}
+
 void QuillUndoCommand::setTileMap(TileMap *map)
 {
     delete m_tileMap;
@@ -274,7 +290,10 @@ void QuillUndoCommand::setTileMap(TileMap *map)
     m_tileMap = map;
 }
 
-TileMap *QuillUndoCommand::tileMap() const
+TileMap *QuillUndoCommand::tileMap()
 {
+    if (!m_tileMap)
+        createTileMap();
+
     return m_tileMap;
 }

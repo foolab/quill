@@ -353,8 +353,8 @@ QList<QuillImage> File::allImageLevels(int displayLevel) const
 {
     if (!m_exists || !m_stack->command())
         return QList<QuillImage>();
-    else if ((!m_stack->command()->tileMap()) ||
-             (displayLevel < Core::instance()->previewLevelCount()))
+    else if ((displayLevel < Core::instance()->previewLevelCount()) ||
+             (!m_stack->command()->tileMap()))
         return m_stack->allImageLevels(displayLevel);
     else
         return m_stack->allImageLevels(displayLevel) +

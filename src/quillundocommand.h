@@ -198,6 +198,12 @@ public:
     bool belongsToSession(int id) const;
 
     /*!
+      Automatically creates a new tile map for the command.
+    */
+
+    void createTileMap();
+
+    /*!
       Sets the tile map for the command.
       The tile map becomes property of the command.
     */
@@ -209,7 +215,7 @@ public:
       map will be reflected to the command.
      */
 
-    TileMap *tileMap() const;
+    TileMap *tileMap();
 
     /*!
       Helper function to scale a size into a bounding box.
