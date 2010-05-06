@@ -1,3 +1,7 @@
+libquill (1.100506.0) unstable; urgency=low
+
+  * Response time optimizations
+
 libquill (1.100503.0) unstable; urgency=low
 
   * Fixes: NB#165752 Code review
