@@ -3,6 +3,7 @@ TARGET = quill-autoclean
 DEPENDPATH += .
 INCLUDEPATH += .
 LIBS += -lquill
+QMAKE_LIBDIR += ../src/
 
 CONFIG += debug
 
