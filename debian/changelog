@@ -1,3 +1,9 @@
+libquill (1.100506.1) unstable; urgency=low
+
+  * Fixes: NB#167489 No thumbnails generated for read-only images
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 06 May 2010 17:20:00 +0200
+
 libquill (1.100506.0) unstable; urgency=low
 
   * Response time optimizations
