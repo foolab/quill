@@ -390,7 +390,9 @@ void QuillUndoStack::prepareSave(const QString &fileName,
     m_isSessionRecording = false;
 
     delete m_saveCommand;
+    m_saveCommand =0;
     delete m_saveMap;
+    m_saveMap = 0;
 
     if (!Core::instance()->defaultTileSize().isEmpty())
         m_saveMap = new SaveMap(command()->fullImageSize(),

@@ -512,6 +512,8 @@ void ut_file::testDoubleRevertRestore()
    QVERIFY(file->canRevert());
    file->revert();
    QVERIFY(file->canRestore());
+
+   delete file;
 }
 
 int main ( int argc, char *argv[] ){
