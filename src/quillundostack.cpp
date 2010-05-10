@@ -362,7 +362,7 @@ int QuillUndoStack::savedIndex() const
 
 bool QuillUndoStack::isDirty() const
 {
-    return (command()->index() != savedIndex());
+    return (m_stack->count() > 0) && (command()->index() != savedIndex());
 }
 
 void QuillUndoStack::startSession()
