@@ -46,6 +46,7 @@
 #include "quill.h"
 #include "quillerror.h"
 #include "core.h"
+#include "displaylevel.h"
 #include "file.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
@@ -76,12 +77,11 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_temporaryFileDirectory(QString()),
     m_crashDumpPath(QString())
 {
-    m_previewSize.append(Quill::defaultViewPortSize);
-    m_thumbnailDirectory.append(QString());
-    m_fileLimit.append(1);
-    m_fileLimit.append(1);
-    m_cache.append(new ImageCache(0));
-    m_cache.append(new ImageCache(0));
+    DisplayLevel *previewLevel = new DisplayLevel(Quill::defaultViewPortSize);
+    m_displayLevel.append(previewLevel);
+
+    DisplayLevel *fullLevel = new DisplayLevel(Quill::defaultViewPortSize * 2);
+    m_displayLevel.append(fullLevel);
 
     qRegisterMetaType<QuillImageList>("QuillImageList");
     qRegisterMetaType<QuillError>("QuillError");
@@ -101,9 +101,9 @@ Core::~Core()
     foreach(File *file, m_files)
         delete file;
 
-    while (!m_cache.isEmpty()) {
-        delete m_cache.first();
-        m_cache.removeFirst();
+    while (!m_displayLevel.isEmpty()) {
+        delete m_displayLevel.first();
+        m_displayLevel.removeFirst();
     }
     delete m_tileCache;
     delete m_threadManager;
@@ -142,62 +142,59 @@ void Core::setPreviewLevelCount(int count)
     if (!m_files.isEmpty() || (count <= 0))
         return;
 
-    int oldCount = m_previewSize.count();
+    int oldCount = m_displayLevel.count()-1;
     if (count > oldCount)
         for (int i = oldCount; i < count; i++) {
-            m_previewSize.append(m_previewSize.last() * 2);
-            m_fileLimit.append(1);
-            m_cache.append(new ImageCache(0));
-            m_thumbnailDirectory.append(QString());
+            m_displayLevel.append(
+              new DisplayLevel(m_displayLevel.last()->size() * 2));
         }
     else if (count < oldCount)
         for (int i = oldCount; i > count; i--) {
-            m_previewSize.removeLast();
-            m_fileLimit.removeLast();
-            delete m_cache.last();
-            m_cache.removeLast();
-            m_thumbnailDirectory.removeLast();
+            delete m_displayLevel.last();
+            m_displayLevel.removeLast();
         }
 }
 
 int Core::previewLevelCount() const
 {
-    return m_previewSize.count();
+    return m_displayLevel.count()-1;
 }
 
 ImageCache *Core::cache(int level) const
 {
-    return m_cache[level];
+    return m_displayLevel[level]->imageCache();
 }
 
 void Core::setPreviewSize(int level, const QSize &size)
 {
-    if ((level < 0) || (level >= m_previewSize.count()))
+    if ((level < 0) || (level >= m_displayLevel.count()-1))
         return;
 
-    m_previewSize.replace(level, size);
+    m_displayLevel[level]->setSize(size);
+    if (level == m_displayLevel.count()-2)
+        m_displayLevel[level+1]->setSize(size*2);
 }
 
 QSize Core::previewSize(int level) const
 {
-    if ((level >=0 ) && (level < m_previewSize.count()))
-        return m_previewSize[level];
+    if ((level >=0 ) && (level < m_displayLevel.count()-1))
+        return m_displayLevel[level]->size();
     else
         return QSize();
 }
 
 void Core::setFileLimit(int level, int limit)
 {
-    if ((level < 0) || (level >= m_fileLimit.count()))
+    if ((level < 0) || (level >= m_displayLevel.count()))
         return;
 
-    m_fileLimit[level] = limit;
+    m_displayLevel[level]->setFileLimit(limit);
 }
 
 int Core::fileLimit(int level) const
 {
-    if ((level >=0 ) && (level < m_fileLimit.count()))
-        return m_fileLimit[level];
+    if ((level >=0 ) && (level < m_displayLevel.count()))
+        return m_displayLevel[level]->fileLimit();
     else
         return 0;
 }
@@ -234,15 +231,18 @@ int Core::nonTiledImagePixelsLimit() const
 
 void Core::setEditHistoryCacheSize(int level, int limit)
 {
-    if ((level < 0) || (level >= m_cache.count()))
+    if ((level < 0) || (level >= m_displayLevel.count()))
         return;
 
-    m_cache[level]->setMaxSize(limit);
+    m_displayLevel[level]->imageCache()->setMaxSize(limit);
 }
 
 int Core::editHistoryCacheSize(int level)
 {
-    return m_cache[level]->maxSize();
+    if ((level < 0) || (level >= m_displayLevel.count()))
+        return 0;
+
+    return m_displayLevel[level]->imageCache()->maxSize();
 }
 
 bool Core::fileExists(const QString &fileName)
@@ -521,15 +521,18 @@ QString Core::editHistoryDirectory() const
 
 void Core::setThumbnailDirectory(int level, const QString &directory)
 {
-    m_thumbnailDirectory[level] = directory;
+    if ((level < 0) || (level >= m_displayLevel.count()))
+        return;
+
+    m_displayLevel[level]->setThumbnailFlavorPath(directory);
 }
 
 QString Core::thumbnailDirectory(int level) const
 {
-    if (level >= previewLevelCount())
+    if ((level < 0) || (level >= m_displayLevel.count()))
         return QString();
-    else
-        return m_thumbnailDirectory[level];
+
+    return m_displayLevel[level]->thumbnailFlavorPath();
 }
 
 void Core::setThumbnailExtension(const QString &extension)

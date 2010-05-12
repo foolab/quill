@@ -65,7 +65,7 @@ class Scheduler;
 class ThreadManager;
 class TileCache;
 class DBusThumbnailer;
-class CorePrivate;
+class DisplayLevel;
 
 class Core : public QObject
 {
@@ -638,16 +638,13 @@ private:
 
     static Core *g_instance;
 
-    QList<QSize> m_previewSize;
-    QList<ImageCache*> m_cache;
-    QList<int> m_fileLimit;
+    QList<DisplayLevel*> m_displayLevel;
 
     QSize m_imageSizeLimit;
     int m_imagePixelsLimit, m_nonTiledImagePixelsLimit;
     QSize m_vectorGraphicsRenderingSize;
 
     QString m_editHistoryDirectory;
-    QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;

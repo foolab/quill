@@ -45,6 +45,7 @@ HEADERS += quill.h \
            quillerror.h \
            file.h \
            core.h \
+           displaylevel.h \
            tilecache.h \
            tilemap.h \
            savemap.h \
@@ -65,6 +66,7 @@ SOURCES += quill.cpp \
            quillerror.cpp \
            file.cpp \
            core.cpp \
+           displaylevel.cpp \
            tilecache.cpp \
            tilemap.cpp \
            savemap.cpp \
