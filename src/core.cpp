@@ -183,6 +183,30 @@ QSize Core::previewSize(int level) const
         return QSize();
 }
 
+void Core::setMinimumPreviewSize(int level, const QSize &size)
+{
+    if ((level < 0) || (level >= m_displayLevel.count()-1))
+        return;
+
+    m_displayLevel[level]->setMinimumSize(size);
+}
+
+QSize Core::minimumPreviewSize(int level) const
+{
+    if ((level >=0 ) && (level < m_displayLevel.count()-1))
+        return m_displayLevel[level]->minimumSize();
+    else
+        return QSize();
+}
+
+bool Core::isSubstituteLevel(int level, int targetLevel) const
+{
+    return (level == targetLevel) ||
+        ((level < targetLevel) &&
+          !minimumPreviewSize(level).isValid() &&
+          !minimumPreviewSize(targetLevel).isValid());
+}
+
 void Core::setFileLimit(int level, int limit)
 {
     if ((level < 0) || (level >= m_displayLevel.count()))

@@ -27,6 +27,7 @@ SUBDIRS += \
            ut_error \
            ut_export \
            ut_format \
+           ut_croppedthumbnail \
            ut_logger \
            ut_metadata \
            ut_dbusthumbnailer \

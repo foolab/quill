@@ -161,6 +161,10 @@ public:
 
     virtual bool isReadOnly() const;
 
+    bool canEnableDisplayLevel(int level) const;
+
+    bool isDisplayLevelEnabled(int level) const;
+
     /*!
       Sets the display level of the file.
       -1 = no display, 0 = first level only, ...

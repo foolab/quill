@@ -164,6 +164,17 @@ bool File::isReadOnly() const
     return m_readOnly;
 }
 
+bool File::canEnableDisplayLevel(int level) const
+{
+    return (Core::instance()->numFilesAtLevel(level) <
+            Core::instance()->fileLimit(level));
+}
+
+bool File::isDisplayLevelEnabled(int level) const
+{
+    return Core::instance()->isSubstituteLevel(level, m_displayLevel);
+}
+
 bool File::setDisplayLevel(int level)
 {
     int originalDisplayLevel = m_displayLevel;
@@ -171,7 +182,7 @@ bool File::setDisplayLevel(int level)
     if (level > originalDisplayLevel) {
         // Block if trying to raise display level over strict limits
         for (int l=originalDisplayLevel+1; l<=level; l++)
-            if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
+            if (!canEnableDisplayLevel(level)) {
                 emitError(QuillError(QuillError::GlobalFileLimitError,
                                      QuillError::NoErrorSource,
                                      m_fileName));
@@ -559,7 +570,7 @@ void File::writeEditHistory(const QString &history, QuillError *error)
 void File::emitSingleImage(QuillImage image, int level)
 {
     foreach(QuillFile *file, m_references)
-        if (file->displayLevel() >= level)
+        if (Core::instance()->isSubstituteLevel(level, file->displayLevel()))
             file->emitImageAvailable(image);
 }
 

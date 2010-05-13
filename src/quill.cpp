@@ -133,6 +133,18 @@ QSize Quill::previewSize(int level)
     return Core::instance()->previewSize(level);
 }
 
+void Quill::setMinimumPreviewSize(int level, const QSize &size)
+{
+    Core::instance()->setMinimumPreviewSize(level, size);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::qsizeToString(size));
+}
+
+QSize Quill::minimumPreviewSize(int level)
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
+    return Core::instance()->minimumPreviewSize(level);
+}
+
 void Quill::setImageSizeLimit(const QSize &size)
 {
     Core::instance()->setImageSizeLimit(size);

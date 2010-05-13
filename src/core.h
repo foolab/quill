@@ -182,6 +182,25 @@ public:
     void setPreviewSize(int level, const QSize &size);
 
     /*!
+      Sets the minimum size of a preview-level image.
+     */
+
+    void setMinimumPreviewSize(int level, const QSize &size);
+
+    /*!
+      The minimum size of a preview-level image.
+    */
+
+    QSize minimumPreviewSize(int level) const;
+
+    /*!
+      Returns true if the given display level can substiture for the given
+      level.
+     */
+
+    bool isSubstituteLevel(int level, int targetLevel) const;
+
+    /*!
       Sets the default tile size if tiling is in use.
       The default is 0, which disables tiling.
      */
