@@ -55,6 +55,7 @@ private slots:
     void cleanupTestCase();
 
     void testReplacementPolicy();
+    void testCroppedThumbnailSize();
 };
 
 #endif  // UT_CROPPED_THUMBNAIL_H

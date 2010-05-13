@@ -98,6 +98,27 @@ void ut_croppedthumbnail::testReplacementPolicy()
     delete file;
 }
 
+void ut_croppedthumbnail::testCroppedThumbnailSize()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    Unittests::generatePaletteImage().save(testFile.fileName(), "png");
+
+    Quill::setPreviewLevelCount(1);
+    Quill::setPreviewSize(0, QSize(2, 2));
+    Quill::setMinimumPreviewSize(0, QSize(2, 2));
+
+    QuillFile *file = new QuillFile(testFile.fileName());
+    file->setDisplayLevel(0);
+
+    Quill::releaseAndWait();
+
+    QCOMPARE(file->allImageLevels().count(), 1);
+    QCOMPARE(file->allImageLevels().first().size(), QSize(2, 2));
+
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_croppedthumbnail test;
