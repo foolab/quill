@@ -571,6 +571,10 @@ public:
 
     void setClone(bool status);
 
+    QuillImage cropToSize(const QuillImage &image) const;
+
+    QList<QuillImage> cropToSize(const QList<QuillImage> &imageList) const;
+
 signals:
 
     /*!
