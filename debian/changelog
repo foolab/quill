@@ -1,3 +1,9 @@
+libquill (1.100514.1) unstable; urgency=low
+
+  * Fixed problem of permissions checking in the previous build.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 14 May 2010 10:55:00 +0200
+
 libquill (1.100514.0) unstable; urgency=low
 
   * Fixes: NB#167136 File unnecessarily opened for writing
