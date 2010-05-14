@@ -132,7 +132,7 @@ void File::setFileName(const QString &fileName)
                              fileName));
         setExists(false);
     }
-    else if (!file.open(QIODevice::ReadWrite))
+    else if (!(file.permissions() & QFile::ReadUser))
         setReadOnly();
 }
 
