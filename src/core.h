@@ -65,7 +65,7 @@ class Scheduler;
 class ThreadManager;
 class TileCache;
 class DBusThumbnailer;
-class CorePrivate;
+class DisplayLevel;
 
 class Core : public QObject
 {
@@ -180,6 +180,25 @@ public:
      */
 
     void setPreviewSize(int level, const QSize &size);
+
+    /*!
+      Sets the minimum size of a preview-level image.
+     */
+
+    void setMinimumPreviewSize(int level, const QSize &size);
+
+    /*!
+      The minimum size of a preview-level image.
+    */
+
+    QSize minimumPreviewSize(int level) const;
+
+    /*!
+      Returns true if the given display level can substiture for the given
+      level.
+     */
+
+    bool isSubstituteLevel(int level, int targetLevel) const;
 
     /*!
       Sets the default tile size if tiling is in use.
@@ -638,16 +657,13 @@ private:
 
     static Core *g_instance;
 
-    QList<QSize> m_previewSize;
-    QList<ImageCache*> m_cache;
-    QList<int> m_fileLimit;
+    QList<DisplayLevel*> m_displayLevel;
 
     QSize m_imageSizeLimit;
     int m_imagePixelsLimit, m_nonTiledImagePixelsLimit;
     QSize m_vectorGraphicsRenderingSize;
 
     QString m_editHistoryDirectory;
-    QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;

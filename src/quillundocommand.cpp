@@ -181,7 +181,8 @@ QuillImage QuillUndoCommand::fullImage() const
 int QuillUndoCommand::bestImageLevel(int maxLevel) const
 {
     for (int i=maxLevel; i>=0; i--)
-        if (!image(i).isNull())
+        if (Core::instance()->isSubstituteLevel(i, maxLevel) &&
+            !image(i).isNull())
             return i;
     return -1;
 }
@@ -202,7 +203,8 @@ QList<QuillImage> QuillUndoCommand::allImageLevels(int maxLevel) const
         maxLevel = Core::instance()->previewLevelCount();
     QList<QuillImage> list;
     for (int i=0; i<=maxLevel; i++)
-        if (!image(i).isNull())
+        if (Core::instance()->isSubstituteLevel(i, maxLevel) &&
+            !image(i).isNull())
             list.append(image(i));
 
     return list;

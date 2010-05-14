@@ -286,6 +286,28 @@ public:
     static QSize previewSize(int level);
 
     /*!
+      Sets the minimum size for preview images of a certain level. The
+      default is no size, which is represented by an invalid size
+      parameter. If either dimension of this value is valid, libquill
+      will use cropped scaling to ensure that the minimum size
+      requirement is met. However, libquill will never change the aspect
+      ratio of an image, nor upscale an image which is smaller than
+      this set minimum size.
+
+      Note that cropped preview levels (ones with minimum size set)
+      cannot be automatically substituted to other levels.
+     */
+
+    static void setMinimumPreviewSize(int level, const QSize &size);
+
+    /*!
+      Gets the minimum size of a preview size for a level. See
+      setMinimumPreviewSize().
+    */
+
+    static QSize minimumPreviewSize(int level);
+
+    /*!
       Sets the maximum tile size if tiling is in use.
       The default is 0, which disables tiling.
      */

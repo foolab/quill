@@ -157,6 +157,13 @@ public:
 
       Default is -1. This can be modified on the fly.
 
+      If target preview level is a cropped one (see
+      Quill::setPreviewLevelMinimumSize()), this will subscribe to
+      image changes at the target display level and nothing else. If
+      target preview level is not a cropped one, this will subscribe
+      to image changes at the target level and any levels which can be
+      temporarily substituted to it (any smaller uncropped preview levels).
+
       If Quill::fileLimit() of the target level, or any level below
       it, has been exceeded, this command does nothing, returns false,
       and an error() signal is emitted.
