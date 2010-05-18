@@ -40,160 +40,66 @@
 #include <QVariant>
 #include <QtTest/QtTest>
 #include <QuillImageFilterFactory>
+#include <quillmetadata/QuillMetadata>
 
 #include "quill.h"
 #include "quillfile.h"
-
-#include "metadata.h"
-#include "ut_metadata.h"
+#include "ut_quillmetadata.h"
 #include "unittests.h"
 
-ut_metadata::ut_metadata()
+ut_quillmetadata::ut_quillmetadata()
 {
 }
 
-void ut_metadata::initTestCase()
+void ut_quillmetadata::initTestCase()
 {
 }
 
-void ut_metadata::cleanupTestCase()
+void ut_quillmetadata::cleanupTestCase()
 {
 }
 
-void ut_metadata::init()
+void ut_quillmetadata::init()
 {
-    metadata = new Metadata("/usr/share/libquill-tests/images/exif.jpg");
-    xmp = new Metadata("/usr/share/libquill-tests/images/xmp.jpg");
-    iptc = new Metadata("/usr/share/libquill-tests/images/iptc.jpg");
+    metadata = new QuillMetadata("/usr/share/libquill-tests/images/exif.jpg");
+    xmp = new QuillMetadata("/usr/share/libquill-tests/images/xmp.jpg");
+    iptc = new QuillMetadata("/usr/share/libquill-tests/images/iptc.jpg");
 }
 
-void ut_metadata::cleanup()
+void ut_quillmetadata::cleanup()
 {
     delete metadata;
     delete xmp;
     delete iptc;
 }
 
-void ut_metadata::testCameraMake()
-{
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_Make).toString(), QString("Quill"));
-}
-
-void ut_metadata::testCameraModel()
-{
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_Model).toString(), QString("Q100125"));
-}
-
-void ut_metadata::testImageWidth()
-{
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_ImageWidth).toInt(), 2);
-}
-
-void ut_metadata::testImageHeight()
-{
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_ImageHeight).toInt(), 2);
-}
-
-void ut_metadata::testFocalLength()
-{
-    QVERIFY(metadata->isValid());
-    Unittests::compareReal(metadata->entry(Metadata::Tag_FocalLength).toDouble(), 9.9);
-}
-
-void ut_metadata::testExposureTime()
-{
-    QVERIFY(metadata->isValid());
-    Unittests::compareReal(metadata->entry(Metadata::Tag_ExposureTime).toDouble(), 1/200.0);
-}
-
-void ut_metadata::testTimestampOriginal()
-{
-    QVERIFY(metadata->isValid());
-    QCOMPARE(metadata->entry(Metadata::Tag_TimestampOriginal).toString(),
-             QString("2010:01:25 15:00:00"));
-}
-
-void ut_metadata::testSubject()
-{
-    QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Metadata::Tag_Subject).toString(),
-             QString("test,quill"));
-}
-
-void ut_metadata::testCity()
-{
-    QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Metadata::Tag_City).toString(),
-             QString("Tapiola"));
-}
-
-void ut_metadata::testCountry()
-{
-    QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Metadata::Tag_Country).toString(),
-             QString("Finland"));
-}
-
-void ut_metadata::testRating()
-{
-    QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Metadata::Tag_Rating).toInt(),
-             5);
-}
-
-void ut_metadata::testCreator()
-{
-    QVERIFY(xmp->isValid());
-    QCOMPARE(xmp->entry(Metadata::Tag_Creator).toString(),
-             QString("John Q"));
-}
-
-void ut_metadata::testCityIptc()
-{
-    QVERIFY(iptc->isValid());
-    QCOMPARE(iptc->entry(Metadata::Tag_City).toString(),
-             QString("Tapiola"));
-}
-
-void ut_metadata::testCountryIptc()
-{
-    QVERIFY(iptc->isValid());
-    QCOMPARE(iptc->entry(Metadata::Tag_Country).toString(),
-             QString("Finland"));
-}
-
-
-void ut_metadata::testWriteSubject()
+void ut_quillmetadata::testWriteSubject()
 {
     QTemporaryFile file;
     file.open();
     Unittests::generatePaletteImage().save(file.fileName(), "jpg");
     xmp->write(file.fileName());
 
-    Metadata writtenMetadata(file.fileName());
+    QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Subject).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Subject).toString(),
              QString("test,quill"));
 }
 
-void ut_metadata::testWriteCity()
+void ut_quillmetadata::testWriteCity()
 {
     QTemporaryFile file;
     file.open();
     Unittests::generatePaletteImage().save(file.fileName(), "jpg");
     xmp->write(file.fileName());
 
-    Metadata writtenMetadata(file.fileName());
+    QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_City).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_City).toString(),
              QString("Tapiola"));
 }
 
-void ut_metadata::testPreserveXMP()
+void ut_quillmetadata::testPreserveXMP()
 {
     QTemporaryFile file;
     file.open();
@@ -220,23 +126,23 @@ void ut_metadata::testPreserveXMP()
 
     // Verify that file image size has changed
     QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
-    Metadata writtenMetadata(file.fileName());
+    QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
 
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Subject).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Subject).toString(),
              QString("test,quill"));
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_City).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_City).toString(),
              QString("Tapiola"));
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Country).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Country).toString(),
              QString("Finland"));
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Rating).toInt(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Rating).toInt(),
              5);
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Creator).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Creator).toString(),
              QString("John Q"));
     delete quillFile;
 }
 
-void ut_metadata::testPreserveIptc()
+void ut_quillmetadata::testPreserveIptc()
 {
     QTemporaryFile file;
     file.open();
@@ -263,17 +169,17 @@ void ut_metadata::testPreserveIptc()
 
     // Verify that file image size has changed
     QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
-    Metadata writtenMetadata(file.fileName());
+    QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
 
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_City).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_City).toString(),
              QString("Tapiola"));
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Country).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Country).toString(),
              QString("Finland"));
     delete quillFile;
 }
 
-void ut_metadata::testPreserveExif()
+void ut_quillmetadata::testPreserveExif()
 {
     QTemporaryFile file;
     file.open();
@@ -300,24 +206,24 @@ void ut_metadata::testPreserveExif()
 
     // Verify that file image size has changed
     QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
-    Metadata writtenMetadata(file.fileName());
+    QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
 
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Make).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Make).toString(),
              QString("Quill"));
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_Model).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Model).toString(),
              QString("Q100125"));
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_ImageWidth).toInt(), 2);
-    QCOMPARE(writtenMetadata.entry(Metadata::Tag_ImageHeight).toInt(), 2);
-    Unittests::compareReal(writtenMetadata.entry(Metadata::Tag_FocalLength).toDouble(), 9.9);
-    Unittests::compareReal(writtenMetadata.entry(Metadata::Tag_ExposureTime).toDouble(), 1/200.0);
-    QCOMPARE(metadata->entry(Metadata::Tag_TimestampOriginal).toString(),
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_ImageWidth).toInt(), 2);
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_ImageHeight).toInt(), 2);
+    Unittests::compareReal(writtenMetadata.entry(QuillMetadata::Tag_FocalLength).toDouble(), 9.9);
+    Unittests::compareReal(writtenMetadata.entry(QuillMetadata::Tag_ExposureTime).toDouble(), 1/200.0);
+    QCOMPARE(metadata->entry(QuillMetadata::Tag_TimestampOriginal).toString(),
              QString("2010:01:25 15:00:00"));
     delete quillFile;
 }
 
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
-    ut_metadata test;
+    ut_quillmetadata test;
     return QTest::qExec( &test, argc, argv );
 }

@@ -29,7 +29,7 @@ SUBDIRS += \
            ut_format \
            ut_croppedthumbnail \
            ut_logger \
-           ut_metadata \
+           ut_quillmetadata \
            ut_dbusthumbnailer \
            ut_autoclean \
            benchmark  \

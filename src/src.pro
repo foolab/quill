@@ -17,7 +17,7 @@ CONFIG += release
 CONFIG += quillimagefilter
 
 #LIBS += -lexif -lexempi -liptcdata
-LIBS += -lexif -lexempi
+LIBS += -lexif -lexempi -lquillmetadata
 # Generate pkg-config support by default
 # Note that we HAVE TO also create prl config as QMake implementation
 # mixes both of them together.
@@ -57,7 +57,7 @@ HEADERS += quill.h \
            imagecache.h \
            historyxml.h \
            logger.h \
-           metadata.h \
+#           metadata.h \
            dbus-thumbnailer/dbusthumbnailer.h \
            dbus-thumbnailer/thumbnailer_generic.h \
 
@@ -78,7 +78,7 @@ SOURCES += quill.cpp \
            imagecache.cpp \
            historyxml.cpp \
            logger.cpp \
-           metadata.cpp \
+#           metadata.cpp \
            dbus-thumbnailer/dbusthumbnailer.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
 

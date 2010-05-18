@@ -43,6 +43,7 @@
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
+#include <quillmetadata/QuillMetadata>
 #include "file.h"
 #include "core.h"
 #include "imagecache.h"
@@ -51,7 +52,6 @@
 #include "tilemap.h"
 #include "quillerror.h"
 #include "logger.h"
-#include "metadata.h"
 
 File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
                m_readOnly(false), m_hasThumbnailError(false), m_isClone(false),
@@ -750,7 +750,7 @@ void File::prepareSave()
 
     QByteArray rawExifDump;
     if (!m_isClone) {
-        Metadata metadata(m_fileName);
+        QuillMetadata metadata(m_fileName);
         rawExifDump = metadata.dumpExif();
     }
 
@@ -786,7 +786,7 @@ void File::concludeSave()
     // Copy metadata from previous version to new one
 
     if (!m_isClone) {
-        Metadata metadata(m_fileName);
+        QuillMetadata metadata(m_fileName);
         if (!metadata.write(temporaryName)) {
             // If metadata write failed, the temp file is likely corrupt
             emitError(QuillError(QuillError::FileWriteError,
