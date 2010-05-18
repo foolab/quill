@@ -12,7 +12,7 @@ DEFINES     +=
 MOC_DIR = .moc
 QT += dbus
 
-CONFIG += debug
+CONFIG += release
 
 CONFIG += quillimagefilter
 
