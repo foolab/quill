@@ -67,6 +67,7 @@ private slots:
     void testSourceChanged();
 
     void testImmediateSizeQuery();
+    void testDropRedoHistory();
 };
 
 #endif  // TEST_LIBQUILL_UNDO_COMMAND_STACK_H

@@ -411,6 +411,38 @@ void ut_stack::testImmediateSizeQuery()
     delete file;
 }
 
+void ut_stack::testDropRedoHistory()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+    QuillImage resultImage = filter->apply(image);
+
+    QuillImageFilter *filter2 =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter2->setOption(QuillImageFilter::Contrast, QVariant(20));
+    QuillImage resultImage2 = filter2->apply(resultImage);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
+    file->runFilter(filter);
+    file->runFilter(filter2);
+    file->undo();
+    QVERIFY(file->canRedo());
+    file->dropRedoHistory();
+    QVERIFY(!file->canRedo());
+
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_stack test;

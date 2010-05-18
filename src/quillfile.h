@@ -68,6 +68,7 @@ to the application using asynchronous QObject signals.
 #define QUILLFILE_H
 
 #include <QObject>
+#include <QDateTime>
 #include "quill.h"
 #include "quillerror.h"
 
@@ -258,6 +259,13 @@ public:
     virtual void redo();
 
     /*!
+      Empties the redo history for the file. Redoing will no longer be
+      possible after this action.
+     */
+
+    virtual void dropRedoHistory();
+
+    /*!
       Returns a representation of the current state of the file.
 
       @result the highest-resolution representation of the full image
@@ -341,6 +349,15 @@ public:
      */
 
     virtual bool exists() const;
+
+    /*!
+      Returns a timestamp of the last time the file was edited. This
+      value is cached by Quill and may not be accurate if the file has
+      been edited by other processes during the lifetime of the
+      QuillFile.
+     */
+
+    virtual QDateTime lastModified() const;
 
     /*!
       If the file is supported and has no errors.

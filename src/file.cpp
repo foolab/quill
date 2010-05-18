@@ -134,6 +134,7 @@ void File::setFileName(const QString &fileName)
     }
     else if (!(file.permissions() & QFile::WriteUser))
         setReadOnly();
+    m_lastModified = QFileInfo(file).lastModified();
 }
 
 void File::setFileFormat(const QString &fileFormat)
@@ -339,6 +340,12 @@ void File::redo()
 
         emitAllImages();
     }
+}
+
+void File::dropRedoHistory()
+{
+    if (canRedo())
+        m_stack->dropRedoHistory();
 }
 
 QuillImage File::bestImage(int displayLevel) const
@@ -623,6 +630,11 @@ void File::setExists(bool exists)
     m_exists = exists;
 }
 
+QDateTime File::lastModified() const
+{
+    return m_lastModified;
+}
+
 void File::setSupported(bool supported)
 {
     m_supported = supported;
@@ -809,6 +821,8 @@ void File::concludeSave()
     }
 
     removeThumbnails();
+
+    m_lastModified = QDateTime::currentDateTime();
 
     emit saved();
     Core::instance()->emitSaved(m_fileName);

@@ -191,7 +191,7 @@ void QuillUndoStack::undo()
 {
     if (canUndo()) {
         // In case of an intermediate load, we make a double undo
-        if ((command()->filter()->role() == QuillImageFilter::Role_Load) && (m_stack->index() > 2))
+        if (command()->filter() && (command()->filter()->role() == QuillImageFilter::Role_Load) && (m_stack->index() > 2))
             m_stack->undo();
 
         // If we are not currently recording a session, an entire
@@ -259,6 +259,16 @@ void QuillUndoStack::redo()
         setRevertIndex(0);
     }
 }
+
+void QuillUndoStack::dropRedoHistory()
+{
+    // Push an invalid command to replace any existing edit history
+    QuillUndoCommand *emptyCommand = new QuillUndoCommand(this);
+    m_stack->push(emptyCommand);
+    undo();
+    setRevertIndex(0);
+}
+
 QuillImage QuillUndoStack::bestImage(int maxLevel) const
 {
     QuillUndoCommand *curr = command();

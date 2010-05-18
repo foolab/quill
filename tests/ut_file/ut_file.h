@@ -63,6 +63,7 @@ private slots:
     void testDifferentPreviewLevels();
     void testSaveAfterDelete();
     void testReadOnly();
+    void testLastModified();
 
     void testRevertRestore();
     void testDoubleRevertRestore();

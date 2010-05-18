@@ -280,6 +280,12 @@ public:
     virtual void redo();
 
     /*!
+      Drops the redo history so it cannot be recovered anymore.
+    */
+
+    virtual void dropRedoHistory();
+
+    /*!
       Returns a representation of the current state of the file.
 
       @result the highest-resolution representation of the full image
@@ -379,6 +385,12 @@ public:
      */
 
     virtual bool exists() const;
+
+    /*!
+      Gets the (cached) last modification time of a file.
+    */
+
+    virtual QDateTime lastModified() const;
 
     /*!
       Sets file existence status
@@ -615,6 +627,7 @@ private:
     bool m_readOnly;
     bool m_hasThumbnailError;
     bool m_isClone;
+    QDateTime m_lastModified;
 
     QuillUndoStack *m_stack;
 
