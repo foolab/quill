@@ -1,3 +1,9 @@
+libquill (1.100519.0) unstable; urgency=low
+
+  * Removed metadata from libquill
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 19 May 2010 09:00:00 +0200
+
 libquill (1.100518.2) unstable; urgency=low
 
   * Replacing previous entry which was not properly registered.
