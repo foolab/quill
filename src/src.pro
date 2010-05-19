@@ -5,7 +5,7 @@
 TEMPLATE = lib
 TARGET = quill
 # Please do not remove this INCLUDEPATH in any case
-INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter
+INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter $$[QT_INSTALL_HEADERS]/quillmetadata
 DEPENDPATH += .
 
 DEFINES     +=
@@ -14,16 +14,15 @@ QT += dbus
 
 CONFIG += release
 
-CONFIG += quillimagefilter
+CONFIG += quillimagefilter quillmetadata
 
-#LIBS += -lexif -lexempi -liptcdata
-LIBS += -lexif -lexempi -lquillmetadata
+LIBS += -lexif -lexempi
 # Generate pkg-config support by default
 # Note that we HAVE TO also create prl config as QMake implementation
 # mixes both of them together.
 CONFIG += create_pc create_prl no_install_prl
 
-QMAKE_PKGCONFIG_REQUIRES = quillimagefilter QtGui
+QMAKE_PKGCONFIG_REQUIRES = quillimagefilter quillmetadata QtGui
 QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS]/$$TARGET
 QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
@@ -57,7 +56,6 @@ HEADERS += quill.h \
            imagecache.h \
            historyxml.h \
            logger.h \
-#           metadata.h \
            dbus-thumbnailer/dbusthumbnailer.h \
            dbus-thumbnailer/thumbnailer_generic.h \
 
@@ -78,7 +76,6 @@ SOURCES += quill.cpp \
            imagecache.cpp \
            historyxml.cpp \
            logger.cpp \
-#           metadata.cpp \
            dbus-thumbnailer/dbusthumbnailer.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
 

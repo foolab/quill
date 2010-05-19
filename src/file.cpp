@@ -43,7 +43,7 @@
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
-#include <quillmetadata/QuillMetadata>
+#include <QuillMetadata>
 #include "file.h"
 #include "core.h"
 #include "imagecache.h"
