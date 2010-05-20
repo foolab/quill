@@ -37,7 +37,7 @@ Description: libquill debug symbols
 Package: libquill-tests
 Section: tests
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqtcore4, libqtgui4, libquill1 (= ${binary:Version}), libquillimagefilter1, libquillmeatadata1,libexif12, libexempi3, testrunner, ci-package, ci-testing [armel]
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqtcore4, libqtgui4, libquill1 (= ${binary:Version}), libquillimagefilter1, libquillmetadata1,libexif12, libexempi3, testrunner, ci-package, ci-testing [armel]
 XB-Maemo-CI-Packages: libquill1
 XB-Maemo-CI-Stage: fast, staging, acceptance
 Description: libquill unit tests

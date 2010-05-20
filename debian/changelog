@@ -1,3 +1,9 @@
+libquill (1.100520.1) unstable; urgency=low
+
+  * Fixed metadata dependency in control file
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 20 May 2010 09:30:00 +0200
+
 libquill (1.100520.0) unstable; urgency=low
 
   * Added metadata dependency in control file
