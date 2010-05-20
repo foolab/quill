@@ -101,7 +101,7 @@ ImageCache *DisplayLevel::imageCache() const
     return m_imageCache;
 }
 
-QSize DisplayLevel::targetSize(const QSize &fullImageSize)
+QSize DisplayLevel::targetSize(const QSize &fullImageSize) const
 {
     QSize size;
 
@@ -134,10 +134,11 @@ QSize DisplayLevel::targetSize(const QSize &fullImageSize)
             size = QSize(targetWidth, m_minimumSize.height());
         }
     }
+    return size;
 }
 
 QRect DisplayLevel::targetArea(const QSize &targetSize,
-                               const QSize &fullImageSize)
+                               const QSize &fullImageSize) const
 {
     if (!m_minimumSize.isValid())
         return QRect(QPoint(0, 0), fullImageSize);
@@ -154,9 +155,28 @@ QRect DisplayLevel::targetArea(const QSize &targetSize,
                       + m_size.height() - 1) / m_size.height(),
                      fullImageSize.height());
 
-    qDebug() << "+++size" << size;
-
     return QRect((fullImageSize.width() - size.width()) / 2,
                  (fullImageSize.height() - size.height()) / 2,
                  size.width(), size.height());
+}
+
+QSize DisplayLevel::scaleBounding(const QSize &size,
+                                  const QSize &boundingBox)
+{
+    QSize targetSize;
+
+    // keep aspect ratio, always round fractions up
+    int targetWidth = (boundingBox.height() * size.width()
+        + size.height() - 1) / size.height();
+
+    if (targetWidth <= boundingBox.width())
+        targetSize = QSize(targetWidth, boundingBox.height());
+    else {
+        // keep aspect ratio, always round fractions up
+        int targetHeight = (boundingBox.width() * size.height()
+        + size.width() - 1) / size.width();
+        targetSize = QSize(boundingBox.width(), targetHeight);
+    }
+
+    return targetSize;
 }

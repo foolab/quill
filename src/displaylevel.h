@@ -67,9 +67,14 @@ class DisplayLevel {
 
     ImageCache *imageCache() const;
 
-    QSize targetSize(const QSize &fullImageSize);
+    QSize targetSize(const QSize &fullImageSize) const;
     QRect targetArea(const QSize &targetSize,
-                     const QSize &fullImageSize);
+                     const QSize &fullImageSize) const;
+
+    /*!
+      Helper function to scale a size into a bounding box.
+    */
+    static QSize scaleBounding(const QSize &size, const QSize &boundingBox);
 
  private:
     QSize m_size;
