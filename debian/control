@@ -3,13 +3,13 @@ Section: libs
 Priority: extra
 Maintainer: Pekka Marjola <Pekka.Marjola@nokia.com>
 Build-Depends: debhelper (>= 5), libqt4-dev,
-    libquillimagefilter-dev, libqt4-opengl-dev, libexif-dev, libexempi-dev,
+    libquillimagefilter-dev, libquillmetadata-dev,libqt4-opengl-dev, libexif-dev, libexempi-dev,
     doxygen
 Standards-Version: 3.8.0
 
 Package: libquill1
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libquillimagefilter1, libexif12,
+Depends: ${shlibs:Depends}, ${misc:Depends}, libquillimagefilter1, libquillmetadata1,libexif12,
     libexempi3
 Description: libquill library
  This library is a created from libquill and it includes multi-thread.
@@ -17,7 +17,7 @@ Description: libquill library
 Package: libquill-dev
 Section: libdevel
 Architecture: all
-Depends: libquill1 (= ${binary:Version}),libquillimagefilter-dev,libqt4-dev,
+Depends: libquill1 (= ${binary:Version}),libquillimagefilter-dev,libquillmetadata-dev,libqt4-dev,
          libexif-dev, libexempi-dev
 Description: libquill development headers
 
@@ -37,7 +37,7 @@ Description: libquill debug symbols
 Package: libquill-tests
 Section: tests
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqtcore4, libqtgui4, libquill1 (= ${binary:Version}), libquillimagefilter1, libexif12, libexempi3, testrunner, ci-package, ci-testing [armel]
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqtcore4, libqtgui4, libquill1 (= ${binary:Version}), libquillimagefilter1, libquillmeatadata1,libexif12, libexempi3, testrunner, ci-package, ci-testing [armel]
 XB-Maemo-CI-Packages: libquill1
 XB-Maemo-CI-Stage: fast, staging, acceptance
 Description: libquill unit tests
