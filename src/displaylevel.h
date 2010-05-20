@@ -71,10 +71,8 @@ class DisplayLevel {
     QRect targetArea(const QSize &targetSize,
                      const QSize &fullImageSize) const;
 
-    /*!
-      Helper function to scale a size into a bounding box.
-    */
-    static QSize scaleBounding(const QSize &size, const QSize &boundingBox);
+    static QSize scaleBounding(const QSize &size, const QSize &boundingBox,
+                               const QSize &minimum);
 
  private:
     QSize m_size;

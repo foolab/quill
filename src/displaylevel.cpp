@@ -103,38 +103,31 @@ ImageCache *DisplayLevel::imageCache() const
 
 QSize DisplayLevel::targetSize(const QSize &fullImageSize) const
 {
-    QSize size;
+    return scaleBounding(fullImageSize, m_size, m_minimumSize).
+        boundedTo(fullImageSize);
+}
 
-    int targetWidth = (m_size.height() * fullImageSize.width()
-                       + fullImageSize.height() - 1) / fullImageSize.height();
+QSize DisplayLevel::scaleBounding(const QSize &size, const QSize &boundingBox,
+                                  const QSize &minimum)
+{
+    QSize targetSize;
 
-    if (targetWidth <= m_size.width() && targetWidth >= m_minimumSize.width())
-        size = QSize(targetWidth, m_size.height());
-    else if (targetWidth < m_minimumSize.width()) {
-        int targetHeight = (m_minimumSize.width() * fullImageSize.height()
-                            + fullImageSize.width() - 1) / fullImageSize.width();
-        if (targetHeight <= m_size.height())
-            size = QSize(m_minimumSize.width(), targetHeight);
-        else
-            size = QSize(m_minimumSize.width(), m_size.height());
-    }
+    int targetWidth = (boundingBox.height() * size.width()
+                       + size.height() - 1) / size.height();
+
+    if (targetWidth <= boundingBox.width() && targetWidth >= minimum.width())
+        targetSize = QSize(targetWidth, boundingBox.height());
+    else if (targetWidth < minimum.width())
+        targetSize = QSize(minimum.width(), boundingBox.height());
     else {
-        int targetHeight = (m_size.width() * fullImageSize.height()
-                            + fullImageSize.width() - 1) / fullImageSize.width();
-        if ((targetHeight <= m_size.height()) && (targetHeight >= m_minimumSize.height()))
-            size = QSize(m_size.width(), targetHeight);
-        else if (targetHeight > m_size.height())
-            size = QSize(m_size.width(), m_size.height());
-        else {
-            targetWidth = (m_minimumSize.height() * fullImageSize.width()
-                           + fullImageSize.height() - 1) / fullImageSize.height();
-            if (targetWidth > m_size.width())
-                targetWidth = m_size.width();
-
-            size = QSize(targetWidth, m_minimumSize.height());
-        }
+        int targetHeight = (boundingBox.width() * size.height()
+                            + size.width() - 1) / size.width();
+        if (targetHeight >= minimum.height())
+            targetSize = QSize(boundingBox.width(), targetHeight);
+        else
+            targetSize = QSize(boundingBox.width(), minimum.height());
     }
-    return size;
+    return targetSize;
 }
 
 QRect DisplayLevel::targetArea(const QSize &targetSize,
@@ -158,25 +151,4 @@ QRect DisplayLevel::targetArea(const QSize &targetSize,
     return QRect((fullImageSize.width() - size.width()) / 2,
                  (fullImageSize.height() - size.height()) / 2,
                  size.width(), size.height());
-}
-
-QSize DisplayLevel::scaleBounding(const QSize &size,
-                                  const QSize &boundingBox)
-{
-    QSize targetSize;
-
-    // keep aspect ratio, always round fractions up
-    int targetWidth = (boundingBox.height() * size.width()
-        + size.height() - 1) / size.height();
-
-    if (targetWidth <= boundingBox.width())
-        targetSize = QSize(targetWidth, boundingBox.height());
-    else {
-        // keep aspect ratio, always round fractions up
-        int targetHeight = (boundingBox.width() * size.height()
-        + size.width() - 1) / size.width();
-        targetSize = QSize(boundingBox.width(), targetHeight);
-    }
-
-    return targetSize;
 }

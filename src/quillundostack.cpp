@@ -144,7 +144,7 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
         Core::instance()->vectorGraphicsRenderingSize().isValid()) {
         QSize maximumSize = Core::instance()->vectorGraphicsRenderingSize().
             boundedTo(Core::instance()->previewSize(Core::instance()->previewLevelCount()-1));
-        fullSize = DisplayLevel::scaleBounding(fullSize, maximumSize);
+        fullSize = DisplayLevel::scaleBounding(fullSize, maximumSize, QSize());
     }
 
     command->setFullImageSize(fullSize);
