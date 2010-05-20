@@ -352,7 +352,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
         return 0;
 
     if (file->image(level).size() !=
-        file->stack()->command()->targetPreviewSize(level))
+        Core::instance()->targetSizeForLevel(level, file->fullImageSize()))
         return 0;
 
     if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
@@ -369,7 +369,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     task->setCommandId(file->stack()->command()->uniqueId());
     task->setDisplayLevel(level);
     task->setFilter(filter);
-    task->setInputImage(file->image(level));
+    task->setInputImage(QImage(file->image(level)));
 
     return task;
 }
@@ -415,10 +415,11 @@ Task *Scheduler::newNormalTask(File *file, int level)
         prevImage = QuillImage();
     else if (prev == 0)
     {
-        prevImage = QuillImage(QImage(command->targetPreviewSize(level),
+        prevImage = QuillImage(QImage(Core::instance()->targetSizeForLevel(level, command->fullImageSize()),
                                       QImage::Format_RGB32));
+
         prevImage.setFullImageSize(command->fullImageSize());
-        prevImage.setArea(QRect(QPoint(0, 0), command->fullImageSize()));
+        prevImage.setArea(Core::instance()->targetAreaForLevel(level, prevImage.size(), command->fullImageSize()));
         prevImage.setZ(level);
     }
     else
@@ -476,7 +477,7 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
     for (level=0; level<Core::instance()->previewLevelCount(); level++)
     {
         // Preview images cannot be bigger than full image
-        targetSize = command->targetPreviewSize(level);
+        targetSize = Core::instance()->targetSizeForLevel(level, command->fullImageSize());
         if ((!command->image(level).size().isEmpty()) &&
             (command->image(level).size() != targetSize))
             break;

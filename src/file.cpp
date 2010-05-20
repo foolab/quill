@@ -974,7 +974,7 @@ void File::setClone(bool status)
 
 QuillImage File::cropToSize(const QuillImage &image) const
 {
-    if (image.isNull())
+    //    if (image.isNull())
         return image;
 
     int level = image.z();

@@ -41,6 +41,7 @@
 #define DISPLAY_LEVEL_H
 
 #include <QSize>
+#include <QRect>
 #include <QString>
 
 class ImageCache;
@@ -65,6 +66,10 @@ class DisplayLevel {
     QString thumbnailFlavorPath() const;
 
     ImageCache *imageCache() const;
+
+    QSize targetSize(const QSize &fullImageSize);
+    QRect targetArea(const QSize &targetSize,
+                     const QSize &fullImageSize);
 
  private:
     QSize m_size;

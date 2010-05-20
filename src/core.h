@@ -559,6 +559,19 @@ public:
     QList<QByteArray> writableImageFormats();
 
     /*!
+      Gets the target size for a given preview level for a given-size image.
+     */
+
+    QSize targetSizeForLevel(int level, const QSize &fullImageSize);
+
+    /*!
+      Gets the target area for a given preview level for a given-size image.
+     */
+
+    QRect targetAreaForLevel(int level, const QSize &targetSize,
+                             const QSize &fullImageSize);
+
+    /*!
       Return one file.
     */
 

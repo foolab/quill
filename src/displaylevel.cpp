@@ -100,3 +100,63 @@ ImageCache *DisplayLevel::imageCache() const
 {
     return m_imageCache;
 }
+
+QSize DisplayLevel::targetSize(const QSize &fullImageSize)
+{
+    QSize size;
+
+    int targetWidth = (m_size.height() * fullImageSize.width()
+                       + fullImageSize.height() - 1) / fullImageSize.height();
+
+    if (targetWidth <= m_size.width() && targetWidth >= m_minimumSize.width())
+        size = QSize(targetWidth, m_size.height());
+    else if (targetWidth < m_minimumSize.width()) {
+        int targetHeight = (m_minimumSize.width() * fullImageSize.height()
+                            + fullImageSize.width() - 1) / fullImageSize.width();
+        if (targetHeight <= m_size.height())
+            size = QSize(m_minimumSize.width(), targetHeight);
+        else
+            size = QSize(m_minimumSize.width(), m_size.height());
+    }
+    else {
+        int targetHeight = (m_size.width() * fullImageSize.height()
+                            + fullImageSize.width() - 1) / fullImageSize.width();
+        if ((targetHeight <= m_size.height()) && (targetHeight >= m_minimumSize.height()))
+            size = QSize(m_size.width(), targetHeight);
+        else if (targetHeight > m_size.height())
+            size = QSize(m_size.width(), m_size.height());
+        else {
+            targetWidth = (m_minimumSize.height() * fullImageSize.width()
+                           + fullImageSize.height() - 1) / fullImageSize.height();
+            if (targetWidth > m_size.width())
+                targetWidth = m_size.width();
+
+            size = QSize(targetWidth, m_minimumSize.height());
+        }
+    }
+}
+
+QRect DisplayLevel::targetArea(const QSize &targetSize,
+                               const QSize &fullImageSize)
+{
+    if (!m_minimumSize.isValid())
+        return QRect(QPoint(0, 0), fullImageSize);
+
+    QSize size;
+
+    if (targetSize.width() * fullImageSize.height() >
+        targetSize.height() * fullImageSize.width())
+        size = QSize(fullImageSize.width(),
+                     (targetSize.height() * fullImageSize.width()
+                      + m_size.width() - 1) / m_size.width());
+    else
+        size = QSize((targetSize.width() * fullImageSize.height()
+                      + m_size.height() - 1) / m_size.height(),
+                     fullImageSize.height());
+
+    qDebug() << "+++size" << size;
+
+    return QRect((fullImageSize.width() - size.width()) / 2,
+                 (fullImageSize.height() - size.height()) / 2,
+                 size.width(), size.height());
+}
