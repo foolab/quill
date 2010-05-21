@@ -1,3 +1,10 @@
+libquill (1.100521.0) unstable; urgency=low
+
+  * Implemented: SWP#HImag-2047
+  * Implemented: SWP#HImag-2103
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 21 May 2010 08:20:00 +0200
+
 libquill (1.100520.1) unstable; urgency=low
 
   * Fixed metadata dependency in control file
