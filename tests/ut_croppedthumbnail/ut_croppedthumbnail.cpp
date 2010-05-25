@@ -119,6 +119,41 @@ void ut_croppedthumbnail::testCroppedThumbnailSize()
     delete file;
 }
 
+void ut_croppedthumbnail::testCroppedThumbnailAfterEdit()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    Quill::setPreviewLevelCount(1);
+    Quill::setPreviewSize(0, QSize(2, 2));
+    Quill::setMinimumPreviewSize(0, QSize(2, 2));
+
+    QuillFile *file = new QuillFile(testFile.fileName());
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.crop");
+    filter->setOption(QuillImageFilter::CropRectangle, QRect(0, 0, 4, 2));
+    file->runFilter(filter);
+
+    file->setDisplayLevel(1);
+
+    Quill::releaseAndWait(); // load 0
+    Quill::releaseAndWait(); // crop 0 - bad version
+    Quill::releaseAndWait(); // load 1
+    Quill::releaseAndWait(); // crop 1
+    Quill::releaseAndWait(); // reform 0
+
+    file->setDisplayLevel(0);
+    QCOMPARE(file->allImageLevels().count(), 1);
+    QCOMPARE(file->allImageLevels().first().size(), QSize(2, 2));
+    QVERIFY(Unittests::compareImage(file->allImageLevels().first(),
+                                    image.copy(1, 0, 2, 2)));
+
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_croppedthumbnail test;

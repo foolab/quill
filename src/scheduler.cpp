@@ -115,7 +115,20 @@ Task *Scheduler::newTask()
                     return task;
             }
 
-    // Fourth priority (save in progress): getting final full image/tiles
+
+    // Fourth priority (all images):
+    // regenerating lower-resolution preview images to
+    // better match their respective higher-resolution previews or
+    // full images
+
+    foreach (File *file, allFiles) {
+        Task *task = newPreviewImprovementTask(file);
+
+        if (task)
+            return task;
+    }
+
+    // Fifth priority (save in progress): getting final full image/tiles
 
     File *prioritySaveFile = Core::instance()->prioritySaveFile();
 
@@ -125,7 +138,7 @@ Task *Scheduler::newTask()
         if (task)
             return task;
 
-        // Fifth priority (save in progress): saving image
+        // Sixth priority (save in progress): saving image
 
         task = newSaveTask(prioritySaveFile);
 
@@ -133,24 +146,12 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Sixth priority (highest display level): full image/tiles
+    // Seventh priority (highest display level): full image/tiles
 
     if ((priorityFile != 0) &&
         (priorityFile->displayLevel() >= previewLevelCount)) {
 
         Task *task = newNormalTask(priorityFile, previewLevelCount);
-
-        if (task)
-            return task;
-    }
-
-    // Seventh priority (highest display level):
-    // regenerating lower-resolution preview images to
-    // better match their respective higher-resolution previews or
-    // full images
-
-    if (priorityFile != 0) {
-        Task *task = newPreviewImprovementTask(priorityFile);
 
         if (task)
             return task;
@@ -466,53 +467,59 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
 
-    // If the current command already has a full image, we see if the
-    // previews need re-calculating
+    // If the current command already has a better preview image, we try
+    // to regenerate the lower level images accordingly
 
     QuillUndoCommand *command = stack->command();
 
     int level;
     QSize targetSize;
 
-    for (level=0; level<Core::instance()->previewLevelCount(); level++)
+    for (level=0; level<file->displayLevel(); level++)
     {
         // Preview images cannot be bigger than full image
         targetSize = Core::instance()->targetSizeForLevel(level, command->fullImageSize());
+
         if ((!command->image(level).size().isEmpty()) &&
             (command->image(level).size() != targetSize))
             break;
     }
 
-    if (level < Core::instance()->previewLevelCount())
+    if (level < file->displayLevel())
     {
-        QuillImage prevImage = command->fullImage();
+        QuillImage prevImage;
 
-        if (prevImage == QuillImage())
-        {
-            // The case with tiling (base on the largest preview)
-            if (level < Core::instance()->previewLevelCount() - 1)
-                prevImage = command->image(Core::instance()->previewLevelCount() - 1);
+        // Based on the next available non-cropped preview
 
-            if (prevImage == QuillImage())
-                return 0;
-        }
+        for (int sourceLevel = level+1;
+             sourceLevel <= file->displayLevel();
+             sourceLevel++)
+            if (!Core::instance()->minimumPreviewSize(sourceLevel).isValid()
+                && !command->image(sourceLevel).isNull()) {
+                prevImage = command->image(sourceLevel);
+                break;
+            }
+
+        if (prevImage.isNull())
+            return 0;
 
         // Create ad-hoc filter for preview re-calculation
 
-        QuillImageFilter *scaleFilter =
+        QuillImageFilter *scaleCropFilter =
             QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_PreviewScale);
-        scaleFilter->setOption(QuillImageFilter::SizeAfter,
-                               QVariant(targetSize));
+        scaleCropFilter->setOption(QuillImageFilter::SizeAfter,
+                                   QVariant(targetSize));
+        scaleCropFilter->setOption(QuillImageFilter::CropRectangle,
+                                   QVariant(Core::instance()->targetAreaForLevel(level, targetSize, command->fullImageSize())));
 
         Task *task = new Task();
         task->setCommandId(command->uniqueId());
         task->setDisplayLevel(level);
-        task->setFilter(scaleFilter);
-        // Treat image as a full image
-        task->setInputImage(QuillImage(QImage(prevImage)));
+        task->setFilter(scaleCropFilter);
+
+        task->setInputImage(prevImage);
 
         return task;
-
     }
     // This should never happen
     return 0;
