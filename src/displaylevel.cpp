@@ -100,3 +100,55 @@ ImageCache *DisplayLevel::imageCache() const
 {
     return m_imageCache;
 }
+
+QSize DisplayLevel::targetSize(const QSize &fullImageSize) const
+{
+    return scaleBounding(fullImageSize, m_size, m_minimumSize).
+        boundedTo(fullImageSize);
+}
+
+QSize DisplayLevel::scaleBounding(const QSize &size, const QSize &boundingBox,
+                                  const QSize &minimum)
+{
+    QSize targetSize;
+
+    int targetWidth = (boundingBox.height() * size.width()
+                       + size.height() - 1) / size.height();
+
+    if (targetWidth <= boundingBox.width() && targetWidth >= minimum.width())
+        targetSize = QSize(targetWidth, boundingBox.height());
+    else if (targetWidth < minimum.width())
+        targetSize = QSize(minimum.width(), boundingBox.height());
+    else {
+        int targetHeight = (boundingBox.width() * size.height()
+                            + size.width() - 1) / size.width();
+        if (targetHeight >= minimum.height())
+            targetSize = QSize(boundingBox.width(), targetHeight);
+        else
+            targetSize = QSize(boundingBox.width(), minimum.height());
+    }
+    return targetSize;
+}
+
+QRect DisplayLevel::targetArea(const QSize &targetSize,
+                               const QSize &fullImageSize) const
+{
+    if (!m_minimumSize.isValid())
+        return QRect(QPoint(0, 0), fullImageSize);
+
+    QSize size;
+
+    if (targetSize.width() * fullImageSize.height() >
+        targetSize.height() * fullImageSize.width())
+        size = QSize(fullImageSize.width(),
+                     (targetSize.height() * fullImageSize.width()
+                      + m_size.width() - 1) / m_size.width());
+    else
+        size = QSize((targetSize.width() * fullImageSize.height()
+                      + m_size.height() - 1) / m_size.height(),
+                     fullImageSize.height());
+
+    return QRect((fullImageSize.width() - size.width()) / 2,
+                 (fullImageSize.height() - size.height()) / 2,
+                 size.width(), size.height());
+}

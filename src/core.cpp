@@ -682,6 +682,23 @@ QList<QByteArray> Core::writableImageFormats()
     return m_writableImageFormats;
 }
 
+QSize Core::targetSizeForLevel(int level, const QSize &fullImageSize)
+{
+    if ((level >=0 ) && (level < m_displayLevel.count()-1))
+        return m_displayLevel[level]->targetSize(fullImageSize);
+    else
+        return QSize();
+}
+
+QRect Core::targetAreaForLevel(int level, const QSize &targetSize,
+                               const QSize &fullImageSize)
+{
+    if ((level >=0 ) && (level < m_displayLevel.count()-1))
+        return m_displayLevel[level]->targetArea(targetSize, fullImageSize);
+    else
+        return QRect();
+}
+
 void Core::activateDBusThumbnailer()
 {
     Logger::log("[Core]"+QString(Q_FUNC_INFO));

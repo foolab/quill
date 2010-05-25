@@ -352,14 +352,14 @@ QuillImage File::bestImage(int displayLevel) const
 {
     if (!m_exists)
         return QuillImage();
-    return cropToSize(m_stack->bestImage(displayLevel));
+    return m_stack->bestImage(displayLevel);
 }
 
 QuillImage File::image(int level) const
 {
     if (!m_exists)
         return QuillImage();
-    return cropToSize(m_stack->image(level));
+    return m_stack->image(level);
 }
 
 void File::setImage(int level, const QuillImage &image)
@@ -373,10 +373,10 @@ QList<QuillImage> File::allImageLevels(int displayLevel) const
         return QList<QuillImage>();
     else if ((displayLevel < Core::instance()->previewLevelCount()) ||
              (!m_stack->command()->tileMap()))
-        return cropToSize(m_stack->allImageLevels(displayLevel));
+        return m_stack->allImageLevels(displayLevel);
     else
-        return cropToSize(m_stack->allImageLevels(displayLevel) +
-                          m_stack->command()->tileMap()->nonEmptyTiles(m_viewPort));
+        return m_stack->allImageLevels(displayLevel) +
+            m_stack->command()->tileMap()->nonEmptyTiles(m_viewPort);
 }
 
 QSize File::fullImageSize() const
@@ -578,7 +578,7 @@ void File::emitSingleImage(QuillImage image, int level)
 {
     foreach(QuillFile *file, m_references)
         if (Core::instance()->isSubstituteLevel(level, file->displayLevel()))
-            file->emitImageAvailable(cropToSize(image));
+            file->emitImageAvailable(image);
 }
 
 void File::emitTiles(QList<QuillImage> tiles)
@@ -985,59 +985,4 @@ bool File::isClone()
 void File::setClone(bool status)
 {
     m_isClone = status;
-}
-
-QuillImage File::cropToSize(const QuillImage &image) const
-{
-    if (image.isNull())
-        return image;
-
-    int level = image.z();
-    QSize size = Core::instance()->minimumPreviewSize(level);
-    QSize maxSize = Core::instance()->previewSize(level);
-    QSize targetSize;
-
-    if (!size.isValid())
-        return image;
-
-    if ((image.width() > size.width()) &&
-        (image.height() > size.height()))
-        return image;
-
-    int targetWidth = (size.height() * image.width()
-                       + image.height() - 1) / image.height();
-
-    if (targetWidth >= size.width())
-        targetSize = QSize(targetWidth, size.height());
-    else {
-        int targetHeight = (size.width() * image.height()
-                            + image.width() - 1) / image.width();
-        targetSize = QSize(size.width(), targetHeight);
-    }
-
-    targetSize = targetSize.boundedTo(fullImageSize());
-
-    QuillImage resultImage = image.scaled(targetSize);
-
-    if (resultImage.width() > maxSize.width())
-        resultImage = resultImage.copy((resultImage.width()-maxSize.width())/2,
-                                       0,
-                                       maxSize.width(),
-                                       resultImage.height());
-
-    if (resultImage.height() > maxSize.height())
-        resultImage = resultImage.copy(0,
-                                       (resultImage.height()-maxSize.height())/2,
-                                       resultImage.width(),
-                                       maxSize.height());
-
-    return QuillImage(image, resultImage);
-}
-
-QList<QuillImage> File::cropToSize(const QList<QuillImage> &imageList) const
-{
-    QList<QuillImage> resultList;
-    foreach(QuillImage image, imageList)
-        resultList.append(cropToSize(image));
-    return resultList;
 }
