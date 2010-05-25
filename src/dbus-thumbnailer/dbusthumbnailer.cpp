@@ -76,6 +76,7 @@ void DBusThumbnailer::errorHandler(uint handle, const QStringList failedUris,
                                    int errorCode, const QString message)
 {
     Q_UNUSED(handle);
-    emit thumbnailError(failedUris.first(), errorCode, message);
+    Q_UNUSED(failedUris);
+    emit thumbnailError(m_taskFileName, errorCode, message);
     m_taskInProgress = false;
 }

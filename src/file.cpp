@@ -611,7 +611,8 @@ void File::remove()
     m_exists = false;
     m_saveInProgress = false;
     delete m_stack;
-    m_stack = 0;
+    // A file always needs a stack.
+    m_stack = new QuillUndoStack(this);
 
     if (hasOriginal())
         original()->remove();
