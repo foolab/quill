@@ -264,7 +264,7 @@ void File::runFilter(QuillImageFilter *filter)
         m_stack->load();
     m_stack->add(filter);
 
-    m_saveInProgress = false;
+    abortSave();
     Core::instance()->dump();
     Core::instance()->suggestNewTask();
 }
@@ -299,7 +299,7 @@ void File::undo()
     {
         m_stack->undo();
 
-        m_saveInProgress = false;
+        abortSave();
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
@@ -321,7 +321,7 @@ void File::redo()
     {
         m_stack->redo();
 
-        m_saveInProgress = false;
+        abortSave();
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
@@ -575,7 +575,7 @@ void File::remove()
     removeThumbnails();
 
     m_exists = false;
-    m_saveInProgress = false;
+    abortSave();
     delete m_stack;
     m_stack = 0;
 
@@ -794,6 +794,14 @@ void File::concludeSave()
     Core::instance()->emitSaved(m_fileName);
 }
 
+void File::abortSave()
+{
+    m_stack->abortSave();
+    delete m_temporaryFile;
+    m_temporaryFile = 0;
+    m_saveInProgress = false;
+}
+
 bool File::hasOriginal()
 {
     QString indexName = QString('\\') + m_fileName;
@@ -906,7 +914,7 @@ void File::revert()
 {
     if (canRevert()){
         m_stack->revert();
-        m_saveInProgress = false;
+        abortSave();
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
         emitAllImages();
@@ -925,7 +933,7 @@ void File::restore()
 {
     if(canRestore()){
         m_stack->restore();
-        m_saveInProgress = false;
+        abortSave();
         Core::instance()->dump();
         Core::instance()->suggestNewTask();
         emitAllImages();

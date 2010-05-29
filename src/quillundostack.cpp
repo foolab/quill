@@ -424,6 +424,15 @@ void QuillUndoStack::concludeSave()
     m_saveMap = 0;
 }
 
+void QuillUndoStack::abortSave()
+{
+    delete m_saveCommand;
+    m_saveCommand = 0;
+
+    delete m_saveMap;
+    m_saveMap = 0;
+}
+
 QuillUndoCommand *QuillUndoStack::saveCommand()
 {
     return m_saveCommand;

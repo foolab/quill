@@ -249,6 +249,12 @@ public:
     void concludeSave();
 
     /*!
+      Aborts saving, immediately freeing resources.
+    */
+
+    void abortSave();
+
+    /*!
       Returns pointer to the save command, to be used by thread
       manager.
      */

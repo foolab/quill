@@ -451,6 +451,12 @@ public:
     void concludeSave();
 
     /*!
+      Aborts a save operation in progress, freeing any resources.
+    */
+
+    void abortSave();
+
+    /*!
       If the file has an original registered in core.
     */
 
