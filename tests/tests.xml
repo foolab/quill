@@ -128,6 +128,14 @@
 	<step >/usr/lib/libquill-tests/ut_error </step>
       </case>
     </set>
+
+    <set name="quill-cropped-thumbnails-tests" feature="croppedthumbnails">
+      <description>quill export test</description>
+      <case name="ut_croppedthumbnail" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_croppedthumbnail </step>
+      </case>
+    </set>
+
     <set name="quill-tile-loadingtests" feature="errorhandling">
       <description>quill tile loading test</description>
       <case name="ut_tileloading" type="Functional" level="Component">
@@ -142,8 +150,8 @@
     </set>
     <set name="quill-metadata-tests" feature="metadata">
       <description>quill error handling test</description>
-      <case name="ut_metadata" type="Functional" level="Component">
-	<step >/usr/lib/libquill-tests/ut_metadata </step>
+      <case name="ut_quillmetadata" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_quillmetadata </step>
       </case>
     </set>
 
@@ -151,6 +159,13 @@
       <description>d-bus thumbnailer test</description>
       <case name="ut_dbusthumbnailer" type="Functional" level="Component">
 	<step >/usr/lib/libquill-tests/ut_dbusthumbnailer </step>
+      </case>
+    </set>
+
+    <set name="quill-util-autoclean-tests" feature="autoclean">
+      <description>automatic cleanup of unused files test</description>
+      <case name="ut_autoclean" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_autoclean </step>
       </case>
     </set>
   </suite>

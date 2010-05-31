@@ -41,6 +41,7 @@
 #include <QImageReader>
 #include <QCryptographicHash>
 #include <QByteArray>
+#include <QColor>
 #include <QDir>
 #include <QuillImageFilter>
 #include <QDebug>
@@ -132,6 +133,18 @@ QSize Quill::previewSize(int level)
     return Core::instance()->previewSize(level);
 }
 
+void Quill::setMinimumPreviewSize(int level, const QSize &size)
+{
+    Core::instance()->setMinimumPreviewSize(level, size);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::qsizeToString(size));
+}
+
+QSize Quill::minimumPreviewSize(int level)
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
+    return Core::instance()->minimumPreviewSize(level);
+}
+
 void Quill::setImageSizeLimit(const QSize &size)
 {
     Core::instance()->setImageSizeLimit(size);
@@ -210,6 +223,30 @@ bool Quill::isDBusThumbnailingEnabled()
     return Core::instance()->isDBusThumbnailingEnabled();
 }
 
+void Quill::setBackgroundRenderingColor(const QColor &color)
+{
+    Core::instance()->setBackgroundRenderingColor(color);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+}
+
+QColor Quill::backgroundRenderingColor()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->backgroundRenderingColor();
+}
+
+void Quill::setVectorGraphicsRenderingSize(const QSize &size)
+{
+    Core::instance()->setVectorGraphicsRenderingSize(size);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+}
+
+QSize Quill::vectorGraphicsRenderingSize()
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->vectorGraphicsRenderingSize();
+}
+
 void Quill::setTemporaryFilePath(const QString &tmpFilePath)
 {
     Core::instance()->setTemporaryFileDirectory(tmpFilePath);
@@ -286,4 +323,12 @@ Quill* Quill::instance()
     }
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return g_instance;
+}
+
+Quill::Quill()
+{
+}
+
+Quill::~Quill()
+{
 }

@@ -43,7 +43,7 @@
 #include <QCryptographicHash>
 #include <QList>
 #include <QDir>
-#include <QDebug>
+#include <QuillMetadata>
 #include "file.h"
 #include "core.h"
 #include "imagecache.h"
@@ -52,7 +52,6 @@
 #include "tilemap.h"
 #include "quillerror.h"
 #include "logger.h"
-#include "metadata.h"
 
 File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
                m_readOnly(false), m_hasThumbnailError(false), m_isClone(false),
@@ -133,8 +132,9 @@ void File::setFileName(const QString &fileName)
                              fileName));
         setExists(false);
     }
-    else if (!file.open(QIODevice::ReadWrite))
+    else if (!(file.permissions() & QFile::WriteUser))
         setReadOnly();
+    m_lastModified = QFileInfo(file).lastModified();
 }
 
 void File::setFileFormat(const QString &fileFormat)
@@ -159,7 +159,21 @@ void File::setReadOnly()
 
 bool File::isReadOnly() const
 {
+    // the stack needs to be set up to get this value
+    if (exists() && (m_stack->count() == 0))
+          m_stack->load();
     return m_readOnly;
+}
+
+bool File::canEnableDisplayLevel(int level) const
+{
+    return (Core::instance()->numFilesAtLevel(level) <
+            Core::instance()->fileLimit(level));
+}
+
+bool File::isDisplayLevelEnabled(int level) const
+{
+    return Core::instance()->isSubstituteLevel(level, m_displayLevel);
 }
 
 bool File::setDisplayLevel(int level)
@@ -169,7 +183,7 @@ bool File::setDisplayLevel(int level)
     if (level > originalDisplayLevel) {
         // Block if trying to raise display level over strict limits
         for (int l=originalDisplayLevel+1; l<=level; l++)
-            if (Core::instance()->numFilesAtLevel(l) >= Core::instance()->fileLimit(l)) {
+            if (!canEnableDisplayLevel(level)) {
                 emitError(QuillError(QuillError::GlobalFileLimitError,
                                      QuillError::NoErrorSource,
                                      m_fileName));
@@ -191,9 +205,8 @@ bool File::setDisplayLevel(int level)
     m_displayLevel = level;
 
     // setup stack here
-    if (exists() && (level >= 0) && (m_stack->count() == 0)) {
+    if (exists() && (level >= 0) && (m_stack->count() == 0))
         m_stack->load();
-    }
 
     if (level > originalDisplayLevel)
         Core::instance()->suggestNewTask();
@@ -329,6 +342,12 @@ void File::redo()
     }
 }
 
+void File::dropRedoHistory()
+{
+    if (canRedo())
+        m_stack->dropRedoHistory();
+}
+
 QuillImage File::bestImage(int displayLevel) const
 {
     if (!m_exists)
@@ -352,8 +371,8 @@ QList<QuillImage> File::allImageLevels(int displayLevel) const
 {
     if (!m_exists || !m_stack->command())
         return QList<QuillImage>();
-    else if ((!m_stack->command()->tileMap()) ||
-             (displayLevel < Core::instance()->previewLevelCount()))
+    else if ((displayLevel < Core::instance()->previewLevelCount()) ||
+             (!m_stack->command()->tileMap()))
         return m_stack->allImageLevels(displayLevel);
     else
         return m_stack->allImageLevels(displayLevel) +
@@ -478,7 +497,7 @@ File *File::readFromEditHistory(const QString &fileName,
     QFile file(editHistoryFileName(fileName,
                                    Core::instance()->editHistoryDirectory()));
 
-    qDebug() << "Reading edit history from" << file.fileName();
+    Logger::log("[File] Reading edit history from "+file.fileName());
 
     if (!file.exists()) {
         *error = QuillError(QuillError::FileNotFoundError,
@@ -501,14 +520,29 @@ File *File::readFromEditHistory(const QString &fileName,
     }
     file.close();
 
-    qDebug() << "Read" << history.size() << "bytes";
-    qDebug() << history;
+    // If a file is write protected, set the state to read-only.
+    bool readOnly = false;
+
+    if (!file.open(QIODevice::ReadWrite)) {
+        *error = QuillError(QuillError::FileOpenForWriteError,
+                            QuillError::EditHistoryErrorSource,
+                            file.fileName());
+        readOnly = true;
+    }
+    file.close();
+
+    Logger::log("[File] Edit history size is "+QString::number(history.size())+
+                " bytes");
+    Logger::log("[File] Edit history dump: "+history);
 
     File *result = HistoryXml::decodeOne(history);
     if (!result)
         *error = QuillError(QuillError::FileCorruptError,
                             QuillError::EditHistoryErrorSource,
                             file.fileName());
+    if (result && readOnly)
+        result->setReadOnly();
+
     return result;
 }
 
@@ -523,7 +557,7 @@ void File::writeEditHistory(const QString &history, QuillError *error)
     QFile file(editHistoryFileName(m_fileName,
                                    Core::instance()->editHistoryDirectory()));
 
-    qDebug() << "Writing edit history to" << file.fileName();
+    Logger::log("[File] Writing edit history to "+file.fileName());
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         *error = QuillError(QuillError::FileOpenForWriteError,
                             QuillError::EditHistoryErrorSource,
@@ -543,7 +577,7 @@ void File::writeEditHistory(const QString &history, QuillError *error)
 void File::emitSingleImage(QuillImage image, int level)
 {
     foreach(QuillFile *file, m_references)
-        if (file->displayLevel() >= level)
+        if (Core::instance()->isSubstituteLevel(level, file->displayLevel()))
             file->emitImageAvailable(image);
 }
 
@@ -577,7 +611,8 @@ void File::remove()
     m_exists = false;
     abortSave();
     delete m_stack;
-    m_stack = 0;
+    // A file always needs a stack.
+    m_stack = new QuillUndoStack(this);
 
     if (hasOriginal())
         original()->remove();
@@ -594,6 +629,11 @@ bool File::exists() const
 void File::setExists(bool exists)
 {
     m_exists = exists;
+}
+
+QDateTime File::lastModified() const
+{
+    return m_lastModified;
 }
 
 void File::setSupported(bool supported)
@@ -709,10 +749,9 @@ void File::prepareSave()
         return;
     }
 
-
     QByteArray rawExifDump;
     if (!m_isClone) {
-        Metadata metadata(m_fileName);
+        QuillMetadata metadata(m_fileName);
         rawExifDump = metadata.dumpExif();
     }
 
@@ -741,46 +780,55 @@ void File::concludeSave()
         if (result.errorCode() != QuillError::NoError) {
             result.setErrorSource(QuillError::ImageOriginalErrorSource);
             emitError(result);
-            return;
+            goto cleanup;
         }
     }
 
     // Copy metadata from previous version to new one
 
     if (!m_isClone) {
-        Metadata metadata(m_fileName);
+        QuillMetadata metadata(m_fileName);
         if (!metadata.write(temporaryName)) {
             // If metadata write failed, the temp file is likely corrupt
             emitError(QuillError(QuillError::FileWriteError,
                                  QuillError::TemporaryFileErrorSource,
                                  m_fileName));
-            return;
+            goto cleanup;
         }
     }
 
     // This is more efficient than renaming between partitions.
 
-    QuillError result = File::overwritingCopy(temporaryName,
-                                              m_fileName);
-    if (result.errorCode() != QuillError::NoError) {
-        result.setErrorSource(QuillError::ImageFileErrorSource);
-        emitError(result);
-        return;
-    }
+    {
+        QuillError result = File::overwritingCopy(temporaryName,
+                                                  m_fileName);
+        if (result.errorCode() != QuillError::NoError) {
+            result.setErrorSource(QuillError::ImageFileErrorSource);
+            emitError(result);
+            goto cleanup;
+        }
 
-    m_stack->concludeSave();
-    if (hasOriginal())
-        original()->stack()->concludeSave();
+        m_stack->concludeSave();
+        if (hasOriginal())
+            original()->stack()->concludeSave();
 
-    if (!m_isClone)
-        writeEditHistory(HistoryXml::encode(this), &result);
+        if (!m_isClone)
+            writeEditHistory(HistoryXml::encode(this), &result);
 
-    if (result.errorCode() != QuillError::NoError) {
-        emitError(result);
-        return;
+        if (result.errorCode() != QuillError::NoError) {
+            emitError(result);
+            goto cleanup;
+        }
     }
 
     removeThumbnails();
+
+    m_lastModified = QDateTime::currentDateTime();
+
+    emit saved();
+    Core::instance()->emitSaved(m_fileName);
+
+ cleanup:
     m_saveInProgress = false;
 
     Core::instance()->dump();
@@ -789,9 +837,6 @@ void File::concludeSave()
 
     delete m_temporaryFile;
     m_temporaryFile = 0;
-
-    emit saved();
-    Core::instance()->emitSaved(m_fileName);
 }
 
 void File::abortSave()
@@ -949,4 +994,3 @@ void File::setClone(bool status)
 {
     m_isClone = status;
 }
-

@@ -37,56 +37,33 @@
 **
 ****************************************************************************/
 
-#include <QObject>
+#include <QString>
+#include <QList>
+#include <QXmlStreamReader>
 
-#ifndef TEST_LIBQUILL_METADATA_H
-#define TEST_LIBQUILL_METADATA_H
+class Autoclean {
+ public:
+    Autoclean();
 
-class Metadata;
+    void setEditHistoryPath(const QString &editHistoryPath);
+    QString editHistoryPath() const;
 
-class ut_metadata : public QObject {
-Q_OBJECT
-public:
-    ut_metadata();
+    void setThumbnailPaths(const QList<QString> &pathList);
+    QList<QString> thumbnailPaths() const;
 
-private slots:
-    void init();
-    void cleanup();
-    void initTestCase();
-    void cleanupTestCase();
+    void run(int nItemsToCheck) const;
 
-    // Unit tests for metadata reading
+    static QString getMainFileName(const QString &editHistoryFileName);
+    static bool verifyMainFileName(const QString &mainFileName,
+                                   const QString &editHistoryFileName);
+    static QString originalFileName(const QString &mainFileName);
+    static void removeThumbnails(const QString &mainFileName,
+                                 const QList<QString> &thumbnailPaths);
+    static QString fileNameHash(const QString &fileName);
 
-    void testCameraMake();
-    void testCameraModel();
-    void testImageWidth();
-    void testImageHeight();
-    void testFocalLength();
-    void testExposureTime();
-    void testTimestampOriginal();
-    void testSubject();
-    void testCity();
-    void testCountry();
-    void testRating();
-    void testCreator();
-    void testCityIptc();
-    void testCountryIptc();
+    static QXmlStreamReader::TokenType readToken(QXmlStreamReader *reader);
 
-    // Writer tests using reader
-
-    void testWriteSubject();
-    void testWriteCity();
-
-    // High-level tests for metadata preservation
-
-    void testPreserveXMP();
-    void testPreserveIptc();
-    void testPreserveExif();
-
-private:
-    Metadata *metadata;
-    Metadata *xmp;
-    Metadata *iptc;
+ private:
+    QString m_editHistoryPath;
+    QList<QString> m_thumbnailPaths;
 };
-
-#endif  // TEST_LIBQUILL_METADATA_H

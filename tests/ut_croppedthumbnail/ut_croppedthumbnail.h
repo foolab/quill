@@ -37,96 +37,26 @@
 **
 ****************************************************************************/
 
-#ifndef QUILL_METADATA_H
-#define QUILL_METADATA_H
+#ifndef UT_CROPPED_THUMBNAIL_H
+#define UT_CROPPED_THUMBNAIL_H
 
-#include <libexif/exif-data.h>
-#include <exempi-2.0/exempi/xmp.h>
-#include <QString>
+#include <QObject>
+#include <QImage>
 
-class XmpTag {
+class ut_croppedthumbnail : public QObject {
+Q_OBJECT
 public:
-    XmpTag();
-    XmpTag(const QString &schema, const QString &tag);
+    ut_croppedthumbnail();
 
-    QString schema;
-    QString tag;
+private slots:
+    void init();
+    void cleanup();
+    void initTestCase();
+    void cleanupTestCase();
+
+    void testReplacementPolicy();
+    void testCroppedThumbnailSize();
+    void testCroppedThumbnailAfterEdit();
 };
 
-class Metadata
-{
- public:
-
-    enum Tag {
-        Tag_Make,
-        Tag_Model,
-        Tag_ImageWidth,
-        Tag_ImageHeight,
-        Tag_FocalLength,
-        Tag_ExposureTime,
-        Tag_TimestampOriginal,
-        Tag_Title,
-        Tag_Copyright,
-        Tag_Creator,
-        Tag_Keywords,
-        Tag_Subject,
-        Tag_City,
-        Tag_Country,
-        Tag_Location,
-        Tag_Rating,
-        Tag_Timestamp
-    };
-
- public:
-    Metadata(const QString &fileName);
-    ~Metadata();
-
-    /*!
-      Returns true if the metadata in the file was valid.
-     */
-    bool isValid();
-
-    /*!
-      Returns the value of the metadata entry for a given tag.
-      Currently, only some tags are supported for testing purposes.
-     */
-    QVariant entry(Tag tag);
-
-    /*!
-      Writes the metadata into an existing file. Writes XMP and
-      IPTC-IIM using libexempi, does not write EXIF data which should
-      be written at the start of the save by the save filter.
-    */
-    bool write(const QString &fileName);
-
-    /*!
-      As libexif does not have a writeback feature, the EXIF block
-      is dumped into a byte array instead to be processed by the save filter.
-     */
-    QByteArray dumpExif();
-
- private:
-
-    /*!
-      Initializes the internal tag list.
-     */
-
-    void initTags();
-
-    QVariant entryExif(Tag tag);
-    QVariant entryXmp(Tag tag);
-
-    bool writeXmp(const QString &fileName);
-
- private:
-    static QHash<Tag,ExifTag> m_exifTags;
-    static QHash<Tag,XmpTag> m_xmpTags;
-    static bool initialized;
-
-    ExifData *m_exifData;
-    ExifByteOrder m_exifByteOrder;
-
-    XmpPtr m_xmpPtr;
-};
-
-#endif
+#endif  // UT_CROPPED_THUMBNAIL_H

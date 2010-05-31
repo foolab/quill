@@ -51,6 +51,7 @@ can only be changed if no files have been opened yet.
 #define __QUILL_CORE_H_
 
 #include <QObject>
+#include <QColor>
 
 #include "quill.h"
 #include "quillerror.h"
@@ -64,7 +65,7 @@ class Scheduler;
 class ThreadManager;
 class TileCache;
 class DBusThumbnailer;
-class CorePrivate;
+class DisplayLevel;
 
 class Core : public QObject
 {
@@ -77,7 +78,6 @@ friend class ut_core;
 public:
 
     Core(Quill::ThreadingMode threadingMode = Quill::ThreadingNormal);
-    ~Core();
 
     /*!
       The initializer is called before instance() is called for the first time,
@@ -180,6 +180,25 @@ public:
      */
 
     void setPreviewSize(int level, const QSize &size);
+
+    /*!
+      Sets the minimum size of a preview-level image.
+     */
+
+    void setMinimumPreviewSize(int level, const QSize &size);
+
+    /*!
+      The minimum size of a preview-level image.
+    */
+
+    QSize minimumPreviewSize(int level) const;
+
+    /*!
+      Returns true if the given display level can substiture for the given
+      level.
+     */
+
+    bool isSubstituteLevel(int level, int targetLevel) const;
 
     /*!
       Sets the default tile size if tiling is in use.
@@ -492,6 +511,67 @@ public:
     QString temporaryFileDirectory() const;
 
     /*!
+      Sets the default color for alpha channel rendering.
+
+      As Quill does not support alpha channel editing, the alpha
+      channel is immediately and permanently rendered as the
+      background rendering color.
+     */
+
+    void setBackgroundRenderingColor(const QColor &color);
+
+    /*!
+      Gets the default color for alpha channel rendering.
+
+      See setBackgroundRenderingColor().
+    */
+
+    QColor backgroundRenderingColor() const;
+
+    /*!
+      Sets the bounding box for vector graphics rendering.
+
+      Vector graphics (mimetype "image/svg+xml") will be
+      rendered to this size, preserving aspect ratio.
+
+      Default is an invalid QSize, which means that all
+      vector graphics is rendered into their intended size.
+     */
+
+    void setVectorGraphicsRenderingSize(const QSize &size);
+
+    /*!
+      Returns the bounding box for vector graphics rendering.
+
+      Vector graphics (mimetype "image/svg+xml") will be
+      rendered to this size, preserving aspect ratio.
+    */
+
+    QSize vectorGraphicsRenderingSize() const;
+
+    /*!
+      Returns the list of writable image formats. Internal use only.
+
+      QImageWriter::supportedImageFormats() was shown to be a
+      particularly heavy operation and was thus optimized with this.
+    */
+
+    QList<QByteArray> writableImageFormats();
+
+    /*!
+      Gets the target size for a given preview level for a given-size image.
+     */
+
+    QSize targetSizeForLevel(int level, const QSize &fullImageSize);
+
+    /*!
+      Gets the target area for a given preview level for a given-size image.
+     */
+
+    QRect targetAreaForLevel(int level, const QSize &targetSize,
+                             const QSize &fullImageSize);
+
+    /*!
       Return one file.
     */
 
@@ -525,6 +605,7 @@ public:
     void emitError(QuillError error);
 
 private:
+    ~Core();
 
     /*!
       Activates the D-Bus thumbnailer with a task if there is any.
@@ -589,15 +670,13 @@ private:
 
     static Core *g_instance;
 
-    QList<QSize> m_previewSize;
-    QList<ImageCache*> m_cache;
-    QList<int> m_fileLimit;
+    QList<DisplayLevel*> m_displayLevel;
 
     QSize m_imageSizeLimit;
     int m_imagePixelsLimit, m_nonTiledImagePixelsLimit;
+    QSize m_vectorGraphicsRenderingSize;
 
     QString m_editHistoryDirectory;
-    QList<QString> m_thumbnailDirectory;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;
@@ -614,6 +693,10 @@ private:
 
     QString m_temporaryFileDirectory;
     QString m_crashDumpPath;
+
+    QColor m_backgroundRenderingColor;
+
+    QList<QByteArray> m_writableImageFormats;
 
     DBusThumbnailer *m_dBusThumbnailer;
 };

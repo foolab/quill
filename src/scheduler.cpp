@@ -53,6 +53,7 @@
 #include "threadmanager.h"
 #include "tilemap.h"
 #include "savemap.h"
+#include "logger.h"
 
 Scheduler::Scheduler()
 {
@@ -114,7 +115,20 @@ Task *Scheduler::newTask()
                     return task;
             }
 
-    // Fourth priority (save in progress): getting final full image/tiles
+
+    // Fourth priority (all images):
+    // regenerating lower-resolution preview images to
+    // better match their respective higher-resolution previews or
+    // full images
+
+    foreach (File *file, allFiles) {
+        Task *task = newPreviewImprovementTask(file);
+
+        if (task)
+            return task;
+    }
+
+    // Fifth priority (save in progress): getting final full image/tiles
 
     File *prioritySaveFile = Core::instance()->prioritySaveFile();
 
@@ -124,7 +138,7 @@ Task *Scheduler::newTask()
         if (task)
             return task;
 
-        // Fifth priority (save in progress): saving image
+        // Sixth priority (save in progress): saving image
 
         task = newSaveTask(prioritySaveFile);
 
@@ -132,7 +146,7 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Sixth priority (highest display level): full image/tiles
+    // Seventh priority (highest display level): full image/tiles
 
     if ((priorityFile != 0) &&
         (priorityFile->displayLevel() >= previewLevelCount)) {
@@ -143,23 +157,11 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Seventh priority (highest display level):
-    // regenerating lower-resolution preview images to
-    // better match their respective higher-resolution previews or
-    // full images
-
-    if (priorityFile != 0) {
-        Task *task = newPreviewImprovementTask(priorityFile);
-
-        if (task)
-            return task;
-    }
-
     // Eighth priority (any): saving thumbnails
 
     if (Core::instance()->isThumbnailCreationEnabled())
         foreach(File *file, allFiles)
-            if (file->supported() && !file->isReadOnly() && !file->isWaitingForData())
+            if (file->supported() && !file->isWaitingForData())
                 for (int level=0; level<=previewLevelCount-1; level++) {
                     Task *task = newThumbnailSaveTask(file, level);
 
@@ -324,9 +326,10 @@ Task *Scheduler::newThumbnailLoadTask(File *file,
         return 0;
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
-
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
+    filter->setOption(QuillImageFilter::BackgroundColor,
+                      Core::instance()->backgroundRenderingColor());
 
     Task *task = new Task();
     task->setCommandId(command->uniqueId());
@@ -350,7 +353,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
         return 0;
 
     if (file->image(level).size() !=
-        file->stack()->command()->targetPreviewSize(level))
+        Core::instance()->targetSizeForLevel(level, file->fullImageSize()))
         return 0;
 
     if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
@@ -367,7 +370,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     task->setCommandId(file->stack()->command()->uniqueId());
     task->setDisplayLevel(level);
     task->setFilter(filter);
-    task->setInputImage(file->image(level));
+    task->setInputImage(QImage(file->image(level)));
 
     return task;
 }
@@ -382,6 +385,13 @@ Task *Scheduler::newNormalTask(File *file, int level)
 
     if (stack->image(level) != QuillImage())
         // Image already exists - no need to recalculate
+        return 0;
+
+    // For read-only images, we stop loading if we already have
+    // an equivalent of the full image
+    if (file->isReadOnly() &&
+        (level > 0) &&
+        (file->image(level-1).size() == file->fullImageSize()))
         return 0;
 
     if ((level == Core::instance()->previewLevelCount()) &&
@@ -406,10 +416,11 @@ Task *Scheduler::newNormalTask(File *file, int level)
         prevImage = QuillImage();
     else if (prev == 0)
     {
-        prevImage = QuillImage(QImage(command->targetPreviewSize(level),
+        prevImage = QuillImage(QImage(Core::instance()->targetSizeForLevel(level, command->fullImageSize()),
                                       QImage::Format_RGB32));
+
         prevImage.setFullImageSize(command->fullImageSize());
-        prevImage.setArea(QRect(QPoint(0, 0), command->fullImageSize()));
+        prevImage.setArea(Core::instance()->targetAreaForLevel(level, prevImage.size(), command->fullImageSize()));
         prevImage.setZ(level);
     }
     else
@@ -456,53 +467,59 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
 
-    // If the current command already has a full image, we see if the
-    // previews need re-calculating
+    // If the current command already has a better preview image, we try
+    // to regenerate the lower level images accordingly
 
     QuillUndoCommand *command = stack->command();
 
     int level;
     QSize targetSize;
 
-    for (level=0; level<Core::instance()->previewLevelCount(); level++)
+    for (level=0; level<file->displayLevel(); level++)
     {
         // Preview images cannot be bigger than full image
-        targetSize = command->targetPreviewSize(level);
+        targetSize = Core::instance()->targetSizeForLevel(level, command->fullImageSize());
+
         if ((!command->image(level).size().isEmpty()) &&
             (command->image(level).size() != targetSize))
             break;
     }
 
-    if (level < Core::instance()->previewLevelCount())
+    if (level < file->displayLevel())
     {
-        QuillImage prevImage = command->fullImage();
+        QuillImage prevImage;
 
-        if (prevImage == QuillImage())
-        {
-            // The case with tiling (base on the largest preview)
-            if (level < Core::instance()->previewLevelCount() - 1)
-                prevImage = command->image(Core::instance()->previewLevelCount() - 1);
+        // Based on the next available non-cropped preview
 
-            if (prevImage == QuillImage())
-                return 0;
-        }
+        for (int sourceLevel = level+1;
+             sourceLevel <= file->displayLevel();
+             sourceLevel++)
+            if (!Core::instance()->minimumPreviewSize(sourceLevel).isValid()
+                && !command->image(sourceLevel).isNull()) {
+                prevImage = command->image(sourceLevel);
+                break;
+            }
+
+        if (prevImage.isNull())
+            return 0;
 
         // Create ad-hoc filter for preview re-calculation
 
-        QuillImageFilter *scaleFilter =
+        QuillImageFilter *scaleCropFilter =
             QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_PreviewScale);
-        scaleFilter->setOption(QuillImageFilter::SizeAfter,
-                               QVariant(targetSize));
+        scaleCropFilter->setOption(QuillImageFilter::SizeAfter,
+                                   QVariant(targetSize));
+        scaleCropFilter->setOption(QuillImageFilter::CropRectangle,
+                                   QVariant(Core::instance()->targetAreaForLevel(level, targetSize, command->fullImageSize())));
 
         Task *task = new Task();
         task->setCommandId(command->uniqueId());
         task->setDisplayLevel(level);
-        task->setFilter(scaleFilter);
-        // Treat image as a full image
-        task->setInputImage(QuillImage(QImage(prevImage)));
+        task->setFilter(scaleCropFilter);
+
+        task->setInputImage(prevImage);
 
         return task;
-
     }
     // This should never happen
     return 0;
@@ -553,7 +570,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 stack->file()->emitError(QuillError(QuillError::FileWriteError,
                                                     QuillError::ThumbnailErrorSource,
                                                     filter->option(QuillImageFilter::FileName).toString()));
-                qDebug() << "Thumbnail save failed!";
+                Logger::log("[Scheduler] Thumbnail save failed!");
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
 
@@ -617,6 +634,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             }
 
             image = QuillImage(image, command->fullImageSize());
+            image.setZ(task->displayLevel());
             delete filter;
         } else if ((image.isNull()) &&
                    (command->filter()->role() == QuillImageFilter::Role_Load)) {
@@ -631,7 +649,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
             QString fileName = filter->option(QuillImageFilter::FileName).toString();
             QuillError::ErrorSource errorSource;
-            qDebug() << "Normal load failed!" << fileName << file->fileName();
+            Logger::log("[Scheduler] Normal load failed from file " +
+                        file->fileName());
 
             if (fileName == file->fileName()) {
                 errorSource = QuillError::ImageFileErrorSource;

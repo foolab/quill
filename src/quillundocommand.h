@@ -163,13 +163,6 @@ public:
     QList<QuillImage> allImageLevels(int maxLevel) const;
 
     /*!
-      Gets the target preview size for the level, with a correct
-      aspect ratio.
-     */
-
-    QSize targetPreviewSize(int level) const;
-
-    /*!
       Makes the command part of a session, and sets the session id
       for the command. Commands with the same session id will undo and
       redo together.
@@ -198,6 +191,12 @@ public:
     bool belongsToSession(int id) const;
 
     /*!
+      Automatically creates a new tile map for the command.
+    */
+
+    void createTileMap();
+
+    /*!
       Sets the tile map for the command.
       The tile map becomes property of the command.
     */
@@ -209,7 +208,7 @@ public:
       map will be reflected to the command.
      */
 
-    TileMap *tileMap() const;
+    TileMap *tileMap();
 
 private:
     int m_id;

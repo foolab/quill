@@ -344,7 +344,7 @@ void ut_stack::testSetImage()
     Quill::setEditHistoryDirectory("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 2);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), "");
 
     file->setDisplayLevel(0);
     QuillImage quillImage(image);
@@ -407,6 +407,38 @@ void ut_stack::testImmediateSizeQuery()
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QCOMPARE(file->fullImageSize(), QSize(8, 2));
+
+    delete file;
+}
+
+void ut_stack::testDropRedoHistory()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+    QuillImage resultImage = filter->apply(image);
+
+    QuillImageFilter *filter2 =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter2->setOption(QuillImageFilter::Contrast, QVariant(20));
+    QuillImage resultImage2 = filter2->apply(resultImage);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
+    file->runFilter(filter);
+    file->runFilter(filter2);
+    file->undo();
+    QVERIFY(file->canRedo());
+    file->dropRedoHistory();
+    QVERIFY(!file->canRedo());
 
     delete file;
 }

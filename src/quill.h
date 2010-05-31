@@ -286,6 +286,28 @@ public:
     static QSize previewSize(int level);
 
     /*!
+      Sets the minimum size for preview images of a certain level. The
+      default is no size, which is represented by an invalid size
+      parameter. If either dimension of this value is valid, libquill
+      will use cropped scaling to ensure that the minimum size
+      requirement is met. However, libquill will never change the aspect
+      ratio of an image, nor upscale an image which is smaller than
+      this set minimum size.
+
+      Note that cropped preview levels (ones with minimum size set)
+      cannot be automatically substituted to other levels.
+     */
+
+    static void setMinimumPreviewSize(int level, const QSize &size);
+
+    /*!
+      Gets the minimum size of a preview size for a level. See
+      setMinimumPreviewSize().
+    */
+
+    static QSize minimumPreviewSize(int level);
+
+    /*!
       Sets the maximum tile size if tiling is in use.
       The default is 0, which disables tiling.
      */
@@ -438,6 +460,45 @@ public:
     static QString temporaryFilePath();
 
     /*!
+      Sets the default color for alpha channel rendering.
+
+      As Quill does not support alpha channel editing, the alpha
+      channel is immediately and permanently rendered as the
+      background rendering color.
+     */
+
+    static void setBackgroundRenderingColor(const QColor &color);
+
+    /*!
+      Gets the default color for alpha channel rendering.
+
+      See setBackgroundRenderingColor().
+    */
+
+    static QColor backgroundRenderingColor();
+
+    /*!
+      Sets the bounding box for vector graphics rendering.
+
+      Vector graphics (mimetype "image/svg+xml") will be
+      rendered to this size, preserving aspect ratio. This
+      size cannot be bigger than the biggest preview level.
+
+      Default is an invalid QSize, which means that all
+      vector graphics is rendered into their intended size.
+     */
+
+    static void setVectorGraphicsRenderingSize(const QSize &size);
+
+    /*!
+      Returns the bounding box for vector graphics rendering.
+
+      See setVectorGraphicsRenderingSize().
+    */
+
+    static QSize vectorGraphicsRenderingSize();
+
+    /*!
       Returns true if it is possible to recover from a previous crash.
       This will only work if setCrashDumpFile() has been previously
       called, the physical file is found and actually contains something to
@@ -565,6 +626,14 @@ signals:
     void error(QuillError error);
 
 private:
+
+    /*!
+      This class is a static class, so no constructors should not be invoked
+      from the outside.
+    */
+
+    Quill();
+    ~Quill();
 
     QuillPrivate *priv;
     static Quill *g_instance;

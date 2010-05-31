@@ -45,7 +45,6 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
-#include <QDebug>
 
 #include "quillundostack.h"
 #include "quillundocommand.h"
@@ -54,6 +53,7 @@
 #include "tilemap.h"
 #include "savemap.h"
 #include "logger.h"
+#include "displaylevel.h"
 
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
@@ -77,18 +77,35 @@ File* QuillUndoStack::file()
 void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 {
     QFile loadFile(m_file->originalFileName());
-    if (loadFile.exists() && (loadFile.size() > 0))
+    if (loadFile.exists() && (loadFile.size() > 0)) {
         filter->setOption(QuillImageFilter::FileName,
                           m_file->originalFileName());
-    else
+        filter->setOption(QuillImageFilter::FileFormat,
+                          m_file->fileFormat());
+    }
+    else {
         filter->setOption(QuillImageFilter::FileName,
                           m_file->fileName());
+        filter->setOption(QuillImageFilter::FileFormat,
+                          m_file->targetFormat());
+    }
+
+    QByteArray format = filter->option(QuillImageFilter::FileFormat).toByteArray();
+
+    if (!format.isNull() &&
+        !Core::instance()->writableImageFormats().contains(format))
+        m_file->setReadOnly();
+
+    if (m_file->fileFormat().isEmpty())
+        m_file->setFileFormat(filter->option(QuillImageFilter::MimeType).toByteArray());
 }
 
 void QuillUndoStack::load()
 {
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
+    filter->setOption(QuillImageFilter::BackgroundColor,
+                      Core::instance()->backgroundRenderingColor());
     setInitialLoadFilter(filter);
     add(filter);
 }
@@ -122,20 +139,15 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
     if (!m_file->checkImageSize(fullSize))
         m_file->imageSizeError();
 
-    command->setFullImageSize(fullSize);
-
-    // tile map
-    if (!Core::instance()->defaultTileSize().isEmpty() && !command->tileMap()) {
-        TileMap *tileMap;
-        if (filter->role() == QuillImageFilter::Role_Load)
-            tileMap = new TileMap(filter->newFullImageSize(QSize()),
-                                  Core::instance()->defaultTileSize(),
-                                  Core::instance()->tileCache());
-        else
-            tileMap = new TileMap(command->prev()->tileMap(), filter);
-
-        command->setTileMap(tileMap);
+    // Vector graphics are always rendered to a fixed size
+    if ((m_file->fileFormat() == "image/svg+xml") &&
+        Core::instance()->vectorGraphicsRenderingSize().isValid()) {
+        QSize maximumSize = Core::instance()->vectorGraphicsRenderingSize().
+            boundedTo(Core::instance()->previewSize(Core::instance()->previewLevelCount()-1));
+        fullSize = DisplayLevel::scaleBounding(fullSize, maximumSize, QSize());
     }
+
+    command->setFullImageSize(fullSize);
 }
 
 void QuillUndoStack::add(QuillImageFilter *filter)
@@ -180,7 +192,7 @@ void QuillUndoStack::undo()
 {
     if (canUndo()) {
         // In case of an intermediate load, we make a double undo
-        if ((command()->filter()->role() == QuillImageFilter::Role_Load) && (m_stack->index() > 2))
+        if (command()->filter() && (command()->filter()->role() == QuillImageFilter::Role_Load) && (m_stack->index() > 2))
             m_stack->undo();
 
         // If we are not currently recording a session, an entire
@@ -248,6 +260,16 @@ void QuillUndoStack::redo()
         setRevertIndex(0);
     }
 }
+
+void QuillUndoStack::dropRedoHistory()
+{
+    // Push an invalid command to replace any existing edit history
+    QuillUndoCommand *emptyCommand = new QuillUndoCommand(this);
+    m_stack->push(emptyCommand);
+    undo();
+    setRevertIndex(0);
+}
+
 QuillImage QuillUndoStack::bestImage(int maxLevel) const
 {
     QuillUndoCommand *curr = command();
@@ -351,7 +373,7 @@ int QuillUndoStack::savedIndex() const
 
 bool QuillUndoStack::isDirty() const
 {
-    return (command()->index() != savedIndex());
+    return (m_stack->count() > 0) && (command()->index() != savedIndex());
 }
 
 void QuillUndoStack::startSession()
@@ -379,7 +401,9 @@ void QuillUndoStack::prepareSave(const QString &fileName,
     m_isSessionRecording = false;
 
     delete m_saveCommand;
+    m_saveCommand =0;
     delete m_saveMap;
+    m_saveMap = 0;
 
     if (!Core::instance()->defaultTileSize().isEmpty())
         m_saveMap = new SaveMap(command()->fullImageSize(),

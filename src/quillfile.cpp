@@ -264,6 +264,13 @@ void QuillFile::redo()
         priv->m_file->redo();
 }
 
+void QuillFile::dropRedoHistory()
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        priv->m_file->dropRedoHistory();
+}
+
 QuillImage QuillFile::image() const
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
@@ -348,6 +355,15 @@ bool QuillFile::exists() const
         return priv->m_file->exists();
     else
         return false;
+}
+
+QDateTime QuillFile::lastModified() const
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->lastModified();
+    else
+        return QDateTime();
 }
 
 bool QuillFile::supported() const

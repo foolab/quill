@@ -37,36 +37,49 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_FILE_H
-#define TEST_LIBQUILL_FILE_H
+#ifndef DISPLAY_LEVEL_H
+#define DISPLAY_LEVEL_H
 
-#include <QObject>
-#include <QImage>
-#include <QIODevice>
+#include <QSize>
+#include <QRect>
+#include <QString>
 
-class ut_file : public QObject {
-Q_OBJECT
-public:
-    ut_file();
+class ImageCache;
 
-private slots:
-    void init();
-    void cleanup();
-    void initTestCase();
-    void cleanupTestCase();
+class DisplayLevel {
+ public:
+    DisplayLevel(const QSize &size);
+    ~DisplayLevel();
 
-    void testRemove();
-    void testOriginal();
-    void testOriginalAfterSave();
-    void testFileLimit();
-    void testMultipleAccess();
-    void testDifferentPreviewLevels();
-    void testSaveAfterDelete();
-    void testReadOnly();
-    void testLastModified();
+    void setSize(const QSize &size);
+    QSize size() const;
 
-    void testRevertRestore();
-    void testDoubleRevertRestore();
+    void setMinimumSize(const QSize &size);
+    QSize minimumSize() const;
+
+    bool isCropped() const;
+
+    void setFileLimit(int limit);
+    int fileLimit() const;
+
+    void setThumbnailFlavorPath(const QString &name);
+    QString thumbnailFlavorPath() const;
+
+    ImageCache *imageCache() const;
+
+    QSize targetSize(const QSize &fullImageSize) const;
+    QRect targetArea(const QSize &targetSize,
+                     const QSize &fullImageSize) const;
+
+    static QSize scaleBounding(const QSize &size, const QSize &boundingBox,
+                               const QSize &minimum);
+
+ private:
+    QSize m_size;
+    QSize m_minimumSize;
+    int m_fileLimit;
+    QString m_thumbnailFlavorPath;
+    ImageCache *m_imageCache;
 };
 
-#endif  // TEST_LIBQUILL_FILE_H
+#endif

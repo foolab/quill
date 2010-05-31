@@ -75,13 +75,13 @@ public:
 
 private:
     static void writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer);
-    static bool writeComplexType(QVariant variant, QXmlStreamWriter *writer);
+    static bool writeComplexType(const QVariant &variant, QXmlStreamWriter *writer);
     static QXmlStreamReader::TokenType readToken(QXmlStreamReader *reader);
     static void readEditSession(QXmlStreamReader *reader, QuillUndoStack *stack,
                                 int *savedIndex, int *targetIndex,
                                 const QString &fileName);
     static QuillImageFilter *readFilter(QXmlStreamReader *reader);
-    static QVariant recoverVariant(QVariant::Type variantType, QString string);
+    static QVariant recoverVariant(QVariant::Type variantType, const QString &string);
     static QVariant recoverComplexType(QVariant::Type variantType, QXmlStreamReader *reader);
 };
 

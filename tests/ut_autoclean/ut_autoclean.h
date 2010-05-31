@@ -37,36 +37,33 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_FILE_H
-#define TEST_LIBQUILL_FILE_H
+#ifndef TEST_AUTO_CLEAN_H
+#define TEST_AUTO_CLEAN_H
 
 #include <QObject>
-#include <QImage>
-#include <QIODevice>
+#include "autoclean.h"
 
-class ut_file : public QObject {
+class ut_autoclean: public QObject {
 Q_OBJECT
 public:
-    ut_file();
+    ut_autoclean();
 
 private slots:
-    void init();
-    void cleanup();
     void initTestCase();
     void cleanupTestCase();
+    void init();
+    void cleanup();
 
-    void testRemove();
-    void testOriginal();
-    void testOriginalAfterSave();
-    void testFileLimit();
-    void testMultipleAccess();
-    void testDifferentPreviewLevels();
-    void testSaveAfterDelete();
-    void testReadOnly();
-    void testLastModified();
+    void testHistoryPathDefault();
+    void testHistoryPathSet();
+    void testThumbnailPathsDefault();
+    void testThumbnailPathsSet();
+    void testGetMainFileNameNormal();
+    void testGetMainFileNameBroken();
+    void testOriginalFileName();
 
-    void testRevertRestore();
-    void testDoubleRevertRestore();
+private:
+    Autoclean *autoclean;
 };
 
-#endif  // TEST_LIBQUILL_FILE_H
+#endif  // TEST_AUTO_CLEAN_H

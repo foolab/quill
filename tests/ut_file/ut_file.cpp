@@ -397,6 +397,21 @@ void ut_file::testReadOnly()
     delete file;
 }
 
+void ut_file::testLastModified()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    QDateTime lastModified = QFileInfo(testFile.fileName()).lastModified();
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QCOMPARE(file->lastModified(), lastModified);
+    delete file;
+}
+
 void ut_file::testRevertRestore()
 {
    QTemporaryFile testFile;
@@ -512,6 +527,8 @@ void ut_file::testDoubleRevertRestore()
    QVERIFY(file->canRevert());
    file->revert();
    QVERIFY(file->canRestore());
+
+   delete file;
 }
 
 int main ( int argc, char *argv[] ){

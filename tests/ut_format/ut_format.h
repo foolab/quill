@@ -63,6 +63,8 @@ private slots:
     void testPixelsLimit();
     void testNonTiledPixelsLimit();
     void testMultipleLimits();
+
+    void testReadOnlyFormat();
 };
 
 #endif  // _UT_FORMAT_H_

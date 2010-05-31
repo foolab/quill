@@ -138,6 +138,12 @@ public:
     void redo();
 
     /*!
+      Drops any redo history, not recoverable.
+     */
+
+    void dropRedoHistory();
+
+    /*!
       Gets the current image, best resolution available.
     */
 

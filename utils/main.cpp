@@ -37,36 +37,28 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_FILE_H
-#define TEST_LIBQUILL_FILE_H
+#include <QDir>
 
-#include <QObject>
-#include <QImage>
-#include <QIODevice>
+#include "autoclean.h"
 
-class ut_file : public QObject {
-Q_OBJECT
-public:
-    ut_file();
+int main(int argc, char **argv)
+{
+    Autoclean autoclean;
+    autoclean.setEditHistoryPath(QDir::homePath()+"/.config/quill/history");
 
-private slots:
-    void init();
-    void cleanup();
-    void initTestCase();
-    void cleanupTestCase();
+    QList<QString> thumbnailPaths;
+    thumbnailPaths.append(QDir::homePath()+"/.thumbnails/normal");
+    thumbnailPaths.append(QDir::homePath()+"/.thumbnails/wide");
+    thumbnailPaths.append(QDir::homePath()+"/.thumbnails/screen");
+    autoclean.setThumbnailPaths(thumbnailPaths);
 
-    void testRemove();
-    void testOriginal();
-    void testOriginalAfterSave();
-    void testFileLimit();
-    void testMultipleAccess();
-    void testDifferentPreviewLevels();
-    void testSaveAfterDelete();
-    void testReadOnly();
-    void testLastModified();
+    int repeats = 0;
 
-    void testRevertRestore();
-    void testDoubleRevertRestore();
-};
+    if (argc >= 2)
+        repeats = QString(argv[1]).toInt();
 
-#endif  // TEST_LIBQUILL_FILE_H
+    if (repeats <= 0)
+        repeats = 100;
+
+    autoclean.run(repeats);
+}

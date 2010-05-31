@@ -37,36 +37,39 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_FILE_H
-#define TEST_LIBQUILL_FILE_H
-
 #include <QObject>
-#include <QImage>
-#include <QIODevice>
 
-class ut_file : public QObject {
+#ifndef TEST_QUILL_METADATA_H
+#define TEST_QUILL_METADATA_H
+
+class QuillMetadata;
+
+class ut_quillmetadata : public QObject {
 Q_OBJECT
 public:
-    ut_file();
+    ut_quillmetadata();
 
 private slots:
     void init();
     void cleanup();
     void initTestCase();
     void cleanupTestCase();
+    
+    // Writer tests using reader
 
-    void testRemove();
-    void testOriginal();
-    void testOriginalAfterSave();
-    void testFileLimit();
-    void testMultipleAccess();
-    void testDifferentPreviewLevels();
-    void testSaveAfterDelete();
-    void testReadOnly();
-    void testLastModified();
+    void testWriteSubject();
+    void testWriteCity();
 
-    void testRevertRestore();
-    void testDoubleRevertRestore();
+    // High-level tests for metadata preservation
+
+    void testPreserveXMP();
+    void testPreserveIptc();
+    void testPreserveExif();
+
+private:
+    QuillMetadata *metadata;
+    QuillMetadata *xmp;
+    QuillMetadata *iptc;
 };
 
-#endif  // TEST_LIBQUILL_FILE_H
+#endif  // TEST_QUILL_METADATA_H

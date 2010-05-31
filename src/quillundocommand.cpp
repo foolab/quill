@@ -181,7 +181,8 @@ QuillImage QuillUndoCommand::fullImage() const
 int QuillUndoCommand::bestImageLevel(int maxLevel) const
 {
     for (int i=maxLevel; i>=0; i--)
-        if (!image(i).isNull())
+        if (Core::instance()->isSubstituteLevel(i, maxLevel) &&
+            !image(i).isNull())
             return i;
     return -1;
 }
@@ -202,7 +203,8 @@ QList<QuillImage> QuillUndoCommand::allImageLevels(int maxLevel) const
         maxLevel = Core::instance()->previewLevelCount();
     QList<QuillImage> list;
     for (int i=0; i<=maxLevel; i++)
-        if (!image(i).isNull())
+        if (Core::instance()->isSubstituteLevel(i, maxLevel) &&
+            !image(i).isNull())
             list.append(image(i));
 
     return list;
@@ -216,27 +218,6 @@ void QuillUndoCommand::setFullImageSize(const QSize &size)
 QSize QuillUndoCommand::fullImageSize() const
 {
     return m_fullImageSize;
-}
-
-QSize QuillUndoCommand::targetPreviewSize(int level) const
-{
-    QSize previewSize = Core::instance()->previewSize(level);
-    QSize targetSize;
-
-    // keep aspect ratio, always round fractions up
-    int targetWidth = (previewSize.height() * m_fullImageSize.width()
-        + m_fullImageSize.height() - 1) / m_fullImageSize.height();
-
-    if (targetWidth <= previewSize.width())
-        targetSize = QSize(targetWidth, previewSize.height());
-    else {
-        // keep aspect ratio, always round fractions up
-        int targetHeight = (previewSize.width() * m_fullImageSize.height()
-        + m_fullImageSize.width() - 1) / m_fullImageSize.width();
-        targetSize = QSize(previewSize.width(), targetHeight);
-    }
-
-    return targetSize.boundedTo(m_fullImageSize);
 }
 
 void QuillUndoCommand::setSessionId(int id)
@@ -260,6 +241,22 @@ bool QuillUndoCommand::belongsToSession(int id) const
     return (m_belongsToSession && m_sessionId == id);
 }
 
+void QuillUndoCommand::createTileMap()
+{
+    if (m_tileMap || !m_filter)
+        return;
+
+    if (m_filter->role() == QuillImageFilter::Role_Load)
+        m_tileMap = new TileMap(m_fullImageSize,
+                                Core::instance()->defaultTileSize(),
+                                Core::instance()->tileCache());
+    else {
+        if (!prev()->tileMap())
+            prev()->createTileMap();
+        m_tileMap = new TileMap(prev()->tileMap(), m_filter);
+    }
+}
+
 void QuillUndoCommand::setTileMap(TileMap *map)
 {
     delete m_tileMap;
@@ -267,7 +264,10 @@ void QuillUndoCommand::setTileMap(TileMap *map)
     m_tileMap = map;
 }
 
-TileMap *QuillUndoCommand::tileMap() const
+TileMap *QuillUndoCommand::tileMap()
 {
+    if (!m_tileMap)
+        createTileMap();
+
     return m_tileMap;
 }

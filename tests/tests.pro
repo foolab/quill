@@ -27,9 +27,11 @@ SUBDIRS += \
            ut_error \
            ut_export \
            ut_format \
+           ut_croppedthumbnail \
            ut_logger \
-           ut_metadata \
+           ut_quillmetadata \
            ut_dbusthumbnailer \
+           ut_autoclean \
            benchmark  \
 
 # --- install
@@ -38,6 +40,7 @@ tatam.path  = $$(DESTDIR)/usr/share/libquill-tests/
 
 tatamimages.files += images/image_16x4.jpg
 tatamimages.files += images/image_16x4.png
+tatamimages.files += images/image_16x4.gif
 tatamimages.files += images/exif.jpg
 tatamimages.files += images/xmp.jpg
 tatamimages.files += images/iptc.jpg
