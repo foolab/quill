@@ -1,3 +1,9 @@
+libquill (1.100601.0) unstable; urgency=low
+
+  * Fixed potential problems with cropped thumbnails
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 01 Jun 2010 10:30:00 +0200
+
 libquill (1.100531.0) unstable; urgency=low
 
   * Fixes: NB#168252 Application crashed at ~QuillUndoCommand
