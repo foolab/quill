@@ -465,6 +465,9 @@ Task *Scheduler::newSaveTask(File *file)
 
 Task *Scheduler::newPreviewImprovementTask(File *file)
 {
+    if (!file->exists() || !file->supported() || file->isWaitingForData())
+        return 0;
+
     QuillUndoStack *stack = file->stack();
 
     // If the current command already has a better preview image, we try
