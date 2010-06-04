@@ -752,7 +752,7 @@ void File::prepareSave()
     QByteArray rawExifDump;
     if (!m_isClone) {
         QuillMetadata metadata(m_fileName);
-        rawExifDump = metadata.dumpExif();
+        rawExifDump = metadata.dump(QuillMetadata::ExifFormat);
     }
 
     m_stack->prepareSave(m_temporaryFile->fileName(), rawExifDump);
@@ -788,7 +788,7 @@ void File::concludeSave()
 
     if (!m_isClone) {
         QuillMetadata metadata(m_fileName);
-        if (!metadata.write(temporaryName)) {
+        if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
             // If metadata write failed, the temp file is likely corrupt
             emitError(QuillError(QuillError::FileWriteError,
                                  QuillError::TemporaryFileErrorSource,

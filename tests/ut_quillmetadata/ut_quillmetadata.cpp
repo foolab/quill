@@ -73,32 +73,6 @@ void ut_quillmetadata::cleanup()
     delete iptc;
 }
 
-void ut_quillmetadata::testWriteSubject()
-{
-    QTemporaryFile file;
-    file.open();
-    Unittests::generatePaletteImage().save(file.fileName(), "jpg");
-    xmp->write(file.fileName());
-
-    QuillMetadata writtenMetadata(file.fileName());
-    QVERIFY(writtenMetadata.isValid());
-    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Subject).toString(),
-             QString("test,quill"));
-}
-
-void ut_quillmetadata::testWriteCity()
-{
-    QTemporaryFile file;
-    file.open();
-    Unittests::generatePaletteImage().save(file.fileName(), "jpg");
-    xmp->write(file.fileName());
-
-    QuillMetadata writtenMetadata(file.fileName());
-    QVERIFY(writtenMetadata.isValid());
-    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_City).toString(),
-             QString("Tapiola"));
-}
-
 void ut_quillmetadata::testPreserveXMP()
 {
     QTemporaryFile file;
@@ -129,8 +103,10 @@ void ut_quillmetadata::testPreserveXMP()
     QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
 
-    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Subject).toString(),
-             QString("test,quill"));
+    QStringList list;
+    list << "test" << "quill";
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Subject).toStringList(),
+             list);
     QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_City).toString(),
              QString("Tapiola"));
     QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Country).toString(),

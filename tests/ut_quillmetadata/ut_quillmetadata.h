@@ -54,11 +54,6 @@ private slots:
     void cleanup();
     void initTestCase();
     void cleanupTestCase();
-    
-    // Writer tests using reader
-
-    void testWriteSubject();
-    void testWriteCity();
 
     // High-level tests for metadata preservation
 
