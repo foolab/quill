@@ -1,3 +1,9 @@
+libquill (1.100604.1) unstable; urgency=low
+
+  * Fixes: NB#166261 <CodeStyle><Saftey>.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Fri, 04 Jun 2010 12:20:00 +0200
+
 libquill (1.100604.0) unstable; urgency=low
 
   * Changed API to match with libquillmetadata
