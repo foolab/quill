@@ -607,6 +607,8 @@ public:
 private:
     ~Core();
 
+    Q_DISABLE_COPY(Core);
+
     /*!
       Activates the D-Bus thumbnailer with a task if there is any.
     */
