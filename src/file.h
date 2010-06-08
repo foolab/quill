@@ -517,6 +517,24 @@ public:
     bool isWaitingForData() const;
 
     /*!
+      Explicitly asks to keep (and save, if thumbnail creation is
+      enabled) thumbnails generated from an image given by
+      setImage(). This must be done before setWaitingForData(false) is
+      called or thumbnails will be lost. Thumbnail saving cannot be
+      undone, but it may be aborted if the QuillFile instances related
+      to this file are deleted.
+    */
+
+    void keepTemporaryImages();
+
+    /*!
+      If temporary images are to be kept and saved -
+      see keepTemporaryImages().
+     */
+
+    bool isKeepingImages();
+
+    /*!
       There are errors in the thumbnail cache for this file,
       thumbnail reading should be disabled.
      */
@@ -643,6 +661,7 @@ private:
     QRect m_viewPort;
 
     bool m_waitingForData;
+    bool m_keepImages;
     bool m_saveInProgress;
     QTemporaryFile *m_temporaryFile;
 };

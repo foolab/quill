@@ -413,6 +413,17 @@ public:
     bool isWaitingForData() const;
 
     /*!
+      Explicitly asks to keep (and save, if thumbnail creation is
+      enabled) thumbnails generated from an image given by
+      setImage(). This must be done before setWaitingForData(false) is
+      called or thumbnails will be lost. Thumbnail saving cannot be
+      undone, but it may be aborted if the QuillFile instances related
+      to this file are deleted.
+    */
+
+    void keepTemporaryImages();
+
+    /*!
       Returns true if Quill Core holds an internal file object
       related to this one.
     */

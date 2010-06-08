@@ -445,6 +445,13 @@ bool QuillFile::isWaitingForData() const
         return false;
 }
 
+void QuillFile::keepTemporaryImages()
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        priv->m_file->keepTemporaryImages();
+}
+
 bool QuillFile::canRevert() const
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));

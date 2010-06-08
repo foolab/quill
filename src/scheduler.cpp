@@ -161,7 +161,8 @@ Task *Scheduler::newTask()
 
     if (Core::instance()->isThumbnailCreationEnabled())
         foreach(File *file, allFiles)
-            if (file->supported() && !file->isWaitingForData())
+            if ((file->supported() && !file->isWaitingForData()) ||
+                file->isKeepingImages())
                 for (int level=0; level<=previewLevelCount-1; level++) {
                     Task *task = newThumbnailSaveTask(file, level);
 
@@ -353,7 +354,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
         return 0;
 
     if (file->image(level).size() !=
-        Core::instance()->targetSizeForLevel(level, file->fullImageSize()))
+        Core::instance()->targetSizeForLevel(level, fullSizeForAspectRatio(file)))
         return 0;
 
     if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
@@ -465,7 +466,8 @@ Task *Scheduler::newSaveTask(File *file)
 
 Task *Scheduler::newPreviewImprovementTask(File *file)
 {
-    if (!file->exists() || !file->supported() || file->isWaitingForData())
+    if (!file->exists() ||
+        (file->isWaitingForData() && !file->isKeepingImages()))
         return 0;
 
     QuillUndoStack *stack = file->stack();
@@ -474,27 +476,40 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
     // to regenerate the lower level images accordingly
 
     QuillUndoCommand *command = stack->command();
+    if (!command)
+        return 0;
 
     int level;
     QSize targetSize;
+    QSize fullImageSize = fullSizeForAspectRatio(file);
 
-    for (level=0; level<file->displayLevel(); level++)
+    if (fullImageSize.isEmpty())
+        return 0;
+
+    for (level=0; level<=file->displayLevel(); level++)
     {
         // Preview images cannot be bigger than full image
-        targetSize = Core::instance()->targetSizeForLevel(level, command->fullImageSize());
+        targetSize = Core::instance()->targetSizeForLevel(level, fullImageSize);
 
-        if ((!command->image(level).size().isEmpty()) &&
+        if ((!command->image(level).size().isEmpty() ||
+             file->isKeepingImages()) &&
             (command->image(level).size() != targetSize))
             break;
     }
 
-    if (level < file->displayLevel())
+    if (level <= file->displayLevel())
     {
         QuillImage prevImage;
 
         // Based on the next available non-cropped preview
+        // If full image is not available, a level may use itself as the base
+        int startingLevel;
+        if (command->fullImageSize().isEmpty())
+            startingLevel = level;
+        else
+            startingLevel = level+1;
 
-        for (int sourceLevel = level+1;
+        for (int sourceLevel = startingLevel;
              sourceLevel <= file->displayLevel();
              sourceLevel++)
             if (!Core::instance()->minimumPreviewSize(sourceLevel).isValid()
@@ -513,7 +528,7 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
         scaleCropFilter->setOption(QuillImageFilter::SizeAfter,
                                    QVariant(targetSize));
         scaleCropFilter->setOption(QuillImageFilter::CropRectangle,
-                                   QVariant(Core::instance()->targetAreaForLevel(level, targetSize, command->fullImageSize())));
+                                   QVariant(Core::instance()->targetAreaForLevel(level, targetSize, fullImageSize)));
 
         Task *task = new Task();
         task->setCommandId(command->uniqueId());
@@ -526,6 +541,22 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
     }
     // This should never happen
     return 0;
+}
+
+QSize Scheduler::fullSizeForAspectRatio(const File *file)
+{
+    QSize fullImageSize = file->fullImageSize();
+
+    // If the full image size is not valid (unsupported formats), assume that
+    // the biggest available preview has the correct aspect ratio
+    if (fullImageSize.isEmpty())
+        for (int level=0; level<=file->displayLevel(); level++) {
+            QSize levelSize = file->image(level).size();
+            if (!levelSize.isEmpty())
+                fullImageSize = levelSize;
+        }
+
+    return fullImageSize;
 }
 
 void Scheduler::processFinishedTask(Task *task, QuillImage image)

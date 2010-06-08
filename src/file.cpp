@@ -57,8 +57,8 @@ File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
                m_readOnly(false), m_hasThumbnailError(false), m_isClone(false),
                m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
-               m_waitingForData(false), m_saveInProgress(false),
-               m_temporaryFile(0)
+               m_waitingForData(false), m_keepImages(false),
+               m_saveInProgress(false), m_temporaryFile(0)
 {
     m_stack = new QuillUndoStack(this);
 }
@@ -920,8 +920,9 @@ void File::setWaitingForData(bool status)
             m_stack->calculateFullImageSize(m_stack->command(0));
 
         // purge cache of temporary images
-        for (int l=0; l<=m_displayLevel; l++)
-            Core::instance()->cache(l)->purge(this);
+        if (!m_keepImages)
+            for (int l=0; l<=m_displayLevel; l++)
+                Core::instance()->cache(l)->purge(this);
         Core::instance()->suggestNewTask();
     }
 }
@@ -929,6 +930,17 @@ void File::setWaitingForData(bool status)
 bool File::isWaitingForData() const
 {
     return m_waitingForData;
+}
+
+void File::keepTemporaryImages()
+{
+    m_keepImages = true;
+    Core::instance()->suggestNewTask();
+}
+
+bool File::isKeepingImages()
+{
+    return m_keepImages;
 }
 
 void File::setThumbnailError(bool status)

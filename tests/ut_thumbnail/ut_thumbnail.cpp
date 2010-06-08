@@ -280,6 +280,88 @@ void ut_thumbnail::testFailedWrite()
     delete file;
 }
 
+void ut_thumbnail::testFromSetImage()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    testFile.write("AVI");
+    testFile.flush();
+
+    QuillImage image = Unittests::generatePaletteImage();
+
+    Quill::setPreviewLevelCount(2);
+    Quill::setPreviewSize(0, QSize(2, 2));
+    Quill::setMinimumPreviewSize(0, QSize(2, 2));
+
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailDirectory(1, "/tmp/quill/thumbnails1");
+    Quill::setThumbnailExtension("png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "video/avi");
+    QVERIFY(file);
+
+    file->setWaitingForData(true);
+    file->setDisplayLevel(1);
+    file->setImage(1, image);
+    file->keepTemporaryImages();
+    file->setWaitingForData(false);
+
+    QString thumbName = file->thumbnailFileName(0);
+    QString thumbName1 = file->thumbnailFileName(1);
+
+    Quill::releaseAndWait(); // try and fail load
+    Quill::releaseAndWait(); // create lv0
+    Quill::releaseAndWait(); // save lv0
+    Quill::releaseAndWait(); // save lv1
+
+    // We should now have a newly created thumbnail.
+
+    QVERIFY(Unittests::compareImage(QImage(thumbName),
+                                    image.copy(3, 0, 2, 2)));
+    QVERIFY(Unittests::compareImage(QImage(thumbName1),
+                                    image));
+
+    delete file;
+}
+
+void ut_thumbnail::testDownscaledFromSetImage()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    testFile.write("AVI");
+    testFile.flush();
+
+    QuillImage image = Unittests::generatePaletteImage();
+
+    Quill::setPreviewSize(0, QSize(4, 1));
+
+    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailExtension("png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "video/avi");
+    QVERIFY(file);
+
+    file->setWaitingForData(true);
+    file->setDisplayLevel(0);
+    file->setImage(0, image); // Set too big image
+    file->keepTemporaryImages();
+    file->setWaitingForData(false);
+
+    QString thumbName = file->thumbnailFileName(0);
+
+    Quill::releaseAndWait(); // try and fail load
+    Quill::releaseAndWait(); // rescale lv0
+    Quill::releaseAndWait(); // save lv0
+
+    // We should now have a newly created thumbnail.
+    // Note that this approach uses fast transformation instead of smooth!
+
+    QVERIFY(Unittests::compareImage(QImage(thumbName),
+                                    image.scaled(QSize(4, 1))));
+
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_thumbnail test;

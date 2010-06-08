@@ -293,7 +293,7 @@ void QuillUndoStack::setImage(int level, const QuillImage &image)
     QuillUndoCommand *curr = command();
     if (curr) {
         curr->setImage(level, image);
-        curr->setFullImageSize(image.fullImageSize());
+        //curr->setFullImageSize(image.fullImageSize());
     }
 }
 

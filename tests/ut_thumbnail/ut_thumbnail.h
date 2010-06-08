@@ -61,6 +61,9 @@ private slots:
     void testLoadUnsupported();
 
     void testFailedWrite();
+
+    void testFromSetImage();
+    void testDownscaledFromSetImage();
 };
 
 #endif  // TEST_LIBQUILL_THUMBNAIL_H
