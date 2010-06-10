@@ -1,3 +1,9 @@
+libquill (1.100610.0) unstable; urgency=low
+
+  * Fixes: NB#169686 Random UI crashes at Scheduler::processFinishedTask()
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 10 Jun 2010 14:25:00 +0200
+
 libquill (1.100604.0) unstable; urgency=low
 
   * Changed API to match with libquillmetadata
