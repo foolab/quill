@@ -634,7 +634,8 @@ private:
 
     Quill();
     ~Quill();
-
+    Q_DISABLE_COPY(Quill);
+private:
     QuillPrivate *priv;
     static Quill *g_instance;
 };
