@@ -1,0 +1,8 @@
+# subsystem: Image Editor
+# src-pkg: libquill
+interface: Image Processing Engine
+type: library
+libs-pkg: libquill1
+dev-pkg: libquill-dev
+state: unstable
+scope: Platform
