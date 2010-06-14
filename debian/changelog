@@ -1,3 +1,9 @@
+libquill (1.100614.3) unstable; urgency=low
+
+  * Fixes: NB#174357 quill-utils should not install binaries in /usr/bin/quill-utils/
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:50:00 +0200
+
 libquill (1.100614.2) unstable; urgency=low
 
   * Tag again
