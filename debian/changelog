@@ -1,14 +1,20 @@
+libquill (1.100614.2) unstable; urgency=low
+
+  * Tag again
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:15:00 +0200
+
 libquill (1.100614.1) unstable; urgency=low
 
   * Tag again
 
- -- Wenpeng Zhou<ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:00:00 +0200
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:00:00 +0200
 
 libquill (1.100614.0) unstable; urgency=low
 
   * Fixes: NB#174314 Add an API file to the source package of the ImageEditingOperations interface
 
- -- Wenpeng Zhou<ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 12:40:00 +0200
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 12:40:00 +0200
 
 libquill (1.100610.0) unstable; urgency=low
 
