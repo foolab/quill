@@ -79,7 +79,12 @@ Task *Scheduler::newTask()
     for (int level=0; level<=previewLevelCount-1; level++)
         foreach (File *file, allFiles)
             if (level <= file->displayLevel()) {
-                Task *task = newThumbnailLoadTask(file, level);
+                Task *task = 0;
+                //here we compare the last modified time
+                if(file->hasThumbnail(level)&&file->lastModified()>QFileInfo(file->thumbnailFileName(level)).lastModified())
+                    task = newNormalTask(file, level);
+                else
+                    task = newThumbnailLoadTask(file, level);
 
                 if (task)
                     return task;
