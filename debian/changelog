@@ -1,3 +1,9 @@
+libquill (1.100618.0) unstable; urgency=low
+
+  * Fixes: NB#168104 Infamous white-screen bug
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 18 Jun 2010 12:50:00 +0200
+
 libquill (1.100614.4) unstable; urgency=low
 
   * Fixed: quill-utils installing path 
