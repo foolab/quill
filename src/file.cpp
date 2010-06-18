@@ -205,7 +205,8 @@ bool File::setDisplayLevel(int level)
     m_displayLevel = level;
 
     // setup stack here
-    if (exists() && (level >= 0) && (m_stack->count() == 0))
+    if ((m_exists || m_waitingForData) &&
+        (level >= 0) && (m_stack->count() == 0))
         m_stack->load();
 
     if (level > originalDisplayLevel)
@@ -350,14 +351,14 @@ void File::dropRedoHistory()
 
 QuillImage File::bestImage(int displayLevel) const
 {
-    if (!m_exists)
+    if (!m_exists && !m_waitingForData)
         return QuillImage();
     return m_stack->bestImage(displayLevel);
 }
 
 QuillImage File::image(int level) const
 {
-    if (!m_exists)
+    if (!m_exists && !m_waitingForData)
         return QuillImage();
     return m_stack->image(level);
 }
@@ -369,7 +370,7 @@ void File::setImage(int level, const QuillImage &image)
 
 QList<QuillImage> File::allImageLevels(int displayLevel) const
 {
-    if (!m_exists || !m_stack->command())
+    if ((!m_exists && !m_waitingForData) || !m_stack->command())
         return QList<QuillImage>();
     else if ((displayLevel < Core::instance()->previewLevelCount()) ||
              (!m_stack->command()->tileMap()))
@@ -915,6 +916,7 @@ void File::setWaitingForData(bool status)
     m_waitingForData = status;
 
     if (!status) {
+        m_exists = true;
         m_supported = true;
         if (!m_stack->isClean())
             m_stack->calculateFullImageSize(m_stack->command(0));

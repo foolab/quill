@@ -64,7 +64,9 @@ private slots:
     void testSessionSaveLoad();
 
     void testSetImage();
+    void testSetImageOnNonexistent();
     void testSourceChanged();
+    void testSourceCreated();
 
     void testImmediateSizeQuery();
     void testDropRedoHistory();
