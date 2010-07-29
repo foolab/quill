@@ -1,3 +1,10 @@
+libquill (1.100729.0) unstable; urgency=low
+
+  * Fixes: NB#177039 Crash in SaveMap::isBufferComplete
+  * Fixes: NB#180120 Crash on using the edit option AutoFixall
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 29 Jul 2010 10:15:00 +0200
+
 libquill (1.100618.0) unstable; urgency=low
 
   * Fixes: NB#168104 Infamous white-screen bug
