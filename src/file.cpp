@@ -113,8 +113,8 @@ QString File::fileFormat() const
 
 bool File::isJpeg() const
 {
-    return m_fileFormat != "jpeg" && m_fileFormat != "jpg" &&
-        m_fileFormat != "image/jpeg";
+    return m_fileFormat == "jpeg" || m_fileFormat == "jpg" ||
+        m_fileFormat == "image/jpeg";
 }
 
 QString File::originalFileName() const
@@ -427,7 +427,7 @@ bool File::checkImageSize(const QSize &fullImageSize)
         return false;
 
     int imagePixelsLimit = 0;
-    if (isJpeg())
+    if (!isJpeg())
         imagePixelsLimit = Core::instance()->nonTiledImagePixelsLimit();
 
     if (imagePixelsLimit == 0)
@@ -714,6 +714,8 @@ void File::removeThumbnails()
             QFile::remove(thumbnailFileName(level));
 }
 
+#include <QDebug>
+
 void File::prepareSave()
 {
     delete m_temporaryFile;
@@ -792,7 +794,7 @@ void File::concludeSave()
 
     // Copy metadata from previous version to new one
 
-    if (!m_isClone) {
+    if (isJpeg() && !m_isClone) {
         QuillMetadata metadata(m_fileName);
         if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
             // If metadata write failed, the temp file is likely corrupt
@@ -818,7 +820,7 @@ void File::concludeSave()
         if (hasOriginal())
             original()->stack()->concludeSave();
 
-        if (isJpeg() && !m_isClone)
+        if (!m_isClone)
             writeEditHistory(HistoryXml::encode(this), &result);
 
         if (result.errorCode() != QuillError::NoError) {
