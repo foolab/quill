@@ -128,7 +128,8 @@ void SaveMap::nextBuffer()
 
 bool SaveMap::isBufferComplete() const
 {
-    return m_tileRows.at(0).isEmpty();
+    return (m_tileRows.isEmpty() ||
+            m_tileRows.at(0).isEmpty());
 }
 
 bool SaveMap::isSaveComplete() const

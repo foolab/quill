@@ -207,6 +207,14 @@ bool Core::isSubstituteLevel(int level, int targetLevel) const
           !minimumPreviewSize(targetLevel).isValid());
 }
 
+bool Core::smallestNonCroppedLevel() const
+{
+    for (int level=0; level < m_displayLevel.count() - 1; level++)
+        if (!minimumPreviewSize(level).isValid())
+            return level;
+    return m_displayLevel.count();
+}
+
 void Core::setFileLimit(int level, int limit)
 {
     if ((level < 0) || (level >= m_displayLevel.count()))

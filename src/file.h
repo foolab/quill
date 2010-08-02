@@ -607,6 +607,8 @@ signals:
     void error(QuillError error);
 
 private:
+    bool isJpeg() const;
+
     void prepareSave();
 
     static QString fileNameHash(const QString &fileName);
