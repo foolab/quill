@@ -1,3 +1,10 @@
+libquill (1.100802.0) unstable; urgency=low
+
+  * Fixes: NB#174787 BMP edits failing due to metadata
+  * Fixes: NB#181972 GIF images not shown in full screen mode
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 02 Aug 2010 14:15:00 +0200
+
 libquill (1.100729.0) unstable; urgency=low
 
   * Fixes: NB#177039 Crash in SaveMap::isBufferComplete
