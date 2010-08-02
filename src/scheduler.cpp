@@ -390,7 +390,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
     // For read-only images, we stop loading if we already have
     // an equivalent of the full image
     if (file->isReadOnly() &&
-        (level > 0) &&
+        (level > Core::instance()->smallestNonCroppedLevel()) &&
         (file->image(level-1).size() == file->fullImageSize()))
         return 0;
 
