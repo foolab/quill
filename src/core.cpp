@@ -75,8 +75,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_scheduler(new Scheduler()),
     m_threadManager(new ThreadManager(threadingMode)),
     m_temporaryFileDirectory(QString()),
-    m_crashDumpPath(QString()),
-    m_fileName(QString())
+    m_crashDumpPath(QString())
 {
     DisplayLevel *previewLevel = new DisplayLevel(Quill::defaultViewPortSize);
     m_displayLevel.append(previewLevel);
@@ -720,13 +719,6 @@ void Core::activateDBusThumbnailer()
         // using m_files instead of existingFiles() since this will potentially
         // be called often and the existing file list creation is a slow task.
         foreach (File *file, m_files){
-            if(file->fileName()==m_fileName){
-                if(file->thumbnailSupported()){
-                    file->setThumbnailSupported(false);
-                }
-                return;
-
-            }
             if (!file->supported() &&
                 file->thumbnailSupported() &&
                 file->exists() &&
@@ -774,9 +766,7 @@ void Core::processDBusThumbnailerError(const QString fileName,
         m_files.value(fileName)->emitError(QuillError(QuillError::FileFormatUnsupportedError,
                                                  QuillError::ImageFileErrorSource,
                                                  fileName));
-        m_fileName = fileName;
     }
-
 }
 
 void Core::emitSaved(QString fileName)

@@ -1,3 +1,9 @@
+libquill (1.100803.1) unstable; urgency=low
+
+  * Fixes: NB#172907 Thumbnail for one image, when opened it displays another image
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 03 Aug 2010 11:15:00 +0200
+
 libquill (1.100803.0) unstable; urgency=low
 
   * Fixes: NB#176911 Camera-ui crashes observed in Post-capture Edit view “_dbus_connection_unlock (connection=0x1) at dbus-connection.c:372”
@@ -26,7 +32,7 @@ libquill (1.100618.0) unstable; urgency=low
 
 libquill (1.100614.4) unstable; urgency=low
 
-  * Fixed: quill-utils installing path 
+  * Fixed: quill-utils installing path
 
  -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:50:00 +0200
 

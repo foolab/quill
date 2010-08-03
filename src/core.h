@@ -708,7 +708,6 @@ private:
     QList<QByteArray> m_writableImageFormats;
 
     DBusThumbnailer *m_dBusThumbnailer;
-    QString m_fileName;
 };
 
 #endif
