@@ -1,3 +1,9 @@
+libquill (1.100803.0) unstable; urgency=low
+
+  * Fixes: NB#176911 Camera-ui crashes observed in Post-capture Edit view “_dbus_connection_unlock (connection=0x1) at dbus-connection.c:372”
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 03 Aug 2010 11:15:00 +0200
+
 libquill (1.100802.0) unstable; urgency=low
 
   * Fixes: NB#174787 BMP edits failing due to metadata
