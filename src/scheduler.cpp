@@ -391,7 +391,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
     // For read-only images, we stop loading if we already have
     // an equivalent of the full image
     if (file->isReadOnly() &&
-        (level > 0) &&
+        (level > Core::instance()->smallestNonCroppedLevel()) &&
         (file->image(level-1).size() == file->fullImageSize()))
         return 0;
 
@@ -569,8 +569,11 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
     QuillUndoCommand *command =
         Core::instance()->findInAllStacks(task->commandId());
     QuillUndoStack *stack = 0;
-    if (command != 0)
+    File *file = 0;
+    if (command != 0) {
         stack = command->stack();
+        file = stack->file();
+    }
 
     // Set active filter to zero (so that we do not block its deletion)
 
@@ -579,6 +582,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
     QuillImageFilterGenerator *generator =
         dynamic_cast<QuillImageFilterGenerator*>(filter);
+
+    QuillError error;
 
     if (command == 0)
     {
@@ -598,12 +603,12 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
     }
     else if (filter->role() == QuillImageFilter::Role_Save)
     {
-        if (!stack->file()->isSaveInProgress()) {
+        if (!file->isSaveInProgress()) {
             // Save failed - disabling thumbnailing
             if (image.isNull()) {
-                stack->file()->emitError(QuillError(QuillError::FileWriteError,
-                                                    QuillError::ThumbnailErrorSource,
-                                                    filter->option(QuillImageFilter::FileName).toString()));
+                error = QuillError(QuillError::FileWriteError,
+                                   QuillError::ThumbnailErrorSource,
+                                   filter->option(QuillImageFilter::FileName).toString());
                 Logger::log("[Scheduler] Thumbnail save failed!");
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
@@ -617,10 +622,10 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
         {
             // If full image saving is concluded, rename the file and clean up.
 
-            stack->file()->concludeSave();
+            file->concludeSave();
 
-            if (stack->file()->allowDelete())
-                delete stack->file();
+            if (file->allowDelete())
+                delete file;
         }
         else
             // Full image saving proceeds
@@ -658,13 +663,11 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             // Thumbnail load failed
             if ((image.isNull()) &&
                 (filter->role() == QuillImageFilter::Role_Load)) {
-                QuillError quillError =
-                    QuillError(QuillError::translateFilterError(filter->error()),
-                               QuillError::ThumbnailErrorSource,
-                               filter->option(QuillImageFilter::FileName).toString());
-                stack->file()->emitError(quillError);
-                stack->file()->removeThumbnails();
-                stack->file()->setThumbnailError(true);
+                error = QuillError(QuillError::translateFilterError(filter->error()),
+                                   QuillError::ThumbnailErrorSource,
+                                   filter->option(QuillImageFilter::FileName).toString());
+                file->removeThumbnails();
+                file->setThumbnailError(true);
             }
 
             image = QuillImage(image, command->fullImageSize());
@@ -672,7 +675,6 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             delete filter;
         } else if ((image.isNull()) &&
                    (command->filter()->role() == QuillImageFilter::Role_Load)) {
-            File *file = stack->file();
 
             // Prevent repeating the faulty operation
             command->setFullImageSize(QSize());
@@ -698,10 +700,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 errorSource = QuillError::ImageOriginalErrorSource;
             }
 
-            file->emitError(QuillError(errorCode, errorSource,
-                                       fileName));
-
-            Core::instance()->suggestNewTask();
+            error = QuillError(errorCode, errorSource, fileName);
         }
 
         // Normal case: a better version of an image has been calculated.
@@ -718,9 +717,11 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             current = stack->command();
 
         if (current && (current->uniqueId() == task->commandId())) {
-            stack->file()->emitSingleImage(image, task->displayLevel());
+            file->emitSingleImage(image, task->displayLevel());
         }
     }
-
     delete task;
+
+    if (error.errorCode() != QuillError::NoError)
+        file->emitError(error);
 }

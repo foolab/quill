@@ -435,11 +435,12 @@ void QuillUndoStack::prepareSave(const QString &fileName,
 
 void QuillUndoStack::concludeSave()
 {
-    m_savedIndex = command()->index();
+    if (!m_stack->isClean()) {
+        m_savedIndex = command()->index();
 
-    // Update initial load filter to point to modified file
-    if (m_stack->command(0))
+        // Update initial load filter to point to modified file
         setInitialLoadFilter(command(0)->filter());
+    }
 
     delete m_saveCommand;
     m_saveCommand = 0;

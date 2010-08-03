@@ -11,5 +11,5 @@ CONFIG += debug
 HEADERS += autoclean.h
 SOURCES += autoclean.cpp main.cpp
 
-target.path = /usr/bin/quill-utils
+target.path = /usr/lib/quill-utils
 INSTALLS += target

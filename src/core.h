@@ -201,6 +201,13 @@ public:
     bool isSubstituteLevel(int level, int targetLevel) const;
 
     /*!
+      Returns the smallest level which is not cropped and represents
+      the full image.
+    */
+
+    bool smallestNonCroppedLevel() const;
+
+    /*!
       Sets the default tile size if tiling is in use.
       The default is 0, which disables tiling.
      */

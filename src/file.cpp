@@ -111,6 +111,12 @@ QString File::fileFormat() const
     return m_fileFormat;
 }
 
+bool File::isJpeg() const
+{
+    return m_fileFormat == "jpeg" || m_fileFormat == "jpg" ||
+        m_fileFormat == "image/jpeg";
+}
+
 QString File::originalFileName() const
 {
     return m_originalFileName;
@@ -205,7 +211,8 @@ bool File::setDisplayLevel(int level)
     m_displayLevel = level;
 
     // setup stack here
-    if (exists() && (level >= 0) && (m_stack->count() == 0))
+    if ((m_exists || m_waitingForData) &&
+        (level >= 0) && (m_stack->count() == 0))
         m_stack->load();
 
     if (level > originalDisplayLevel)
@@ -350,14 +357,14 @@ void File::dropRedoHistory()
 
 QuillImage File::bestImage(int displayLevel) const
 {
-    if (!m_exists)
+    if (!m_exists && !m_waitingForData)
         return QuillImage();
     return m_stack->bestImage(displayLevel);
 }
 
 QuillImage File::image(int level) const
 {
-    if (!m_exists)
+    if (!m_exists && !m_waitingForData)
         return QuillImage();
     return m_stack->image(level);
 }
@@ -369,7 +376,7 @@ void File::setImage(int level, const QuillImage &image)
 
 QList<QuillImage> File::allImageLevels(int displayLevel) const
 {
-    if (!m_exists || !m_stack->command())
+    if ((!m_exists && !m_waitingForData) || !m_stack->command())
         return QList<QuillImage>();
     else if ((displayLevel < Core::instance()->previewLevelCount()) ||
              (!m_stack->command()->tileMap()))
@@ -420,8 +427,7 @@ bool File::checkImageSize(const QSize &fullImageSize)
         return false;
 
     int imagePixelsLimit = 0;
-    if (m_fileFormat != "jpeg" && m_fileFormat != "jpg" &&
-        m_fileFormat != "image/jpeg")
+    if (!isJpeg())
         imagePixelsLimit = Core::instance()->nonTiledImagePixelsLimit();
 
     if (imagePixelsLimit == 0)
@@ -708,6 +714,8 @@ void File::removeThumbnails()
             QFile::remove(thumbnailFileName(level));
 }
 
+#include <QDebug>
+
 void File::prepareSave()
 {
     delete m_temporaryFile;
@@ -750,7 +758,7 @@ void File::prepareSave()
     }
 
     QByteArray rawExifDump;
-    if (!m_isClone) {
+    if (isJpeg() && !m_isClone) {
         QuillMetadata metadata(m_fileName);
         rawExifDump = metadata.dump(QuillMetadata::ExifFormat);
     }
@@ -786,7 +794,7 @@ void File::concludeSave()
 
     // Copy metadata from previous version to new one
 
-    if (!m_isClone) {
+    if (isJpeg() && !m_isClone) {
         QuillMetadata metadata(m_fileName);
         if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
             // If metadata write failed, the temp file is likely corrupt
@@ -915,6 +923,7 @@ void File::setWaitingForData(bool status)
     m_waitingForData = status;
 
     if (!status) {
+        m_exists = true;
         m_supported = true;
         if (!m_stack->isClean())
             m_stack->calculateFullImageSize(m_stack->command(0));

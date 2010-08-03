@@ -366,6 +366,26 @@ void ut_stack::testSetImage()
     delete file;
 }
 
+void ut_stack::testSetImageOnNonexistent()
+{
+    QImage image = Unittests::generatePaletteImage();
+
+    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryCacheSize(0, 2);
+
+    QuillFile *file = new QuillFile("/tmp/quill/invalid", "");
+
+    file->setWaitingForData(true);
+    file->setDisplayLevel(0);
+    QuillImage quillImage(image);
+    quillImage.setFullImageSize(QSize(8, 2));
+    file->setImage(0, quillImage);
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+
+    delete file;
+}
+
 void ut_stack::testSourceChanged()
 {
     QTemporaryFile testFile;
@@ -395,6 +415,42 @@ void ut_stack::testSourceChanged()
     QVERIFY(Unittests::compareImage(file->image(1), image));
 
     delete file;
+}
+
+void ut_stack::testSourceCreated()
+{
+    QString fileName = "/tmp/quill/pctest.png";
+
+    QFile::remove(fileName);
+    QVERIFY(!QFile::exists(fileName));
+
+    QImage image = Unittests::generatePaletteImage();
+
+    QuillFile *file = new QuillFile(fileName, "png");
+    QVERIFY(!file->exists());
+    file->setWaitingForData(true);
+
+    file->setDisplayLevel(1);
+    file->setImage(0, image);
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+
+    image.save(fileName, "png");
+
+    file->setWaitingForData(false);
+    QVERIFY(file->exists());
+    QCOMPARE(file->displayLevel(), 1);
+    QVERIFY(file->image(0).isNull()); // Temporary images are thrown away
+    QVERIFY(file->image(1).isNull());
+
+    Quill::releaseAndWait(); // 0
+    Quill::releaseAndWait(); // 1
+
+    QVERIFY(Unittests::compareImage(file->image(0), image));
+    QVERIFY(Unittests::compareImage(file->image(1), image));
+
+    delete file;
+    QFile::remove(fileName);
 }
 
 void ut_stack::testImmediateSizeQuery()

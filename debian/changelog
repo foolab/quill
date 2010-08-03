@@ -1,3 +1,59 @@
+libquill (1.100802.0) unstable; urgency=low
+
+  * Fixes: NB#174787 BMP edits failing due to metadata
+  * Fixes: NB#181972 GIF images not shown in full screen mode
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 02 Aug 2010 14:15:00 +0200
+
+libquill (1.100729.0) unstable; urgency=low
+
+  * Fixes: NB#177039 Crash in SaveMap::isBufferComplete
+  * Fixes: NB#180120 Crash on using the edit option AutoFixall
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 29 Jul 2010 10:15:00 +0200
+
+libquill (1.100618.0) unstable; urgency=low
+
+  * Fixes: NB#168104 Infamous white-screen bug
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 18 Jun 2010 12:50:00 +0200
+
+libquill (1.100614.4) unstable; urgency=low
+
+  * Fixed: quill-utils installing path 
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:50:00 +0200
+
+libquill (1.100614.3) unstable; urgency=low
+
+  * Fixes: NB#174357 quill-utils should not install binaries in /usr/bin/quill-utils/
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:50:00 +0200
+
+libquill (1.100614.2) unstable; urgency=low
+
+  * Tag again
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:15:00 +0200
+
+libquill (1.100614.1) unstable; urgency=low
+
+  * Tag again
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 13:00:00 +0200
+
+libquill (1.100614.0) unstable; urgency=low
+
+  * Fixes: NB#174314 Add an API file to the source package of the ImageEditingOperations interface
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 16 Jun 2010 12:40:00 +0200
+
+libquill (1.100610.0) unstable; urgency=low
+
+  * Fixes: NB#169686 Random UI crashes at Scheduler::processFinishedTask()
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 10 Jun 2010 14:25:00 +0200
+
 libquill (1.100604.1) unstable; urgency=low
 
   * Fixes: NB#166261 <CodeStyle><Saftey>.
