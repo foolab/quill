@@ -44,6 +44,7 @@
 #include <QList>
 #include <QDir>
 #include <QuillMetadata>
+#include <QDebug>
 #include "file.h"
 #include "core.h"
 #include "imagecache.h"
@@ -654,15 +655,22 @@ bool File::supported() const
 
 void File::setThumbnailSupported(bool supported)
 {
+    //qDebug()<<"File::setThumbnailSupported():the supported parameter?"<<supported;
     m_thumbnailSupported = supported;
+    //qDebug()<<"File::setThumbnailSupported():the supported?"<<m_thumbnailSupported;
 }
 
 bool File::thumbnailSupported() const
 {
-    if (Core::instance()->isDBusThumbnailingEnabled())
+    if (Core::instance()->isDBusThumbnailingEnabled()){
+        //qDebug()<<"----File::thumbnailSupported():thumbnailer enabled";
         return m_thumbnailSupported;
-    else
+        
+    }
+    else{
+        //qDebug()<<"----File::thumbnailSupported():thumbnailer disabled";
         return m_supported;
+    }
 }
 
 QuillError File::overwritingCopy(const QString &fileName,

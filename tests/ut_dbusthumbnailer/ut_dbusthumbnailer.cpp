@@ -69,7 +69,7 @@ void ut_dbusthumbnailer::testSupports()
 {
     DBusThumbnailer* dbusThumbnailer = new DBusThumbnailer();
     QCOMPARE(dbusThumbnailer->supports("video/mp4"),true);
-    QCOMPARE(dbusThumbnailer->supports("image/jpeg"),true);
+    QCOMPARE(dbusThumbnailer->supports("image/jpeg"),false);
     QCOMPARE(dbusThumbnailer->supports("image/jpeg3"),false);
     delete dbusThumbnailer;
 }

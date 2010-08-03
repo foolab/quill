@@ -75,7 +75,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_scheduler(new Scheduler()),
     m_threadManager(new ThreadManager(threadingMode)),
     m_temporaryFileDirectory(QString()),
-    m_crashDumpPath(QString())
+    m_crashDumpPath(QString()),
+    m_fileName(QString())
 {
     DisplayLevel *previewLevel = new DisplayLevel(Quill::defaultViewPortSize);
     m_displayLevel.append(previewLevel);
@@ -94,6 +95,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     connect(m_dBusThumbnailer,
             SIGNAL(thumbnailError(const QString, uint, const QString)),
             SLOT(processDBusThumbnailerError(const QString, uint, const QString)));
+
+    m_files.clear();
 }
 
 Core::~Core()
@@ -279,7 +282,7 @@ int Core::editHistoryCacheSize(int level)
 
 bool Core::fileExists(const QString &fileName)
 {
-    return (m_files.value(fileName) != 0);
+    return m_files.contains(fileName);
 }
 
 File *Core::file(const QString &fileName,
@@ -709,14 +712,21 @@ QRect Core::targetAreaForLevel(int level, const QSize &targetSize,
 
 void Core::activateDBusThumbnailer()
 {
+
     Logger::log("[Core]"+QString(Q_FUNC_INFO));
     if (m_dBusThumbnailer->isRunning())
         return;
-
     for (int level=0; level<=previewLevelCount()-1; level++)
         // using m_files instead of existingFiles() since this will potentially
         // be called often and the existing file list creation is a slow task.
         foreach (File *file, m_files){
+            if(file->fileName()==m_fileName){
+                if(file->thumbnailSupported()){
+                    file->setThumbnailSupported(false);
+                }
+                return;
+
+            }
             if (!file->supported() &&
                 file->thumbnailSupported() &&
                 file->exists() &&
@@ -735,7 +745,7 @@ void Core::activateDBusThumbnailer()
                                                       file->fileFormat(),
                                                       flavor);
                 return;
-                }
+            }
         }
 }
 
@@ -743,10 +753,10 @@ void Core::processDBusThumbnailerGenerated(const QString fileName,
                                            const QString flavor)
 {
     Logger::log("[Core] D-Bus thumbnailer finished with "+ fileName);
+    Q_UNUSED(flavor);
     int level = levelFromFlavor(flavor);
     if (!file(fileName, "")->hasThumbnail(level))
         processDBusThumbnailerError(fileName, -1, "No thumbnail found");
-
     suggestNewTask();
 }
 
@@ -759,12 +769,14 @@ void Core::processDBusThumbnailerError(const QString fileName,
 
     Logger::log("[Core] D-Bus thumbnailer error with "+ fileName);
 
-    file(fileName, "")->emitError(QuillError(QuillError::FileFormatUnsupportedError,
-                                             QuillError::ImageFileErrorSource,
-                                             fileName));
+    if(fileExists(fileName)){
 
-    // Do not try to do any more thumbnailing for this file.
-    file(fileName, "")->setThumbnailSupported(false);
+        m_files.value(fileName)->emitError(QuillError(QuillError::FileFormatUnsupportedError,
+                                                 QuillError::ImageFileErrorSource,
+                                                 fileName));
+        m_fileName = fileName;
+    }
+
 }
 
 void Core::emitSaved(QString fileName)

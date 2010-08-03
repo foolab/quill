@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QStringList>
-
 class ThumbnailerGenericProxy;
 
 class DBusThumbnailer : public QObject {

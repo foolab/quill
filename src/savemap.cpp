@@ -45,6 +45,7 @@
 
 #include "tilemap.h"
 #include "savemap.h"
+#include "logger.h"
 
 SaveMap::SaveMap(const QSize &fullImageSize, int bufferSize, TileMap *tileMap) :
     m_fullImageSize(fullImageSize),
@@ -63,6 +64,7 @@ SaveMap::SaveMap(const QSize &fullImageSize, int bufferSize, TileMap *tileMap) :
                                                   fullImageSize.width(),
                                                   m_bufferHeight)));
     }
+    Logger::log("[SaveMap] "+QString(Q_FUNC_INFO)+"buffer size:"+Logger::intToString(bufferSize)+"buffer height:"+Logger::intToString(m_bufferHeight)+"full image width:"+Logger::intToString(fullImageSize.width())+"full image height"+Logger::intToString(fullImageSize.height()));
 }
 
 SaveMap::~SaveMap()
@@ -88,9 +90,11 @@ int SaveMap::prioritize()
 
 QuillImageFilter *SaveMap::addToBuffer(int index)
 {
-    if (!m_tileRows.at(0).contains(index))
+    Logger::log("[SaveMap] "+QString(Q_FUNC_INFO)+Logger::intToString(index));
+    if (!m_tileRows.at(0).contains(index)){
+        Logger::log("[SaveMap] "+QString(Q_FUNC_INFO)+" index is not included in tile rows");
         return 0;
-
+    }
     m_tileRows[0].removeOne(index);
 
     QuillImageFilter *filter =
@@ -119,6 +123,7 @@ void SaveMap::setBuffer(const QuillImage &buffer)
 
 void SaveMap::nextBuffer()
 {
+    Logger::log("[SaveMap] "+QString(Q_FUNC_INFO)+Logger::intToString(m_bufferId));
     m_tileRows.removeAt(0);
     m_bufferId++;
     m_buffer = QuillImage();
@@ -128,8 +133,8 @@ void SaveMap::nextBuffer()
 
 bool SaveMap::isBufferComplete() const
 {
-    return (m_tileRows.isEmpty() ||
-            m_tileRows.at(0).isEmpty());
+    Logger::log("[SaveMap] "+QString(Q_FUNC_INFO)+Logger::intToString(m_tileRows.size()));
+    return m_tileRows.at(0).isEmpty();
 }
 
 bool SaveMap::isSaveComplete() const

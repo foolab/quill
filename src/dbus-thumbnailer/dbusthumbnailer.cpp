@@ -1,6 +1,7 @@
 #include "dbusthumbnailer.h"
 #include "thumbnailer_generic.h"
-
+#include "logger.h"
+#include <QDebug>
 QString DBusThumbnailer::tumblerService = "org.freedesktop.thumbnails.Thumbnailer1";
 QString DBusThumbnailer::tumblerCache = "/org/freedesktop/thumbnails/Thumbnailer1";
 
@@ -30,8 +31,8 @@ void DBusThumbnailer::connectDBus()
 
 bool DBusThumbnailer::supports(const QString mimeType)
 {
-    return ((mimeType == "video/mp4") ||
-            (mimeType == "image/jpeg"));
+
+    return mimeType == "video/mp4";
 }
 
 bool DBusThumbnailer::isRunning()
@@ -43,6 +44,8 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
                                          const QString &mimeType,
                                          const QString &flavor)
 {
+    Logger::log("[DBusThumbnailer] "+QString(Q_FUNC_INFO));
+
     if (isRunning())
         return;
 
@@ -61,8 +64,9 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
     if ((!m_tumbler) || (!m_tumbler->isValid()))
         connectDBus();
 
-    if (m_tumbler)
+    if (m_tumbler){
         m_tumbler->Queue(uris, mimes, flavor, "default", 0);
+                         }
 }
 
 void DBusThumbnailer::finishedHandler(uint handle)
@@ -78,5 +82,6 @@ void DBusThumbnailer::errorHandler(uint handle, const QStringList failedUris,
     Q_UNUSED(handle);
     Q_UNUSED(failedUris);
     emit thumbnailError(m_taskFileName, errorCode, message);
-    m_taskInProgress = false;
+
 }
+
