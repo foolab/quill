@@ -41,7 +41,6 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QCache>
-#include <QDebug>
 
 #include "tilemap.h"
 #include "savemap.h"

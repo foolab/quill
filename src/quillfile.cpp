@@ -42,7 +42,6 @@
 #include "quillfile.h"
 #include "file.h"
 #include "historyxml.h"
-#include <QDebug>
 
 class QuillFilePrivate {
 public:
@@ -443,13 +442,6 @@ bool QuillFile::isWaitingForData() const
         return priv->m_file->isWaitingForData();
     else
         return false;
-}
-
-void QuillFile::keepTemporaryImages()
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    if (priv->m_file)
-        priv->m_file->keepTemporaryImages();
 }
 
 bool QuillFile::canRevert() const

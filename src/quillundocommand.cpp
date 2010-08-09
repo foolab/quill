@@ -38,7 +38,6 @@
 ****************************************************************************/
 
 #include <QImage>
-#include <QDebug>
 #include <QuillImage>
 #include <QuillImageFilter>
 

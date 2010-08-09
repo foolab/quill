@@ -53,12 +53,11 @@
 #include "quillerror.h"
 #include "logger.h"
 
-File::File() : m_exists(true), m_supported(true), m_thumbnailSupported(true),
-               m_readOnly(false), m_hasThumbnailError(false), m_isClone(false),
+File::File() : m_state(State_Normal),
+               m_hasThumbnailError(false), m_isClone(false),
                m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
-               m_waitingForData(false), m_keepImages(false),
-               m_saveInProgress(false), m_temporaryFile(0)
+               m_temporaryFile(0)
 {
     m_stack = new QuillUndoStack(this);
 }
@@ -83,7 +82,7 @@ void File::removeReference(QuillFile *file)
         // Trying to lower the display level, remaining references will
         // prevent this from happening.
         setDisplayLevel(-1);
-        if (m_references.isEmpty() && !m_saveInProgress) {
+        if (m_references.isEmpty() && !isSaveInProgress()) {
             detach();
         }
     }
@@ -91,7 +90,7 @@ void File::removeReference(QuillFile *file)
 
 bool File::allowDelete()
 {
-    return m_references.isEmpty() && !m_saveInProgress;
+    return m_references.isEmpty() && !isSaveInProgress();
 }
 
 void File::detach()
@@ -160,15 +159,15 @@ void File::setTargetFormat(const QString &targetFormat)
 
 void File::setReadOnly()
 {
-    m_readOnly = true;
+    setState(State_ReadOnly);
 }
 
 bool File::isReadOnly() const
 {
-    // the stack needs to be set up to get this value
-    if (exists() && (m_stack->count() == 0))
-          m_stack->load();
-    return m_readOnly;
+    if (m_stack->isClean())
+        m_stack->load();
+
+    return state() == State_ReadOnly;
 }
 
 bool File::canEnableDisplayLevel(int level) const
@@ -205,14 +204,14 @@ bool File::setDisplayLevel(int level)
     // Purge images from cache if lowering display level here
     // Exception: when save is in progress, leave the highest level
     for (int l=originalDisplayLevel; l>level; l--)
-        if ((l < Core::instance()->previewLevelCount()) || (!m_saveInProgress))
+        if ((l < Core::instance()->previewLevelCount()) ||
+            (!isSaveInProgress()))
             Core::instance()->cache(l)->purge(this);
 
     m_displayLevel = level;
 
     // setup stack here
-    if ((m_exists || m_waitingForData) &&
-        (level >= 0) && (m_stack->count() == 0))
+    if (m_stack->isClean() && (state() != State_NonExistent))
         m_stack->load();
 
     if (level > originalDisplayLevel)
@@ -227,8 +226,7 @@ int File::displayLevel() const
 
 void File::save()
 {
-    if (m_exists && m_supported && !m_readOnly &&
-        !m_saveInProgress && isDirty())
+    if ((state() == State_Normal) && isDirty())
     {
         prepareSave();
         Core::instance()->suggestNewTask();
@@ -237,7 +235,8 @@ void File::save()
 
 void File::saveAs(const QString &fileName, const QString &fileFormat)
 {
-    if (m_exists && m_supported && !Core::instance()->fileExists(fileName)) {
+    if (supportsViewing() &&
+        !Core::instance()->fileExists(fileName)) {
         // Create placeholder
         QFile qFile(fileName);
         qFile.open(QIODevice::WriteOnly);
@@ -260,7 +259,7 @@ void File::saveAs(const QString &fileName, const QString &fileFormat)
 
 bool File::isSaveInProgress() const
 {
-    return m_saveInProgress;
+    return state() == State_Saving;
 }
 
 bool File::isDirty() const
@@ -275,7 +274,7 @@ bool File::isDirty() const
 
 void File::runFilter(QuillImageFilter *filter)
 {
-    if (!m_exists || !m_supported || m_readOnly) {
+    if (!supportsEditing()) {
         delete filter;
         return;
     }
@@ -291,13 +290,13 @@ void File::runFilter(QuillImageFilter *filter)
 
 void File::startSession()
 {
-    if (m_exists && m_supported && !m_readOnly)
+    if (supportsEditing())
         m_stack->startSession();
 }
 
 void File::endSession()
 {
-    if (m_stack)
+    if (supportsEditing())
         m_stack->endSession();
 }
 
@@ -308,7 +307,7 @@ bool File::isSession() const
 
 bool File::canUndo() const
 {
-    if (!m_exists || !m_supported || m_readOnly)
+    if (!supportsEditing())
         return false;
     return m_stack->canUndo();
 }
@@ -329,7 +328,7 @@ void File::undo()
 
 bool File::canRedo() const
 {
-    if (!m_exists || !m_supported || m_readOnly)
+    if (!supportsEditing())
         return false;
 
     return m_stack->canRedo();
@@ -357,26 +356,28 @@ void File::dropRedoHistory()
 
 QuillImage File::bestImage(int displayLevel) const
 {
-    if (!m_exists && !m_waitingForData)
+    if (!exists())
         return QuillImage();
     return m_stack->bestImage(displayLevel);
 }
 
 QuillImage File::image(int level) const
 {
-    if (!m_exists && !m_waitingForData)
+    if (!exists())
         return QuillImage();
     return m_stack->image(level);
 }
 
 void File::setImage(int level, const QuillImage &image)
 {
+    if ((state() == State_NonExistent) || (state() == State_UnsupportedFormat))
+        setState(State_Placeholder);
     m_stack->setImage(level, image);
 }
 
 QList<QuillImage> File::allImageLevels(int displayLevel) const
 {
-    if ((!m_exists && !m_waitingForData) || !m_stack->command())
+    if (!exists() || !m_stack->command())
         return QList<QuillImage>();
     else if ((displayLevel < Core::instance()->previewLevelCount()) ||
              (!m_stack->command()->tileMap()))
@@ -388,7 +389,7 @@ QList<QuillImage> File::allImageLevels(int displayLevel) const
 
 QSize File::fullImageSize() const
 {
-    if (!m_exists)
+    if (!exists())
         return QSize();
     return m_stack->fullImageSize();
 }
@@ -399,7 +400,8 @@ void File::setViewPort(const QRect &viewPort)
     m_viewPort = viewPort;
 
     // New tiles will only be calculated if the display level allows it
-    if (!m_exists || (m_displayLevel < Core::instance()->previewLevelCount()))
+    if (!supportsViewing() ||
+        (m_displayLevel < Core::instance()->previewLevelCount()))
         return;
 
     Core::instance()->suggestNewTask();
@@ -447,9 +449,6 @@ QuillUndoStack *File::stack() const
 
 bool File::hasThumbnail(int level) const
 {
-    if (!m_exists)
-        return false;
-
     if (Core::instance()->thumbnailDirectory(level).isEmpty())
         return false;
 
@@ -605,7 +604,7 @@ void File::emitAllImages()
 
 void File::remove()
 {
-    if (!m_exists)
+    if (state() == State_NonExistent)
         return;
 
     QFile(m_fileName).remove();
@@ -614,8 +613,9 @@ void File::remove()
                                       Core::instance()->editHistoryDirectory()));
     removeThumbnails();
 
-    m_exists = false;
     abortSave();
+    setState(State_NonExistent);
+
     delete m_stack;
     // A file always needs a stack.
     m_stack = new QuillUndoStack(this);
@@ -629,12 +629,15 @@ void File::remove()
 
 bool File::exists() const
 {
-    return m_exists;
+    return (state() != State_NonExistent);
 }
 
 void File::setExists(bool exists)
 {
-    m_exists = exists;
+    if (!exists)
+        setState(State_NonExistent);
+    else if (state() == State_NonExistent)
+        setState(State_Normal);
 }
 
 QDateTime File::lastModified() const
@@ -644,25 +647,31 @@ QDateTime File::lastModified() const
 
 void File::setSupported(bool supported)
 {
-    m_supported = supported;
+    if (supported && (state() == State_UnsupportedFormat))
+        setState(State_Normal);
+    else if (!supported)
+        setState(State_UnsupportedFormat);
 }
 
 bool File::supported() const
 {
-    return m_supported;
+    return supportsViewing();
 }
 
 void File::setThumbnailSupported(bool supported)
 {
-    m_thumbnailSupported = supported;
+    if (supported && state() == State_UnsupportedFormat)
+        setState(State_ExternallySupportedFormat);
+    else if (!supported)
+        setState(State_UnsupportedFormat);
 }
 
 bool File::thumbnailSupported() const
 {
     if (Core::instance()->isDBusThumbnailingEnabled())
-        return m_thumbnailSupported;
+        return supportsThumbnails();
     else
-        return m_supported;
+        return supportsViewing();
 }
 
 QuillError File::overwritingCopy(const QString &fileName,
@@ -714,8 +723,6 @@ void File::removeThumbnails()
             QFile::remove(thumbnailFileName(level));
 }
 
-#include <QDebug>
-
 void File::prepareSave()
 {
     delete m_temporaryFile;
@@ -765,7 +772,7 @@ void File::prepareSave()
 
     m_stack->prepareSave(m_temporaryFile->fileName(), rawExifDump);
 
-    m_saveInProgress = true;
+    setState(State_Saving);
 }
 
 void File::concludeSave()
@@ -837,7 +844,7 @@ void File::concludeSave()
     Core::instance()->emitSaved(m_fileName);
 
  cleanup:
-    m_saveInProgress = false;
+    setState(State_Normal);
 
     Core::instance()->dump();
 
@@ -852,7 +859,7 @@ void File::abortSave()
     m_stack->abortSave();
     delete m_temporaryFile;
     m_temporaryFile = 0;
-    m_saveInProgress = false;
+    setState(State_Normal);
 }
 
 bool File::hasOriginal()
@@ -915,41 +922,35 @@ void File::imageSizeError()
     emitError(QuillError(QuillError::ImageSizeLimitError,
                          QuillError::ImageFileErrorSource,
                          m_fileName));
-    m_supported = false;
+    setState(State_UnsupportedFormat);
 }
 
 void File::setWaitingForData(bool status)
 {
-    m_waitingForData = status;
+    if (status)
+        setState(State_Placeholder);
+    else
+        refresh();
+}
 
-    if (!status) {
-        m_exists = true;
-        m_supported = true;
-        if (!m_stack->isClean())
-            m_stack->calculateFullImageSize(m_stack->command(0));
+void File::refresh()
+{
+    // Purge temporary images from cache
+    if (state() != State_Placeholder)
+        for (int l=0; l<=m_displayLevel; l++)
+            Core::instance()->cache(l)->purge(this);
 
-        // purge cache of temporary images
-        if (!m_keepImages)
-            for (int l=0; l<=m_displayLevel; l++)
-                Core::instance()->cache(l)->purge(this);
-        Core::instance()->suggestNewTask();
-    }
+    setState(State_Normal);
+
+    if (!m_stack->isClean())
+        m_stack->calculateFullImageSize(m_stack->command(0));
+
+    Core::instance()->suggestNewTask();
 }
 
 bool File::isWaitingForData() const
 {
-    return m_waitingForData;
-}
-
-void File::keepTemporaryImages()
-{
-    m_keepImages = true;
-    Core::instance()->suggestNewTask();
-}
-
-bool File::isKeepingImages()
-{
-    return m_keepImages;
+    return state() == State_Placeholder;
 }
 
 void File::setThumbnailError(bool status)
@@ -971,7 +972,7 @@ void File::emitError(QuillError quillError)
 
 bool File::canRevert() const
 {
-    if (!m_exists || !m_supported || m_readOnly)
+    if (!supportsEditing())
         return false;
     return m_stack->canRevert();
 }
@@ -989,7 +990,7 @@ void File::revert()
 
 bool File::canRestore() const
 {
-    if (!m_exists || !m_supported || m_readOnly)
+    if (!supportsEditing())
         return false;
 
     return m_stack->canRestore();
@@ -1014,4 +1015,35 @@ bool File::isClone()
 void File::setClone(bool status)
 {
     m_isClone = status;
+}
+
+File::State File::state() const
+{
+    return m_state;
+}
+
+void File::setState(File::State state)
+{
+    m_state = state;
+}
+
+bool File::supportsThumbnails() const
+{
+    return ((m_state != State_NonExistent) &&
+            (m_state != State_UnsupportedFormat));
+}
+
+bool File::supportsViewing() const
+{
+    return ((m_state != State_NonExistent) &&
+            (m_state != State_UnsupportedFormat) &&
+            (m_state != State_ExternallySupportedFormat));
+}
+
+bool File::supportsEditing() const
+{
+    return ((m_state != State_NonExistent) &&
+            (m_state != State_UnsupportedFormat) &&
+            (m_state != State_ExternallySupportedFormat) &&
+            (m_state != State_ReadOnly));
 }

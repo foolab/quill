@@ -161,14 +161,12 @@ Task *Scheduler::newTask()
 
     if (Core::instance()->isThumbnailCreationEnabled())
         foreach(File *file, allFiles)
-            if ((file->supported() && !file->isWaitingForData()) ||
-                file->isKeepingImages())
-                for (int level=0; level<=previewLevelCount-1; level++) {
-                    Task *task = newThumbnailSaveTask(file, level);
+            for (int level=0; level<=previewLevelCount-1; level++) {
+                Task *task = newThumbnailSaveTask(file, level);
 
-                    if (task)
-                        return task;
-                }
+                if (task)
+                    return task;
+            }
 
     return 0;
 }
@@ -466,8 +464,7 @@ Task *Scheduler::newSaveTask(File *file)
 
 Task *Scheduler::newPreviewImprovementTask(File *file)
 {
-    if (!file->exists() ||
-        (file->isWaitingForData() && !file->isKeepingImages()))
+    if (!file->exists())
         return 0;
 
     QuillUndoStack *stack = file->stack();
@@ -491,9 +488,7 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
         // Preview images cannot be bigger than full image
         targetSize = Core::instance()->targetSizeForLevel(level, fullImageSize);
 
-        if ((!command->image(level).size().isEmpty() ||
-             file->isKeepingImages()) &&
-            (command->image(level).size() != targetSize))
+        if (command->image(level).size() != targetSize)
             break;
     }
 

@@ -42,7 +42,6 @@
 #include <QuillImageFilterGenerator>
 #include <QImageWriter>
 #include <QDir>
-#include <QDebug>
 #include "quill.h"
 #include "quillerror.h"
 #include "core.h"
@@ -351,7 +350,7 @@ File *Core::priorityFile() const
     int level = -1;
 
     foreach (File *file, m_files)
-        if (file->exists() && file->supported() &&
+        if (file->supportsViewing() &&
             (file->displayLevel() > level)) {
             name = file->fileName();
             level = file->displayLevel();

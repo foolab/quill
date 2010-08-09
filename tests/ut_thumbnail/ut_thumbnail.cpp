@@ -303,7 +303,6 @@ void ut_thumbnail::testFromSetImage()
     file->setWaitingForData(true);
     file->setDisplayLevel(1);
     file->setImage(1, image);
-    file->keepTemporaryImages();
     file->setWaitingForData(false);
 
     QString thumbName = file->thumbnailFileName(0);
@@ -344,7 +343,6 @@ void ut_thumbnail::testDownscaledFromSetImage()
     file->setWaitingForData(true);
     file->setDisplayLevel(0);
     file->setImage(0, image); // Set too big image
-    file->keepTemporaryImages();
     file->setWaitingForData(false);
 
     QString thumbName = file->thumbnailFileName(0);

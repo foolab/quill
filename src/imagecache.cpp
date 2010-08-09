@@ -38,7 +38,6 @@
 ****************************************************************************/
 
 #include <QuillImage>
-#include <QDebug>
 #include "imagecache.h"
 
 class CacheImage
