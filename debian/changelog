@@ -1,3 +1,9 @@
+libquill (1.100811.1) unstable; urgency=low
+
+  * Added missing test image for GIF format
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 11 Aug 2010 12:45:00 +0200
+
 libquill (1.100811.0) unstable; urgency=low
 
   * Moving internally to file state instead of flags
