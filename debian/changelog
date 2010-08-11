@@ -1,3 +1,10 @@
+libquill (1.100811.0) unstable; urgency=low
+
+  * Moving internally to file state instead of flags
+  * Fixes: NB#183057 Thumbnails not immediately available
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 11 Aug 2010 08:35:00 +0200
+
 libquill (1.100803.1) unstable; urgency=low
 
   * Fixes: NB#172907 Thumbnail for one image, when opened it displays another image
