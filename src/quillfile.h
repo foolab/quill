@@ -141,6 +141,8 @@ public:
     /*!
       Sets file as read only, disabling all edits. Only makes sense
       with originals.
+
+      DEPRECATED, dropped
     */
 
     void setReadOnly();
@@ -370,6 +372,8 @@ public:
       unsupported. This should only be used after the contents of a
       file have been changed. If this is set to true with a file not
       recognizable by Quill, it will revert to unsupported.
+
+      DEPRECATED - Please use refresh() if the file contents have been changed.
      */
 
     void setSupported(bool supported);
@@ -402,6 +406,10 @@ public:
 
       Warning: the status must be set before raising the preview level, or the
       image will get an "unsupported" status.
+
+      DEPRECATED - setImage() will now automatically put the file into
+      waiting state. Also, refresh() should be used to remove the
+      waiting state from a file.
     */
 
     void setWaitingForData(bool);

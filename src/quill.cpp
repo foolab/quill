@@ -44,7 +44,6 @@
 #include <QColor>
 #include <QDir>
 #include <QuillImageFilter>
-#include <QDebug>
 #include "quill.h"
 #include "quillfile.h"
 #include "core.h"

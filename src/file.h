@@ -59,7 +59,22 @@ Q_OBJECT
     friend class ut_dbusthumbnail;
     friend class ut_file;
     friend class ut_error;
+
+    typedef enum {
+        State_Initial,     //! Initial, currently not in use
+        State_Normal,      //! File is usable, no problems
+        State_NonExistent, //! File does not exist
+        State_ExternallySupportedFormat, //! File format is only supported via
+                                         //! D-Bus thumbnailer
+        State_UnsupportedFormat, //! File format is not supported at all
+        State_ReadOnly,          //! File is otherwise usable but cannot be
+                                 //! written
+        State_Placeholder,       //! File is a placeholder for coming data
+        State_Saving             //! File is being saved
+    } State;
+
 public:
+
     File();
     virtual ~File();
 
@@ -381,6 +396,33 @@ public:
     QuillUndoStack *stack() const;
 
     /*!
+      Returns the state of the file.
+    */
+
+    State state() const;
+
+    /*!
+      Changes the state of the file.
+     */
+
+    void setState(State state);
+
+    /*!
+      Returns true if the file supports viewing thumbnails.
+    */
+    bool supportsThumbnails() const;
+
+    /*!
+      Returns true if the file supports viewing.
+    */
+    bool supportsViewing() const;
+
+    /*!
+      Returns true if the file supports editing.
+    */
+    bool supportsEditing() const;
+
+    /*!
       If the file exists in the file system.
      */
 
@@ -506,9 +548,17 @@ public:
 
       Warning: the status must be set before raising the preview level, or the
       image will get an "unsupported" status.
+
+      DEPRECATED.
     */
 
     void setWaitingForData(bool status);
+
+    /*!
+      Reloads changes from the file system.
+     */
+
+    void refresh();
 
     /*!
       Returns the waiting-for-data status for the file. See setWaitingForData().
@@ -625,10 +675,8 @@ private:
 private:
     QList<QuillFile*> m_references;
 
-    bool m_exists;
-    bool m_supported;
-    bool m_thumbnailSupported;
-    bool m_readOnly;
+    State m_state;
+
     bool m_hasThumbnailError;
     bool m_isClone;
     QDateTime m_lastModified;
@@ -644,8 +692,6 @@ private:
 
     QRect m_viewPort;
 
-    bool m_waitingForData;
-    bool m_saveInProgress;
     QTemporaryFile *m_temporaryFile;
 };
 

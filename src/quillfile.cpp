@@ -42,7 +42,6 @@
 #include "quillfile.h"
 #include "file.h"
 #include "historyxml.h"
-#include <QDebug>
 
 class QuillFilePrivate {
 public:

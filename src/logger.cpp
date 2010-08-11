@@ -40,7 +40,6 @@
 #include <QTextStream>
 #include <QDir>
 #include <QSize>
-#include <QDebug>
 #include "logger.h"
 
 bool Logger::existFlag = true;

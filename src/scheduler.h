@@ -175,6 +175,13 @@ private:
 
     Task *newTilingOverlayTask(File *file);
 
+    /*!
+      Calculates full size, either based on the real full size or
+      the best preview given by setImage()
+     */
+
+    static QSize fullSizeForAspectRatio(const File *file);
+
 private:
     ThreadManager *m_threadManager;
 

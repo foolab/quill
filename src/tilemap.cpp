@@ -40,7 +40,6 @@
 #include <QuillImage>
 #include <QuillImageFilter>
 #include <QCache>
-#include <QDebug>
 
 #include "tilemap.h"
 #include "tilecache.h"

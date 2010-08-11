@@ -131,7 +131,7 @@ void ut_format::testNonTiledPixelsLimit()
     testFile.open();
 
     QTemporaryFile testFile2;
-    testFile.open();
+    testFile2.open();
 
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
@@ -178,12 +178,14 @@ void ut_format::testReadOnlyFormat()
     testFile.open();
 
     QFile originalFile("/usr/share/libquill-tests/images/image_16x4.gif");
+    originalFile.open(QIODevice::ReadOnly);
     QByteArray buffer = originalFile.readAll();
     testFile.write(buffer);
     testFile.flush();
 
     QuillFile *file = new QuillFile(testFile.fileName(), "gif");
     QVERIFY(file->isReadOnly());
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){

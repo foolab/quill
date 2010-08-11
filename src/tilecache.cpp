@@ -39,7 +39,6 @@
 
 #include <QuillImage>
 #include <QCache>
-#include <QDebug>
 
 #include "tilecache.h"
 
