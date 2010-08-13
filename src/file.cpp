@@ -160,7 +160,8 @@ void File::setTargetFormat(const QString &targetFormat)
 
 void File::setReadOnly()
 {
-    setState(State_ReadOnly);
+    if (state != State_Placeholder)
+        setState(State_ReadOnly);
 }
 
 bool File::isReadOnly() const
@@ -374,6 +375,7 @@ void File::setImage(int level, const QuillImage &image)
     if ((state() == State_NonExistent) || (state() == State_UnsupportedFormat))
         setState(State_Placeholder);
     m_stack->setImage(level, image);
+    m_stack->setImage(level, image.convertToFormat(QImage::Format_RGB32));
 }
 
 QList<QuillImage> File::allImageLevels(int displayLevel) const
