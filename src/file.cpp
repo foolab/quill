@@ -160,7 +160,7 @@ void File::setTargetFormat(const QString &targetFormat)
 
 void File::setReadOnly()
 {
-    if (state != State_Placeholder)
+    if (state() != State_Placeholder)
         setState(State_ReadOnly);
 }
 
