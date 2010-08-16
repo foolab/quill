@@ -137,7 +137,9 @@ QRect DisplayLevel::targetArea(const QSize &targetSize,
         return QRect(QPoint(0, 0), fullImageSize);
 
     QSize size;
-
+    //If the full image size is smaller than the mini size, we will not scale it when generating thumbail
+    if(fullImageSize.width()<= m_minimumSize.width()&&fullImageSize.height()<= m_minimumSize.width())
+        return QRect(QPoint(0,0),fullImageSize);
     if (targetSize.width() * fullImageSize.height() >
         targetSize.height() * fullImageSize.width())
         size = QSize(fullImageSize.width(),
