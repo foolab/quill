@@ -376,6 +376,8 @@ void File::setImage(int level, const QuillImage &image)
         setState(State_Placeholder);
     m_stack->setImage(level, image);
     m_stack->setImage(level, image.convertToFormat(QImage::Format_RGB32));
+
+    Core::instance()->suggestNewTask();
 }
 
 QList<QuillImage> File::allImageLevels(int displayLevel) const
@@ -455,7 +457,11 @@ bool File::hasThumbnail(int level) const
     if (Core::instance()->thumbnailDirectory(level).isEmpty())
         return false;
 
-    return QFile::exists(thumbnailFileName(level));
+    if (!QFile::exists(thumbnailFileName(level)))
+        return false;
+
+    return QFileInfo(thumbnailFileName(level)).lastModified()
+        >= lastModified();
 }
 
 QString File::fileNameHash(const QString &fileName)
@@ -726,6 +732,16 @@ void File::removeThumbnails()
             QFile::remove(thumbnailFileName(level));
 }
 
+void File::touchThumbnails()
+{
+    for (int level=0; level<Core::instance()->previewLevelCount(); level++)
+        if (hasThumbnail(level)) {
+            QFile file(thumbnailFileName(level));
+            file.open(QIODevice::Append);
+            file.close();
+        }
+}
+
 void File::prepareSave()
 {
     delete m_temporaryFile;
@@ -942,6 +958,8 @@ void File::refresh()
     if (state() != State_Placeholder)
         for (int l=0; l<=m_displayLevel; l++)
             Core::instance()->cache(l)->purge(this);
+    else
+        touchThumbnails();
 
     setState(State_Normal);
 

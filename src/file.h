@@ -60,6 +60,8 @@ Q_OBJECT
     friend class ut_file;
     friend class ut_error;
 
+public:
+
     typedef enum {
         State_Initial,     //! Initial, currently not in use
         State_Normal,      //! File is usable, no problems
@@ -72,8 +74,6 @@ Q_OBJECT
         State_Placeholder,       //! File is a placeholder for coming data
         State_Saving             //! File is being saved
     } State;
-
-public:
 
     File();
     virtual ~File();
@@ -671,6 +671,12 @@ private:
      */
 
     void writeEditHistory(const QString &history, QuillError *error);
+
+    /*!
+      Touches all thumbnails for a file. This is usable if the main
+      file has been changed and thumbnails don't need regenerating.
+     */
+    virtual void touchThumbnails();
 
 private:
     QList<QuillFile*> m_references;
