@@ -460,8 +460,6 @@ bool File::hasThumbnail(int level) const
     if (!QFile::exists(thumbnailFileName(level)))
         return false;
 
-    Logger::log("[File] " + fileName() + " last modified " + lastModified().toString() + " thumbnail modified " + QFileInfo(thumbnailFileName(level)).lastModified().toString());
-
     return (QFileInfo(thumbnailFileName(level)).lastModified()
             >= lastModified()) ||
         // Ignore main files with modification dates in the future

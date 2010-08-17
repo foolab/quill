@@ -1,3 +1,9 @@
+libquill (1.100817.0) unstable; urgency=low
+
+  * Fixes: NB#184832 Video thumbnails not shown at all
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 17 Aug 2010 15:45:00 +0200
+
 libquill (1.100811.1) unstable; urgency=low
 
   * Added missing test image for GIF format
