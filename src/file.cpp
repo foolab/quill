@@ -460,8 +460,12 @@ bool File::hasThumbnail(int level) const
     if (!QFile::exists(thumbnailFileName(level)))
         return false;
 
-    return QFileInfo(thumbnailFileName(level)).lastModified()
-        >= lastModified();
+    Logger::log("[File] " + fileName() + " last modified " + lastModified().toString() + " thumbnail modified " + QFileInfo(thumbnailFileName(level)).lastModified().toString());
+
+    return (QFileInfo(thumbnailFileName(level)).lastModified()
+            >= lastModified()) ||
+        // Ignore main files with modification dates in the future
+        (lastModified() > QDateTime::currentDateTime());
 }
 
 QString File::fileNameHash(const QString &fileName)
@@ -669,7 +673,7 @@ bool File::supported() const
 
 void File::setThumbnailSupported(bool supported)
 {
-    if (supported && state() == State_UnsupportedFormat)
+    if (supported && (state() == State_UnsupportedFormat))
         setState(State_ExternallySupportedFormat);
     else if (!supported)
         setState(State_UnsupportedFormat);
@@ -919,10 +923,12 @@ void File::processFilterError(QuillImageFilter *filter)
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
                 (errorCode == QuillError::FileCorruptError)) {
                 setSupported(false);
-                if (Core::instance()->isDBusThumbnailingEnabled())
+                if (Core::instance()->isDBusThumbnailingEnabled()) {
+                    setThumbnailSupported(true);
                     // Not emitting an error yet, as D-Bus thumbnailer might
                     // still find an use for the file
                     return;
+                }
             }
             else
                 setExists(false);

@@ -690,8 +690,11 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             if (fileName == file->fileName()) {
                 errorSource = QuillError::ImageFileErrorSource;
                 if ((errorCode == QuillError::FileFormatUnsupportedError) ||
-                    (errorCode == QuillError::FileCorruptError))
+                    (errorCode == QuillError::FileCorruptError)) {
                     file->setSupported(false);
+                    if (Core::instance()->isDBusThumbnailingEnabled())
+                        file->setThumbnailSupported(true);
+                }
                 else
                     file->setExists(false);
             }
