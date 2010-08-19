@@ -1,43 +1,32 @@
 #include <QCoreApplication>
-#include <QEventLoop>
-#include <QDir>
-#include <QTime>
 #include <QDebug>
 
-#include <Quill>
-#include <QuillFile>
-#include <QuillImageFilter>
-#include <QuillImageFilterFactory>
+#include "batchrotate.cpp"
+
+void help()
+{
+    qDebug() << "Usage: benchmark [case] [filename] <options>";
+    qDebug();
+    qDebug() << "Cases:";
+    qDebug() << "00 rotate         - Batch load/rotate/save";
+    qDebug() << "01 loadthumbs     - Load multiple thumbnails";
+    qDebug() << "02 generatethumbs - Generate multiple thumbnails for viewing";
+    qDebug();
+    qDebug() << "Options:";
+    qDebug() << "-n  number of files";
+    qDebug() << "-w  thumbnail width";
+    qDebug() << "-h  thumbnail height";
+}
 
 int main(int argc, char **argv)
 {
-    QCoreApplication app(argc, argv); // Without this, QEventLoop will not work
-    QEventLoop loop;
+    QCoreApplication app(argc, argv);
 
-    QTime time;
-    time.start();
-
-    for(int i = 0; i<argc; i++)
-        qDebug()<<"the arg is: "<<argv[i];
-
-    if(argc ==2)
-        Quill::setTemporaryFilePath(QString(argv[1]));
-    Quill::setDefaultTileSize(QSize(256, 256));
-
-    QuillFile *file = new QuillFile("input/benchmark12.jpg", "jpg");
-
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Rotate");
-    filter->setOption(QuillImageFilter::Angle, QVariant(90));
-
-    file->runFilter(filter);
-
-    QObject::connect(file, SIGNAL(saved()), &loop, SLOT(quit()));
-
-    file->save();
-
-    loop.exec();
-
-    qDebug() << "Use case batch rotate/save:" << time.elapsed() << "ms";
-    delete file;
+    if (argc < 3)
+        help();
+    else if ((QString(argv[1]) == "00") || (QString(argv[1]) == "rotate")) {
+        batchrotate(argv[2]);
+    }
+    else
+        help();
 }
