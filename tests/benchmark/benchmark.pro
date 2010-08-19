@@ -10,5 +10,5 @@ INCLUDEPATH += .
 include(../tests.pri)
 
 # Input
-SOURCES += benchmark.cpp batchrotate.cpp
-HEADERS += batchrotate.h
+SOURCES += benchmark.cpp batchrotate.cpp generatethumbs.cpp
+HEADERS += batchrotate.h generatethumbs.h
