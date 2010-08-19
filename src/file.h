@@ -59,6 +59,7 @@ Q_OBJECT
     friend class ut_dbusthumbnail;
     friend class ut_file;
     friend class ut_error;
+    friend class loadthumbs;
 
 public:
 
@@ -639,6 +640,8 @@ public:
 
     void setClone(bool status);
 
+    static QString fileNameHash(const QString &fileName);
+
 signals:
 
     /*!
@@ -660,8 +663,6 @@ private:
     bool isJpeg() const;
 
     void prepareSave();
-
-    static QString fileNameHash(const QString &fileName);
 
     static QString editHistoryFileName(const QString &fileName,
                                        const QString &editHistoryDirectory);

@@ -4,6 +4,7 @@
 
 #include "batchrotate.h"
 #include "generatethumbs.h"
+#include "loadthumbs.h"
 
 void help()
 {
@@ -35,6 +36,28 @@ int main(int argc, char **argv)
         help();
     else if ((QString(argv[1]) == "00") || (QString(argv[1]) == "rotate"))
         batchrotate(argv[2]);
+    else if ((QString(argv[1]) == "01") || (QString(argv[1]) == "loadthumbs")) {
+        QString fileName = argv[2];
+
+        int n = 100, w = 128, h = 128;
+        while ((c = getopt(argc, argv, "n:w:h:f")) != -1) {
+            switch(c) {
+            case 'n' :
+                n = QString(optarg).toInt();
+                break;
+            case 'w' :
+                w = QString(optarg).toInt();
+                break;
+            case 'h' :
+                h = QString(optarg).toInt();
+                break;
+            }
+        }
+
+        QSize size(w, h);
+
+        loadThumbs(fileName, n, size);
+    }
     else if ((QString(argv[1]) == "02") || (QString(argv[1]) == "generatethumbs")) {
         QString fileName = argv[2];
 
