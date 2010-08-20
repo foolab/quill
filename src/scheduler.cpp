@@ -80,11 +80,10 @@ Task *Scheduler::newTask()
         foreach (File *file, allFiles)
             if (level <= file->displayLevel()) {
                 Task *task = 0;
-                //here we compare the last modified time
-                if(file->hasThumbnail(level)&&file->lastModified()>QFileInfo(file->thumbnailFileName(level)).lastModified())
-                    task = newNormalTask(file, level);
-                else
+                if (file->hasThumbnail(level))
                     task = newThumbnailLoadTask(file, level);
+                else
+                    task = newNormalTask(file, level);
 
                 if (task)
                     return task;
@@ -502,9 +501,9 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
         QuillImage prevImage;
 
         // Based on the next available non-cropped preview
-        // If full image is not available, a level may use itself as the base
+        // In placeholder mode, a level may also use itself as the base
         int startingLevel;
-        if (command->fullImageSize().isEmpty())
+        if (file->state() == File::State_Placeholder)
             startingLevel = level;
         else
             startingLevel = level+1;
@@ -693,8 +692,11 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             if (fileName == file->fileName()) {
                 errorSource = QuillError::ImageFileErrorSource;
                 if ((errorCode == QuillError::FileFormatUnsupportedError) ||
-                    (errorCode == QuillError::FileCorruptError))
+                    (errorCode == QuillError::FileCorruptError)) {
                     file->setSupported(false);
+                    if (Core::instance()->isDBusThumbnailingEnabled())
+                        file->setThumbnailSupported(true);
+                }
                 else
                     file->setExists(false);
             }

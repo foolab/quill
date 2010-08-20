@@ -11,8 +11,8 @@ Package: libquill1
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libquillimagefilter1, libquillmetadata1,libexif12,
     libexempi3
-Description: libquill library
- This library is a created from libquill and it includes multi-thread.
+Description: Qt based engine for mobile image processing applications
+ A high-level, Qt-based engine for building image viewing and editing applications especially for mobile devices. It provides optimized image loading and handling, fast response times for previewing images, memory-optimized handling of large images, transparent thumbnail handling and non-destructive editing.
 
 Package: libquill-dev
 Section: libdevel

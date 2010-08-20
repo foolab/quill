@@ -1,43 +1,91 @@
+#include <unistd.h>
 #include <QCoreApplication>
-#include <QEventLoop>
-#include <QDir>
-#include <QTime>
 #include <QDebug>
 
-#include <Quill>
-#include <QuillFile>
-#include <QuillImageFilter>
-#include <QuillImageFilterFactory>
+#include "batchrotate.h"
+#include "generatethumbs.h"
+#include "loadthumbs.h"
+
+void help()
+{
+    qDebug() << "Usage: benchmark [case] [filename] <options>";
+    qDebug();
+    qDebug() << "Cases:";
+    qDebug() << "00 rotate         - Batch load/rotate/save";
+    qDebug() << "01 loadthumbs     - Load multiple thumbnails";
+    qDebug() << "02 generatethumbs - Generate multiple thumbnails for viewing";
+    qDebug();
+    qDebug() << "Options:";
+    qDebug() << "-n  number of files, default 100";
+    qDebug() << "-w  thumbnail width, default 128";
+    qDebug() << "-h  thumbnail height, default 128";
+    qDebug() << "-f  force thumbnail size";
+}
+
+int c;
+extern char *optarg;
+extern int optind;
+extern int optopt;
+extern int opterr;
 
 int main(int argc, char **argv)
 {
-    QCoreApplication app(argc, argv); // Without this, QEventLoop will not work
-    QEventLoop loop;
+    QCoreApplication app(argc, argv);
 
-    QTime time;
-    time.start();
+    if (argc < 3)
+        help();
+    else if ((QString(argv[1]) == "00") || (QString(argv[1]) == "rotate"))
+        batchrotate(argv[2]);
+    else if ((QString(argv[1]) == "01") || (QString(argv[1]) == "loadthumbs")) {
+        QString fileName = argv[2];
 
-    for(int i = 0; i<argc; i++)
-        qDebug()<<"the arg is: "<<argv[i];
+        int n = 100, w = 128, h = 128;
+        while ((c = getopt(argc, argv, "n:w:h:f")) != -1) {
+            switch(c) {
+            case 'n' :
+                n = QString(optarg).toInt();
+                break;
+            case 'w' :
+                w = QString(optarg).toInt();
+                break;
+            case 'h' :
+                h = QString(optarg).toInt();
+                break;
+            }
+        }
 
-    if(argc ==2)
-        Quill::setTemporaryFilePath(QString(argv[1]));
-    Quill::setDefaultTileSize(QSize(256, 256));
+        QSize size(w, h);
 
-    QuillFile *file = new QuillFile("input/benchmark12.jpg", "jpg");
+        loadThumbs(fileName, n, size);
+    }
+    else if ((QString(argv[1]) == "02") || (QString(argv[1]) == "generatethumbs")) {
+        QString fileName = argv[2];
 
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("Rotate");
-    filter->setOption(QuillImageFilter::Angle, QVariant(90));
+        int n = 100, w = 128, h = 128;
+        bool f = false;
+        while ((c = getopt(argc, argv, "n:w:h:f")) != -1) {
+            switch(c) {
+            case 'n' :
+                n = QString(optarg).toInt();
+                break;
+            case 'w' :
+                w = QString(optarg).toInt();
+                break;
+            case 'h' :
+                h = QString(optarg).toInt();
+                break;
+            case 'f' :
+                f = true;
+            }
+        }
 
-    file->runFilter(filter);
+        QSize size(w, h);
+        QSize minimumSize;
+        if (f)
+            minimumSize = size;
 
-    QObject::connect(file, SIGNAL(saved()), &loop, SLOT(quit()));
-
-    file->save();
-
-    loop.exec();
-
-    qDebug() << "Use case batch rotate/save:" << time.elapsed() << "ms";
-    delete file;
+        generateThumbs(fileName, n, size, minimumSize);
+    }
+    else
+        help();
 }

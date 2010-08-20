@@ -710,7 +710,6 @@ QRect Core::targetAreaForLevel(int level, const QSize &targetSize,
 
 void Core::activateDBusThumbnailer()
 {
-
     Logger::log("[Core]"+QString(Q_FUNC_INFO));
     if (m_dBusThumbnailer->isRunning())
         return;
@@ -718,9 +717,7 @@ void Core::activateDBusThumbnailer()
         // using m_files instead of existingFiles() since this will potentially
         // be called often and the existing file list creation is a slow task.
         foreach (File *file, m_files){
-            if (!file->supported() &&
-                file->thumbnailSupported() &&
-                file->exists() &&
+            if ((file->state() == File::State_ExternallySupportedFormat) &&
                 (level <= file->displayLevel()) &&
                 !thumbnailDirectory(level).isNull() &&
                 file->stack() &&
