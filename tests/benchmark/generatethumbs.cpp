@@ -10,9 +10,9 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 
-void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize)
+void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize, QString mimeType, QString flavor)
 {
-    qDebug() << "Generating" << n << size.width() << "x" << size.height() << "thumbnails for" << originalFileName;
+    qDebug() << "Generating" << n << flavor << size.width() << "x" << size.height() << "thumbnails for" << originalFileName << "MIME" << mimeType;
 
     QEventLoop loop;
     QTime time;
@@ -20,7 +20,9 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
     Quill::setPreviewSize(0, size);
     Quill::setMinimumPreviewSize(0, minimumSize);
-    Quill::setDBusThumbnailingEnabled(false);
+    Quill::setThumbnailDirectory(0, QDir::homePath()+"/.thumbnails/"+flavor);
+    Quill::setThumbnailExtension("jpeg");
+    Quill::setThumbnailCreationEnabled(false);
 
     int numFiles = n;
 
@@ -37,7 +39,7 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
         origFile.close();
 
         for (int i=0; i<numFiles; i++) {
-            file[i].setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX.jpeg");
+            file[i].setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX");
             file[i].open();
             fileName[i] = file[i].fileName();
             file[i].write(buf);
@@ -48,7 +50,7 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     time.start();
 
     for (int i=0; i<numFiles; i++) {
-        quillFile[i] = new QuillFile(fileName[i], "jpg");
+        quillFile[i] = new QuillFile(fileName[i], mimeType);
         QObject::connect(quillFile[i], SIGNAL(imageAvailable(const QuillImageList)),
                          &loop, SLOT(quit()));
     }
@@ -60,8 +62,9 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
 
     int displayLevelTime = time.elapsed();
 
-    while (Quill::isCalculationInProgress())
+    do
         loop.exec();
+    while (Quill::isCalculationInProgress());
 
     int finalTime = time.elapsed();
 
