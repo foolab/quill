@@ -28,23 +28,19 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
 
     Quill::setFileLimit(0, numFiles);
 
-    QTemporaryFile file[numFiles];
     QString fileName[numFiles];
     QuillFile *quillFile[numFiles];
 
-    {
-        QFile origFile(originalFileName);
-        origFile.open(QIODevice::ReadOnly);
-        QByteArray buf = origFile.readAll();
-        origFile.close();
-
-        for (int i=0; i<numFiles; i++) {
-            file[i].setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX");
-            file[i].open();
-            fileName[i] = file[i].fileName();
-            file[i].write(buf);
-            file[i].flush();
+    for (int i=0; i<numFiles; i++) {
+        {   // Needed for the life of the QTemporaryFile
+            QTemporaryFile file;
+            file.setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX");
+            file.open();
+            fileName[i] = file.fileName();
+            file.close();
         }
+        QFile::remove(fileName[i]);
+        QFile::copy(originalFileName, fileName[i]);
     }
 
     time.start();
@@ -83,6 +79,8 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     qDebug() << "Use case generate" << numFiles << "thumbnails:"
              << finalTime << "ms";
 
-    for (int i=0; i<numFiles; i++)
+    for (int i=0; i<numFiles; i++) {
         delete quillFile[i];
+        QFile::remove(fileName[i]);
+    }
 }
