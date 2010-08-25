@@ -404,6 +404,28 @@ public:
     static void setEditHistoryPath(const QString &path);
 
     /*!
+      Sets the base path under which thumbnails are saved. This
+      defaults to the freedesktop standard which is .thumbnails under
+      QDir::homePath().
+     */
+
+    static void setThumbnailBasePath(const QString &path);
+
+    /*!
+      Sets the unique thumbnail flavor name for a given display
+      level. This is also the name of the directory under the
+      thumbnail base path which is used as the file system cache for
+      thumbnails of this level.
+
+      Not setting this value or setting this to empty means that
+      thumbnails of this level will not be cached to the file system.
+    */
+
+    static void setThumbnailFlavorName(int level, const QString &name);
+
+    /*!
+      Deprecated, please use setThumbnailBasePath() and setThumbnailFlavorName()
+
       Sets the directory where to look for ready-made thumbnails
       for a given preview level. Default is empty, meaning that all
       preview images for the level are generated from the full image.

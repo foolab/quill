@@ -62,8 +62,9 @@ class DisplayLevel {
     void setFileLimit(int limit);
     int fileLimit() const;
 
-    void setThumbnailFlavorPath(const QString &name);
-    QString thumbnailFlavorPath() const;
+    void setThumbnailFlavorName(const QString &name);
+
+    QString thumbnailFlavorName() const;
 
     ImageCache *imageCache() const;
 
@@ -78,7 +79,7 @@ class DisplayLevel {
     QSize m_size;
     QSize m_minimumSize;
     int m_fileLimit;
-    QString m_thumbnailFlavorPath;
+    QString m_thumbnailFlavorName;
     ImageCache *m_imageCache;
 };
 

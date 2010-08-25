@@ -344,6 +344,12 @@ public:
 
     QString thumbnailDirectory(int level) const;
 
+    void setThumbnailBasePath(const QString &path);
+
+    void setThumbnailFlavorName(int level, const QString &name);
+
+    QString thumbnailFlavorName(int level) const;
+
     /*!
       Sets the file extension which is used in storing and retrieving thumbnail
       files. This is also used to determine the format of the thumbnail files.
@@ -622,12 +628,6 @@ private:
     void activateDBusThumbnailer();
 
     /*!
-      Converts a preview level to a D-bus thumbnailer flavor.
-    */
-
-    QString flavorFromLevel(int level);
-
-    /*!
       Converts a D-bus thumbnailer flavor to a preview level.
     */
 
@@ -686,6 +686,7 @@ private:
     QSize m_vectorGraphicsRenderingSize;
 
     QString m_editHistoryDirectory;
+    QString m_thumbnailBasePath;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;

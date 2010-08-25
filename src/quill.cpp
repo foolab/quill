@@ -192,6 +192,18 @@ void Quill::setThumbnailDirectory(int level, const QString &directory)
     Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+directory);
 }
 
+void Quill::setThumbnailBasePath(const QString &path)
+{
+    Core::instance()->setThumbnailBasePath(path);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
+}
+
+void Quill::setThumbnailFlavorName(int level, const QString &name)
+{
+    Core::instance()->setThumbnailFlavorName(level, name);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+" "+name);
+}
+
 void Quill::setThumbnailExtension(const QString &extension)
 {
     Core::instance()->setThumbnailExtension(extension);
