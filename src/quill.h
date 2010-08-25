@@ -593,6 +593,24 @@ public:
     static bool isSaveInProgress();
 
     /*!
+      Puts the calling thread (which must be the thread Quill
+      object was created in) to sleep until Quill has synchronized its
+      state with the file system and it is safe to exit the
+      application. This means that all files in progress of saving
+      have finished, however excluding thumbnail saving.
+
+      Alternatively, a timeout value can be set so that after a
+      certain time even if the saving has not finished, the call will
+      return.
+
+      @param msec Timeout in milliseconds, or 0 for no timeout.
+
+      @return true if saving was finished, false if timeout occurred.
+     */
+
+    static bool waitUntilFinished(int msec = 0);
+
+    /*!
       To make background loading tests easier on fast machines
 
       Only works if Quill has been created with threadingMode =

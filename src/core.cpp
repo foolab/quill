@@ -42,6 +42,8 @@
 #include <QuillImageFilterGenerator>
 #include <QImageWriter>
 #include <QDir>
+#include <QEventLoop>
+#include <QTimer>
 #include "quill.h"
 #include "quillerror.h"
 #include "core.h"
@@ -663,6 +665,31 @@ bool Core::isCalculationInProgress() const
 bool Core::isSaveInProgress() const
 {
     return (prioritySaveFile() != 0);
+}
+
+void Core::timeout()
+{
+    m_loop.exit(1);
+}
+
+bool Core::waitUntilFinished(int msec)
+{
+    if (msec > 0)
+        QTimer::singleShot(msec, this, SLOT(timeout()));
+
+    QObject::connect(this, SIGNAL(saved(QString)),
+                     &m_loop, SLOT(quit()));
+    QObject::connect(this, SIGNAL(error(QuillError)),
+                     &m_loop, SLOT(quit()));
+
+    while (isSaveInProgress())
+        if (m_loop.exec()) {
+            Logger::log("[Core] WaitUntilFinished: interrupted by timeout");
+            return false;
+        }
+
+    Logger::log("[Core] WaitUntilFinished: success");
+    return true;
 }
 
 void Core::setTemporaryFileDirectory(const QString &fileDir)

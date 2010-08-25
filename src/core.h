@@ -52,6 +52,7 @@ can only be changed if no files have been opened yet.
 
 #include <QObject>
 #include <QColor>
+#include <QEventLoop>
 
 #include "quill.h"
 #include "quillerror.h"
@@ -513,6 +514,12 @@ public:
     bool isSaveInProgress() const;
 
     /*!
+      See Quill::waitUntilFinished()
+     */
+
+    bool waitUntilFinished(int msec);
+
+    /*!
       Sets the temporary file path
       @param fileDir the file path
     */
@@ -674,6 +681,7 @@ private slots:
                                          const QString flavor);
     void processDBusThumbnailerError(const QString fileName, uint errorCode,
                                      const QString message);
+    void timeout();
 
 private:
 
@@ -709,6 +717,8 @@ private:
     QList<QByteArray> m_writableImageFormats;
 
     DBusThumbnailer *m_dBusThumbnailer;
+
+    QEventLoop m_loop;
 };
 
 #endif

@@ -306,6 +306,12 @@ bool Quill::isSaveInProgress()
     return Core::instance()->isSaveInProgress();
 }
 
+bool Quill::waitUntilFinished(int msec)
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->waitUntilFinished(msec);
+}
+
 void Quill::releaseAndWait()
 {
     Core::instance()->releaseAndWait();
