@@ -389,11 +389,19 @@ public:
     static int nonTiledImagePixelsLimit();
 
     /*
+      Deprecated: please use setEditHistoryPath().
       Sets the default directory where to look for edit histories.
       Default is $HOME/.config/quill/history.
      */
 
     static void setEditHistoryDirectory(const QString &directory);
+
+    /*
+      Sets the path where Quill will store and retrieve edit histories.
+      Default is $HOME/.config/quill/history .
+     */
+
+    static void setEditHistoryPath(const QString &path);
 
     /*!
       Sets the directory where to look for ready-made thumbnails
@@ -450,7 +458,7 @@ public:
       crash, so it is recommended to use a temporary partition for
       such files.
     */
-    static void setTemporaryFilePath(const QString &tmpFilePath);
+    static void setTemporaryFilePath(const QString &path);
 
     /*!
       The path where Quill will store its temporary files. See
@@ -541,7 +549,7 @@ public:
       See also canRecover() and recover().
      */
 
-    static void setCrashDumpPath(const QString &fileName);
+    static void setCrashDumpPath(const QString &path);
 
     /*!
       Returns the crash dump path. See setCrashDumpPath();
@@ -593,14 +601,14 @@ signals:
     /*!
       Edits to a file have been successfully saved.
 
-      @param fileName the name of the file which has been saved.
+      @param filePath the path to the file which has been saved.
 
       Since it may be that all QuillFile objects related to a save in
       progress have been deleted already, a successful save triggers
       both QuillFile::saved() and this signal.
      */
 
-    void saved(QString fileName);
+    void saved(QString filePath);
 
     /*
       A file has been removed.
@@ -609,7 +617,7 @@ signals:
       with QuillFile::remove().
      */
 
-    void removed(QString fileName);
+    void removed(QString filePath);
 
     /*!
       Any error not specific to any individual QuillFile is reported
