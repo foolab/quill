@@ -196,6 +196,9 @@ void ut_error::testEmptyFileRead()
     QCOMPARE(error.errorData(), testFile.fileName());
 
     QCOMPARE(file->supported(), false);
+    QCOMPARE(file->supportsThumbnails(), false);
+    QCOMPARE(file->supportsViewing(), false);
+    QCOMPARE(file->supportsEditing(), false);
     delete file;
 }
 
@@ -257,6 +260,8 @@ void ut_error::testWriteProtectedFile()
     file->runFilter(filter);
 
     QVERIFY(!file->isReadOnly());
+    QVERIFY(file->supportsEditing());
+
     // Write protect before save is called
     testFile.setPermissions(QFile::ReadOwner);
 
@@ -969,6 +974,7 @@ void ut_error::testWriteProtectedEditHistory()
 
     QCOMPARE(spy2.count(), 1);
     QVERIFY(file->isReadOnly());
+    QVERIFY(!file->supportsEditing());
 
     delete file;
 }

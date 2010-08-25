@@ -365,6 +365,33 @@ QDateTime QuillFile::lastModified() const
         return QDateTime();
 }
 
+bool QuillFile::supportsThumbnails() const
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->supportsThumbnails();
+    else
+        return false;
+}
+
+bool QuillFile::supportsViewing() const
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->supportsViewing();
+    else
+        return false;
+}
+
+bool QuillFile::supportsEditing() const
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->supportsEditing();
+    else
+        return false;
+}
+
 bool QuillFile::supported() const
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
@@ -426,6 +453,13 @@ void QuillFile::emitImageAvailable(const QuillImage &image)
 void QuillFile::emitImageAvailable(const QList<QuillImage> &imageList)
 {
     emit imageAvailable(imageList);
+}
+
+void QuillFile::refresh()
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        priv->m_file->refresh();
 }
 
 void QuillFile::setWaitingForData(bool status)

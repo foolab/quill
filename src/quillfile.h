@@ -363,6 +363,9 @@ public:
 
     /*!
       If the file is supported and has no errors.
+
+      DEPRECATED - Please use supportsThumbnails(), supportsViewing(),
+      or supportsEditing().
      */
 
     bool supported() const;
@@ -377,6 +380,41 @@ public:
      */
 
     void setSupported(bool supported);
+
+    /*!
+      Returns true if thumbnails of the file can be viewed.
+
+      This means that either the file is directly supported by Quill, or
+      that thumbnails of the file can be created by the external thumbnailer.
+    */
+
+    bool supportsThumbnails() const;
+
+    /*!
+      Returns true if any resolution version of the file can be
+      easily viewed.
+
+      This means that the image format is supported by Quill via a Qt
+      image format plugin, and the image size is not larger than the
+      constraints set by Quill::setImageSizeLimit(),
+      Quill::setImagePixelsLimit(), and
+      Quill::setNonTiledImagePixelsLimit().
+
+      See also supportsThumbnails().
+    */
+
+    bool supportsViewing() const;
+
+    /*!
+      Returns true if the file can be edited.
+
+      This means that the file can be fully viewed (see
+      supportsViewing()), the user has write access, plus the image
+      format is supported by Quill via a read-write Qt image format
+      plugin.
+    */
+
+    bool supportsEditing() const;
 
     /*!
       Completely removes a file along with its associated original
@@ -419,6 +457,15 @@ public:
     */
 
     bool isWaitingForData() const;
+
+    /*!
+      Used to inform Quill that file contents have changed in the file
+      system; should also be used when file image was initially set
+      with setImage() and file contents are now available in the
+      system.
+     */
+
+    void refresh();
 
     /*!
       Returns true if Quill Core holds an internal file object
