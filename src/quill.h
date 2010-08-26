@@ -389,13 +389,43 @@ public:
     static int nonTiledImagePixelsLimit();
 
     /*
+      Deprecated: please use setEditHistoryPath().
       Sets the default directory where to look for edit histories.
       Default is $HOME/.config/quill/history.
      */
 
     static void setEditHistoryDirectory(const QString &directory);
 
+    /*
+      Sets the path where Quill will store and retrieve edit histories.
+      Default is $HOME/.config/quill/history .
+     */
+
+    static void setEditHistoryPath(const QString &path);
+
     /*!
+      Sets the base path under which thumbnails are saved. This
+      defaults to the freedesktop standard which is .thumbnails under
+      QDir::homePath().
+     */
+
+    static void setThumbnailBasePath(const QString &path);
+
+    /*!
+      Sets the unique thumbnail flavor name for a given display
+      level. This is also the name of the directory under the
+      thumbnail base path which is used as the file system cache for
+      thumbnails of this level.
+
+      Not setting this value or setting this to empty means that
+      thumbnails of this level will not be cached to the file system.
+    */
+
+    static void setThumbnailFlavorName(int level, const QString &name);
+
+    /*!
+      Deprecated, please use setThumbnailBasePath() and setThumbnailFlavorName()
+
       Sets the directory where to look for ready-made thumbnails
       for a given preview level. Default is empty, meaning that all
       preview images for the level are generated from the full image.
@@ -450,7 +480,7 @@ public:
       crash, so it is recommended to use a temporary partition for
       such files.
     */
-    static void setTemporaryFilePath(const QString &tmpFilePath);
+    static void setTemporaryFilePath(const QString &path);
 
     /*!
       The path where Quill will store its temporary files. See
@@ -541,7 +571,7 @@ public:
       See also canRecover() and recover().
      */
 
-    static void setCrashDumpPath(const QString &fileName);
+    static void setCrashDumpPath(const QString &path);
 
     /*!
       Returns the crash dump path. See setCrashDumpPath();
@@ -561,6 +591,24 @@ public:
      */
 
     static bool isSaveInProgress();
+
+    /*!
+      Puts the calling thread (which must be the thread Quill
+      object was created in) to sleep until Quill has synchronized its
+      state with the file system and it is safe to exit the
+      application. This means that all files in progress of saving
+      have finished, however excluding thumbnail saving.
+
+      Alternatively, a timeout value can be set so that after a
+      certain time even if the saving has not finished, the call will
+      return.
+
+      @param msec Timeout in milliseconds, or 0 for no timeout.
+
+      @return true if saving was finished, false if timeout occurred.
+     */
+
+    static bool waitUntilFinished(int msec = 0);
 
     /*!
       To make background loading tests easier on fast machines
@@ -593,14 +641,14 @@ signals:
     /*!
       Edits to a file have been successfully saved.
 
-      @param fileName the name of the file which has been saved.
+      @param filePath the path to the file which has been saved.
 
       Since it may be that all QuillFile objects related to a save in
       progress have been deleted already, a successful save triggers
       both QuillFile::saved() and this signal.
      */
 
-    void saved(QString fileName);
+    void saved(QString filePath);
 
     /*
       A file has been removed.
@@ -609,7 +657,7 @@ signals:
       with QuillFile::remove().
      */
 
-    void removed(QString fileName);
+    void removed(QString filePath);
 
     /*!
       Any error not specific to any individual QuillFile is reported

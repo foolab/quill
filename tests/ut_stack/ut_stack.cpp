@@ -375,7 +375,6 @@ void ut_stack::testSetImageOnNonexistent()
 
     QuillFile *file = new QuillFile("/tmp/quill/invalid", "");
 
-    file->setWaitingForData(true);
     file->setDisplayLevel(0);
     QuillImage quillImage(image);
     quillImage.setFullImageSize(QSize(8, 2));
@@ -394,7 +393,6 @@ void ut_stack::testSourceChanged()
     QImage image = Unittests::generatePaletteImage();
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
-    file->setWaitingForData(true);
 
     file->setDisplayLevel(1);
     file->setImage(0, image);
@@ -403,7 +401,7 @@ void ut_stack::testSourceChanged()
 
     image.save(testFile.fileName(), "png");
 
-    file->setWaitingForData(false);
+    file->refresh();
     QCOMPARE(file->displayLevel(), 1);
     QVERIFY(!file->image(0).isNull()); // Temporary images are not thrown away
     QVERIFY(file->image(1).isNull());
@@ -427,7 +425,6 @@ void ut_stack::testSourceCreated()
 
     QuillFile *file = new QuillFile(fileName, "png");
     QVERIFY(!file->exists());
-    file->setWaitingForData(true);
 
     file->setDisplayLevel(1);
     file->setImage(0, image);
@@ -436,7 +433,7 @@ void ut_stack::testSourceCreated()
 
     image.save(fileName, "png");
 
-    file->setWaitingForData(false);
+    file->refresh();
     QVERIFY(file->exists());
     QCOMPARE(file->displayLevel(), 1);
     QVERIFY(!file->image(0).isNull()); // Temporary images are not thrown away
