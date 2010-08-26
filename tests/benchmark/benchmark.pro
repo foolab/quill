@@ -3,9 +3,11 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET = 
+TARGET =
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . ../../src
+LIBPATH += ../../src
+LIBS += -lquill
 
 CONFIG += quill
 CONFIG += quillimagefilter
