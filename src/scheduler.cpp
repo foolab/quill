@@ -623,8 +623,10 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
             file->concludeSave();
 
-            if (file->allowDelete())
+            if (file->allowDelete()){
                 delete file;
+                file = 0;
+            }
         }
         else
             // Full image saving proceeds
@@ -724,6 +726,6 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
     }
     delete task;
 
-    if (error.errorCode() != QuillError::NoError)
+    if (file&&error.errorCode() != QuillError::NoError)
         file->emitError(error);
 }
