@@ -10,21 +10,25 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 
-void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize, QString mimeType, QString flavor)
+int compare(QImage source, QImage target)
 {
-    qDebug() << "Generating" << n << flavor << size.width() << "x" << size.height() << "thumbnails for" << originalFileName << "MIME" << mimeType;
+    int result = 0;
+    for (int x=0; x<source.width(); x++)
+        for (int y=0; y<source.height(); y++)
+            if (source.pixel(x, y) != target.pixel(x, y))
+                result++;
+    return result;
+}
+
+void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, int radius)
+{
+    qDebug() << "Removing red eyes from" << numFiles << size.width() << "x" << size.height() << "thumbnails of" << originalFileName << "at point" << center << "with tolerance" << radius;
 
     QEventLoop loop;
     QTime time;
 
     Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
     Quill::setPreviewSize(0, size);
-    Quill::setMinimumPreviewSize(0, minimumSize);
-    Quill::setThumbnailDirectory(0, QDir::homePath()+"/.thumbnails/"+flavor);
-    Quill::setThumbnailExtension("jpeg");
-    Quill::setThumbnailCreationEnabled(false);
-
-    int numFiles = n;
 
     Quill::setFileLimit(0, numFiles);
 
@@ -46,7 +50,7 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     time.start();
 
     for (int i=0; i<numFiles; i++) {
-        quillFile[i] = new QuillFile(fileName[i], mimeType);
+        quillFile[i] = new QuillFile(fileName[i], "image/jpeg");
         QObject::connect(quillFile[i], SIGNAL(imageAvailable(const QuillImageList)),
                          &loop, SLOT(quit()));
     }
@@ -62,11 +66,35 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
         loop.exec();
     while (Quill::isCalculationInProgress());
 
-    int finalTime = time.elapsed();
+    int prepareTime = time.elapsed();
 
     for (int i=0; i<numFiles; i++)
         if (quillFile[i]->image(0).isNull()) {
             qDebug("Error: not all images are loaded!");
+            return;
+        }
+
+    QImage beforeEdit = quillFile[0]->image(0);
+
+    time.restart();
+
+    for (int i=0; i<numFiles; i++) {
+        QuillImageFilter *filter =
+            QuillImageFilterFactory::createImageFilter("org.maemo.red-eye-detection");
+        filter->setOption(QuillImageFilter::Radius, QVariant(radius));
+        filter->setOption(QuillImageFilter::Center, QVariant(center));
+        quillFile[i]->runFilter(filter);
+    }
+
+    do
+        loop.exec();
+    while (Quill::isCalculationInProgress());
+
+    int finalTime = time.elapsed();
+
+    for (int i=0; i<numFiles; i++)
+        if (quillFile[i]->image(0).isNull()) {
+            qDebug("Error: not all images are edited!");
             return;
         }
 
@@ -76,8 +104,14 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     qDebug() << "Set display levels of" << numFiles << "QuillFiles:"
              << displayLevelTime - initTime << "ms";
 
-    qDebug() << "Use case generate" << numFiles << "thumbnails:"
+    qDebug() << "Total prepare" << numFiles << "QuillFiles:"
+             << prepareTime << "ms";
+
+    qDebug() << "Use case edit response for" << numFiles << "QuillFiles:"
              << finalTime << "ms";
+
+    int differences = compare(quillFile[0]->image(0), beforeEdit);
+    qDebug() << differences << "pixels were changed by the edit.";
 
     for (int i=0; i<numFiles; i++) {
         delete quillFile[i];
