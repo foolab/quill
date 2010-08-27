@@ -456,6 +456,8 @@ QuillUndoStack *File::stack() const
 
 bool File::hasThumbnail(int level) const
 {
+    if(isOriginal())
+        return false;
     if (Core::instance()->thumbnailDirectory(level).isEmpty())
         return false;
 
@@ -482,13 +484,7 @@ QString File::fileNameHash(const QString &fileName)
 
 QString File::thumbnailFileName(int level) const
 {
-    QString hashValueString;
-    if(m_original){
-        hashValueString = fileNameHash(m_originalFileName);
-    }
-    else{
-        hashValueString = fileNameHash(m_fileName);
-    }
+    QString hashValueString = fileNameHash(m_fileName);
     hashValueString.append("." + Core::instance()->thumbnailExtension());
     hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
                             QDir::separator());
@@ -1082,7 +1078,7 @@ bool File::supportsEditing() const
             (m_state != State_ReadOnly));
 }
 
-bool File::isOriginal()
+bool File::isOriginal() const
 {
     return m_original;
 }

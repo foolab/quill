@@ -643,7 +643,7 @@ public:
     /*!
       If the file is an original one
      */
-    bool isOriginal();
+    bool isOriginal() const;
 
     /*!
       Sets a flag for the original file

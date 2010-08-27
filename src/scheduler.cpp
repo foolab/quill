@@ -41,7 +41,6 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
-#include <QDebug>
 #include "scheduler.h"
 #include "quillerror.h"
 #include "task.h"
