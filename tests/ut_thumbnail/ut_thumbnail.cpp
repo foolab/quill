@@ -55,6 +55,7 @@ ut_thumbnail::ut_thumbnail()
 void ut_thumbnail::initTestCase()
 {
     QDir().mkpath("/tmp/quill/thumbnails");
+    QDir().mkpath("/tmp/quill/thumbnails/normal");
     Unittests::generatePaletteImage().save("/tmp/test.png");
 }
 
