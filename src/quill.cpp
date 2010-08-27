@@ -302,7 +302,7 @@ bool Quill::isCalculationInProgress()
 
 bool Quill::isSaveInProgress()
 {
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::boolToString(Core::instance()->isSaveInProgress()));
     return Core::instance()->isSaveInProgress();
 }
 

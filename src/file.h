@@ -640,6 +640,15 @@ public:
 
     static QString fileNameHash(const QString &fileName);
 
+    /*!
+      If the file is an original one
+     */
+    bool isOriginal() const;
+
+    /*!
+      Sets a flag for the original file
+     */
+    void setOriginal(bool flag);
 signals:
 
     /*!
@@ -698,6 +707,8 @@ private:
     QRect m_viewPort;
 
     QTemporaryFile *m_temporaryFile;
+    //one flag for the original file
+    bool m_original;
 };
 
 #endif // QUILLFILE_H

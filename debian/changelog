@@ -1,3 +1,8 @@
+libquill (1.100827.0) unstable; urgency=low
+  * Fixes: NB#164692 If an already edited image is opened original image in the tools dialog place holder is not correct
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Fri, 27 Aug 2010 12:15:00 +0200
+
 libquill (1.100826.1) unstable; urgency=low
   * Fixed build problems in benchmark
 
