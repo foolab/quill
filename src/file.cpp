@@ -484,6 +484,8 @@ QString File::fileNameHash(const QString &fileName)
 
 QString File::thumbnailFileName(int level) const
 {
+    if(isOriginal())
+        return QString();
     QString hashValueString = fileNameHash(m_fileName);
     hashValueString.append("." + Core::instance()->thumbnailExtension());
     hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
