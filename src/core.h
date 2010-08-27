@@ -393,6 +393,12 @@ public:
     bool isDBusThumbnailingEnabled() const;
 
     /*!
+      Returns true if the given mime type is supported by D-Bus thumbnailer.
+     */
+
+    bool isExternallySupportedFormat(const QString &format) const;
+
+    /*!
       Returns true if it is possible to recover from a previous crash.
       This will only work if setCrashDumpFile() has been previously
       called, the physical file is found and actually contains something to

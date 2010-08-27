@@ -924,7 +924,8 @@ void File::processFilterError(QuillImageFilter *filter)
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
                 (errorCode == QuillError::FileCorruptError)) {
                 setSupported(false);
-                if (Core::instance()->isDBusThumbnailingEnabled()) {
+                if (Core::instance()->isDBusThumbnailingEnabled() &&
+                    Core::instance()->isExternallySupportedFormat(m_fileFormat)) {
                     setThumbnailSupported(true);
                     // Not emitting an error yet, as D-Bus thumbnailer might
                     // still find an use for the file

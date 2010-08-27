@@ -754,6 +754,11 @@ QRect Core::targetAreaForLevel(int level, const QSize &targetSize,
         return QRect();
 }
 
+bool Core::isExternallySupportedFormat(const QString &format) const
+{
+    return m_dBusThumbnailer->supports(format);
+}
+
 void Core::activateDBusThumbnailer()
 {
     Logger::log("[Core]"+QString(Q_FUNC_INFO));
