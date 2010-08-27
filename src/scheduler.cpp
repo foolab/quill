@@ -38,11 +38,10 @@
 ****************************************************************************/
 
 #include <QDir>
-
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QuillImageFilterGenerator>
-
+#include <QDebug>
 #include "scheduler.h"
 #include "quillerror.h"
 #include "task.h"
@@ -80,11 +79,12 @@ Task *Scheduler::newTask()
         foreach (File *file, allFiles)
             if (level <= file->displayLevel()) {
                 Task *task = 0;
-                if (file->hasThumbnail(level))
+                if (file->hasThumbnail(level)){
                     task = newThumbnailLoadTask(file, level);
-                else
+                }
+                else{
                     task = newNormalTask(file, level);
-
+                }
                 if (task)
                     return task;
             }
@@ -344,6 +344,8 @@ Task *Scheduler::newThumbnailLoadTask(File *file,
 
 Task *Scheduler::newThumbnailSaveTask(File *file, int level)
 {
+    if(file->isOriginal())
+        return 0;
     QuillUndoStack *stack = file->stack();
 
     if ((!stack) || (!stack->command()))

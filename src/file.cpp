@@ -44,7 +44,6 @@
 #include <QList>
 #include <QDir>
 #include <QuillMetadata>
-#include <QDebug>
 #include "file.h"
 #include "core.h"
 #include "imagecache.h"
@@ -58,7 +57,7 @@ File::File() : m_state(State_Normal),
                m_hasThumbnailError(false), m_isClone(false),
                m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
-               m_temporaryFile(0)
+               m_temporaryFile(0),m_original(false)
 {
     m_stack = new QuillUndoStack(this);
 }
@@ -483,7 +482,13 @@ QString File::fileNameHash(const QString &fileName)
 
 QString File::thumbnailFileName(int level) const
 {
-    QString hashValueString = fileNameHash(m_fileName);
+    QString hashValueString;
+    if(m_original){
+        hashValueString = fileNameHash(m_originalFileName);
+    }
+    else{
+        hashValueString = fileNameHash(m_fileName);
+    }
     hashValueString.append("." + Core::instance()->thumbnailExtension());
     hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
                             QDir::separator());
@@ -904,7 +909,8 @@ File *File::original()
     original->setFileFormat(m_fileFormat);
     original->setOriginalFileName(m_originalFileName);
     original->setReadOnly();
-
+    //We set a flag for the original file, then we can distinguish original one from edited one
+    original->setOriginal(true);
     Core::instance()->insertFile(original, indexName);
     return original;
 }
@@ -1074,4 +1080,14 @@ bool File::supportsEditing() const
             (m_state != State_UnsupportedFormat) &&
             (m_state != State_ExternallySupportedFormat) &&
             (m_state != State_ReadOnly));
+}
+
+bool File::isOriginal()
+{
+    return m_original;
+}
+
+void File::setOriginal(bool flag)
+{
+    m_original = flag;
 }
