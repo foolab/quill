@@ -42,6 +42,8 @@
 #include <QuillImageFilterGenerator>
 #include <QImageWriter>
 #include <QDir>
+#include <QEventLoop>
+#include <QTimer>
 #include "quill.h"
 #include "quillerror.h"
 #include "core.h"
@@ -66,6 +68,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_imagePixelsLimit(0),
     m_nonTiledImagePixelsLimit(0),
     m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
+    m_thumbnailBasePath(QDir::homePath() + "/.thumbnails"),
     m_thumbnailCreationEnabled(true),
     m_dBusThumbnailingEnabled(true),
     m_recoveryInProgress(false),
@@ -552,12 +555,30 @@ QString Core::editHistoryDirectory() const
     return m_editHistoryDirectory;
 }
 
+void Core::setThumbnailBasePath(const QString &path)
+{
+    m_thumbnailBasePath = path;
+}
+
+void Core::setThumbnailFlavorName(int level, const QString &name)
+{
+    m_displayLevel[level]->setThumbnailFlavorName(name);
+}
+
+QString Core::thumbnailFlavorName(int level) const
+{
+    return m_displayLevel[level]->thumbnailFlavorName();
+}
+
 void Core::setThumbnailDirectory(int level, const QString &directory)
 {
     if ((level < 0) || (level >= m_displayLevel.count()))
         return;
 
-    m_displayLevel[level]->setThumbnailFlavorPath(directory);
+    QDir dir = QDir(directory);
+    dir.cdUp();
+    setThumbnailBasePath(dir.path());
+    setThumbnailFlavorName(level, QDir(directory).dirName());
 }
 
 QString Core::thumbnailDirectory(int level) const
@@ -565,7 +586,12 @@ QString Core::thumbnailDirectory(int level) const
     if ((level < 0) || (level >= m_displayLevel.count()))
         return QString();
 
-    return m_displayLevel[level]->thumbnailFlavorPath();
+    const QString flavorName = m_displayLevel[level]->thumbnailFlavorName();
+
+    if (flavorName.isEmpty())
+        return QString();
+
+    return m_thumbnailBasePath + "/" + flavorName;
 }
 
 void Core::setThumbnailExtension(const QString &extension)
@@ -641,6 +667,31 @@ bool Core::isSaveInProgress() const
     return (prioritySaveFile() != 0);
 }
 
+void Core::timeout()
+{
+    m_loop.exit(1);
+}
+
+bool Core::waitUntilFinished(int msec)
+{
+    if (msec > 0)
+        QTimer::singleShot(msec, this, SLOT(timeout()));
+
+    QObject::connect(this, SIGNAL(saved(QString)),
+                     &m_loop, SLOT(quit()));
+    QObject::connect(this, SIGNAL(error(QuillError)),
+                     &m_loop, SLOT(quit()));
+
+    while (isSaveInProgress())
+        if (m_loop.exec()) {
+            Logger::log("[Core] WaitUntilFinished: interrupted by timeout");
+            return false;
+        }
+
+    Logger::log("[Core] WaitUntilFinished: success");
+    return true;
+}
+
 void Core::setTemporaryFileDirectory(const QString &fileDir)
 {
     m_temporaryFileDirectory = fileDir;
@@ -651,15 +702,10 @@ QString Core::temporaryFileDirectory() const
     return m_temporaryFileDirectory;
 }
 
-QString Core::flavorFromLevel(int level)
-{
-    return QDir(thumbnailDirectory(level)).dirName();
-}
-
 int Core::levelFromFlavor(QString flavor)
 {
     for (int level=0; level<=previewLevelCount()-1; level++)
-        if (flavorFromLevel(level) == flavor)
+        if (thumbnailFlavorName(level) == flavor)
             return level;
     return -1;
 }
@@ -725,7 +771,7 @@ void Core::activateDBusThumbnailer()
                 !file->hasThumbnail(level) &&
                 m_dBusThumbnailer->supports(file->fileFormat())) {
 
-                QString flavor = flavorFromLevel(level);
+                QString flavor = thumbnailFlavorName(level);
 
                 Logger::log("[Core] Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
 

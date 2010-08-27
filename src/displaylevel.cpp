@@ -86,14 +86,14 @@ int DisplayLevel::fileLimit() const
     return m_fileLimit;
 }
 
-void DisplayLevel::setThumbnailFlavorPath(const QString &path)
+void DisplayLevel::setThumbnailFlavorName(const QString &name)
 {
-    m_thumbnailFlavorPath = path;
+    m_thumbnailFlavorName = name;
 }
 
-QString DisplayLevel::thumbnailFlavorPath() const
+QString DisplayLevel::thumbnailFlavorName() const
 {
-    return m_thumbnailFlavorPath;
+    return m_thumbnailFlavorName;
 }
 
 ImageCache *DisplayLevel::imageCache() const

@@ -52,6 +52,7 @@ can only be changed if no files have been opened yet.
 
 #include <QObject>
 #include <QColor>
+#include <QEventLoop>
 
 #include "quill.h"
 #include "quillerror.h"
@@ -344,6 +345,12 @@ public:
 
     QString thumbnailDirectory(int level) const;
 
+    void setThumbnailBasePath(const QString &path);
+
+    void setThumbnailFlavorName(int level, const QString &name);
+
+    QString thumbnailFlavorName(int level) const;
+
     /*!
       Sets the file extension which is used in storing and retrieving thumbnail
       files. This is also used to determine the format of the thumbnail files.
@@ -507,6 +514,12 @@ public:
     bool isSaveInProgress() const;
 
     /*!
+      See Quill::waitUntilFinished()
+     */
+
+    bool waitUntilFinished(int msec);
+
+    /*!
       Sets the temporary file path
       @param fileDir the file path
     */
@@ -622,12 +635,6 @@ private:
     void activateDBusThumbnailer();
 
     /*!
-      Converts a preview level to a D-bus thumbnailer flavor.
-    */
-
-    QString flavorFromLevel(int level);
-
-    /*!
       Converts a D-bus thumbnailer flavor to a preview level.
     */
 
@@ -674,6 +681,7 @@ private slots:
                                          const QString flavor);
     void processDBusThumbnailerError(const QString fileName, uint errorCode,
                                      const QString message);
+    void timeout();
 
 private:
 
@@ -686,6 +694,7 @@ private:
     QSize m_vectorGraphicsRenderingSize;
 
     QString m_editHistoryDirectory;
+    QString m_thumbnailBasePath;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;
@@ -708,6 +717,8 @@ private:
     QList<QByteArray> m_writableImageFormats;
 
     DBusThumbnailer *m_dBusThumbnailer;
+
+    QEventLoop m_loop;
 };
 
 #endif

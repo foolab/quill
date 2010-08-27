@@ -80,11 +80,12 @@ void ut_thumbnail::testName()
     // This should be safe to run in any environment as this test does
     // not really create, or check existence of, any files.
 
-    Quill::setThumbnailDirectory(0, "/home/user");
+    Quill::setThumbnailBasePath("/home/user");
+    Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("jpeg");
 
     QCOMPARE(file->thumbnailFileName(0),
-             QString("/home/user/6756f54a791d53a4ece8ebb70471b573.jpeg"));
+             QString("/home/user/normal/6756f54a791d53a4ece8ebb70471b573.jpeg"));
 
     delete file;
 }
@@ -96,7 +97,8 @@ void ut_thumbnail::testLoad()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName());

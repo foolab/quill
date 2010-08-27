@@ -192,6 +192,18 @@ void Quill::setThumbnailDirectory(int level, const QString &directory)
     Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+directory);
 }
 
+void Quill::setThumbnailBasePath(const QString &path)
+{
+    Core::instance()->setThumbnailBasePath(path);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
+}
+
+void Quill::setThumbnailFlavorName(int level, const QString &name)
+{
+    Core::instance()->setThumbnailFlavorName(level, name);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+" "+name);
+}
+
 void Quill::setThumbnailExtension(const QString &extension)
 {
     Core::instance()->setThumbnailExtension(extension);
@@ -246,10 +258,10 @@ QSize Quill::vectorGraphicsRenderingSize()
     return Core::instance()->vectorGraphicsRenderingSize();
 }
 
-void Quill::setTemporaryFilePath(const QString &tmpFilePath)
+void Quill::setTemporaryFilePath(const QString &path)
 {
-    Core::instance()->setTemporaryFileDirectory(tmpFilePath);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+tmpFilePath);
+    Core::instance()->setTemporaryFileDirectory(path);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
 }
 
 QString Quill::temporaryFilePath()
@@ -258,10 +270,10 @@ QString Quill::temporaryFilePath()
     return Core::instance()->temporaryFileDirectory();
 }
 
-void Quill::setCrashDumpPath(const QString &fileName)
+void Quill::setCrashDumpPath(const QString &path)
 {
-    Core::instance()->setCrashDumpPath(fileName);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+fileName);
+    Core::instance()->setCrashDumpPath(path);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
 }
 
 QString Quill::crashDumpPath()
@@ -292,6 +304,12 @@ bool Quill::isSaveInProgress()
 {
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
     return Core::instance()->isSaveInProgress();
+}
+
+bool Quill::waitUntilFinished(int msec)
+{
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
+    return Core::instance()->waitUntilFinished(msec);
 }
 
 void Quill::releaseAndWait()

@@ -1,3 +1,16 @@
+libquill (1.100826.1) unstable; urgency=low
+  * Fixed build problems in benchmark
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 26 Aug 2010 13:30:00 +0200
+
+libquill (1.100826.0) unstable; urgency=low
+  * Fixes: NB#180306 <coverity>
+  * Fixes: NB#180037 Low resolution images are not displayed properly in thumbnails
+  * Expanded high level benchmark code
+  * Polished interface
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 26 Aug 2010 13:00:00 +0200
+
 libquill (1.100820.0) unstable; urgency=low
   * New benchmark code
   * Fixed package description

@@ -3,12 +3,15 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET = 
+TARGET =
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . ../../src
+LIBPATH += ../../src
+LIBS += -lquill
 
-include(../tests.pri)
+CONFIG += quill
+CONFIG += quillimagefilter
 
 # Input
-SOURCES += benchmark.cpp batchrotate.cpp generatethumbs.cpp loadthumbs.cpp
-HEADERS += batchrotate.h generatethumbs.h generatethumbs.h
+SOURCES += benchmark.cpp batchrotate.cpp generatethumbs.cpp loadthumbs.cpp tiling.cpp autofix.cpp straighten.cpp redeye.cpp
+HEADERS += batchrotate.h generatethumbs.h generatethumbs.h tiling.h autofix.h straighten.h redeye.h

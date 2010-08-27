@@ -4,6 +4,6 @@
 #include <QString>
 #include <QSize>
 
-void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize);
+void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize, QString mimeType, QString flavorName);
 
 #endif
