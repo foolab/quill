@@ -223,18 +223,6 @@ public:
     QSize defaultTileSize() const;
 
     /*!
-      Sets the file limit for a given level.
-     */
-
-    void setFileLimit(int level, int limit);
-
-    /*!
-      Returns the file limit for a given level.
-     */
-
-    int fileLimit(int level) const;
-
-    /*!
       Sets the maximum allowed dimensions for an image. If either
       dimension of an image overflows its respective limit set here,
       the image will not be handled by Quill.

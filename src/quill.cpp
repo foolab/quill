@@ -86,14 +86,16 @@ void Quill::setSaveBufferSize(int size)
 
 void Quill::setFileLimit(int level, int limit)
 {
-    Core::instance()->setFileLimit(level, limit);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::intToString(limit));
+    Q_UNUSED(level);
+    Q_UNUSED(limit);
+    // this function is deprecated and will be removed.
 }
 
 int Quill::fileLimit(int level)
 {
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
-    return Core::instance()->fileLimit(level);
+    Q_UNUSED(level);
+    // this function is deprecated and will be removed.
+    return 0;
 }
 
 void Quill::setEditHistoryCacheSize(int level, int limit)

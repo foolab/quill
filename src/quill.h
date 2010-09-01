@@ -207,6 +207,8 @@ public:
     static int previewLevelCount();
 
     /*!
+      Deprecated, please do not use.
+
       Sets the maximum number of files that can have their display level
       equal or bigger than the given level at one time.
 
@@ -235,6 +237,8 @@ public:
     static void setFileLimit(int level, int limit);
 
     /*!
+      Deprecated, please do not use.
+
       Returns the limit for the number of files that can be open at the
       given level at one time. See setFileLimit().
      */

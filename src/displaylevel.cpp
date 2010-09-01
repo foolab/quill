@@ -41,7 +41,6 @@
 #include "displaylevel.h"
 
 DisplayLevel::DisplayLevel(const QSize &size) : m_size(size),
-                                                m_fileLimit(1),
                                                 m_imageCache(new ImageCache(0))
 {
 }
@@ -74,16 +73,6 @@ QSize DisplayLevel::minimumSize() const
 bool DisplayLevel::isCropped() const
 {
     return m_minimumSize.isValid();
-}
-
-void DisplayLevel::setFileLimit(int limit)
-{
-    m_fileLimit = limit;
-}
-
-int DisplayLevel::fileLimit() const
-{
-    return m_fileLimit;
 }
 
 void DisplayLevel::setThumbnailFlavorName(const QString &name)

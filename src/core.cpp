@@ -219,22 +219,6 @@ bool Core::smallestNonCroppedLevel() const
     return m_displayLevel.count();
 }
 
-void Core::setFileLimit(int level, int limit)
-{
-    if ((level < 0) || (level >= m_displayLevel.count()))
-        return;
-
-    m_displayLevel[level]->setFileLimit(limit);
-}
-
-int Core::fileLimit(int level) const
-{
-    if ((level >=0 ) && (level < m_displayLevel.count()))
-        return m_displayLevel[level]->fileLimit();
-    else
-        return 0;
-}
-
 void Core::setImageSizeLimit(const QSize &size)
 {
     m_imageSizeLimit = size;

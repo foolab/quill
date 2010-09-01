@@ -78,7 +78,6 @@ class DisplayLevel {
  private:
     QSize m_size;
     QSize m_minimumSize;
-    int m_fileLimit;
     QString m_thumbnailFlavorName;
     ImageCache *m_imageCache;
 };
