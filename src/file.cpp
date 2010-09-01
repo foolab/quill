@@ -171,12 +171,6 @@ bool File::isReadOnly() const
     return state() == State_ReadOnly;
 }
 
-bool File::canEnableDisplayLevel(int level) const
-{
-    return (Core::instance()->numFilesAtLevel(level) <
-            Core::instance()->fileLimit(level));
-}
-
 bool File::isDisplayLevelEnabled(int level) const
 {
     return Core::instance()->isSubstituteLevel(level, m_displayLevel);
@@ -186,16 +180,7 @@ bool File::setDisplayLevel(int level)
 {
     int originalDisplayLevel = m_displayLevel;
 
-    if (level > originalDisplayLevel) {
-        // Block if trying to raise display level over strict limits
-        for (int l=originalDisplayLevel+1; l<=level; l++)
-            if (!canEnableDisplayLevel(level)) {
-                emitError(QuillError(QuillError::GlobalFileLimitError,
-                                     QuillError::NoErrorSource,
-                                     m_fileName));
-                return false;
-            }
-    } else {
+    if (level <= originalDisplayLevel) {
         // If some other file object wants to keep the display level up
         foreach (QuillFile *file, m_references)
             if (file->displayLevel() > level)

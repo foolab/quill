@@ -199,34 +199,6 @@ void ut_file::testOriginalAfterSave()
     delete original;
 }
 
-void ut_file::testFileLimit()
-{
-    QTemporaryFile testFile;
-    testFile.open();
-
-    QTemporaryFile testFile2;
-    testFile2.open();
-
-    QuillImage image = Unittests::generatePaletteImage();
-    image.save(testFile.fileName(), "png");
-    image.save(testFile2.fileName(), "png");
-
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
-    QuillFile *file2 = new QuillFile(testFile2.fileName(), "png");
-
-    QVERIFY(file->setDisplayLevel(0));
-    QVERIFY(!file2->setDisplayLevel(0));
-
-    Quill::setFileLimit(0, 2);
-    QVERIFY(file2->setDisplayLevel(0));
-
-    Quill::releaseAndWait();
-    Quill::releaseAndWait();
-
-    delete file;
-    delete file2;
-}
-
 void ut_file::testMultipleAccess()
 {
     QTemporaryFile testFile;

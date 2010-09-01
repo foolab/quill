@@ -177,8 +177,6 @@ public:
 
     bool isReadOnly() const;
 
-    bool canEnableDisplayLevel(int level) const;
-
     bool isDisplayLevelEnabled(int level) const;
 
     /*!

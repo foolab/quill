@@ -177,6 +177,20 @@ int QuillFile::displayLevel() const
     return priv->m_displayLevel;
 }
 
+void QuillFile::setPriority(int priority)
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(priority));
+    Logger::log("[QuillFile] Warning: method setPriority() not implemented yet");
+    Q_UNUSED(priority);
+}
+
+int QuillFile::priority() const
+{
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
+    Logger::log("[QuillFile] Warning: method priority() not implemented yet");
+    return 0;
+}
+
 void QuillFile::saveAs(const QString &fileName,
                        const QString &fileFormat)
 {

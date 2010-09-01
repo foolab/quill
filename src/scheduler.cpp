@@ -420,11 +420,12 @@ Task *Scheduler::newNormalTask(File *file, int level)
         prevImage = QuillImage();
     else if (prev == 0)
     {
-        prevImage = QuillImage(QImage(Core::instance()->targetSizeForLevel(level, command->fullImageSize()),
-                                      QImage::Format_RGB32));
-
-        prevImage.setFullImageSize(command->fullImageSize());
-        prevImage.setArea(Core::instance()->targetAreaForLevel(level, prevImage.size(), command->fullImageSize()));
+        QSize fullSize = command->fullImageSize();
+        QSize targetSize = Core::instance()->targetSizeForLevel(level, fullSize);
+        prevImage = QuillImage();
+        prevImage.setFullImageSize(fullSize);
+        prevImage.setTargetSize(targetSize);
+        prevImage.setArea(Core::instance()->targetAreaForLevel(level, targetSize, fullSize));
         prevImage.setZ(level);
     }
     else

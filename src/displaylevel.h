@@ -59,9 +59,6 @@ class DisplayLevel {
 
     bool isCropped() const;
 
-    void setFileLimit(int limit);
-    int fileLimit() const;
-
     void setThumbnailFlavorName(const QString &name);
 
     QString thumbnailFlavorName() const;
@@ -78,7 +75,6 @@ class DisplayLevel {
  private:
     QSize m_size;
     QSize m_minimumSize;
-    int m_fileLimit;
     QString m_thumbnailFlavorName;
     ImageCache *m_imageCache;
 };

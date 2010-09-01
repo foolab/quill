@@ -89,6 +89,11 @@ Q_OBJECT
     friend class File;
     friend class ut_file;
 public:
+
+    static const int Priority_High = 128;
+    static const int Priority_Normal = 0;
+    static const int Priority_Low = -128;
+
     /*!
       Provides access to a file object. The object will be created
       if necessary. The object becomes property of the caller and can
@@ -179,6 +184,40 @@ public:
     */
 
     int displayLevel() const;
+
+    /*!
+      Note: this method currently has no effect.
+
+      Sets the priority that Quill will use in handling loads and
+      edits on this file. Files that are most meaningful for the user
+      like ones currently displayed should have a high priority; files
+      that are cached since they are about to be displayed should have
+      a lower priority.
+
+      Any integer value is valid for priority. Small priority
+      differences (less than 100) mean that Quill may prefer a fast
+      operation on a lower-priority file before a slow operation on a
+      higher-priority file. Bigger differences mean that Quill will
+      prefer files with higher priority no matter the operation. The
+      constants QuillFile::Priority_Low, QuillFile::Priority_Normal
+      and QuillFile::Priority_High can also be used.
+
+      Priority has no effect on saving changes to edited files or
+      saving thumbnails. As these operations are not user intensive,
+      they always carry the lowest possible priority; additionally,
+      this function will not have an effect on relative priorities of
+      save operations.
+     */
+
+    void setPriority(int priority);
+
+    /*!
+      Note: this method currently has no effect and will return zero.
+
+      Returns the priority value for this QuillFile instance. See setPriority().
+    */
+
+    int priority() const;
 
     /*!
       Saves the current state of the active QuillFile with a new name
