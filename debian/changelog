@@ -1,3 +1,8 @@
+libquill (1.100903.0) unstable; urgency=low
+  * Optimized file use with lots of small images.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 03 Sep 2010 14:45:00 +0200
+
 libquill (1.100901.0) unstable; urgency=low
   * Polished interface: removed file limits, added priorities
 

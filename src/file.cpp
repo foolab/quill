@@ -139,7 +139,7 @@ void File::setFileName(const QString &fileName)
     }
     else if (!(info.permissions() & QFile::WriteUser))
         setReadOnly();
-    m_lastModified = QFileInfo(info).lastModified();
+    m_lastModified = info.lastModified();
 }
 
 void File::setFileFormat(const QString &fileFormat)
