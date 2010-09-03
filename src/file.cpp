@@ -130,16 +130,16 @@ void File::setFileName(const QString &fileName)
 {
     m_fileName = fileName;
 
-    QFile file(fileName);
-    if (!file.exists()) {
+    QFileInfo info(fileName);
+    if (!info.exists()) {
         emitError(QuillError(QuillError::FileNotFoundError,
                              QuillError::ImageFileErrorSource,
                              fileName));
         setExists(false);
     }
-    else if (!(file.permissions() & QFile::WriteUser))
+    else if (!(info.permissions() & QFile::WriteUser))
         setReadOnly();
-    m_lastModified = QFileInfo(file).lastModified();
+    m_lastModified = QFileInfo(info).lastModified();
 }
 
 void File::setFileFormat(const QString &fileFormat)
