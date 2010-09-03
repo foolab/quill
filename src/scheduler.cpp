@@ -323,8 +323,7 @@ Task *Scheduler::newThumbnailLoadTask(File *file,
     QuillUndoCommand *command = getTask(file->stack(), level);
 
     if ((command->filter()->role() != QuillImageFilter::Role_Load) ||
-        (command->index() != command->stack()->savedIndex()) ||
-        (!file->hasThumbnail(level)))
+        (command->index() != command->stack()->savedIndex()))
         return 0;
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
