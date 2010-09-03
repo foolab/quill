@@ -439,20 +439,21 @@ QuillUndoStack *File::stack() const
     return m_stack;
 }
 
-bool File::hasThumbnail(int level) const
+bool File::hasThumbnail(int level)
 {
     if(isOriginal())
         return false;
     if (Core::instance()->thumbnailDirectory(level).isEmpty())
         return false;
 
-    if (!QFile::exists(thumbnailFileName(level)))
+    QFileInfo info(thumbnailFileName(level));
+
+    if (!info.exists())
         return false;
 
-    return (QFileInfo(thumbnailFileName(level)).lastModified()
-            >= lastModified()) ||
-        // Ignore main files with modification dates in the future
-        (lastModified() > QDateTime::currentDateTime());
+    return ((info.lastModified() >= lastModified()) ||
+            // Ignore main files with modification dates in the future
+            (lastModified() > QDateTime::currentDateTime()));
 }
 
 QString File::fileNameHash(const QString &fileName)
@@ -467,11 +468,14 @@ QString File::fileNameHash(const QString &fileName)
     return hashValue.toHex();
 }
 
-QString File::thumbnailFileName(int level) const
+QString File::thumbnailFileName(int level)
 {
     if(isOriginal())
         return QString();
-    QString hashValueString = fileNameHash(m_fileName);
+    if (m_fileNameHash.isEmpty())
+        m_fileNameHash = fileNameHash(m_fileName);
+
+    QString hashValueString = m_fileNameHash;
     hashValueString.append("." + Core::instance()->thumbnailExtension());
     hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
                             QDir::separator());

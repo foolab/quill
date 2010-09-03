@@ -372,7 +372,7 @@ public:
       If a related thumbnail has been cached to the file system.
      */
 
-    bool hasThumbnail(int level) const;
+    bool hasThumbnail(int level);
 
     /*!
       Gets the file name associated with the given preview level.
@@ -382,7 +382,7 @@ public:
       not guaranteed to exist.
      */
 
-    QString thumbnailFileName(int level) const;
+    QString thumbnailFileName(int level);
 
     /*!
       Returns the associated undo stack.
@@ -701,6 +701,7 @@ private:
     QString m_originalFileName;
     QString m_fileFormat;
     QString m_targetFormat;
+    QString m_fileNameHash;
 
     QRect m_viewPort;
 
