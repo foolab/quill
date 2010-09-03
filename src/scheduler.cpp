@@ -350,7 +350,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     if ((!stack) || (!stack->command()))
         return 0;
 
-    if ((Core::instance()->thumbnailDirectory(level).isEmpty()) ||
+    if ((Core::instance()->thumbnailFlavorName(level).isEmpty()) ||
         (file->image(level).isNull()) ||
         (file->isDirty()) ||
         (file->hasThumbnail(level)))

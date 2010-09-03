@@ -443,7 +443,7 @@ bool File::hasThumbnail(int level)
 {
     if(isOriginal())
         return false;
-    if (Core::instance()->thumbnailDirectory(level).isEmpty())
+    if (Core::instance()->thumbnailFlavorName(level).isEmpty())
         return false;
 
     QFileInfo info(thumbnailFileName(level));
