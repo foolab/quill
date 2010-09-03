@@ -19,7 +19,9 @@ void loadThumbs(QString originalFileName, int n, QSize size)
     QTime time;
 
     Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
-    Quill::setThumbnailDirectory(0, QDir::homePath()+"/.thumbnails/quill-benchmark");
+    Quill::setThumbnailBasePath(QDir::homePath()+"/.thumbnails/");
+    Quill::setThumbnailFlavorName(0, "quill-benchmark");
+
     Quill::setThumbnailExtension("jpg");
     Quill::setPreviewSize(0, size);
 
@@ -27,30 +29,31 @@ void loadThumbs(QString originalFileName, int n, QSize size)
 
     Quill::setFileLimit(0, numFiles);
 
-    QTemporaryFile file[numFiles];
     QString fileName[numFiles];
     QuillFile *quillFile[numFiles];
 
     {
-        QFile origFile(originalFileName);
-        origFile.open(QIODevice::ReadOnly);
-        QByteArray buf = origFile.readAll();
-        origFile.close();
-
         QImage image = QImage(originalFileName).scaled(size);
+        QTemporaryFile thumbFile;
+        thumbFile.open();
+        image.save(thumbFile.fileName(), "jpeg");
 
         for (int i=0; i<numFiles; i++) {
-            file[i].setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX.jpeg");
-            file[i].open();
-            fileName[i] = file[i].fileName();
-            file[i].write(buf);
-            file[i].flush();
+            {   // Needed for the life of the QTemporaryFile
+                QTemporaryFile file;
+                file.setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX");
+                file.open();
+                fileName[i] = file.fileName();
+                file.close();
+            }
+            QFile::remove(fileName[i]);
+            QFile::copy(originalFileName, fileName[i]);
 
             QString thumbFileName = QDir::homePath() +
                 "/.thumbnails/quill-benchmark/" +
-                File::fileNameHash(file[i].fileName()) + ".jpg";
+                File::fileNameHash(fileName[i]) + ".jpg";
 
-            image.save(thumbFileName);
+            QFile::copy(thumbFile.fileName(), thumbFileName);
         }
     }
 
@@ -89,6 +92,8 @@ void loadThumbs(QString originalFileName, int n, QSize size)
     qDebug() << "Use case load" << numFiles << "generated thumbnails:"
              << finalTime << "ms";
 
-    for (int i=0; i<numFiles; i++)
+    for (int i=0; i<numFiles; i++) {
         delete quillFile[i];
+        QFile::remove(fileName[i]);
+    }
 }
