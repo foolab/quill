@@ -512,6 +512,13 @@ public:
     void abortSave();
 
     /*!
+      Concludes a thumbnail save operation (internally registers
+      thumbnails as saved).
+     */
+
+    void registerThumbnail(int level);
+
+    /*!
       If the file has an original registered in core.
     */
 
@@ -696,6 +703,8 @@ private:
     QuillUndoStack *m_stack;
 
     int m_displayLevel;
+    int m_hasThumbnail; // If a thumbnail exists in the file system
+                        // optimization is currently for level 0 only
 
     QString m_fileName;
     QString m_originalFileName;

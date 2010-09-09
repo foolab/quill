@@ -612,6 +612,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 Logger::log("[Scheduler] Thumbnail save failed!");
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
+            else
+                file->registerThumbnail(task->displayLevel());
 
             // Thumbnail saving - delete temporary filter
             delete filter;
