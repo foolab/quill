@@ -88,7 +88,20 @@ Task *Scheduler::newTask()
                     return task;
             }
 
-    // Second priority (highest display level): all preview levels
+    // Second priority (any): saving thumbnails
+    // Saving a thumbnail is very fast compared to generating one,
+    // it should be done whenever possible.
+
+    if (Core::instance()->isThumbnailCreationEnabled())
+        foreach(File *file, allFiles)
+            for (int level=0; level<=previewLevelCount-1; level++) {
+                Task *task = newThumbnailSaveTask(file, level);
+
+                if (task)
+                    return task;
+            }
+
+    // Third priority (highest display level): all preview levels
     // This might be historical, can it be dropped?
 
     File *priorityFile = Core::instance()->priorityFile();
@@ -106,7 +119,7 @@ Task *Scheduler::newTask()
         }
     }
 
-    // Third priority (all other images): all preview levels
+    // Fourth priority (all other images): all preview levels
     // (lowest levels first)
 
     for (int level=0; level<=previewLevelCount-1; level++)
@@ -119,7 +132,7 @@ Task *Scheduler::newTask()
             }
 
 
-    // Fourth priority (all images):
+    // Fifth priority (all images):
     // regenerating lower-resolution preview images to
     // better match their respective higher-resolution previews or
     // full images
@@ -131,7 +144,7 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Fifth priority (save in progress): getting final full image/tiles
+    // Sixth priority (save in progress): getting final full image/tiles
 
     File *prioritySaveFile = Core::instance()->prioritySaveFile();
 
@@ -141,7 +154,7 @@ Task *Scheduler::newTask()
         if (task)
             return task;
 
-        // Sixth priority (save in progress): saving image
+        // Seventh priority (save in progress): saving image
 
         task = newSaveTask(prioritySaveFile);
 
@@ -149,7 +162,7 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Seventh priority (highest display level): full image/tiles
+    // Eighth priority (highest display level): full image/tiles
 
     if ((priorityFile != 0) &&
         (priorityFile->displayLevel() >= previewLevelCount)) {
@@ -159,17 +172,6 @@ Task *Scheduler::newTask()
         if (task)
             return task;
     }
-
-    // Eighth priority (any): saving thumbnails
-
-    if (Core::instance()->isThumbnailCreationEnabled())
-        foreach(File *file, allFiles)
-            for (int level=0; level<=previewLevelCount-1; level++) {
-                Task *task = newThumbnailSaveTask(file, level);
-
-                if (task)
-                    return task;
-            }
 
     return 0;
 }
@@ -323,8 +325,7 @@ Task *Scheduler::newThumbnailLoadTask(File *file,
     QuillUndoCommand *command = getTask(file->stack(), level);
 
     if ((command->filter()->role() != QuillImageFilter::Role_Load) ||
-        (command->index() != command->stack()->savedIndex()) ||
-        (!file->hasThumbnail(level)))
+        (command->index() != command->stack()->savedIndex()))
         return 0;
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
@@ -350,7 +351,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     if ((!stack) || (!stack->command()))
         return 0;
 
-    if ((Core::instance()->thumbnailDirectory(level).isEmpty()) ||
+    if ((Core::instance()->thumbnailFlavorName(level).isEmpty()) ||
         (file->image(level).isNull()) ||
         (file->isDirty()) ||
         (file->hasThumbnail(level)))
@@ -613,6 +614,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 Logger::log("[Scheduler] Thumbnail save failed!");
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
+            else
+                file->registerThumbnail(task->displayLevel());
 
             // Thumbnail saving - delete temporary filter
             delete filter;

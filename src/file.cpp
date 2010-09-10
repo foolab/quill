@@ -55,7 +55,8 @@
 
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false), m_isClone(false),
-               m_displayLevel(-1), m_fileName(""), m_originalFileName(""),
+               m_displayLevel(-1), m_hasThumbnail(false),
+               m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false)
 {
@@ -193,6 +194,11 @@ bool File::setDisplayLevel(int level)
         if ((l < Core::instance()->previewLevelCount()) ||
             (!isSaveInProgress()))
             Core::instance()->cache(l)->purge(this);
+
+    // Optimization: check thumbnail existence in file system here
+    // and only here!
+    if ((level >= 0) && (m_displayLevel < 0))
+        m_hasThumbnail = hasThumbnail(0);
 
     m_displayLevel = level;
 
@@ -443,8 +449,16 @@ bool File::hasThumbnail(int level)
 {
     if(isOriginal())
         return false;
-    if (Core::instance()->thumbnailDirectory(level).isEmpty())
+    if (Core::instance()->thumbnailFlavorName(level).isEmpty())
         return false;
+
+    // Optimization currently for level 0 only
+    // For externally supported files, thumbnails may appear at any time
+    // so they need to be always checked from the file system
+    if ((level == 0) &&
+        (state() != State_ExternallySupportedFormat) &&
+        (m_displayLevel >= 0))
+        return m_hasThumbnail;
 
     QFileInfo info(thumbnailFileName(level));
 
@@ -727,6 +741,7 @@ void File::removeThumbnails()
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
         if (hasThumbnail(level))
             QFile::remove(thumbnailFileName(level));
+    m_hasThumbnail = false;
 }
 
 void File::touchThumbnails()
@@ -876,6 +891,12 @@ void File::abortSave()
     delete m_temporaryFile;
     m_temporaryFile = 0;
     setState(State_Normal);
+}
+
+void File::registerThumbnail(int level)
+{
+    if (level == 0)
+        m_hasThumbnail = true;
 }
 
 bool File::hasOriginal()
