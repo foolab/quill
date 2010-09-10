@@ -1,3 +1,8 @@
+libquill (1.100910.0) unstable; urgency=low
+  * Further optimized thumbnail existence checks.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 10 Sep 2010 08:15:00 +0200
+
 libquill (1.100903.0) unstable; urgency=low
   * Optimized file use with lots of small images.
 
