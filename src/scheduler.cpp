@@ -112,7 +112,7 @@ Task *Scheduler::newTask()
 
     for (int level=0; level<=previewLevelCount-1; level++)
         foreach (File *file, allFiles)
-            if (file->supported() && (level <= file->displayLevel())) {
+            if (file->supportsViewing() && (level <= file->displayLevel())) {
                 Task *task = newNormalTask(file, level);
 
                 if (task)
@@ -392,7 +392,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
 
     // For read-only images, we stop loading if we already have
     // an equivalent of the full image
-    if (file->isReadOnly() &&
+    if ((file->state() == File::State_ReadOnly) &&
         (level > Core::instance()->smallestNonCroppedLevel()) &&
         (file->image(level-1).size() == file->fullImageSize()))
         return 0;
