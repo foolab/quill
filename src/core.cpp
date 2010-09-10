@@ -554,17 +554,6 @@ QString Core::thumbnailFlavorName(int level) const
     return m_displayLevel[level]->thumbnailFlavorName();
 }
 
-void Core::setThumbnailDirectory(int level, const QString &directory)
-{
-    if ((level < 0) || (level >= m_displayLevel.count()))
-        return;
-
-    QDir dir = QDir(directory);
-    dir.cdUp();
-    setThumbnailBasePath(dir.path());
-    setThumbnailFlavorName(level, QDir(directory).dirName());
-}
-
 QString Core::thumbnailDirectory(int level) const
 {
     if ((level < 0) || (level >= m_displayLevel.count()))

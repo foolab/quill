@@ -182,16 +182,10 @@ int Quill::nonTiledImagePixelsLimit()
     return Core::instance()->nonTiledImagePixelsLimit();
 }
 
-void Quill::setEditHistoryDirectory(const QString &directory)
+void Quill::setEditHistoryPath(const QString &path)
 {
-    Core::instance()->setEditHistoryDirectory(directory);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+directory);
-}
-
-void Quill::setThumbnailDirectory(int level, const QString &directory)
-{
-    Core::instance()->setThumbnailDirectory(level, directory);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+directory);
+    Core::instance()->setEditHistoryDirectory(path);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
 }
 
 void Quill::setThumbnailBasePath(const QString &path)

@@ -84,7 +84,7 @@ void ut_tiling::testTiledSaving()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(2, 2));
 
     QImage image(testFile.fileName());
@@ -153,7 +153,7 @@ void ut_tiling::testTiledSavingSmallCache()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setTileCacheSize(1);
 
@@ -219,7 +219,7 @@ void ut_tiling::testTiledSwipe()
     image2.fill(qRgb(255, 255, 255));
     image2.save(testFile2.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
@@ -297,7 +297,7 @@ void ut_tiling::testTiledSaveLoad()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(2, 2));
 
     QImage image(testFile.fileName());
@@ -375,7 +375,7 @@ void ut_tiling::testSaveBuffer()
 
     originalImage.save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setSaveBufferSize(4);
 
@@ -445,7 +445,7 @@ void ut_tiling::testSaveBufferUnequal()
 
     originalImage.save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setSaveBufferSize(6);
@@ -660,7 +660,7 @@ void ut_tiling::testSaveInterrupted()
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     Quill::setPreviewSize(0, QSize(4, 2));
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(4, 4));
 
     QImage image(testFile.fileName());

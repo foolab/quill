@@ -56,7 +56,6 @@ ut_stack::ut_stack()
 
 void ut_stack::initTestCase()
 {
-    QuillImageFilter::registerAll();
     QDir().mkpath("/tmp/quill/history");
 }
 
@@ -273,7 +272,7 @@ void ut_stack::testSessionSaveLoad()
     filter4->setOption(QuillImageFilter::Angle, QVariant(90));
     QuillImage resultImage4 = filter4->apply(resultImage3);
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 5);
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
@@ -301,7 +300,7 @@ void ut_stack::testSessionSaveLoad()
     Quill::initTestingMode();
     Quill::setPreviewSize(0, QSize(8, 2));
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 5);
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
@@ -336,12 +335,12 @@ void ut_stack::testSetImage()
     QImage image = Unittests::generatePaletteImage();
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("BrightnessContrast");
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
     QuillImage resultImage = filter->apply(image);
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 2);
 
     QuillFile *file = new QuillFile(testFile.fileName(), "");
@@ -370,7 +369,7 @@ void ut_stack::testSetImageOnNonexistent()
 {
     QImage image = Unittests::generatePaletteImage();
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 2);
 
     QuillFile *file = new QuillFile("/tmp/quill/invalid", "");

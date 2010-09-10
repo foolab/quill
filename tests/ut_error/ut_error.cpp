@@ -56,12 +56,18 @@
 #include "ut_error.h"
 #include "unittests.h"
 
-ut_error::ut_error()
+ut_error::ut_error() : editHistoryPath("tmp/quill/history"),
+                       thumbnailBasePath("/tmp/quill/thumbnails"),
+                       thumbnailFlavorName("normal"),
+                       thumbnailFullPath(thumbnailBasePath+"/"+
+                                         thumbnailFlavorName+"/")
 {
 }
 
 void ut_error::initTestCase()
 {
+    QDir().mkpath(editHistoryPath);
+    QDir().mkpath(thumbnailBasePath+"/"+thumbnailFlavorName);
 }
 
 void ut_error::cleanupTestCase()
@@ -109,7 +115,7 @@ void ut_error::testEditHistoryWriteFailed()
     QFile dummyFile("/tmp/invalid");
     dummyFile.open(QIODevice::WriteOnly);
 
-    Quill::setEditHistoryDirectory("/tmp/invalid");
+    Quill::setEditHistoryPath("/tmp/invalid");
 
     QuillError error;
 
@@ -195,7 +201,6 @@ void ut_error::testEmptyFileRead()
     QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
     QCOMPARE(error.errorData(), testFile.fileName());
 
-    QCOMPARE(file->supported(), false);
     QCOMPARE(file->supportsThumbnails(), false);
     QCOMPARE(file->supportsViewing(), false);
     QCOMPARE(file->supportsEditing(), false);
@@ -259,7 +264,6 @@ void ut_error::testWriteProtectedFile()
 
     file->runFilter(filter);
 
-    QVERIFY(!file->isReadOnly());
     QVERIFY(file->supportsEditing());
 
     // Write protect before save is called
@@ -509,7 +513,7 @@ void ut_error::testOriginalDirectoryCreateFailed()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath(editHistoryPath);
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
@@ -555,9 +559,7 @@ void ut_error::testForbiddenThumbnail()
 
     QString thumbFileName = File::fileNameHash(testFile.fileName());
     thumbFileName.append(".png");
-    thumbFileName.prepend("/tmp/quill/thumbnails/");
-
-    QDir().mkpath("/tmp/quill/thumbnails");
+    thumbFileName.prepend(thumbnailFullPath);
 
     QImage thumbImage =
         image.scaled(QSize(4, 1), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -567,7 +569,8 @@ void ut_error::testForbiddenThumbnail()
     qFile.setPermissions(0);
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath(thumbnailBasePath);
+    Quill::setThumbnailFlavorName(0, thumbnailFlavorName);
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
@@ -616,7 +619,7 @@ void ut_error::testCorruptThumbnail()
 
     QString thumbFileName = File::fileNameHash(testFile.fileName());
     thumbFileName.append(".png");
-    thumbFileName.prepend("/tmp/quill/thumbnails/");
+    thumbFileName.prepend(thumbnailFullPath);
 
     QFile qFile(thumbFileName);
     qFile.open(QIODevice::WriteOnly);
@@ -624,7 +627,8 @@ void ut_error::testCorruptThumbnail()
     qFile.close();
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath(thumbnailBasePath);
+    Quill::setThumbnailFlavorName(0, thumbnailFlavorName);
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
@@ -677,7 +681,8 @@ void ut_error::testThumbnailDirectoryCreateFailed()
 
     Quill::setPreviewLevelCount(1);
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setThumbnailDirectory(0, "/tmp/invalid");
+    Quill::setThumbnailBasePath("/tmp");
+    Quill::setThumbnailFlavorName(0, "invalid");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
@@ -708,7 +713,7 @@ void ut_error::testTemporaryFileDirectoryCreateFailed()
     image.save(testFile.fileName(), "png");
 
     Quill::setTemporaryFilePath("/tmp/invalid");
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath(editHistoryPath);
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
@@ -755,12 +760,9 @@ void ut_error::testUnreadableEditHistory()
     QDir().mkpath(fileInfo.path() + "/.original/");
     image.save(originalFileName, "png");
 
-    const QString editHistoryDirectory = "/tmp/quill/history";
-    QDir().mkpath(editHistoryDirectory);
-
-    Quill::setEditHistoryDirectory(editHistoryDirectory);
+    Quill::setEditHistoryPath(editHistoryPath);
     const QString editHistoryFileName =
-        File::editHistoryFileName(testFile.fileName(), editHistoryDirectory);
+        File::editHistoryFileName(testFile.fileName(), editHistoryPath);
 
     QFile editHistoryFile(editHistoryFileName);
     editHistoryFile.open(QIODevice::WriteOnly);
@@ -799,12 +801,9 @@ void ut_error::testEmptyEditHistory()
     QDir().mkpath(fileInfo.path() + "/.original/");
     image.save(originalFileName, "png");
 
-    const QString editHistoryDirectory = "/tmp/quill/history";
-    QDir().mkpath(editHistoryDirectory);
-
-    Quill::setEditHistoryDirectory(editHistoryDirectory);
+    Quill::setEditHistoryPath(editHistoryPath);
     const QString editHistoryFileName =
-        File::editHistoryFileName(testFile.fileName(), editHistoryDirectory);
+        File::editHistoryFileName(testFile.fileName(), editHistoryPath);
 
     QFile editHistoryFile(editHistoryFileName);
     editHistoryFile.open(QIODevice::WriteOnly | QIODevice::Truncate);
@@ -839,12 +838,9 @@ void ut_error::testCorruptEditHistory()
     QDir().mkpath(fileInfo.path() + "/.original/");
     image.save(originalFileName, "png");
 
-    const QString editHistoryDirectory = "/tmp/quill/history";
-    QDir().mkpath(editHistoryDirectory);
-
-    Quill::setEditHistoryDirectory(editHistoryDirectory);
+    Quill::setEditHistoryPath(editHistoryPath);
     const QString editHistoryFileName =
-        File::editHistoryFileName(testFile.fileName(), editHistoryDirectory);
+        File::editHistoryFileName(testFile.fileName(), editHistoryPath);
 
     QFile editHistoryFile(editHistoryFileName);
     editHistoryFile.open(QIODevice::WriteOnly);
@@ -877,7 +873,7 @@ void ut_error::testEditHistoryDirectoryCreateFailed()
     QFile dummyFile("/tmp/invalid");
     dummyFile.open(QIODevice::WriteOnly);
 
-    Quill::setEditHistoryDirectory("/tmp/invalid");
+    Quill::setEditHistoryPath("/tmp/invalid");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
@@ -918,12 +914,9 @@ void ut_error::testWriteProtectedEditHistory()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    const QString editHistoryDirectory = "/tmp/quill/history";
-    QDir().mkpath(editHistoryDirectory);
-
-    Quill::setEditHistoryDirectory(editHistoryDirectory);
+    Quill::setEditHistoryPath(editHistoryPath);
     const QString editHistoryFileName =
-        File::editHistoryFileName(testFile.fileName(), editHistoryDirectory);
+        File::editHistoryFileName(testFile.fileName(), editHistoryPath);
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
@@ -973,7 +966,6 @@ void ut_error::testWriteProtectedEditHistory()
     file = new QuillFile(testFile.fileName(), "png");
 
     QCOMPARE(spy2.count(), 1);
-    QVERIFY(file->isReadOnly());
     QVERIFY(!file->supportsEditing());
 
     delete file;

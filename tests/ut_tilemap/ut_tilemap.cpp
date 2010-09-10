@@ -53,7 +53,6 @@ ut_tilemap::ut_tilemap(): tileCache(0)
 
 void ut_tilemap::initTestCase()
 {
-    QuillImageFilter::registerAll();
     tileCache = new TileCache(50);
 }
 

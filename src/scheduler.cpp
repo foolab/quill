@@ -642,7 +642,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
         if (filter == 0)
             filter = QuillImageFilterFactory::
-                createImageFilter("RedEyeReduction");
+                createImageFilter("org.maemo.red-eye-reduction");
 
         delete generator;
         command->setFilter(filter);

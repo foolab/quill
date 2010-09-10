@@ -1056,6 +1056,10 @@ bool File::supportsViewing() const
 
 bool File::supportsEditing() const
 {
+    // this needs to be called to determine if the file has a read only format
+    if (m_stack->isClean())
+        m_stack->load();
+
     return ((m_state != State_NonExistent) &&
             (m_state != State_UnsupportedFormat) &&
             (m_state != State_ExternallySupportedFormat) &&

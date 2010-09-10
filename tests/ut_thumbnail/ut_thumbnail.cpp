@@ -133,7 +133,8 @@ void ut_thumbnail::testSave()
 
     Quill::setPreviewSize(0, QSize(4, 1));
 
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName());
@@ -165,8 +166,9 @@ void ut_thumbnail::testUpdate()
 
     Quill::setPreviewSize(0, QSize(8, 2));
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setEditHistoryPath("/tmp/quill/history");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
@@ -215,10 +217,11 @@ void ut_thumbnail::testLoadUnsupported()
     QImage image = Unittests::generatePaletteImage();
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("png");
 
-    QString thumbName = "/tmp/quill/thumbnails/" +
+    QString thumbName = "/tmp/quill/thumbnails/normal/" +
         File::fileNameHash(fileName) + ".png";
     image.save(thumbName, "png");
 
@@ -253,7 +256,8 @@ void ut_thumbnail::testFailedWrite()
     QFile dummyFile("/tmp/invalid");
     dummyFile.open(QIODevice::WriteOnly);
 
-    Quill::setThumbnailDirectory(0, "/tmp/invalid");
+    Quill::setThumbnailBasePath("/tmp/");
+    Quill::setThumbnailFlavorName(0, "invalid");
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName());
@@ -269,7 +273,8 @@ void ut_thumbnail::testFailedWrite()
     QVERIFY(!Quill::isThumbnailCreationEnabled());
 
     // Change the thumbnail directory into something reasonable
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
 
     Quill::setThumbnailCreationEnabled(true);
     Quill::releaseAndWait();
@@ -296,14 +301,14 @@ void ut_thumbnail::testFromSetImage()
     Quill::setPreviewSize(0, QSize(2, 2));
     Quill::setMinimumPreviewSize(0, QSize(2, 2));
 
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
-    Quill::setThumbnailDirectory(1, "/tmp/quill/thumbnails1");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
+    Quill::setThumbnailFlavorName(1, "large");
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "video/avi");
     QVERIFY(file);
 
-    file->setWaitingForData(true);
     file->setDisplayLevel(1);
     file->setImage(1, image);
 
@@ -336,13 +341,13 @@ void ut_thumbnail::testDownscaledFromSetImage()
 
     Quill::setPreviewSize(0, QSize(4, 1));
 
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("png");
 
     QuillFile *file = new QuillFile(testFile.fileName(), "video/avi");
     QVERIFY(file);
 
-    file->setWaitingForData(true);
     file->setDisplayLevel(0);
     file->setImage(0, image); // Set too big image
 
