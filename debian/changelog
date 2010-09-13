@@ -1,3 +1,8 @@
+libquill (1.100913.2) unstable; urgency=low
+  * Fixes: NB#191407 Source package 'libquill', 'libquillmetadata' interfaces not frozen in 0.2010.36-5
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 13 Sep 2010 10:03:00 +0200
+
 libquill (1.100913.1) unstable; urgency=low
   * API is now stable.
 
