@@ -171,12 +171,6 @@ public:
 
     void setReadOnly();
 
-    /*!
-      If the file is read only.
-    */
-
-    bool isReadOnly() const;
-
     bool isDisplayLevelEnabled(int level) const;
 
     /*!
@@ -438,12 +432,6 @@ public:
     void setExists(bool exists);
 
     /*!
-      If the file is supported and has no errors.
-     */
-
-    bool supported() const;
-
-    /*!
       Tries to force Quill to acknowledge the file as supported or
       unsupported. This should only be used after the contents of a
       file have been changed. If this is set to true with a file not
@@ -453,14 +441,7 @@ public:
     void setSupported(bool supported);
 
     /*!
-      Returns true either if the file is supported() directly by Quill,
-      or if the file can be thumbnailed using the D-Bus thumbnailer.
-     */
-
-    bool thumbnailSupported() const;
-
-    /*!
-      See thumbnailSupported().
+      Marks the file as being supported by (at least) the D-Bus thumbnailer.
      */
 
     void setThumbnailSupported(bool format);
@@ -542,22 +523,6 @@ public:
 
     void imageSizeError();
 
-    /*
-      Sets the waiting-for-data status for this file.
-
-      Set this to true if you want to start editing an image which is not
-      completely available yet, for example if it is currently being
-      transferred by the network. Use setImage() to immediately set a preview
-      level. Set this to false when the full image has arrived.
-
-      Warning: the status must be set before raising the preview level, or the
-      image will get an "unsupported" status.
-
-      DEPRECATED.
-    */
-
-    void setWaitingForData(bool status);
-
     /*!
       Reloads changes from the file system.
      */
@@ -565,7 +530,7 @@ public:
     void refresh();
 
     /*!
-      Returns the waiting-for-data status for the file. See setWaitingForData().
+      Returns true for images that are in Placeholder state, false otherwise.
     */
 
     bool isWaitingForData() const;

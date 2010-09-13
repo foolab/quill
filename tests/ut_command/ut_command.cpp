@@ -52,7 +52,6 @@ ut_command::ut_command()
 
 void ut_command::initTestCase()
 {
-    QuillImageFilter::registerAll();
     stack = new QuillUndoStack(0);
 }
 

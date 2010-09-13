@@ -54,7 +54,6 @@ ut_savemap::ut_savemap()
 
 void ut_savemap::initTestCase()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_savemap::cleanupTestCase()

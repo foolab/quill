@@ -96,7 +96,7 @@ void ut_format::testSizeLimit()
     QCOMPARE(error.errorCode(), QuillError::ImageSizeLimitError);
     QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
 
-    QVERIFY(!file->supported());
+    QVERIFY(!file->supportsViewing());
 
     delete file;
 }
@@ -121,7 +121,7 @@ void ut_format::testPixelsLimit()
     QCOMPARE(error.errorCode(), QuillError::ImageSizeLimitError);
     QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
 
-    QVERIFY(!file->supported());
+    QVERIFY(!file->supportsViewing());
     delete file;
 }
 
@@ -142,12 +142,12 @@ void ut_format::testNonTiledPixelsLimit()
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     file->setDisplayLevel(0);
-    QVERIFY(!file->supported());
+    QVERIFY(!file->supportsViewing());
 
     QuillFile *file2 = new QuillFile(testFile2.fileName(), "jpg");
 
     file2->setDisplayLevel(0);
-    QVERIFY(file2->supported());
+    QVERIFY(file2->supportsViewing());
 
     delete file;
     delete file2;
@@ -167,7 +167,7 @@ void ut_format::testMultipleLimits()
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     file->setDisplayLevel(0);
-    QVERIFY(!file->supported());
+    QVERIFY(!file->supportsViewing());
 
     delete file;
 }
@@ -183,8 +183,8 @@ void ut_format::testReadOnlyFormat()
     testFile.write(buffer);
     testFile.flush();
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "gif");
-    QVERIFY(file->isReadOnly());
+    QuillFile *file = new QuillFile(testFile.fileName(), "image/gif");
+    QVERIFY(!file->supportsEditing());
     delete file;
 }
 

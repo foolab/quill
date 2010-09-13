@@ -164,14 +164,6 @@ void File::setReadOnly()
         setState(State_ReadOnly);
 }
 
-bool File::isReadOnly() const
-{
-    if (m_stack->isClean())
-        m_stack->load();
-
-    return state() == State_ReadOnly;
-}
-
 bool File::isDisplayLevelEnabled(int level) const
 {
     return Core::instance()->isSubstituteLevel(level, m_displayLevel);
@@ -498,11 +490,11 @@ QString File::thumbnailFileName(int level)
 }
 
 QString File::editHistoryFileName(const QString &fileName,
-                                  const QString &editHistoryDirectory)
+                                  const QString &editHistoryPath)
 {
     QString hashValueString = fileNameHash(fileName);
     hashValueString.append(".xml");
-    hashValueString.prepend(editHistoryDirectory + QDir::separator());
+    hashValueString.prepend(editHistoryPath + QDir::separator());
 
     return hashValueString;
 }
@@ -520,7 +512,7 @@ File *File::readFromEditHistory(const QString &fileName,
     }
 
     QFile file(editHistoryFileName(fileName,
-                                   Core::instance()->editHistoryDirectory()));
+                                   Core::instance()->editHistoryPath()));
 
     Logger::log("[File] Reading edit history from "+file.fileName());
 
@@ -573,14 +565,14 @@ File *File::readFromEditHistory(const QString &fileName,
 
 void File::writeEditHistory(const QString &history, QuillError *error)
 {
-    if (!QDir().mkpath(Core::instance()->editHistoryDirectory())) {
+    if (!QDir().mkpath(Core::instance()->editHistoryPath())) {
         *error = QuillError(QuillError::DirCreateError,
                             QuillError::EditHistoryErrorSource,
-                            Core::instance()->editHistoryDirectory());
+                            Core::instance()->editHistoryPath());
         return;
     }
     QFile file(editHistoryFileName(m_fileName,
-                                   Core::instance()->editHistoryDirectory()));
+                                   Core::instance()->editHistoryPath()));
 
     Logger::log("[File] Writing edit history to "+file.fileName());
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
@@ -630,7 +622,7 @@ void File::remove()
     QFile(m_fileName).remove();
     QFile(m_originalFileName).remove();
     QFile::remove(editHistoryFileName(m_fileName,
-                                      Core::instance()->editHistoryDirectory()));
+                                      Core::instance()->editHistoryPath()));
     removeThumbnails();
 
     abortSave();
@@ -673,25 +665,12 @@ void File::setSupported(bool supported)
         setState(State_UnsupportedFormat);
 }
 
-bool File::supported() const
-{
-    return supportsViewing();
-}
-
 void File::setThumbnailSupported(bool supported)
 {
     if (supported && (state() == State_UnsupportedFormat))
         setState(State_ExternallySupportedFormat);
     else if (!supported)
         setState(State_UnsupportedFormat);
-}
-
-bool File::thumbnailSupported() const
-{
-    if (Core::instance()->isDBusThumbnailingEnabled())
-        return supportsThumbnails();
-    else
-        return supportsViewing();
 }
 
 QuillError File::overwritingCopy(const QString &fileName,
@@ -766,7 +745,7 @@ void File::prepareSave()
     // extension as the target file, so that the correct format can be
     // deduced by QImageReader.
 
-    QString path = Core::instance()->temporaryFileDirectory();
+    QString path = Core::instance()->temporaryFilePath();
     if (path.isNull())
         path = "/tmp";
 
@@ -966,14 +945,6 @@ void File::imageSizeError()
     setState(State_UnsupportedFormat);
 }
 
-void File::setWaitingForData(bool status)
-{
-    if (status)
-        setState(State_Placeholder);
-    else
-        refresh();
-}
-
 void File::refresh()
 {
     // Purge temporary images from cache
@@ -1085,6 +1056,10 @@ bool File::supportsViewing() const
 
 bool File::supportsEditing() const
 {
+    // this needs to be called to determine if the file has a read only format
+    if (m_stack->isClean())
+        m_stack->load();
+
     return ((m_state != State_NonExistent) &&
             (m_state != State_UnsupportedFormat) &&
             (m_state != State_ExternallySupportedFormat) &&

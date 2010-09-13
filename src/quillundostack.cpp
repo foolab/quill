@@ -80,13 +80,13 @@ void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
     if (loadFile.exists() && (loadFile.size() > 0)) {
         filter->setOption(QuillImageFilter::FileName,
                           m_file->originalFileName());
-        filter->setOption(QuillImageFilter::FileFormat,
+        filter->setOption(QuillImageFilter::MimeType,
                           m_file->fileFormat());
     }
     else {
         filter->setOption(QuillImageFilter::FileName,
                           m_file->fileName());
-        filter->setOption(QuillImageFilter::FileFormat,
+        filter->setOption(QuillImageFilter::MimeType,
                           m_file->targetFormat());
     }
 

@@ -48,7 +48,6 @@
 
 void ut_imagecache::initTestCase()
 {
-    QuillImageFilter::registerAll();
     file = new File();
 }
 

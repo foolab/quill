@@ -319,21 +319,28 @@ public:
       Default is $HOME/.config/quill/history.
      */
 
-    void setEditHistoryDirectory(const QString &directory);
+    void setEditHistoryPath(const QString &path);
 
-    QString editHistoryDirectory() const;
+    QString editHistoryPath() const;
 
     /*!
-      Sets the directory where to look for ready-made thumbnails
-      for a given preview level. Default is empty, meaning that all
-      preview images for the level are generated from the full image.
-     */
-
-    void setThumbnailDirectory(int level, const QString &directory);
+      Returns the full path where ready-made thumbnails for a given preview
+      level are stored.
+    */
 
     QString thumbnailDirectory(int level) const;
 
+    /*!
+      Sets the base path for thumbnails.
+     */
+
     void setThumbnailBasePath(const QString &path);
+
+    /*!
+      Sets the thumbnail flavor name for a given preview level. Thumbnails
+      for a given level are stored under the base path, in a subdirectory
+      with a same name than the flavor name.
+     */
 
     void setThumbnailFlavorName(int level, const QString &name);
 
@@ -517,12 +524,12 @@ public:
       Sets the temporary file path
       @param fileDir the file path
     */
-    void setTemporaryFileDirectory(const QString &fileDir);
+    void setTemporaryFilePath(const QString &filePath);
 
     /*!
       Gets the temporary file path
      */
-    QString temporaryFileDirectory() const;
+    QString temporaryFilePath() const;
 
     /*!
       Sets the default color for alpha channel rendering.
@@ -687,7 +694,7 @@ private:
     int m_imagePixelsLimit, m_nonTiledImagePixelsLimit;
     QSize m_vectorGraphicsRenderingSize;
 
-    QString m_editHistoryDirectory;
+    QString m_editHistoryPath;
     QString m_thumbnailBasePath;
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
@@ -703,7 +710,7 @@ private:
     Scheduler *m_scheduler;
     ThreadManager *m_threadManager;
 
-    QString m_temporaryFileDirectory;
+    QString m_temporaryFilePath;
     QString m_crashDumpPath;
 
     QColor m_backgroundRenderingColor;

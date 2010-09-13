@@ -393,14 +393,6 @@ public:
     static int nonTiledImagePixelsLimit();
 
     /*
-      Deprecated: please use setEditHistoryPath().
-      Sets the default directory where to look for edit histories.
-      Default is $HOME/.config/quill/history.
-     */
-
-    static void setEditHistoryDirectory(const QString &directory);
-
-    /*
       Sets the path where Quill will store and retrieve edit histories.
       Default is $HOME/.config/quill/history .
      */
@@ -426,16 +418,6 @@ public:
     */
 
     static void setThumbnailFlavorName(int level, const QString &name);
-
-    /*!
-      Deprecated, please use setThumbnailBasePath() and setThumbnailFlavorName()
-
-      Sets the directory where to look for ready-made thumbnails
-      for a given preview level. Default is empty, meaning that all
-      preview images for the level are generated from the full image.
-     */
-
-    static void setThumbnailDirectory(int level, const QString &directory);
 
     /*!
       Sets the file extension which is used in storing and retrieving thumbnail
