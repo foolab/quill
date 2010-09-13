@@ -4,5 +4,5 @@ interface: Image Processing Engine
 type: library
 libs-pkg: libquill1
 dev-pkg: libquill-dev
-state: unstable
+state: stable
 scope: Platform
