@@ -55,7 +55,7 @@ ut_filtergenerator::ut_filtergenerator()
 
 void ut_filtergenerator::initTestCase()
 {
-    QDir().mkpath("/tmp/quill/thumbnails");
+    QDir().mkpath("/tmp/quill/thumbnails/normal");
 }
 
 void ut_filtergenerator::cleanupTestCase()
