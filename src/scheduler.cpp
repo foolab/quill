@@ -312,13 +312,10 @@ Task *Scheduler::newThumbnailLoadTask(QList<File*> files, int minPriority)
     for (int level=0; level<=previewLevelCount-1; level++)
         foreach (File *file, files)
             if (level <= file->displayLevel() &&
-                (file->priority() > minPriority)) {
+                (file->priority() >= minPriority)) {
                 Task *task = 0;
                 if (file->hasThumbnail(level)){
                     task = newThumbnailLoadTask(file, level);
-                }
-                else{
-                    task = newNormalTask(file, level);
                 }
                 if (task)
                     return task;
@@ -399,7 +396,7 @@ Task *Scheduler::newNormalTask(QList<File*> files, int priority)
 
     for (int level=0; level<=previewLevelCount-1; level++)
         foreach (File *file, files)
-            if (file->supported() && (level <= file->displayLevel()) &&
+            if (file->supportsViewing() && (level <= file->displayLevel()) &&
                 (file->priority() >= priority)) {
                 Task *task = newNormalTask(file, level);
 

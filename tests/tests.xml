@@ -142,6 +142,14 @@
 	<step >/usr/lib/libquill-tests/ut_tileloading </step>
       </case>
     </set>
+
+    <set name="quill-scheduler-tests" feature="optimization">
+      <description>quill tile loading test</description>
+      <case name="ut_scheduler" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_scheduler </step>
+      </case>
+    </set>
+
     <set name="quill-logger-tests" feature="errorhandling">
       <description>quill logger test</description>
       <case name="ut_logger" type="Functional" level="Component">

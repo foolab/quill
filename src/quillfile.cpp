@@ -55,6 +55,7 @@ QuillFile::QuillFile()
     priv = new QuillFilePrivate;
     priv->m_file = 0;
     priv->m_displayLevel = -1;
+    priv->m_priority = Priority_Normal;
 }
 
 QuillFile::QuillFile(const QString &fileName,
@@ -63,6 +64,7 @@ QuillFile::QuillFile(const QString &fileName,
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+" file name: "+fileName+" file format: "+fileFormat);
     priv = new QuillFilePrivate;
     priv->m_displayLevel = -1;
+    priv->m_priority = Priority_Normal;
 
     attach(Core::instance()->file(fileName, fileFormat));
 }
@@ -71,6 +73,7 @@ QuillFile::QuillFile(File *file)
 {
     priv = new QuillFilePrivate;
     priv->m_displayLevel = -1;
+    priv->m_priority = Priority_Normal;
     attach(file);
 }
 
@@ -102,6 +105,8 @@ void QuillFile::attach(File *file)
         connect(priv->m_file,
                 SIGNAL(error(QuillError)),
                 SIGNAL(error(QuillError)));
+
+        priv->m_file->calculatePriority();
     }
 }
 

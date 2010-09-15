@@ -28,6 +28,7 @@ SUBDIRS += \
            ut_export \
            ut_format \
            ut_croppedthumbnail \
+           ut_scheduler \
            ut_logger \
            ut_quillmetadata \
            ut_dbusthumbnailer \

@@ -55,8 +55,8 @@
 
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false), m_isClone(false),
-               m_displayLevel(-1), m_hasThumbnail(false),
-               m_fileName(""), m_originalFileName(""),
+               m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
+               m_hasThumbnail(false), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false)
 {
@@ -212,10 +212,10 @@ int File::displayLevel() const
 
 void File::calculatePriority()
 {
-    int priority = -INT_MAX;
+    int priority = INT_MIN;
     foreach (QuillFile *file, m_references)
         if (file->priority() > priority)
-                priority = file->priority();
+            priority = file->priority();
     m_priority = priority;
 }
 
