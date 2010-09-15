@@ -37,6 +37,7 @@
 **
 ****************************************************************************/
 
+#include <limits.h>
 #include <QDir>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
@@ -72,21 +73,15 @@ Task *Scheduler::newTask()
 
     const int previewLevelCount = Core::instance()->previewLevelCount();
 
-    // First priority (all files): loading any pre-generated thumbnails
-    // (lowest levels first)
-    for (int level=0; level<=previewLevelCount-1; level++)
-        foreach (File *file, allFiles)
-            if (level <= file->displayLevel()) {
-                Task *task = 0;
-                if (file->hasThumbnail(level)){
-                    task = newThumbnailLoadTask(file, level);
-                }
-                else{
-                    task = newNormalTask(file, level);
-                }
-                if (task)
-                    return task;
-            }
+    // First priority (high priority files): loading any
+    // pre-generated thumbnails (lowest levels first)
+
+    {
+        Task *task = newThumbnailLoadTask(allFiles,
+                                          QuillFile::Priority_Normal);
+        if (task)
+            return task;
+    }
 
     // Second priority (any): saving thumbnails
     // Saving a thumbnail is very fast compared to generating one,
@@ -101,38 +96,34 @@ Task *Scheduler::newTask()
                     return task;
             }
 
-    // Third priority (highest display level): all preview levels
-    // This might be historical, can it be dropped?
+    // Third priority (high priority files): all preview levels
+    // (lowest first)
 
-    File *priorityFile = Core::instance()->priorityFile();
-
-    if (priorityFile) {
-
-        int maxLevel = priorityFile->displayLevel();
-        if (maxLevel >= previewLevelCount)
-            maxLevel = previewLevelCount-1;
-
-        for (int level=0; level<=maxLevel; level++) {
-            Task *task = newNormalTask(priorityFile, level);
-            if (task)
-                return task;
-        }
+    {
+        Task *task = newNormalTask(allFiles,
+                                   QuillFile::Priority_Normal);
+        if (task)
+            return task;
     }
 
-    // Fourth priority (all other images): all preview levels
+    // Fourth priority (low priority files): pre-generated thumbnails
+
+    {
+        Task *task = newThumbnailLoadTask(allFiles, INT_MIN);
+        if (task)
+            return task;
+    }
+
+    // Fifth priority (low priority files): all preview levels
     // (lowest levels first)
 
-    for (int level=0; level<=previewLevelCount-1; level++)
-        foreach (File *file, allFiles)
-            if (file->supported() && (level <= file->displayLevel())) {
-                Task *task = newNormalTask(file, level);
+    {
+        Task *task = newNormalTask(allFiles, INT_MIN);
+        if (task)
+            return task;
+    }
 
-                if (task)
-                    return task;
-            }
-
-
-    // Fifth priority (all images):
+    // Sixth priority (all images):
     // regenerating lower-resolution preview images to
     // better match their respective higher-resolution previews or
     // full images
@@ -144,7 +135,7 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Sixth priority (save in progress): getting final full image/tiles
+    // Seventh priority (save in progress): getting final full image/tiles
 
     File *prioritySaveFile = Core::instance()->prioritySaveFile();
 
@@ -154,7 +145,7 @@ Task *Scheduler::newTask()
         if (task)
             return task;
 
-        // Seventh priority (save in progress): saving image
+        // Eighth priority (save in progress): saving image
 
         task = newSaveTask(prioritySaveFile);
 
@@ -162,7 +153,9 @@ Task *Scheduler::newTask()
             return task;
     }
 
-    // Eighth priority (highest display level): full image/tiles
+    // Last priority (highest display level): full image/tiles
+
+    File *priorityFile = Core::instance()->priorityFile();
 
     if ((priorityFile != 0) &&
         (priorityFile->displayLevel() >= previewLevelCount)) {
@@ -312,8 +305,28 @@ Task *Scheduler::newTilingOverlayTask(File *file)
     return task;
 }
 
-Task *Scheduler::newThumbnailLoadTask(File *file,
-                                      int level)
+Task *Scheduler::newThumbnailLoadTask(QList<File*> files, int minPriority)
+{
+    int previewLevelCount = Core::instance()->previewLevelCount();
+
+    for (int level=0; level<=previewLevelCount-1; level++)
+        foreach (File *file, files)
+            if (level <= file->displayLevel() &&
+                (file->priority() > minPriority)) {
+                Task *task = 0;
+                if (file->hasThumbnail(level)){
+                    task = newThumbnailLoadTask(file, level);
+                }
+                else{
+                    task = newNormalTask(file, level);
+                }
+                if (task)
+                    return task;
+            }
+    return 0;
+}
+
+Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
 {
     if (!file->stack())
         return 0;
@@ -378,6 +391,22 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     task->setInputImage(QImage(file->image(level)));
 
     return task;
+}
+
+Task *Scheduler::newNormalTask(QList<File*> files, int priority)
+{
+    int previewLevelCount = Core::instance()->previewLevelCount();
+
+    for (int level=0; level<=previewLevelCount-1; level++)
+        foreach (File *file, files)
+            if (file->supported() && (level <= file->displayLevel()) &&
+                (file->priority() >= priority)) {
+                Task *task = newNormalTask(file, level);
+
+                if (task)
+                    return task;
+            }
+    return 0;
 }
 
 Task *Scheduler::newNormalTask(File *file, int level)

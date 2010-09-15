@@ -36,7 +36,7 @@
 ** contact the sales department at qt-sales@nokia.com.
 **
 ****************************************************************************/
-
+#include <limits.h>
 #include <QTemporaryFile>
 #include <QFileInfo>
 #include <QUrl>
@@ -83,6 +83,8 @@ void File::removeReference(QuillFile *file)
         // Trying to lower the display level, remaining references will
         // prevent this from happening.
         setDisplayLevel(-1);
+        // Recalculate priority from remaining references
+        calculatePriority();
         if (m_references.isEmpty() && !isSaveInProgress()) {
             detach();
         }
@@ -214,6 +216,20 @@ bool File::setDisplayLevel(int level)
 int File::displayLevel() const
 {
     return m_displayLevel;
+}
+
+void File::calculatePriority()
+{
+    int priority = -INT_MAX;
+    foreach (QuillFile *file, m_references)
+        if (file->priority() > priority)
+                priority = file->priority();
+    m_priority = priority;
+}
+
+int File::priority() const
+{
+    return m_priority;
 }
 
 void File::save()

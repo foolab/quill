@@ -121,6 +121,13 @@ private:
 
     Task *newNormalTask(File *file, int level);
 
+    /*
+      Go through all files above certain priority
+      trying to find a normal task
+     */
+
+    Task *newNormalTask(QList<File*> files, int minPriority);
+
     /*!
       Used by core to indicate that there may be a save task waiting
       for the background thread.
@@ -137,10 +144,17 @@ private:
     Task *newPreviewImprovementTask(File *file);
 
     /*
+      Go through all files above certain priority
+      trying to find a thumbnail load task
+     */
+
+    Task *newThumbnailLoadTask(QList<File*> files, int minPriority);
+
+    /*
       Suggest to load a pre-generated thumbnail from a file.
      */
 
-    Task *newThumbnailLoadTask(File *file, int level);
+    Task *newThumbnailLoadTask(File *file, int level) const;
 
     /*!
       Suggest to save a thumbnail

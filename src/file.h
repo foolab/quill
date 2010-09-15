@@ -200,6 +200,18 @@ public:
     int displayLevel() const;
 
     /*!
+      Recalculates priority from references.
+    */
+
+    void calculatePriority();
+
+    /*!
+      Returns file priority.
+    */
+
+    int priority() const;
+
+    /*!
       Starts to asynchronously save the current state of the active
       QuillFile with a new name and format. The new file will not have
       an edit history. The handle to the new file cannot be accessed
@@ -703,6 +715,7 @@ private:
     QuillUndoStack *m_stack;
 
     int m_displayLevel;
+    int m_priority;
     int m_hasThumbnail; // If a thumbnail exists in the file system
                         // optimization is currently for level 0 only
 

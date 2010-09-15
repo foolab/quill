@@ -47,6 +47,7 @@ class QuillFilePrivate {
 public:
     File *m_file;
     int m_displayLevel;
+    int m_priority;
 };
 
 QuillFile::QuillFile()
@@ -180,15 +181,14 @@ int QuillFile::displayLevel() const
 void QuillFile::setPriority(int priority)
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(priority));
-    Logger::log("[QuillFile] Warning: method setPriority() not implemented yet");
-    Q_UNUSED(priority);
+    priv->m_priority = priority;
+    priv->m_file->calculatePriority();
 }
 
 int QuillFile::priority() const
 {
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    Logger::log("[QuillFile] Warning: method priority() not implemented yet");
-    return 0;
+    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(priv->m_priority));
+    return priv->m_priority;
 }
 
 void QuillFile::saveAs(const QString &fileName,
