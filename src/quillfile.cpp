@@ -141,22 +141,6 @@ QString QuillFile::targetFormat() const
         return QString();
 }
 
-bool QuillFile::isReadOnly() const
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    if (priv->m_file)
-        return priv->m_file->isReadOnly();
-    else
-        return true;
-}
-
-void QuillFile::setReadOnly()
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    if (priv->m_file)
-        priv->m_file->setReadOnly();
-}
-
 bool QuillFile::setDisplayLevel(int level)
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
@@ -406,24 +390,6 @@ bool QuillFile::supportsEditing() const
         return false;
 }
 
-bool QuillFile::supported() const
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    if (priv->m_file)
-        return priv->m_file->thumbnailSupported();
-    else
-        return false;
-}
-
-void QuillFile::setSupported(bool supported)
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::boolToString(supported));
-    if (priv->m_file) {
-        priv->m_file->setSupported(supported);
-        priv->m_file->setThumbnailSupported(supported);
-    }
-}
-
 void QuillFile::remove()
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
@@ -474,22 +440,6 @@ void QuillFile::refresh()
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file)
         priv->m_file->refresh();
-}
-
-void QuillFile::setWaitingForData(bool status)
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::boolToString(status));
-    if (priv->m_file)
-        priv->m_file->setWaitingForData(status);
-}
-
-bool QuillFile::isWaitingForData() const
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    if (priv->m_file)
-        return priv->m_file->isWaitingForData();
-    else
-        return false;
 }
 
 bool QuillFile::canRevert() const

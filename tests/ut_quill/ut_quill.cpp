@@ -57,7 +57,6 @@ Q_DECLARE_METATYPE(QuillImage);
 
 void ut_quill::initTestCase()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_quill::cleanupTestCase()
@@ -393,7 +392,7 @@ void ut_quill::testLoadSave()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillImage image(QImage(testFile.fileName()));
     QCOMPARE(image, QuillImage(Unittests::generatePaletteImage()));
@@ -449,7 +448,7 @@ void ut_quill::testLoadSave()
     Quill::initTestingMode();
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 5);
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
@@ -491,7 +490,7 @@ void ut_quill::testMultiSave()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QImage image(testFile.fileName());
     QVERIFY(Unittests::compareImage(image, Unittests::generatePaletteImage()));
@@ -536,7 +535,7 @@ void ut_quill::testMultiSave()
     Quill::initTestingMode();
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy2(file2, SIGNAL(saved()));
@@ -565,7 +564,7 @@ void ut_quill::testMultiSave()
 
     Quill::setPreviewSize(0, QSize(4, 1));
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillFile *file3 = new QuillFile(testFile.fileName(), "png");
     file3->setDisplayLevel(1);
@@ -588,7 +587,7 @@ void ut_quill::testNoSave()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QImage image(testFile.fileName());
     QVERIFY(Unittests::compareImage(image, Unittests::generatePaletteImage()));
@@ -631,7 +630,7 @@ void ut_quill::testNoSave()
     Quill::initTestingMode();
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillFile *file3 = new QuillFile(testFile.fileName(), "png");
 
@@ -666,7 +665,7 @@ void ut_quill::testSaveIndex()
 
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -703,7 +702,7 @@ void ut_quill::testSaveIndex()
     Quill::initTestingMode();
 
     Quill::setPreviewSize(0, QSize(4, 1));
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy2(file2, SIGNAL(saved()));
@@ -747,7 +746,7 @@ void ut_quill::testBackgroundPriority()
     image.save(testFile.fileName(), "png");
     image.save(testFile2.fileName(), "png");
 
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setPreviewSize(0, QSize(2, 1));
     Quill::setPreviewLevelCount(2);
 
@@ -925,7 +924,7 @@ void ut_quill::testLoadSaveSmallPicture()
     image.save(testFile.fileName(), "png");
 
     Quill::setPreviewSize(0, QSize(8, 2));
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
@@ -971,7 +970,7 @@ void ut_quill::testLoadSaveSmallPicture()
     Quill::initTestingMode();
 
     Quill::setPreviewSize(0, QSize(8, 2));
-    Quill::setEditHistoryDirectory("/tmp/quill/history");
+    Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillFile *file2 =
         new QuillFile(testFile.fileName(), "png");

@@ -19,7 +19,7 @@ void loadThumbs(QString originalFileName, int n, QSize size)
     QTime time;
 
     Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
-    Quill::setThumbnailBasePath(QDir::homePath()+"/.thumbnails/");
+
     Quill::setThumbnailFlavorName(0, "quill-benchmark");
 
     Quill::setThumbnailExtension("jpg");

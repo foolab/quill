@@ -423,7 +423,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
 
     // For read-only images, we stop loading if we already have
     // an equivalent of the full image
-    if (file->isReadOnly() &&
+    if ((file->state() == File::State_ReadOnly) &&
         (level > Core::instance()->smallestNonCroppedLevel()) &&
         (file->image(level-1).size() == file->fullImageSize()))
         return 0;
@@ -677,7 +677,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
         if (filter == 0)
             filter = QuillImageFilterFactory::
-                createImageFilter("RedEyeReduction");
+                createImageFilter("org.maemo.red-eye-reduction");
 
         delete generator;
         command->setFilter(filter);

@@ -67,7 +67,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_imageSizeLimit(QSize()),
     m_imagePixelsLimit(0),
     m_nonTiledImagePixelsLimit(0),
-    m_editHistoryDirectory(QDir::homePath() + "/.config/quill/history"),
+    m_editHistoryPath(QDir::homePath() + "/.config/quill/history"),
     m_thumbnailBasePath(QDir::homePath() + "/.thumbnails"),
     m_thumbnailCreationEnabled(true),
     m_dBusThumbnailingEnabled(true),
@@ -76,7 +76,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_tileCache(new TileCache(100)),
     m_scheduler(new Scheduler()),
     m_threadManager(new ThreadManager(threadingMode)),
-    m_temporaryFileDirectory(QString()),
+    m_temporaryFilePath(QString()),
     m_crashDumpPath(QString())
 {
     DisplayLevel *previewLevel = new DisplayLevel(Quill::defaultViewPortSize);
@@ -529,14 +529,14 @@ void Core::setCrashDumpPath(const QString &fileName)
     m_crashDumpPath = fileName;
 }
 
-void Core::setEditHistoryDirectory(const QString &directory)
+void Core::setEditHistoryPath(const QString &path)
 {
-    m_editHistoryDirectory = directory;
+    m_editHistoryPath = path;
 }
 
-QString Core::editHistoryDirectory() const
+QString Core::editHistoryPath() const
 {
-    return m_editHistoryDirectory;
+    return m_editHistoryPath;
 }
 
 void Core::setThumbnailBasePath(const QString &path)
@@ -552,17 +552,6 @@ void Core::setThumbnailFlavorName(int level, const QString &name)
 QString Core::thumbnailFlavorName(int level) const
 {
     return m_displayLevel[level]->thumbnailFlavorName();
-}
-
-void Core::setThumbnailDirectory(int level, const QString &directory)
-{
-    if ((level < 0) || (level >= m_displayLevel.count()))
-        return;
-
-    QDir dir = QDir(directory);
-    dir.cdUp();
-    setThumbnailBasePath(dir.path());
-    setThumbnailFlavorName(level, QDir(directory).dirName());
 }
 
 QString Core::thumbnailDirectory(int level) const
@@ -676,14 +665,14 @@ bool Core::waitUntilFinished(int msec)
     return true;
 }
 
-void Core::setTemporaryFileDirectory(const QString &fileDir)
+void Core::setTemporaryFilePath(const QString &filePath)
 {
-    m_temporaryFileDirectory = fileDir;
+    m_temporaryFilePath = filePath;
 }
 
-QString Core::temporaryFileDirectory() const
+QString Core::temporaryFilePath() const
 {
-    return m_temporaryFileDirectory;
+    return m_temporaryFilePath;
 }
 
 int Core::levelFromFlavor(QString flavor)

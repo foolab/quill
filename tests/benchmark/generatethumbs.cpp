@@ -20,7 +20,7 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
     Quill::setPreviewSize(0, size);
     Quill::setMinimumPreviewSize(0, minimumSize);
-    Quill::setThumbnailDirectory(0, QDir::homePath()+"/.thumbnails/"+flavor);
+    Quill::setThumbnailFlavorName(0, flavor);
     Quill::setThumbnailExtension("jpeg");
     Quill::setThumbnailCreationEnabled(false);
 

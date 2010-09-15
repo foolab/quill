@@ -58,7 +58,6 @@ Q_DECLARE_METATYPE(QuillImage);
 
 void ut_export::initTestCase()
 {
-    QuillImageFilter::registerAll();
 }
 
 void ut_export::cleanupTestCase()

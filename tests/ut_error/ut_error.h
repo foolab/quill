@@ -88,6 +88,12 @@ private slots:
     void testWriteProtectedEditHistory();
 
     void testDestructiveFilter();
+
+ private:
+    QString editHistoryPath;
+    QString thumbnailBasePath;
+    QString thumbnailFlavorName;
+    QString thumbnailFullPath;
 };
 
 #endif  // TEST_LIBQUILL_ERROR_H

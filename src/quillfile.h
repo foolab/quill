@@ -144,21 +144,6 @@ public:
     QString targetFormat() const;
 
     /*!
-      Sets file as read only, disabling all edits. Only makes sense
-      with originals.
-
-      DEPRECATED, dropped
-    */
-
-    void setReadOnly();
-
-    /*!
-      If the file is read only.
-    */
-
-    bool isReadOnly() const;
-
-    /*!
       Sets the display level of the file.
       -1 = no display, 0 = first level only, ...
       previewlevelcount = full image or tiles.
@@ -401,26 +386,6 @@ public:
     QDateTime lastModified() const;
 
     /*!
-      If the file is supported and has no errors.
-
-      DEPRECATED - Please use supportsThumbnails(), supportsViewing(),
-      or supportsEditing().
-     */
-
-    bool supported() const;
-
-    /*!
-      Tries to force Quill to acknowledge the file as supported or
-      unsupported. This should only be used after the contents of a
-      file have been changed. If this is set to true with a file not
-      recognizable by Quill, it will revert to unsupported.
-
-      DEPRECATED - Please use refresh() if the file contents have been changed.
-     */
-
-    void setSupported(bool supported);
-
-    /*!
       Returns true if thumbnails of the file can be viewed.
 
       This means that either the file is directly supported by Quill, or
@@ -472,30 +437,6 @@ public:
     */
 
     QuillFile *original();
-
-    /*!
-      Sets the waiting-for-data status for this file.
-
-      Set this to true if you want to start editing an image which is not
-      completely available yet, for example if it is currently being
-      transferred by the network. Use setImage() to immediately set a preview
-      level. Set this to false when the full image has arrived.
-
-      Warning: the status must be set before raising the preview level, or the
-      image will get an "unsupported" status.
-
-      DEPRECATED - setImage() will now automatically put the file into
-      waiting state. Also, refresh() should be used to remove the
-      waiting state from a file.
-    */
-
-    void setWaitingForData(bool);
-
-    /*!
-      Returns the waiting-for-data status for the file. See setWaitingForData().
-    */
-
-    bool isWaitingForData() const;
 
     /*!
       Used to inform Quill that file contents have changed in the file

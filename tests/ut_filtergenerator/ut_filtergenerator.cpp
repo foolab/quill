@@ -55,7 +55,7 @@ ut_filtergenerator::ut_filtergenerator()
 
 void ut_filtergenerator::initTestCase()
 {
-    QDir().mkpath("/tmp/quill/thumbnails");
+    QDir().mkpath("/tmp/quill/thumbnails/normal");
 }
 
 void ut_filtergenerator::cleanupTestCase()
@@ -81,8 +81,6 @@ void ut_filtergenerator::testAutoContrast()
     QTemporaryFile testFile;
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
-
-    QuillImageFilter::registerAll();
 
     QuillFile file(testFile.fileName());
     file.setDisplayLevel(0);
@@ -149,7 +147,8 @@ void ut_filtergenerator::testRedEyeRemoval()
     image.save(testFile.fileName(), "png");
 
     Quill::setPreviewSize(0, QSize(2, 2));
-    Quill::setThumbnailDirectory(0, "/tmp/quill/thumbnails");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("png");
 
     // Create blank thumbnail

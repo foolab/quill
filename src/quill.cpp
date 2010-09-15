@@ -182,16 +182,10 @@ int Quill::nonTiledImagePixelsLimit()
     return Core::instance()->nonTiledImagePixelsLimit();
 }
 
-void Quill::setEditHistoryDirectory(const QString &directory)
+void Quill::setEditHistoryPath(const QString &path)
 {
-    Core::instance()->setEditHistoryDirectory(directory);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+directory);
-}
-
-void Quill::setThumbnailDirectory(int level, const QString &directory)
-{
-    Core::instance()->setThumbnailDirectory(level, directory);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(level)+directory);
+    Core::instance()->setEditHistoryPath(path);
+    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
 }
 
 void Quill::setThumbnailBasePath(const QString &path)
@@ -262,14 +256,14 @@ QSize Quill::vectorGraphicsRenderingSize()
 
 void Quill::setTemporaryFilePath(const QString &path)
 {
-    Core::instance()->setTemporaryFileDirectory(path);
+    Core::instance()->setTemporaryFilePath(path);
     Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
 }
 
 QString Quill::temporaryFilePath()
 {
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
-    return Core::instance()->temporaryFileDirectory();
+    return Core::instance()->temporaryFilePath();
 }
 
 void Quill::setCrashDumpPath(const QString &path)

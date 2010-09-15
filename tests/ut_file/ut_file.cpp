@@ -365,7 +365,7 @@ void ut_file::testReadOnly()
     qFile.setPermissions(QFile::ReadOwner);
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
-    QVERIFY(file->isReadOnly());
+    QVERIFY(!file->supportsEditing());
     delete file;
 }
 
@@ -408,7 +408,7 @@ void ut_file::testRevertRestore()
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
    QuillImageFilter *filter1 =
-       QuillImageFilterFactory::createImageFilter("Rotate");
+       QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
 
    filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
    QuillImage imageAfter1 = filter1->apply(imageAfter);
@@ -459,7 +459,7 @@ void ut_file::testRevertRestore()
    QCOMPARE(file->canRevert(),false);
    QCOMPARE(file->internalFile()->m_stack->revertIndex(),2);
    QuillImageFilter *filter2 =
-       QuillImageFilterFactory::createImageFilter("Rotate");
+       QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
 
    filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
    file->runFilter(filter2);
