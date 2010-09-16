@@ -194,7 +194,10 @@ public:
     int displayLevel() const;
 
     /*!
-      Recalculates priority from references.
+      File priority is always the highest of the priorities of
+      QuillFiles referring to the File object. Any time there is a new
+      file reference, one is deleted, or its priority is changed, the
+      priority is recalculated.
     */
 
     void calculatePriority();

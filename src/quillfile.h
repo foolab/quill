@@ -171,27 +171,38 @@ public:
     int displayLevel() const;
 
     /*!
-      Note: this method currently has no effect.
-
       Sets the priority that Quill will use in handling loads and
       edits on this file. Files that are most meaningful for the user
       like ones currently displayed should have a high priority; files
       that are cached since they are about to be displayed should have
       a lower priority.
 
-      Any integer value is valid for priority. Small priority
+      Any integer value is valid for priority.
+
+      Current functionality:
+
+      Use QuillFile::Priority_Low to designate low priority. All load
+      and edit operations on files with low priority are handled after
+      operations on normal and high priority files. Priority_High has
+      currently no extra priority to Priority_Normal.
+
+      Priority has no effect on saving changes to edited files. As
+      this operation is not user intensive, it always carries the
+      lowest possible priority; additionally, this function will not
+      have an effect on relative priorities of save operations.
+
+      If several QuillFiles of the same file have different
+      priorities, the highest value will be used.
+
+      Intended functionality:
+
+      Small priority
       differences (less than 100) mean that Quill may prefer a fast
       operation on a lower-priority file before a slow operation on a
       higher-priority file. Bigger differences mean that Quill will
       prefer files with higher priority no matter the operation. The
       constants QuillFile::Priority_Low, QuillFile::Priority_Normal
       and QuillFile::Priority_High can also be used.
-
-      Priority has no effect on saving changes to edited files or
-      saving thumbnails. As these operations are not user intensive,
-      they always carry the lowest possible priority; additionally,
-      this function will not have an effect on relative priorities of
-      save operations.
      */
 
     void setPriority(int priority);
