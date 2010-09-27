@@ -1,3 +1,8 @@
+libquill (1.100927.0) unstable; urgency=low
+  * Optimizing format detection.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 27 Sep 2010 13:59:00 +0200
+
 libquill (1.100916.0) unstable; urgency=low
   * Implemented: SWP#HImag-2303
   * Load and edit priority can now be explicitly set
