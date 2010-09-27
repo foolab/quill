@@ -343,6 +343,8 @@ Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
                       file->thumbnailFileName(level));
     filter->setOption(QuillImageFilter::BackgroundColor,
                       Core::instance()->backgroundRenderingColor());
+    filter->setOption(QuillImageFilter::FileFormat,
+                      Core::instance()->thumbnailExtension());
 
     Task *task = new Task();
     task->setCommandId(command->uniqueId());

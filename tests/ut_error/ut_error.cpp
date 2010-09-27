@@ -640,7 +640,7 @@ void ut_error::testCorruptThumbnail()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileFormatUnsupportedError);
+    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
     QCOMPARE((int)error.errorSource(), (int)QuillError::ThumbnailErrorSource);
     QCOMPARE(error.errorData(), thumbFileName);
 
