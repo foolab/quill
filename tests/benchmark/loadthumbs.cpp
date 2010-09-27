@@ -60,7 +60,7 @@ void loadThumbs(QString originalFileName, int n, QSize size)
     time.start();
 
     for (int i=0; i<numFiles; i++) {
-        quillFile[i] = new QuillFile(fileName[i], "jpg");
+        quillFile[i] = new QuillFile(fileName[i], "image/jpeg");
         QObject::connect(quillFile[i], SIGNAL(imageAvailable(const QuillImageList)),
                          &loop, SLOT(quit()));
     }

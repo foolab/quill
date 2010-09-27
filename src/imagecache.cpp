@@ -135,6 +135,19 @@ bool ImageCache::purge(const File *file)
     return m_cacheProtected.remove(file);
 }
 
+bool ImageCache::hasImage(const File *file, int key) const
+{
+    if (m_cache.contains(key)) {
+        CacheImage *image = m_cache.object(key);
+        return !image->image.isNull();
+    } else if (m_cacheProtected.contains(file)) {
+        CacheImage *image = m_cacheProtected.object(file);
+        if (image->key == key)
+            return !image->image.isNull();
+    }
+    return false;
+}
+
 QuillImage ImageCache::image(const File *file, int key) const
 {
     if (m_cache.contains(key)) {

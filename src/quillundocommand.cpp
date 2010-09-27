@@ -136,6 +136,11 @@ QuillUndoCommand *QuillUndoCommand::prev() const
     return m_stack->command(m_index-1);
 }
 
+bool QuillUndoCommand::hasImage(int level) const
+{
+    return Core::instance()->cache(level)->hasImage(m_stack->file(), m_id);
+}
+
 QuillImage QuillUndoCommand::image(int level) const
 {
     return Core::instance()->cache(level)->image(m_stack->file(), m_id);

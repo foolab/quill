@@ -328,7 +328,7 @@ Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
     if (!file->stack())
         return 0;
 
-    if (!file->stack()->image(level).isNull())
+    if (file->stack()->hasImage(level))
         // Image already exists - no need to recalculate
         return 0;
 
