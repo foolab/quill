@@ -64,7 +64,7 @@ Scheduler::~Scheduler()
 
 Task *Scheduler::newTask()
 {
-    QList<File*> allFiles = Core::instance()->existingFiles();
+    QMap<QString, File*> allFiles = Core::instance()->allFiles();
 
     // No files means no operation
 
@@ -305,7 +305,7 @@ Task *Scheduler::newTilingOverlayTask(File *file)
     return task;
 }
 
-Task *Scheduler::newThumbnailLoadTask(QList<File*> files, int minPriority)
+Task *Scheduler::newThumbnailLoadTask(const QMap<QString, File*> &files, int minPriority)
 {
     int previewLevelCount = Core::instance()->previewLevelCount();
 
@@ -392,7 +392,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     return task;
 }
 
-Task *Scheduler::newNormalTask(QList<File*> files, int priority)
+Task *Scheduler::newNormalTask(const QMap<QString, File*> &files, int priority)
 {
     int previewLevelCount = Core::instance()->previewLevelCount();
 
