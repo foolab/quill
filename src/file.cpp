@@ -58,7 +58,8 @@ File::File() : m_state(State_Normal),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
                m_hasThumbnail(false), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
-               m_temporaryFile(0),m_original(false)
+               m_temporaryFile(0),m_original(false),
+               m_hasReadEditHistory(false)
 {
     m_stack = new QuillUndoStack(this);
 }
@@ -515,7 +516,7 @@ QString File::editHistoryFileName(const QString &fileName,
     return hashValueString;
 }
 
-File *File::readFromEditHistory(const QString &fileName,
+void File::readFromEditHistory(const QString &fileName,
                                 const QString &originalFileName,
                                 QuillError *error)
 {
@@ -524,7 +525,7 @@ File *File::readFromEditHistory(const QString &fileName,
         *error = QuillError(QuillError::FileNotFoundError,
                             QuillError::ImageOriginalErrorSource,
                             originalFileName);
-        return 0;
+        return;
     }
 
     QFile file(editHistoryFileName(fileName,
@@ -536,20 +537,20 @@ File *File::readFromEditHistory(const QString &fileName,
         *error = QuillError(QuillError::FileNotFoundError,
                             QuillError::EditHistoryErrorSource,
                             file.fileName());
-        return 0;
+        return;
     }
     if (!file.open(QIODevice::ReadOnly)) {
         *error = QuillError(QuillError::FileOpenForReadError,
                             QuillError::EditHistoryErrorSource,
                             file.fileName());
-        return 0;
+        return;
     }
     const QByteArray history = file.readAll();
     if (history.isEmpty()) {
         *error = QuillError(QuillError::FileReadError,
                             QuillError::EditHistoryErrorSource,
                             file.fileName());
-        return 0;
+        return;
     }
     file.close();
 
@@ -563,20 +564,17 @@ File *File::readFromEditHistory(const QString &fileName,
         readOnly = true;
     }
     file.close();
-
+    if(readOnly)
+        setReadOnly();
     Logger::log("[File] Edit history size is "+QString::number(history.size())+
                 " bytes");
     Logger::log("[File] Edit history dump: "+history);
 
-    File *result = HistoryXml::decodeOne(history);
-    if (!result)
+    if(!HistoryXml::decodeOne(history,this)){
         *error = QuillError(QuillError::FileCorruptError,
                             QuillError::EditHistoryErrorSource,
                             file.fileName());
-    if (result && readOnly)
-        result->setReadOnly();
-
-    return result;
+    }
 }
 
 void File::writeEditHistory(const QString &history, QuillError *error)
@@ -1073,13 +1071,25 @@ bool File::supportsViewing() const
 bool File::supportsEditing() const
 {
     // this needs to be called to determine if the file has a read only format
-    if (m_stack->isClean())
+    if (m_stack->isClean()&&m_hasReadEditHistory)
         m_stack->load();
-
-    return ((m_state != State_NonExistent) &&
-            (m_state != State_UnsupportedFormat) &&
-            (m_state != State_ExternallySupportedFormat) &&
-            (m_state != State_ReadOnly));
+    //if it supports editting, we read the edit history 
+    if((m_state != State_NonExistent) &&
+       (m_state != State_UnsupportedFormat) &&
+       (m_state != State_ExternallySupportedFormat) &&
+       (m_state != State_ReadOnly)){
+        if(!m_hasReadEditHistory){
+            QuillError error;
+            const_cast<File *>(this)->readFromEditHistory(m_fileName,m_originalFileName,&error);
+            if ((error.errorCode() != QuillError::NoError) &&
+                (error.errorCode() != QuillError::FileNotFoundError))
+                Core::instance()->emitError(error);
+            const_cast<File *>(this)->m_hasReadEditHistory = true;
+        }
+        return true;
+    }
+    else
+        return false;
 }
 
 bool File::isOriginal() const

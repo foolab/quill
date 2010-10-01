@@ -184,6 +184,7 @@ void ut_format::testReadOnlyFormat()
     testFile.flush();
 
     QuillFile *file = new QuillFile(testFile.fileName(), "image/gif");
+    file->supportsEditing();
     QVERIFY(!file->supportsEditing());
     delete file;
 }

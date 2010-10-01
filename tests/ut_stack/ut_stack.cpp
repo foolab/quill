@@ -304,6 +304,7 @@ void ut_stack::testSessionSaveLoad()
     Quill::setEditHistoryCacheSize(0, 5);
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
+    file2->supportsEditing();
     file2->setDisplayLevel(0);
 
     Quill::releaseAndWait(); // load

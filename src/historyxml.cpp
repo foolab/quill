@@ -58,13 +58,9 @@ QByteArray HistoryXml::encode(File *file)
     return encode(files);
 }
 
-File *HistoryXml::decodeOne(const QByteArray & array)
+bool HistoryXml::decodeOne(const QByteArray & array,File* file)
 {
-    QList<File *> fileList = HistoryXml::decode(array);
-    if (!fileList.isEmpty())
-        return fileList.first();
-    else
-        return 0;
+    return  HistoryXml::decode(array,file);
 }
 
 
@@ -270,113 +266,39 @@ QXmlStreamReader::TokenType HistoryXml::readToken(QXmlStreamReader *reader)
     return tokenType;
 }
 
-QList<File*> HistoryXml::decode(const QByteArray & array)
+bool HistoryXml::decode(const QByteArray & array,File* file)
 {
     QXmlStreamReader reader(array);
-
-    QList<File*> emptyList, files;
     QXmlStreamReader::TokenType token;
 
-    if (readToken(&reader) != QXmlStreamReader::StartDocument)
-        return emptyList;
+    int savedIndex = 0;
+    int targetIndex = 0;
+    int revertIndex = 0;
+    QString fileName = QString();
+    QString originalFileName = QString();
+    QString fileFormat = QString();
+    QString targetFormat = QString();
 
-    if (readToken(&reader) != QXmlStreamReader::DTD)
-        return emptyList;
+    if(!readEditHistoryHeader(reader,token))
+        return false;
 
-    if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "Core"))
-        return emptyList;
-
-    token = readToken(&reader);
     while (token != QXmlStreamReader::EndElement)
     {
-        if ((token != QXmlStreamReader::StartElement) ||
-            (reader.name() != "QuillUndoStack"))
-            return emptyList;
-
-        if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-            (reader.name() != "File"))
-            return emptyList;
-
-        const QString fileName = reader.attributes().value("", "name").toString();
-        const QString targetFormat = reader.attributes().value("", "format").toString();
-
-        if (readToken(&reader) != QXmlStreamReader::EndElement)
-            return emptyList;
-
-        if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-            (reader.name() != "OriginalFile"))
-            return emptyList;
-        const QString originalFileName = reader.attributes().value("", "name").toString();
-        const QString fileFormat = reader.attributes().value("", "format").toString();
-
-        if (readToken(&reader) != QXmlStreamReader::EndElement)
-            return emptyList;
-
-        if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-            (reader.name() != "TargetIndex"))
-            return emptyList;
-
-        if (readToken(&reader) != QXmlStreamReader::Characters)
-            return emptyList;
-        int targetIndex = reader.text().toString().toInt();
-
-        if (readToken(&reader) != QXmlStreamReader::EndElement)
-            return emptyList;
-
-        if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-            (reader.name() != "SavedIndex"))
-            return emptyList;
-
-        if (readToken(&reader) != QXmlStreamReader::Characters)
-            return emptyList;
-        int savedIndex = reader.text().toString().toInt();
-
-        if (readToken(&reader) != QXmlStreamReader::EndElement)
-            return emptyList;
-        
-        if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-            (reader.name() != "RevertIndex"))
-            return emptyList;
-
-        if (readToken(&reader) != QXmlStreamReader::Characters)
-            return emptyList;
-        int revertIndex = reader.text().toString().toInt();
-
-        if (readToken(&reader) != QXmlStreamReader::EndElement)
-            return emptyList;
-
-        File *file = new File();
-        file->setFileName(fileName);
-        file->setOriginalFileName(originalFileName);
-        file->setFileFormat(fileFormat);
-        file->setTargetFormat(targetFormat);
-
+        if(!decodeEditHistory(reader,token,savedIndex,targetIndex,
+                              revertIndex,fileName,originalFileName,
+                              fileFormat,targetFormat))
+            return false;
         QuillUndoStack *stack = file->stack();
 
         stack->load();
-
-        readEditSession(&reader, stack, &savedIndex, &targetIndex, fileName);
-
-        // Undo the commands which were undone before the crash.
-        while (stack->index()-1 > targetIndex)
-            stack->undo();
-
-        // If a load filter was inserted, treat indexes accordingly.
-        if (savedIndex > 0)
-            stack->setSavedIndex(savedIndex+1);
-        else
-            stack->setSavedIndex(0);
-        stack->setRevertIndex(revertIndex);
-        files.append(file);
-
+        handleStack(reader, stack, savedIndex, targetIndex, fileName,revertIndex);
         token = readToken(&reader);
     }
 
     if (readToken(&reader) != QXmlStreamReader::EndDocument)
-        return emptyList;
+        return false;
 
-    return files;
+    return true;
 }
 
 void HistoryXml::readEditSession(QXmlStreamReader *reader,
@@ -643,3 +565,158 @@ QVariant HistoryXml::recoverComplexType(QVariant::Type variantType,
     }
 }
 
+QList<File*> HistoryXml::decode(const QByteArray & array)
+{
+    QXmlStreamReader reader(array);
+    QList<File*> emptyList, files;
+    QXmlStreamReader::TokenType token;
+
+    int savedIndex = 0;
+    int targetIndex = 0;
+    int revertIndex = 0;
+    QString fileName = QString();
+    QString originalFileName = QString();
+    QString fileFormat = QString();
+    QString targetFormat = QString();
+
+    if(!readEditHistoryHeader(reader,token))
+        return emptyList;
+
+    while (token != QXmlStreamReader::EndElement)
+    {
+        if(!decodeEditHistory(reader,token,savedIndex,targetIndex,revertIndex,
+                              fileName,originalFileName,fileFormat,targetFormat))
+            return emptyList;
+
+        File *file = new File();
+        file->setFileName(fileName);
+        file->setOriginalFileName(originalFileName);
+        file->setFileFormat(fileFormat);
+        file->setTargetFormat(targetFormat);
+
+        QuillUndoStack *stack = file->stack();
+
+        stack->load();
+
+        handleStack(reader, stack, savedIndex, targetIndex, fileName,revertIndex);
+
+        files.append(file);
+
+        token = readToken(&reader);
+
+    }
+
+    if (readToken(&reader) != QXmlStreamReader::EndDocument)
+        return emptyList;
+
+    return files;
+}
+
+File *HistoryXml::decodeOne(const QByteArray & array)
+{
+     QList<File *> fileList = HistoryXml::decode(array);
+    if (!fileList.isEmpty())
+        return fileList.first();
+    else
+        return 0;
+}
+
+bool HistoryXml::decodeEditHistory(QXmlStreamReader& reader,QXmlStreamReader::TokenType& token,
+                                   int& savedIndex,int& targetIndex,int& revertIndex,QString& fileName,
+                                   QString& originalFileName, QString& fileFormat,
+                                   QString& targetFormat)
+{
+    if ((token != QXmlStreamReader::StartElement) ||
+        (reader.name() != "QuillUndoStack"))
+        return false;
+
+    if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
+        (reader.name() != "File"))
+        return false;
+
+    fileName = reader.attributes().value("", "name").toString();
+    targetFormat = reader.attributes().value("", "format").toString();
+
+    if (readToken(&reader) != QXmlStreamReader::EndElement)
+        return false;
+
+    if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
+        (reader.name() != "OriginalFile"))
+        return false;
+    originalFileName = reader.attributes().value("", "name").toString();
+    fileFormat = reader.attributes().value("", "format").toString();
+
+    if (readToken(&reader) != QXmlStreamReader::EndElement)
+        return false;
+
+    if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
+        (reader.name() != "TargetIndex"))
+        return false;
+
+    if (readToken(&reader) != QXmlStreamReader::Characters)
+        return false;
+    targetIndex = reader.text().toString().toInt();
+
+    if (readToken(&reader) != QXmlStreamReader::EndElement)
+        return false;
+
+    if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
+        (reader.name() != "SavedIndex"))
+        return false;
+
+    if (readToken(&reader) != QXmlStreamReader::Characters)
+        return false;
+    savedIndex = reader.text().toString().toInt();
+
+    if (readToken(&reader) != QXmlStreamReader::EndElement)
+        return false;
+
+    if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
+        (reader.name() != "RevertIndex"))
+        return false;
+
+    if (readToken(&reader) != QXmlStreamReader::Characters)
+        return false;
+    revertIndex = reader.text().toString().toInt();
+
+    if (readToken(&reader) != QXmlStreamReader::EndElement)
+        return false;
+
+    return true;
+}
+
+
+bool HistoryXml::readEditHistoryHeader(QXmlStreamReader& reader,QXmlStreamReader::TokenType& token)
+{
+    if (readToken(&reader) != QXmlStreamReader::StartDocument)
+        return false;
+
+    if (readToken(&reader) != QXmlStreamReader::DTD)
+        return false;
+
+    if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
+        (reader.name() != "Core"))
+        return false;
+
+    token = readToken(&reader);
+    return true;
+}
+
+void HistoryXml::handleStack(QXmlStreamReader& reader, QuillUndoStack *stack,
+                            int& savedIndex, int& targetIndex,
+                            const QString& fileName, int&revertIndex)
+{
+    readEditSession(&reader, stack, &savedIndex, &targetIndex, fileName);
+
+    // Undo the commands which were undone before the crash.
+    while (stack->index()-1 > targetIndex)
+        stack->undo();
+
+    // If a load filter was inserted, treat indexes accordingly.
+    if (savedIndex > 0)
+        stack->setSavedIndex(savedIndex+1);
+    else
+        stack->setSavedIndex(0);
+    stack->setRevertIndex(revertIndex);
+
+}

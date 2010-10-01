@@ -146,6 +146,7 @@ void ut_crashrecovery::testBasicRecovery()
     QCOMPARE((int)dumpFile.size(), 0);
 
     file = new QuillFile(testFile.fileName(), "png");
+    file->supportsEditing();
     file->setDisplayLevel(1);
 
     Quill::releaseAndWait(); // load (preview)
@@ -233,6 +234,7 @@ void ut_crashrecovery::testRecoverSaveInProgress()
     QCOMPARE((int)dumpFile.size(), 0);
 
     file = new QuillFile(testFile.fileName(), "png");
+    file->supportsEditing();
     file->setDisplayLevel(1);
 
     Quill::releaseAndWait(); // load (preview)
@@ -317,6 +319,7 @@ void ut_crashrecovery::testRecoveryAfterUndo()
 
     Quill::setPreviewSize(0, QSize(4, 1));
     file = new QuillFile(testFile.fileName(), "png");
+    file->supportsEditing();
     file->setDisplayLevel(1);
 
     Quill::releaseAndWait(); // load

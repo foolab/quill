@@ -469,10 +469,10 @@ public:
       Internal/testing use only.
      */
 
-    static File *readFromEditHistory(const QString &fileName,
-                                     const QString &originalFileName,
-                                     QuillError *error);
-
+    void readFromEditHistory(const QString &fileName,
+                             const QString &originalFileName,
+                             QuillError *error);
+    
     /*!
       Copies a file over another file in the file system.
 
@@ -698,6 +698,8 @@ private:
     QTemporaryFile *m_temporaryFile;
     //one flag for the original file
     bool m_original;
+    //the flag for the stack when we read the edit history xml file
+    bool m_hasReadEditHistory;
 };
 
 #endif // QUILLFILE_H

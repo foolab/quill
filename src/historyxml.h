@@ -72,6 +72,8 @@ public:
     static QByteArray encode(QList<File *> files);
     static File *decodeOne(const QByteArray & array);
     static QList<File *> decode(const QByteArray & array);
+    static bool decodeOne(const QByteArray & array,File* file);
+    static bool decode(const QByteArray & array,File* file);
 
 private:
     static void writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer);
@@ -83,6 +85,15 @@ private:
     static QuillImageFilter *readFilter(QXmlStreamReader *reader);
     static QVariant recoverVariant(QVariant::Type variantType, const QString &string);
     static QVariant recoverComplexType(QVariant::Type variantType, QXmlStreamReader *reader);
+    static bool decodeEditHistory(QXmlStreamReader& reader,QXmlStreamReader::TokenType& token,
+                                  int& saveIndex,int& targetIndex,int& revertIndex,QString& fileName,
+                                  QString& originalFileName, QString& fileFormat,
+                                  QString& targetFormat);
+    static bool readEditHistoryHeader(QXmlStreamReader& reader,QXmlStreamReader::TokenType& token);
+    static void handleStack(QXmlStreamReader& reader, QuillUndoStack *stack,
+                            int& savedIndex, int& targetIndex,
+                            const QString& fileName, int&revertIndex);
 };
+
 
 #endif
