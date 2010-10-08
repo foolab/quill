@@ -188,6 +188,25 @@ void ut_format::testReadOnlyFormat()
     delete file;
 }
 
+void ut_format::testExternallySupportedFormat()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QByteArray buffer;
+    buffer.fill(32, 1000);
+
+    testFile.write(buffer);
+    testFile.flush();
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "video/mp4");
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+    QVERIFY(!file->supportsViewing());
+    QVERIFY(file->supportsThumbnails());
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_format test;
