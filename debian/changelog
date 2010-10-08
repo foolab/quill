@@ -1,3 +1,8 @@
+libquill (1.101008.0) unstable; urgency=low
+  * Cache and CPU cycle optimizations.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 08 Oct 2010 15:12:00 +0200
+
 libquill (1.100927.0) unstable; urgency=low
   * Optimizing format detection.
 
