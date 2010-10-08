@@ -64,7 +64,7 @@ Scheduler::~Scheduler()
 
 Task *Scheduler::newTask()
 {
-    QList<File*> allFiles = Core::instance()->existingFiles();
+    QMap<QString, File*> allFiles = Core::instance()->allFiles();
 
     // No files means no operation
 
@@ -233,7 +233,7 @@ Task *Scheduler::newTilingTask(File *file)
 
     for (index=stack->index()-1; index>=0; index--)
     {
-        if (stack->command(index)->tileMap()->tile(tileIndex) != QuillImage())
+        if (!stack->command(index)->tileMap()->tile(tileIndex).isNull())
             break;
 
         // Load filters can be re-executed
@@ -288,7 +288,7 @@ Task *Scheduler::newTilingOverlayTask(File *file)
     if(tileId < 0)
         return 0;
     // Should never happen.
-    if (stack->command()->tileMap()->tile(tileId) == QuillImage())
+    if (stack->command()->tileMap()->tile(tileId).isNull())
         return 0;
 
     QuillImageFilter *filter = stack->saveMap()->addToBuffer(tileId);
@@ -305,7 +305,7 @@ Task *Scheduler::newTilingOverlayTask(File *file)
     return task;
 }
 
-Task *Scheduler::newThumbnailLoadTask(QList<File*> files, int minPriority)
+Task *Scheduler::newThumbnailLoadTask(const QMap<QString, File*> &files, int minPriority)
 {
     int previewLevelCount = Core::instance()->previewLevelCount();
 
@@ -328,7 +328,7 @@ Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
     if (!file->stack())
         return 0;
 
-    if (file->stack()->image(level) != QuillImage())
+    if (file->stack()->hasImage(level))
         // Image already exists - no need to recalculate
         return 0;
 
@@ -392,7 +392,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     return task;
 }
 
-Task *Scheduler::newNormalTask(QList<File*> files, int priority)
+Task *Scheduler::newNormalTask(const QMap<QString, File*> &files, int priority)
 {
     int previewLevelCount = Core::instance()->previewLevelCount();
 
@@ -416,7 +416,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
         // Empty stack command - should never happen
         return 0;
 
-    if (stack->image(level) != QuillImage())
+    if (!stack->image(level).isNull())
         // Image already exists - no need to recalculate
         return 0;
 

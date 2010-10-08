@@ -112,6 +112,13 @@ public:
     QuillUndoCommand *prev() const;
 
     /*!
+      Only querying for the existence of an image, not interested
+      in the image itself
+     */
+
+    bool hasImage(int level) const;
+
+    /*!
       The preview-size result image of the command
      */
 

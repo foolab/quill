@@ -150,6 +150,12 @@ public:
     QuillImage bestImage(int maxLevel) const;
 
     /*!
+      Query if the current image exists with the given resolution.
+    */
+
+    bool hasImage(int level) const;
+
+    /*!
       Gets the current image, given resolution.
     */
 
