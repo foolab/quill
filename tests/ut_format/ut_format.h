@@ -65,7 +65,6 @@ private slots:
     void testMultipleLimits();
 
     void testReadOnlyFormat();
-    void testExternallySupportedFormat();
 };
 
 #endif  // _UT_FORMAT_H_
