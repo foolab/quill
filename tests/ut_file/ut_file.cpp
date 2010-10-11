@@ -126,7 +126,6 @@ void ut_file::testOriginal()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill::setFileLimit(0, 2);
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
@@ -170,7 +169,6 @@ void ut_file::testOriginalAfterSave()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    Quill::setFileLimit(0, 2);
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
     QuillFile *original = file->original();
     // This makes us to setup the original's undo stack

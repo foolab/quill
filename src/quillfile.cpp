@@ -180,14 +180,6 @@ int QuillFile::priority() const
     return priv->m_priority;
 }
 
-void QuillFile::saveAs(const QString &fileName,
-                       const QString &fileFormat)
-{
-    Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    if (priv->m_file)
-        return priv->m_file->saveAs(fileName, fileFormat);
-}
-
 void QuillFile::save()
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));

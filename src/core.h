@@ -394,63 +394,6 @@ public:
     bool isExternallySupportedFormat(const QString &format) const;
 
     /*!
-      Returns true if it is possible to recover from a previous crash.
-      This will only work if setCrashDumpFile() has been previously
-      called, the physical file is found and actually contains something to
-      recover.
-
-      Crash recovery is only possible on a clean core. Also note that
-      any successful image editing will result in overwriting the
-      crash dump data.
-
-      See also recover().
-     */
-
-    bool canRecover();
-
-    /*!
-      Recovers all unsaved edits from crash dump data stored in a file
-      specified by crashDumpFile().
-
-      The crash dump data is automatically output to a file after each
-      edit. The data contains all edits which have not been
-      synchronized to the file system, regardless of if
-      QuillFile::save() has been called after them.
-
-      The crash recovery feature will recover all unsaved edits and
-      put them to the saving queue. Any files in the saving queue can
-      be viewed or edited normally.
-
-      This feature will not recreate the list of open files or display
-      levels; an application has to keep a data structure of its own
-      and to explicitly re-open any files it was viewing.
-    */
-
-    void recover();
-
-    /*!
-      Dumps all unsaved edits to the dump file.
-    */
-
-    void dump();
-
-    /*!
-      Sets the crash dump file name. Leave as the empty string to
-      disable this feature (default). A directory path will be created
-      for the dump file, if possible.
-
-      See also canRecover() and recover().
-     */
-
-    void setCrashDumpPath(const QString &fileName);
-
-    /*!
-      Returns the crash dump file name. See setCrashDumpFile();
-     */
-
-    QString crashDumpPath() const;
-
-    /*!
       To make background loading tests easier on fast machines
 
       Only works if Quill has been created with threadingMode =
@@ -461,13 +404,6 @@ public:
     */
 
     void releaseAndWait();
-
-    /*!
-      To make background loading tests easier on fast machines
-      @param delay extra delay per operation in seconds
-    */
-
-    void setDebugDelay(int delay);
 
     /*
       From all stacks open and closed, finds one command by its unique id.
@@ -699,7 +635,6 @@ private:
     QString m_thumbnailExtension;
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;
-    bool m_recoveryInProgress;
 
     QMap<QString, File*> m_files;
 
@@ -711,7 +646,6 @@ private:
     ThreadManager *m_threadManager;
 
     QString m_temporaryFilePath;
-    QString m_crashDumpPath;
 
     QColor m_backgroundRenderingColor;
 

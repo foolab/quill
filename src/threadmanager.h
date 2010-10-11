@@ -90,12 +90,6 @@ public:
     void run(Task *task);
 
     /*!
-      Sets debug delay (artificial delay per backround operation, in seconds).
-     */
-
-    void setDebugDelay(int delay);
-
-    /*!
       Release background thread and wait for its completion.
 
       Will freeze the calling (foreground) thread, so testing purposes only!
@@ -122,8 +116,6 @@ private:
 
     QSemaphore *semaphore;
     QEventLoop *eventLoop;
-
-    int debugDelay;
 };
 
 #endif // __QUILL_THREAD_MANAGER_H_

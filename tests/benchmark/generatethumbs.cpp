@@ -26,8 +26,6 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
 
     int numFiles = n;
 
-    Quill::setFileLimit(0, numFiles);
-
     QString fileName[numFiles];
     QuillFile *quillFile[numFiles];
 

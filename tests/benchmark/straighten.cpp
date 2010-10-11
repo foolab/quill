@@ -20,8 +20,6 @@ void straighten(QString originalFileName, int numFiles, QSize size)
     Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
     Quill::setPreviewSize(0, size);
 
-    Quill::setFileLimit(0, numFiles);
-
     QString fileName[numFiles];
     QuillFile *quillFile[numFiles];
 

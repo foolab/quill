@@ -22,10 +22,8 @@ SUBDIRS += \
            ut_core \
            ut_file \
            ut_thumbnail \
-           ut_crashrecovery \
            ut_tileloading \
            ut_error \
-           ut_export \
            ut_format \
            ut_croppedthumbnail \
            ut_scheduler \

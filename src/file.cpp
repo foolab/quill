@@ -54,7 +54,7 @@
 #include "logger.h"
 
 File::File() : m_state(State_Normal),
-               m_hasThumbnailError(false), m_isClone(false),
+               m_hasThumbnailError(false),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
                m_hasThumbnail(false), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
@@ -233,30 +233,6 @@ void File::save()
     }
 }
 
-void File::saveAs(const QString &fileName, const QString &fileFormat)
-{
-    if (supportsViewing() &&
-        !Core::instance()->fileExists(fileName)) {
-        // Create placeholder
-        QFile qFile(fileName);
-        qFile.open(QIODevice::WriteOnly);
-
-        QByteArray history = HistoryXml::encode(this);
-        File *file = HistoryXml::decodeOne(history);
-
-        file->setOriginalFileName(m_fileName);
-        file->setFileFormat(m_fileFormat);
-
-        file->setFileName(fileName);
-        file->setTargetFormat(fileFormat);
-
-        file->setClone(true);
-        file->prepareSave();
-        Core::instance()->attach(file);
-        Core::instance()->suggestNewTask();
-    }
-}
-
 bool File::isSaveInProgress() const
 {
     return state() == State_Saving;
@@ -264,9 +240,7 @@ bool File::isSaveInProgress() const
 
 bool File::isDirty() const
 {
-    if (m_isClone)
-        return true;
-    else if (m_stack)
+    if (m_stack)
         return m_stack->isDirty();
     else
         return false;
@@ -284,7 +258,6 @@ void File::runFilter(QuillImageFilter *filter)
     m_stack->add(filter);
 
     abortSave();
-    Core::instance()->dump();
     Core::instance()->suggestNewTask();
 }
 
@@ -319,7 +292,6 @@ void File::undo()
         m_stack->undo();
 
         abortSave();
-        Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
         emitAllImages();
@@ -341,7 +313,6 @@ void File::redo()
         m_stack->redo();
 
         abortSave();
-        Core::instance()->dump();
         Core::instance()->suggestNewTask();
 
         emitAllImages();
@@ -791,7 +762,7 @@ void File::prepareSave()
     }
 
     QByteArray rawExifDump;
-    if (isJpeg() && !m_isClone) {
+    if (isJpeg()) {
         QuillMetadata metadata(m_fileName);
         rawExifDump = metadata.dump(QuillMetadata::ExifFormat);
     }
@@ -827,7 +798,7 @@ void File::concludeSave()
 
     // Copy metadata from previous version to new one
 
-    if (isJpeg() && !m_isClone) {
+    if (isJpeg()) {
         QuillMetadata metadata(m_fileName);
         if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
             // If metadata write failed, the temp file is likely corrupt
@@ -853,8 +824,7 @@ void File::concludeSave()
         if (hasOriginal())
             original()->stack()->concludeSave();
 
-        if (!m_isClone)
-            writeEditHistory(HistoryXml::encode(this), &result);
+        writeEditHistory(HistoryXml::encode(this), &result);
 
         if (result.errorCode() != QuillError::NoError) {
             emitError(result);
@@ -871,8 +841,6 @@ void File::concludeSave()
 
  cleanup:
     setState(State_Normal);
-
-    Core::instance()->dump();
 
     QFile::remove(temporaryName);
 
@@ -1012,7 +980,6 @@ void File::revert()
     if (canRevert()){
         m_stack->revert();
         abortSave();
-        Core::instance()->dump();
         Core::instance()->suggestNewTask();
         emitAllImages();
     }
@@ -1031,20 +998,9 @@ void File::restore()
     if(canRestore()){
         m_stack->restore();
         abortSave();
-        Core::instance()->dump();
         Core::instance()->suggestNewTask();
         emitAllImages();
     }
-}
-
-bool File::isClone()
-{
-    return m_isClone;
-}
-
-void File::setClone(bool status)
-{
-    m_isClone = status;
 }
 
 File::State File::state() const

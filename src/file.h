@@ -209,17 +209,6 @@ public:
     int priority() const;
 
     /*!
-      Starts to asynchronously save the current state of the active
-      QuillFile with a new name and format. The new file will not have
-      an edit history. The handle to the new file cannot be accessed
-      until the new file has been saved. The saved() signal will be
-      emitted when the changes are finished.
-     */
-
-    void saveAs(const QString &fileName,
-                        const QString &fileFormat = "");
-
-    /*!
       Starts to asynchronously save any changes made to the file (if
       any). If there were any changes, the saved() signal is emitted
       when the changes are finished.
@@ -611,18 +600,6 @@ public:
      */
     void restore();
 
-    /*!
-      If the file is a clone made by export
-     */
-
-    bool isClone();
-
-    /*!
-      Sets a file to be a clone
-     */
-
-    void setClone(bool status);
-
     static QString fileNameHash(const QString &fileName);
 
     /*!
@@ -677,7 +654,6 @@ private:
     State m_state;
 
     bool m_hasThumbnailError;
-    bool m_isClone;
     QDateTime m_lastModified;
 
     QuillUndoStack *m_stack;
