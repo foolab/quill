@@ -634,6 +634,11 @@ public:
       Sets a flag for the original file
      */
     void setOriginal(bool flag);
+
+    /*!
+      If the edit history is read
+    */
+    bool readEditHistory() const;
 signals:
 
     /*!

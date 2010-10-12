@@ -97,6 +97,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
             SIGNAL(thumbnailError(const QString, uint, const QString)),
             SLOT(processDBusThumbnailerError(const QString, uint, const QString)));
 
+    m_writableImageFormats = QImageWriter::supportedImageFormats();
     m_files.clear();
 }
 

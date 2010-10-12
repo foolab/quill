@@ -279,6 +279,9 @@ bool HistoryXml::decode(const QByteArray & array,File* file)
     QString fileFormat = QString();
     QString targetFormat = QString();
 
+    // This method will overwrite the stack, let's make sure that we start with a clean one
+    file->stack()->clear();
+
     if(!readEditHistoryHeader(reader,token))
         return false;
 

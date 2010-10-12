@@ -89,7 +89,7 @@ void ut_quill::testQuillFile()
     Quill::setEditHistoryCacheSize(0, 5);
     Quill::setEditHistoryCacheSize(1, 5);
 
-    QuillFile *file = new QuillFile(testFile.fileName());
+    QuillFile *file = new QuillFile(testFile.fileName(), "image/png");
 
     QVERIFY(file);
 
@@ -109,7 +109,6 @@ void ut_quill::testQuillFile()
 
     QVERIFY(!file->canUndo());
     QVERIFY(!file->canRedo());
-
     QCOMPARE(file->allImageLevels().count(), 1);
     QVERIFY(file->image(1).isNull());
 
@@ -452,7 +451,6 @@ void ut_quill::testLoadSave()
     Quill::setEditHistoryCacheSize(0, 5);
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
-    file2->supportsEditing();
     file2->setDisplayLevel(1);
 
     Quill::releaseAndWait();
@@ -465,7 +463,7 @@ void ut_quill::testLoadSave()
     file2->undo();
     Quill::releaseAndWait();
     Quill::releaseAndWait();
-
+    Quill::releaseAndWait();
     QVERIFY(Unittests::compareImage(file2->image(), image));
 
     // Redo and check repeated loading
@@ -539,7 +537,6 @@ void ut_quill::testMultiSave()
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
     QSignalSpy spy2(file2, SIGNAL(saved()));
-    file2->supportsEditing();
     file2->setDisplayLevel(1);
 
     Quill::releaseAndWait();
@@ -552,7 +549,7 @@ void ut_quill::testMultiSave()
     Quill::releaseAndWait();
     Quill::releaseAndWait();
     Quill::releaseAndWait();
-
+    Quill::releaseAndWait();//load
     QVERIFY(Unittests::compareImage(file2->image(), imageBetween));
 
     file2->save();
@@ -568,7 +565,6 @@ void ut_quill::testMultiSave()
     Quill::setEditHistoryPath("/tmp/quill/history");
 
     QuillFile *file3 = new QuillFile(testFile.fileName(), "png");
-    file3->supportsEditing();
     file3->setDisplayLevel(1);
 
     Quill::releaseAndWait();
@@ -760,7 +756,6 @@ void ut_quill::testBackgroundPriority()
 
     QSignalSpy changedSpy(file, SIGNAL(imageAvailable(const QuillImageList)));
     QSignalSpy spy(file, SIGNAL(saved()));
-    file->supportsEditing();
     file->setDisplayLevel(2);
 
     Quill::releaseAndWait();
@@ -776,7 +771,6 @@ void ut_quill::testBackgroundPriority()
 
     QSignalSpy changedSpy2(file2, SIGNAL(imageAvailable(const QuillImageList)));
     QSignalSpy spy2(file2, SIGNAL(saved()));
-    file2->supportsEditing();
     file2->setDisplayLevel(2);
 
     QCOMPARE(changedSpy.count(), 3);
@@ -978,7 +972,6 @@ void ut_quill::testLoadSaveSmallPicture()
 
     QuillFile *file2 =
         new QuillFile(testFile.fileName(), "png");
-    file2->supportsEditing();
     file2->setDisplayLevel(1);
 
     // Verify the small picture (and the big picture) that they still
@@ -993,7 +986,7 @@ void ut_quill::testLoadSaveSmallPicture()
     // Now, go back one step and see that everything dates back to the
     // original.
     file2->undo();
-
+    Quill::releaseAndWait();//load
     Quill::releaseAndWait();
     Quill::releaseAndWait();
     QVERIFY(Unittests::compareImage(file2->image(), filteredBlackImage));

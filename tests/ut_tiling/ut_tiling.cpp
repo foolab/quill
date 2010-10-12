@@ -667,7 +667,6 @@ void ut_tiling::testSaveInterrupted()
     QCOMPARE(image, Unittests::generatePaletteImage());
 
     QuillFile *file = new QuillFile(testFile.fileName(), "png");
-    file->supportsEditing();
     file->setDisplayLevel(-1);
 
     QuillImageFilter *filter =

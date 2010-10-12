@@ -77,7 +77,7 @@ File* QuillUndoStack::file()
 void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 {
     QFile loadFile(m_file->originalFileName());
-    if (loadFile.exists() && (loadFile.size() > 0)) {
+    if (loadFile.exists() && (loadFile.size() > 0)&&(m_file->readEditHistory()||m_file->isOriginal())) {
         filter->setOption(QuillImageFilter::FileName,
                           m_file->originalFileName());
         filter->setOption(QuillImageFilter::MimeType,
@@ -516,3 +516,7 @@ bool QuillUndoStack::canRestore() const
     return revertIndex() > 0;
 }
 
+void QuillUndoStack::clear()
+{
+    m_stack->clear();
+}

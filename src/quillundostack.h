@@ -307,6 +307,8 @@ public:
       Checks if the operations are restored
      */
     bool canRestore() const;
+
+    void clear();
 private:
 
     /*!

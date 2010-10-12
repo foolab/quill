@@ -193,7 +193,7 @@ void ut_file::testOriginalAfterSave()
 
     original->setDisplayLevel(0);
     Quill::releaseAndWait();
-    QCOMPARE(original->image(), image);
+    QVERIFY(Unittests::compareImage(original->image(), image));
 
     delete file;
     delete original;

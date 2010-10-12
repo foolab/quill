@@ -304,7 +304,6 @@ void ut_stack::testSessionSaveLoad()
     Quill::setEditHistoryCacheSize(0, 5);
 
     QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
-    file2->supportsEditing();
     file2->setDisplayLevel(0);
 
     Quill::releaseAndWait(); // load
@@ -312,9 +311,9 @@ void ut_stack::testSessionSaveLoad()
     QVERIFY(Unittests::compareImage(file2->image(), resultImage2));
 
     file2->redo();
+    Quill::releaseAndWait(); // load
     Quill::releaseAndWait(); // filter3
     Quill::releaseAndWait(); // filter4
-
     QVERIFY(Unittests::compareImage(file2->image(), resultImage4));
 
     file2->undo();
