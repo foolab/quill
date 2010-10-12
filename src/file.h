@@ -705,6 +705,8 @@ private:
     bool m_original;
     //the flag for the stack when we read the edit history xml file
     bool m_hasReadEditHistory;
+
+    Q_DISABLE_COPY(File)
 };
 
 #endif // QUILLFILE_H

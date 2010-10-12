@@ -280,7 +280,7 @@ void File::runFilter(QuillImageFilter *filter)
         return;
     }
 
-    if (m_stack->count() == 0)
+    if (m_stack->isClean())
         m_stack->load();
     m_stack->add(filter);
 

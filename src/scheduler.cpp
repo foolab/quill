@@ -412,7 +412,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
 {
     QuillUndoStack *stack = file->stack();
 
-    if (!stack->command())
+    if (!stack || !stack->command())
         // Empty stack command - should never happen
         return 0;
 

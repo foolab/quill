@@ -321,18 +321,16 @@ File *Core::priorityFile() const
 {
     QString name;
     int level = -1;
+    File *priorityFile = 0;
 
     foreach (File *file, m_files)
         if (file->supportsViewing() &&
             (file->displayLevel() > level)) {
-            name = file->fileName();
+            priorityFile = file;
             level = file->displayLevel();
         }
 
-    if (!name.isEmpty())
-        return m_files[name];
-    else
-        return 0;
+    return priorityFile;
 }
 
 File *Core::prioritySaveFile() const
