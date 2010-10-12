@@ -698,6 +698,8 @@ private:
     QTemporaryFile *m_temporaryFile;
     //one flag for the original file
     bool m_original;
+
+    Q_DISABLE_COPY(File)
 };
 
 #endif // QUILLFILE_H
