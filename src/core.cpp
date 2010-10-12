@@ -683,8 +683,7 @@ QSize Core::vectorGraphicsRenderingSize() const
 
 QList<QByteArray> Core::writableImageFormats()
 {
-    if (m_writableImageFormats.isEmpty())
-        m_writableImageFormats = QImageWriter::supportedImageFormats();
+    //we read the Qt supported image formats from constructor
     return m_writableImageFormats;
 }
 

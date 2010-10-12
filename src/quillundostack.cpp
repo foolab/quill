@@ -76,12 +76,20 @@ File* QuillUndoStack::file()
 
 void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 {
-    QFile loadFile(m_file->originalFileName());
-    if (loadFile.exists() && (loadFile.size() > 0)&&(m_file->readEditHistory()||m_file->isOriginal())) {
-        filter->setOption(QuillImageFilter::FileName,
-                          m_file->originalFileName());
-        filter->setOption(QuillImageFilter::MimeType,
-                          m_file->fileFormat());
+    if(m_file->readEditHistory()||m_file->isOriginal()){
+        QFile loadFile(m_file->originalFileName());
+        if (loadFile.exists() && (loadFile.size() > 0)){
+            filter->setOption(QuillImageFilter::FileName,
+                              m_file->originalFileName());
+            filter->setOption(QuillImageFilter::MimeType,
+                              m_file->fileFormat());
+        }
+        else {
+            filter->setOption(QuillImageFilter::FileName,
+                              m_file->fileName());
+            filter->setOption(QuillImageFilter::MimeType,
+                              m_file->targetFormat());
+        }
     }
     else {
         filter->setOption(QuillImageFilter::FileName,
