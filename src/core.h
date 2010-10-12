@@ -608,7 +608,7 @@ public:
       Return all existing files.
     */
 
-    QList<File*> existingFiles() const;
+    const QMap<QString, File*> allFiles() const;
 
     /*!
       Emits a saved signal.

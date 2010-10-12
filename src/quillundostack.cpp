@@ -279,6 +279,15 @@ QuillImage QuillUndoStack::bestImage(int maxLevel) const
         return QuillImage();
 }
 
+bool QuillUndoStack::hasImage(int level) const
+{
+    QuillUndoCommand *curr = command();
+    if (curr)
+        return curr->hasImage(level);
+    else
+        return false;
+}
+
 QuillImage QuillUndoStack::image(int level) const
 {
     QuillUndoCommand *curr = command();

@@ -118,13 +118,13 @@ bool ImageCache::protect(const File *file, int commandId)
 
 bool ImageCache::remove(const File *file, int commandId)
 {
-    CacheImage *image = m_cache.take(commandId);
-    if (image) {
-        delete image;
+    CacheImage *cacheImage = m_cache.take(commandId);
+    if (cacheImage) {
+        delete cacheImage;
         return true;
     } else {
-        image = m_cacheProtected.object(file);
-        if (image && (image->key == commandId))
+        cacheImage = m_cacheProtected.object(file);
+        if (cacheImage && (cacheImage->key == commandId))
             return m_cacheProtected.remove(file);
     }
     return false;
@@ -135,15 +135,28 @@ bool ImageCache::purge(const File *file)
     return m_cacheProtected.remove(file);
 }
 
+bool ImageCache::hasImage(const File *file, int key) const
+{
+    if (m_cache.contains(key)) {
+        CacheImage *cacheImage = m_cache.object(key);
+        return !cacheImage->image.isNull();
+    } else if (m_cacheProtected.contains(file)) {
+        CacheImage *cacheImage = m_cacheProtected.object(file);
+        if (cacheImage->key == key)
+            return !cacheImage->image.isNull();
+    }
+    return false;
+}
+
 QuillImage ImageCache::image(const File *file, int key) const
 {
     if (m_cache.contains(key)) {
-        CacheImage *image = m_cache.object(key);
-        return image->image;
+        CacheImage *cacheImage = m_cache.object(key);
+        return cacheImage->image;
     } else if (m_cacheProtected.contains(file)) {
-        CacheImage *image = m_cacheProtected.object(file);
-        if (image->key == key)
-            return image->image;
+        CacheImage *cacheImage = m_cacheProtected.object(file);
+        if (cacheImage->key == key)
+            return cacheImage->image;
     }
 
     return QuillImage();

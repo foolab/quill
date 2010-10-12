@@ -1,3 +1,18 @@
+libquill (1.101011.0) unstable; urgency=low
+  * Removed accidentally added testcase.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 08 Oct 2010 16:06:00 +0200
+
+libquill (1.101008.1) unstable; urgency=low
+  * Replaced obsolete testrunner dependency with testrunner-lite
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 08 Oct 2010 16:06:00 +0200
+
+libquill (1.101008.0) unstable; urgency=low
+  * Cache and CPU cycle optimizations.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 08 Oct 2010 15:12:00 +0200
+
 libquill (1.100927.0) unstable; urgency=low
   * Optimizing format detection.
 

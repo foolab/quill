@@ -344,15 +344,9 @@ File *Core::prioritySaveFile() const
     return 0;
 }
 
-QList<File*> Core::existingFiles() const
+const QMap<QString, File*> Core::allFiles() const
 {
-    QList<File*> files;
-
-    foreach (File *file, m_files) {
-        if (file->exists())
-            files += file;
-    }
-    return files;
+    return m_files;
 }
 
 void Core::suggestNewTask()

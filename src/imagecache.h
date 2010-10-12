@@ -111,6 +111,11 @@ public:
                 ProtectionStatus status = NotProtected);
 
     /*!
+      Returns true if the image stored exists in the cache, false otherwise.
+     */
+    bool hasImage(const File *file, int commandId) const;
+
+    /*!
       Returns the image stored in the cache.
      */
     QuillImage image(const File *file, int commandId) const;
