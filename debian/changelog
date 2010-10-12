@@ -1,3 +1,8 @@
+libquill (1.101012.1) unstable; urgency=low
+  * Fixes: NB#197412 Random crashes
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 12 Oct 2010 14:29:00 +0200
+
 libquill (1.101012.0) unstable; urgency=low
   * Implemented: SWP#HImag-2048
 
