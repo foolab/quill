@@ -1,3 +1,8 @@
+libquill (1.101012.0) unstable; urgency=low
+  * Implemented: SWP#HImag-2048
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 12 Oct 2010 12:40:00 +0200
+
 libquill (1.101011.0) unstable; urgency=low
   * Removed accidentally added testcase.
 
