@@ -325,17 +325,18 @@ Task *Scheduler::newThumbnailLoadTask(const QMap<QString, File*> &files, int min
 
 Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
 {
-    if (!file->stack())
+    QuillUndoStack *stack = file->stack();
+    if (!stack || stack->isClean())
         return 0;
 
-    if (file->stack()->hasImage(level))
+    if (stack->hasImage(level))
         // Image already exists - no need to recalculate
         return 0;
 
-    QuillUndoCommand *command = getTask(file->stack(), level);
+    QuillUndoCommand *command = getTask(stack, level);
 
     if ((command->filter()->role() != QuillImageFilter::Role_Load) ||
-        (command->index() != command->stack()->savedIndex()))
+        (command->index() != stack->savedIndex()))
         return 0;
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
