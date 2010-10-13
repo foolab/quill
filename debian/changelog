@@ -1,3 +1,8 @@
+libquill (1.101013.0) unstable; urgency=low
+  * Fixes: NB#197764 Segmentation fault in scheduler
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 13 Oct 2010 09:28:00 +0200
+
 libquill (1.101012.1) unstable; urgency=low
   * Fixes: NB#197412 Random crashes
 

@@ -70,7 +70,6 @@ private slots:
     void testSaveIndex();
 
     void testBackgroundPriority();
-    void testReOpen();
 
     void testLoadSaveSmallPicture();
 
