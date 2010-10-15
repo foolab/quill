@@ -101,13 +101,6 @@
       </case>
     </set>
 
-    <set name="quill-export-tests" feature="export">
-      <description>quill export test</description>
-      <case name="ut_export" type="Functional" level="Component">
-	<step >/usr/lib/libquill-tests/ut_export </step>
-      </case>
-    </set>
-
     <set name="quill-image-format-tests" feature="formats">
       <description>quill image formats test</description>
       <case name="ut_format" type="Functional" level="Component">

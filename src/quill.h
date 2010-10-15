@@ -67,10 +67,7 @@ preserved. In addition, all editing operations until the current
 situation, called "commands", are saved into a separate file in xml
 format. This file, along with the original copy, can be then used to
 reconstruct any point in the editing history of the file. Thus, the
-complete edit history will be accessible during any later session, and
-the current state of any file can be recovered even after a forced
-program shutdown (ie. incoming call) or a device crash (ie. low
-battery).
+complete edit history will be accessible during any later session.
 
   \subsection bg_sec Background processing
 
@@ -205,45 +202,6 @@ public:
      */
 
     static int previewLevelCount();
-
-    /*!
-      Deprecated, please do not use.
-
-      Sets the maximum number of files that can have their display level
-      equal or bigger than the given level at one time.
-
-      Normally, an application should make sure that file display
-      levels are set to -1 whenever those files are not needed any
-      more. The file limit can be considered an extra safeguard to
-      make sure that there is a hard limit on memory used which is not
-      exceeded at any time.
-
-      If a setPreviewLevel() command violates the constraints given by
-      this command, it will fail, and a QuillFile::error() of type
-      Quill::FileLimitExceeded will be emitted.
-
-      This limit can be modified at any time. Lowering the limit under
-      the number of files on the level is allowed; in this case, any
-      files already on the level will function normally.
-
-      @param level Display level. Trying to set this limit on the full
-      image level will fail, due to the limitations of the tile cache
-      the limit for full images is always 1.
-
-      @param limit Number of files allowed on the given level. The minimum
-      value is 1; the default value is 1.
-     */
-
-    static void setFileLimit(int level, int limit);
-
-    /*!
-      Deprecated, please do not use.
-
-      Returns the limit for the number of files that can be open at the
-      given level at one time. See setFileLimit().
-     */
-
-    static int fileLimit(int level);
 
     /*!
       Sets the maximum number of edit history steps that can be cached
@@ -515,57 +473,6 @@ public:
     static QSize vectorGraphicsRenderingSize();
 
     /*!
-      Returns true if it is possible to recover from a previous crash.
-      This will only work if setCrashDumpFile() has been previously
-      called, the physical file is found and actually contains something to
-      recover.
-
-      Crash recovery is only possible on a clean core. Also note that
-      any successful image editing will result in overwriting the
-      crash dump data.
-
-      See also recover().
-     */
-
-    static bool canRecover();
-
-    /*!
-      Recovers all unsaved edits from crash dump data stored in a file
-      specified by crashDumpFile().
-
-      The crash dump data is automatically output to a file after each
-      edit. The data contains all edits which have not been
-      synchronized to the file system, regardless of if
-      QuillFile::save() has been called after them.
-
-      The crash recovery feature will recover all unsaved edits and
-      put them to the saving queue. Any files in the saving queue can
-      be viewed or edited normally.
-
-      This feature will not recreate the list of open files or display
-      levels; an application has to keep a data structure of its own
-      and to explicitly re-open any files it was viewing.
-    */
-
-    static void recover();
-
-    /*!
-      Sets the crash dump path name. Leave as the empty string to
-      disable this feature (default). A directory path will be created
-      for the dump file, if possible.
-
-      See also canRecover() and recover().
-     */
-
-    static void setCrashDumpPath(const QString &path);
-
-    /*!
-      Returns the crash dump path. See setCrashDumpPath();
-     */
-
-    static QString crashDumpPath();
-
-    /*!
       Returns true if there is any calculation in progress.
      */
 
@@ -607,13 +514,6 @@ public:
     */
 
     static void releaseAndWait();
-
-    /*!
-      To make background loading tests easier on fast machines
-      @param delay extra delay per background operation, in seconds
-    */
-
-    static void setDebugDelay(int delay);
 
     /*!
       Returns the singleton instance of Quill. This should only be

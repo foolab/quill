@@ -71,13 +71,11 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_thumbnailBasePath(QDir::homePath() + "/.thumbnails"),
     m_thumbnailCreationEnabled(true),
     m_dBusThumbnailingEnabled(true),
-    m_recoveryInProgress(false),
     m_saveBufferSize(65536*16),
     m_tileCache(new TileCache(100)),
     m_scheduler(new Scheduler()),
     m_threadManager(new ThreadManager(threadingMode)),
-    m_temporaryFilePath(QString()),
-    m_crashDumpPath(QString())
+    m_temporaryFilePath(QString())
 {
     DisplayLevel *previewLevel = new DisplayLevel(Quill::defaultViewPortSize);
     m_displayLevel.append(previewLevel);
@@ -401,110 +399,6 @@ TileCache* Core::tileCache() const
     return m_tileCache;
 }
 
-void Core::dump()
-{
-    if (m_crashDumpPath.isEmpty())
-        return;
-
-    QList<File*> fileList;
-
-    foreach (File *file, m_files)
-        if (file->isDirty() || file->isSaveInProgress())
-            fileList.append(file);
-
-    // If crash recovery has been in progress but has ended,
-    // clear the recovery flag here
-    if (m_recoveryInProgress && !isSaveInProgress())
-        m_recoveryInProgress = false;
-
-    // If crash recovery is still in progress, crash dumping is disabled
-    QString history;
-    if (!fileList.isEmpty() && !m_recoveryInProgress)
-        history = HistoryXml::encode(fileList);
-
-    if (!QDir().mkpath(m_crashDumpPath)) {
-        emitError(QuillError(QuillError::DirCreateError,
-                             QuillError::CrashDumpErrorSource,
-                             m_crashDumpPath));
-        return;
-    }
-    const QString fileName = m_crashDumpPath + QDir::separator() + "dump.xml";
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        emitError(QuillError(QuillError::FileOpenForWriteError,
-                             QuillError::CrashDumpErrorSource,
-                             fileName));
-        return;
-    }
-    qint64 fileSize = file.write(history.toAscii());
-    if (fileSize == -1)
-        emitError(QuillError(QuillError::FileWriteError,
-                             QuillError::CrashDumpErrorSource,
-                             fileName));
-    file.close();
-}
-
-bool Core::canRecover()
-{
-    if (!m_files.isEmpty() || m_crashDumpPath.isEmpty())
-        return false;
-
-    QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
-    if (file.exists() && file.size() > 0)
-        return true;
-    else
-        return false;
-}
-
-void Core::recover()
-{
-    if (!canRecover())
-        return;
-
-    QFile file(m_crashDumpPath + QDir::separator() + "dump.xml");
-    if (!file.open(QIODevice::ReadOnly)) {
-        emitError(QuillError(QuillError::FileOpenForReadError,
-                             QuillError::CrashDumpErrorSource,
-                             file.fileName()));
-        return;
-    }
-    const QByteArray history = file.readAll();
-    if (history.isEmpty()) {
-        emitError(QuillError(QuillError::FileReadError,
-                             QuillError::CrashDumpErrorSource,
-                             file.fileName()));
-    }
-    QList<File*> fileList = HistoryXml::decode(history);
-    if (fileList.count() == 0) {
-        emitError(QuillError(QuillError::FileCorruptError,
-                             QuillError::CrashDumpErrorSource,
-                             file.fileName()));
-    }
-    else
-        m_recoveryInProgress = true;
-
-    // dump an error marker for the duration of the recovery to prevent
-    // multiple crashes
-    dump();
-
-    foreach (File *file, fileList) {
-        m_files.insert(file->fileName(), file);
-        file->save();
-    }
-
-    suggestNewTask();
-}
-
-QString Core::crashDumpPath() const
-{
-    return m_crashDumpPath;
-}
-
-void Core::setCrashDumpPath(const QString &fileName)
-{
-    m_crashDumpPath = fileName;
-}
-
 void Core::setEditHistoryPath(const QString &path)
 {
     m_editHistoryPath = path;
@@ -589,11 +483,6 @@ void Core::processFinishedTask(Task *task, QuillImage resultImage)
 void Core::releaseAndWait()
 {
     m_threadManager->releaseAndWait();
-}
-
-void Core::setDebugDelay(int delay)
-{
-    m_threadManager->setDebugDelay(delay);
 }
 
 int Core::numFilesAtLevel(int level) const

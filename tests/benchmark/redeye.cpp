@@ -30,8 +30,6 @@ void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, i
     Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
     Quill::setPreviewSize(0, size);
 
-    Quill::setFileLimit(0, numFiles);
-
     QString fileName[numFiles];
     QuillFile *quillFile[numFiles];
 

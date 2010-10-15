@@ -24,7 +24,6 @@ SUBDIRS += \
            ut_thumbnail \
            ut_tileloading \
            ut_error \
-           ut_export \
            ut_format \
            ut_croppedthumbnail \
            ut_scheduler \

@@ -27,8 +27,6 @@ void loadThumbs(QString originalFileName, int n, QSize size)
 
     int numFiles = n;
 
-    Quill::setFileLimit(0, numFiles);
-
     QString fileName[numFiles];
     QuillFile *quillFile[numFiles];
 

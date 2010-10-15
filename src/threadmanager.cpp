@@ -53,7 +53,7 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
     m_isRunning(false), m_task(0), resultImage(0),
     watcher(new QFutureWatcher<QuillImage>),
     threadingMode(mode),
-    semaphore(0), eventLoop(0), debugDelay(0)
+    semaphore(0), eventLoop(0)
 {
     if (mode == Quill::ThreadingTest)
     {
@@ -87,9 +87,8 @@ bool ThreadManager::isRunning() const
 }
 
 QuillImage applyFilter(QuillImageFilter *filter, QuillImage image,
-                       QSemaphore *semaphore, int debugDelay)
+                       QSemaphore *semaphore)
 {
-    sleep(debugDelay);
     if (semaphore != 0)
         semaphore->acquire();
     return filter->apply(image);
@@ -104,7 +103,7 @@ void ThreadManager::run(Task *task)
     resultImage = new QFuture<QuillImage>;
     *resultImage =
         QtConcurrent::run(applyFilter, task->filter(), task->inputImage(),
-                          semaphore, debugDelay);
+                          semaphore);
     watcher->setFuture(*resultImage);
 
     // To save memory, clear the input image here since it is not needed.
@@ -128,11 +127,6 @@ void ThreadManager::taskFinished()
 bool ThreadManager::allowDelete(QuillImageFilter *filter) const
 {
     return (!m_isRunning || !m_task || (filter != m_task->filter()));
-}
-
-void ThreadManager::setDebugDelay(int delay)
-{
-    debugDelay = delay;
 }
 
 void ThreadManager::releaseAndWait()

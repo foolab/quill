@@ -84,20 +84,6 @@ void Quill::setSaveBufferSize(int size)
     Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(size));
 }
 
-void Quill::setFileLimit(int level, int limit)
-{
-    Q_UNUSED(level);
-    Q_UNUSED(limit);
-    // this function is deprecated and will be removed.
-}
-
-int Quill::fileLimit(int level)
-{
-    Q_UNUSED(level);
-    // this function is deprecated and will be removed.
-    return 0;
-}
-
 void Quill::setEditHistoryCacheSize(int level, int limit)
 {
     Core::instance()->setEditHistoryCacheSize(level, limit);
@@ -266,30 +252,6 @@ QString Quill::temporaryFilePath()
     return Core::instance()->temporaryFilePath();
 }
 
-void Quill::setCrashDumpPath(const QString &path)
-{
-    Core::instance()->setCrashDumpPath(path);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+path);
-}
-
-QString Quill::crashDumpPath()
-{
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
-    return Core::instance()->crashDumpPath();
-}
-
-bool Quill::canRecover()
-{
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
-    return Core::instance()->canRecover();
-}
-
-void Quill::recover()
-{
-    Core::instance()->recover();
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO));
-}
-
 bool Quill::isCalculationInProgress()
 {
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
@@ -312,12 +274,6 @@ void Quill::releaseAndWait()
 {
     Core::instance()->releaseAndWait();
     Logger::log("[Quill] "+QString(Q_FUNC_INFO));
-}
-
-void Quill::setDebugDelay(int delay)
-{
-    Core::instance()->setDebugDelay(delay);
-    Logger::log("[Quill] "+QString(Q_FUNC_INFO)+Logger::intToString(delay));
 }
 
 Quill* Quill::instance()

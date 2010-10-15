@@ -216,18 +216,6 @@ public:
     int priority() const;
 
     /*!
-      Saves the current state of the active QuillFile with a new name
-      and format. The new file will not have an edit history. The
-      handle to the new file cannot be accessed until the new file has
-      been saved.
-
-      If the target file name is already in use, export will fail.
-    */
-
-    void saveAs(const QString &fileName,
-                        const QString &fileFormat = "");
-
-    /*!
       Starts to asynchronously save any changes made to the file (if
       any). If there were any changes, the saved() signal is emitted
       when the changes are finished.
