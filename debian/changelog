@@ -1,3 +1,8 @@
+libquill (1.101018.0) unstable; urgency=low
+  * Support for Exif orientation.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 18 Oct 2010 12:54:00 +0200
+
 libquill (1.101015.0) unstable; urgency=low
   * Removed dead functionality.
 
