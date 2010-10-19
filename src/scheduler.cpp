@@ -49,7 +49,6 @@
 #include "core.h"
 #include "quillundocommand.h"
 #include "quillundostack.h"
-#include "threadmanager.h"
 #include "tilemap.h"
 #include "savemap.h"
 #include "logger.h"

@@ -51,7 +51,6 @@
 
 ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
     m_isRunning(false), m_task(0), resultImage(0),
-    watcher(new QFutureWatcher<QuillImage>),
     threadingMode(mode),
     semaphore(0), eventLoop(0)
 {
@@ -61,7 +60,7 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
         eventLoop = new QEventLoop();
     }
 
-    connect(watcher,
+    connect(&watcher,
             SIGNAL(finished()),
             SLOT(taskFinished()));
 }
@@ -77,7 +76,6 @@ ThreadManager::~ThreadManager()
     }
     delete semaphore;
     delete eventLoop;
-    delete watcher;
     delete resultImage;
 }
 
@@ -104,7 +102,7 @@ void ThreadManager::run(Task *task)
     *resultImage =
         QtConcurrent::run(applyFilter, task->filter(), task->inputImage(),
                           semaphore);
-    watcher->setFuture(*resultImage);
+    watcher.setFuture(*resultImage);
 
     // To save memory, clear the input image here since it is not needed.
     task->setInputImage(QuillImage());

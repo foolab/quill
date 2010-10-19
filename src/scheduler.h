@@ -56,11 +56,9 @@ QThreadPool on the background.
 
 class QuillImage;
 class File;
-class QtImageFilter;
 class Core;
 class QuillUndoStack;
 class QuillUndoCommand;
-class ThreadManager;
 class Task;
 
 class Scheduler : public QObject
@@ -195,10 +193,6 @@ private:
      */
 
     static QSize fullSizeForAspectRatio(const File *file);
-
-private:
-    ThreadManager *m_threadManager;
-
 };
 
-#endif // __QUILL_THREAD_MANAGER_H_
+#endif // SCHEDULER_H

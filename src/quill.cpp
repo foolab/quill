@@ -294,7 +294,7 @@ Quill* Quill::instance()
     return g_instance;
 }
 
-Quill::Quill()
+Quill::Quill() : priv(0)
 {
 }
 

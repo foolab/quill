@@ -56,7 +56,6 @@ QThreadPool on the background.
 
 class QuillImage;
 class Task;
-class QtImageFilter;
 class Core;
 class QSemaphore;
 class QEventLoop;
