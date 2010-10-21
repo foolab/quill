@@ -32,7 +32,7 @@ void DBusThumbnailer::connectDBus()
 bool DBusThumbnailer::supports(const QString mimeType)
 {
 
-    return mimeType == "video/mp4";
+    return !mimeType.startsWith("image");
 }
 
 bool DBusThumbnailer::isRunning()

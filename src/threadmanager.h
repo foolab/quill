@@ -109,7 +109,7 @@ private:
     Task *m_task;
 
     QFuture<QuillImage> *resultImage;
-    QFutureWatcher<QuillImage> *watcher;
+    QFutureWatcher<QuillImage> watcher;
 
     Quill::ThreadingMode threadingMode;
 

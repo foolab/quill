@@ -45,9 +45,7 @@
 #include <QDir>
 #include <QuillImageFilter>
 #include "quill.h"
-#include "quillfile.h"
 #include "core.h"
-#include "threadmanager.h"
 #include "logger.h"
 
 Quill* Quill:: g_instance = 0;
