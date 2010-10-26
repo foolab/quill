@@ -1035,7 +1035,7 @@ bool File::supportsEditing() const
        (m_state != State_UnsupportedFormat) &&
        (m_state != State_ExternallySupportedFormat) &&
        (m_state != State_ReadOnly)){
-        if(!m_hasReadEditHistory&&!m_original){
+        if(!m_hasReadEditHistory&&!m_original&&(m_state != State_Placeholder)){
             const_cast<File *>(this)->m_hasReadEditHistory = true;
             QuillError error;
             const_cast<File *>(this)->readFromEditHistory(m_fileName,m_originalFileName,&error);

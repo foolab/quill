@@ -97,12 +97,6 @@ public:
     bool allowDelete(QuillImageFilter *filter) const;
 
     /*!
-      Sets debug delay (artificial delay per backround operation, in seconds).
-     */
-
-    void setDebugDelay(int delay);
-
-    /*!
       Release background thread and wait for its completion.
 
       Will freeze the calling (foreground) thread, so testing purposes only!
