@@ -329,50 +329,12 @@ void ut_stack::testSessionSaveLoad()
 
 void ut_stack::testSetImage()
 {
-    QTemporaryFile testFile;
-    testFile.open();
-
-    QImage image = Unittests::generatePaletteImage();
-
-    QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
-    QVERIFY(filter);
-    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
-    QuillImage resultImage = filter->apply(image);
-
-    Quill::setEditHistoryPath("/tmp/quill/history");
-    Quill::setEditHistoryCacheSize(0, 2);
-
-    QuillFile *file = new QuillFile(testFile.fileName(), "");
-
-    file->setDisplayLevel(0);
-    QuillImage quillImage(image);
-    quillImage.setFullImageSize(QSize(8, 2));
-    file->setImage(0, quillImage);
-
-    QVERIFY(Unittests::compareImage(file->image(), image));
-
-    // This belongs to the scope of the feature "edit in postcapture",
-    // not implemented yet.
-
-    file->runFilter(filter);
-    Quill::releaseAndWait();
-
-    QEXPECT_FAIL("", "Will be fixed with the feature 'Edit in postcapture'",
-                 Continue);
-    QVERIFY(Unittests::compareImage(file->image(), resultImage));
-
-    delete file;
-}
-
-void ut_stack::testSetImageOnNonexistent()
-{
     QImage image = Unittests::generatePaletteImage();
 
     Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 2);
 
-    QuillFile *file = new QuillFile("/tmp/quill/invalid", "");
+    QuillFile *file = new QuillFile("/tmp/quill/invalid", "image/jpeg");
 
     file->setDisplayLevel(0);
     QuillImage quillImage(image);
@@ -384,36 +346,7 @@ void ut_stack::testSetImageOnNonexistent()
     delete file;
 }
 
-void ut_stack::testSourceChanged()
-{
-    QTemporaryFile testFile;
-    testFile.open();
-
-    QImage image = Unittests::generatePaletteImage();
-
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
-
-    file->setDisplayLevel(1);
-    file->setImage(0, image);
-
-    QVERIFY(Unittests::compareImage(file->image(), image));
-
-    image.save(testFile.fileName(), "png");
-
-    file->refresh();
-    QCOMPARE(file->displayLevel(), 1);
-    QVERIFY(!file->image(0).isNull()); // Temporary images are not thrown away
-    QVERIFY(file->image(1).isNull());
-
-    Quill::releaseAndWait(); // 1
-
-    QVERIFY(Unittests::compareImage(file->image(0), image));
-    QVERIFY(Unittests::compareImage(file->image(1), image));
-
-    delete file;
-}
-
-void ut_stack::testSourceCreated()
+void ut_stack::testRefresh()
 {
     QString fileName = "/tmp/quill/pctest.png";
 
@@ -445,6 +378,57 @@ void ut_stack::testSourceCreated()
 
     delete file;
     QFile::remove(fileName);
+}
+
+void ut_stack::testEditAfterSetImage()
+{
+    QString fileName = "/tmp/quill/pctest.png";
+
+    QFile::remove(fileName);
+    QVERIFY(!QFile::exists(fileName));
+
+    QTemporaryFile testFile;
+    testFile.open();
+
+    QImage image = Unittests::generatePaletteImage();
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+    QuillImage resultImage = filter->apply(image);
+
+    Quill::setEditHistoryPath("/tmp/quill/history");
+    Quill::setEditHistoryCacheSize(0, 2);
+
+    QuillFile *file = new QuillFile(fileName, "image/png");
+
+    file->setDisplayLevel(0);
+    QuillImage quillImage(image);
+    quillImage.setFullImageSize(QSize(8, 2));
+    file->setImage(0, quillImage);
+
+    QVERIFY(Unittests::compareImage(file->image(), image));
+    QCOMPARE(file->fullImageSize(), QSize(8, 2));
+
+    file->runFilter(filter);
+    Quill::releaseAndWait();
+
+    QVERIFY(Unittests::compareImage(file->image(), resultImage));
+
+    image.save(fileName, "png");
+
+    file->refresh();
+    Quill::releaseAndWait(); // edit (recreate)
+    QVERIFY(Unittests::compareImage(file->image(), resultImage));
+
+    file->save();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // edit
+    Quill::releaseAndWait(); // save
+
+    QVERIFY(Unittests::compareImage(QImage(fileName), resultImage));
+    delete file;
 }
 
 void ut_stack::testImmediateSizeQuery()

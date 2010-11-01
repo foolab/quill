@@ -332,10 +332,10 @@ void ut_thumbnail::testFromSetImage()
 
 void ut_thumbnail::testDownscaledFromSetImage()
 {
-    QTemporaryFile testFile;
-    testFile.open();
-    testFile.write("AVI");
-    testFile.flush();
+    QString fileName = "/tmp/quill/test.png";
+
+    QFile::remove(fileName);
+    QVERIFY(!QFile::exists(fileName));
 
     QuillImage image = Unittests::generatePaletteImage();
 
@@ -345,7 +345,7 @@ void ut_thumbnail::testDownscaledFromSetImage()
     Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "video/avi");
+    QuillFile *file = new QuillFile("/tmp/quill/test.png", "video/avi");
     QVERIFY(file);
 
     file->setDisplayLevel(0);

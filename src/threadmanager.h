@@ -56,7 +56,6 @@ QThreadPool on the background.
 
 class QuillImage;
 class Task;
-class QtImageFilter;
 class Core;
 class QSemaphore;
 class QEventLoop;
@@ -110,7 +109,7 @@ private:
     Task *m_task;
 
     QFuture<QuillImage> *resultImage;
-    QFutureWatcher<QuillImage> *watcher;
+    QFutureWatcher<QuillImage> watcher;
 
     Quill::ThreadingMode threadingMode;
 

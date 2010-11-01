@@ -1,3 +1,17 @@
+libquill (1.101028.1) unstable; urgency=low
+  * Fixed testcase in previous entry
+	
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 28 Oct 2010 12:13:00 +0200
+
+libquill (1.101028.0) unstable; urgency=low
+  * Implemented: SWP#HImag-2460
+  * Implemented: SWP#HImag-2455
+  * Fixes: NB#196813 Coverity defects
+  * External D-bus thumbnailer now supports any non-image mimetype
+  * Editing now works on preview even if final image is not complete
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 28 Oct 2010 10:08:00 +0200
+
 libquill (1.101018.0) unstable; urgency=low
   * Support for Exif orientation.
 
