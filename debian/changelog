@@ -1,3 +1,8 @@
+libquill (1.101104.0) unstable; urgency=low
+  * Supports string based filter options.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 04 Nov 2010 16:29:00 +0200
+
 libquill (1.101101.0) unstable; urgency=low
   * Fixes: NB#197053 -Thumbnails not generated properly for straighten image
 
