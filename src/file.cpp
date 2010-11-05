@@ -449,10 +449,8 @@ bool File::hasThumbnail(int level)
 
     if (!info.exists())
         return false;
-
-    return ((info.lastModified() >= lastModified()) ||
-            // Ignore main files with modification dates in the future
-            (lastModified() > QDateTime::currentDateTime()));
+    
+    return (info.lastModified() >= lastModified());
 }
 
 QString File::fileNameHash(const QString &fileName)
