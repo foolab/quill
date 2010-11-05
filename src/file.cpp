@@ -143,7 +143,13 @@ void File::setFileName(const QString &fileName)
     }
     else if (!(info.permissions() & QFile::WriteUser))
         setReadOnly();
-    m_lastModified = info.lastModified();
+    /*the date and time maybe changed if we edit the image with pc and copied to device.
+      We need to make sure the last modified time should not be later than the current time
+     */
+    if(info.lastModified()>QDateTime::currentDateTime())
+        m_lastModified =QDateTime::currentDateTime();
+    else
+        m_lastModified = info.lastModified();
 }
 
 void File::setFileFormat(const QString &fileFormat)
