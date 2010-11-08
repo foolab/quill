@@ -157,24 +157,17 @@ void HistoryXml::writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer)
 
     writer->writeAttribute("name", filter->name());
 
-    for (QuillImageFilter::QuillFilterOption option =
-             QuillImageFilter::FirstQuillFilterOption;
-         option <= QuillImageFilter::LastQuillFilterOption;
-         option = (QuillImageFilter::QuillFilterOption)(option + 1))
-    {
-        if (filter->supportsOption(option))
-        {
-            const QVariant value = filter->option(option);
+    foreach (QString option, filter->supportedOptions()) {
+        const QVariant value = filter->option(option);
 
-            writer->writeStartElement("", "FilterOption");
-            writer->writeAttribute("name", QString::number(option));
-            writer->writeAttribute("type", QString::number(value.type()));
+        writer->writeStartElement("", "FilterOption");
+        writer->writeAttribute("name", option);
+        writer->writeAttribute("type", QString::number(value.type()));
 
-            if (!writeComplexType(value, writer))
-                writer->writeCharacters(value.toString());
+        if (!writeComplexType(value, writer))
+            writer->writeCharacters(value.toString());
 
-            writer->writeEndElement();
-        }
+        writer->writeEndElement();
     }
     writer->writeEndElement();
 }
@@ -366,8 +359,8 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
             break;
         }
 
-        int option =
-            reader->attributes().value("", "name").toString().toInt();
+        QString option =
+            reader->attributes().value("", "name").toString();
         int optionType =
             reader->attributes().value("", "type").toString().toInt();
 
@@ -403,7 +396,7 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
             success = false;
             break;
         }
-        filter->setOption((QuillImageFilter::QuillFilterOption) option, value);
+        filter->setOption(option, value);
 
         if (reader->readNext() != QXmlStreamReader::EndElement)
         {
