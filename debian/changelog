@@ -1,7 +1,12 @@
+libquill (1.101108.0) unstable; urgency=low
+  * Fixes: NB#202287-Editing DUT local image with a PC and saving image to DUT - thumbnail image and opened image in Gallery shows still old version of image
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 08 Nov 2010 08:45:00 +0200
+
 libquill (1.101101.0) unstable; urgency=low
   * Fixes: NB#197053 -Thumbnails not generated properly for straighten image
 
- -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 01 Dec 2010 12:45:00 +0200
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 01 Nov 2010 12:45:00 +0200
 
 libquill (1.101028.1) unstable; urgency=low
   * Fixed testcase in previous entry
