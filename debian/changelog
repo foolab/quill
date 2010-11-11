@@ -1,3 +1,8 @@
+libquill (1.101111.0) unstable; urgency=low
+  * Fixes: NB#204012 - libquill-tests fail during execution
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 11 Nov 2010 13:45:00 +0200
+
 libquill (1.101108.0) unstable; urgency=low
   * Fixes: NB#202287-Editing DUT local image with a PC and saving image to DUT - thumbnail image and opened image in Gallery shows still old version of image
 
