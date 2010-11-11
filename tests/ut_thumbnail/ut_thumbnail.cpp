@@ -354,7 +354,6 @@ void ut_thumbnail::testDownscaledFromSetImage()
     QString thumbName = file->thumbnailFileName(0);
 
     Quill::releaseAndWait(); // try and fail load
-    Quill::releaseAndWait(); // rescale lv0
     Quill::releaseAndWait(); // save lv0
 
     // We should now have a newly created thumbnail.
