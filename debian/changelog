@@ -1,3 +1,8 @@
+libquill (1.101114.0) unstable; urgency=low
+  * Fixes: NB#204123 - CPU consumption is more than 95% constantly when ever video files are viewed in FSM
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Sun, 14 Nov 2010 13:45:00 +0200
+
 libquill (1.101111.0) unstable; urgency=low
   * Fixes: NB#204012 - libquill-tests fail during execution
 

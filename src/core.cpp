@@ -476,7 +476,14 @@ void Core::insertFile(File *file, const QString &key)
 
 void Core::processFinishedTask(Task *task, QuillImage resultImage)
 {
+    //we distinguish image and video file here.
+    QString videoFileName = task->fileName();
+    int videoDisplayLevel = task->displayLevel();
     m_scheduler->processFinishedTask(task, resultImage);
+
+    if((videoFileName.endsWith(QString(".mp4")))&&videoDisplayLevel==1){
+        return;
+    }
     suggestNewTask();
 }
 

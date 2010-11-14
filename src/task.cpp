@@ -40,7 +40,7 @@
 #include "task.h"
 
 Task::Task() : m_commandId(0), m_displayLevel(0), m_tileId(0),
-               m_inputImage(QuillImage()), m_filter(0)
+               m_inputImage(QuillImage()), m_filter(0),m_fileName(QString())
 {
 }
 
@@ -96,4 +96,14 @@ QuillImageFilter *Task::filter() const
 void Task::setFilter(QuillImageFilter *filter)
 {
     m_filter = filter;
+}
+
+void Task::setFileName(const QString &fileName)
+{
+    m_fileName = fileName;
+}
+
+QString Task::fileName()
+{
+    return m_fileName;
 }

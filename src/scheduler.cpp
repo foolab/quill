@@ -258,6 +258,7 @@ Task *Scheduler::newTilingTask(File *file)
     task->setTileId(tileIndex);
     task->setFilter(command->filter());
     task->setInputImage(prevImage);
+    task->setFileName(file->fileName());
 
     return task;
 }
@@ -272,7 +273,7 @@ Task *Scheduler::newTilingSaveTask(File *file)
         task->setDisplayLevel(Core::instance()->previewLevelCount());
         task->setFilter(stack->saveCommand()->filter());
         task->setInputImage(stack->saveMap()->buffer());
-
+        task->setFileName(file->fileName());
         return task;
     }
     else
@@ -300,6 +301,7 @@ Task *Scheduler::newTilingOverlayTask(File *file)
     task->setTileId(tileId);
     task->setFilter(filter);
     task->setInputImage(prevImage);
+    task->setFileName(file->fileName());
 
     return task;
 }
@@ -352,7 +354,7 @@ Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
     task->setCommandId(command->uniqueId());
     task->setDisplayLevel(level);
     task->setFilter(filter);
-
+    task->setFileName(file->fileName());
     return task;
 }
 
@@ -390,6 +392,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     task->setDisplayLevel(level);
     task->setFilter(filter);
     task->setInputImage(QImage(file->image(level)));
+    task->setFileName(file->fileName());
 
     return task;
 }
@@ -480,6 +483,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
     task->setDisplayLevel(level);
     task->setFilter(command->filter());
     task->setInputImage(prevImage);
+    task->setFileName(file->fileName());
     return task;
 }
 
@@ -496,6 +500,7 @@ Task *Scheduler::newSaveTask(File *file)
     task->setDisplayLevel(Core::instance()->previewLevelCount());
     task->setFilter(stack->saveCommand()->filter());
     task->setInputImage(stack->image(Core::instance()->previewLevelCount()));
+    task->setFileName(file->fileName());
     return task;
 }
 
@@ -568,7 +573,7 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
         task->setFilter(scaleCropFilter);
 
         task->setInputImage(prevImage);
-
+        task->setFileName(file->fileName());
         return task;
     }
     // This should never happen
