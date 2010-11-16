@@ -98,12 +98,3 @@ void Task::setFilter(QuillImageFilter *filter)
     m_filter = filter;
 }
 
-void Task::setFileName(const QString &fileName)
-{
-    m_fileName = fileName;
-}
-
-QString Task::fileName()
-{
-    return m_fileName;
-}

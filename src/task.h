@@ -121,13 +121,6 @@ class Task {
 
     void setFilter(QuillImageFilter *filter);
 
-    /*!
-
-     */
-    void setFileName(const QString &fileName);
-
-    QString fileName();
-
  private:
     int m_commandId;
     int m_displayLevel;
