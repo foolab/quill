@@ -1,3 +1,8 @@
+libquill (1.101116.0) unstable; urgency=low
+  * Fixes: NB#204692 -Opening video in fullscreen gives infinite warnings: "QImage::scaled: Image is a null image"
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 16 Nov 2010 10:45:00 +0200
+
 libquill (1.101114.0) unstable; urgency=low
   * Fixes: NB#204123 - CPU consumption is more than 95% constantly when ever video files are viewed in FSM
 
