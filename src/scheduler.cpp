@@ -63,7 +63,7 @@ Scheduler::~Scheduler()
 
 Task *Scheduler::newTask()
 {
-    QMap<QString, File*> allFiles = Core::instance()->allFiles();
+    QHash<QString, File*> allFiles = Core::instance()->allFiles();
 
     // No files means no operation
 
@@ -303,21 +303,26 @@ Task *Scheduler::newTilingOverlayTask(File *file)
     return task;
 }
 
-Task *Scheduler::newThumbnailLoadTask(const QMap<QString, File*> &files, int minPriority)
+Task *Scheduler::newThumbnailLoadTask(const QHash<QString, File*> &files, int minPriority)
 {
     int previewLevelCount = Core::instance()->previewLevelCount();
-
+    const QList<QString> fileNameList = Core::instance()->fileNameList();
     for (int level=0; level<=previewLevelCount-1; level++)
-        foreach (File *file, files)
-            if (level <= file->displayLevel() &&
-                (file->priority() >= minPriority)) {
-                Task *task = 0;
-                if (file->hasThumbnail(level)){
-                    task = newThumbnailLoadTask(file, level);
+        //we use the file name list to control loading order, the principle is FIFO
+        for(int i=0;i<fileNameList.size();i++){
+            if(files.contains(fileNameList.at(i))){
+                File* file = files.value(fileNameList.at(i));
+                if (level <= file->displayLevel() &&
+                    (file->priority() >= minPriority)) {
+                    Task *task = 0;
+                    if (file->hasThumbnail(level)){
+                        task = newThumbnailLoadTask(file, level);
+                    }
+                    if (task)
+                        return task;
                 }
-                if (task)
-                    return task;
             }
+        }
     return 0;
 }
 
@@ -392,19 +397,24 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
     return task;
 }
 
-Task *Scheduler::newNormalTask(const QMap<QString, File*> &files, int priority)
+Task *Scheduler::newNormalTask(const QHash<QString, File*> &files, int priority)
 {
     int previewLevelCount = Core::instance()->previewLevelCount();
-
+    const QList<QString> fileNameList = Core::instance()->fileNameList();
     for (int level=0; level<=previewLevelCount-1; level++)
-        foreach (File *file, files)
-            if (file->supportsViewing() && (level <= file->displayLevel()) &&
-                (file->priority() >= priority)) {
-                Task *task = newNormalTask(file, level);
+        //we use the file name list to control loading order, the principle is FIFO
+        for(int i=0;i<fileNameList.size();i++){
+            if(files.contains(fileNameList.at(i))){
+                File* file = files.value(fileNameList.at(i));
+                if (file->supportsViewing() && (level <= file->displayLevel()) &&
+                    (file->priority() >= priority)) {
+                    Task *task = newNormalTask(file, level);
 
-                if (task)
-                    return task;
+                    if (task)
+                        return task;
+                }
             }
+        }
     return 0;
 }
 

@@ -97,6 +97,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
 
     m_writableImageFormats = QImageWriter::supportedImageFormats();
     m_files.clear();
+    m_fileNameList.clear();
 }
 
 Core::~Core()
@@ -112,6 +113,7 @@ Core::~Core()
     delete m_threadManager;
     delete m_scheduler;
     delete m_dBusThumbnailer;
+    m_fileNameList.clear();
 }
 
 void Core::init()
@@ -289,17 +291,21 @@ File *Core::file(const QString &fileName,
     file->setTargetFormat(fileFormat);
 
     m_files.insert(fileName, file);
+    m_fileNameList.append(fileName);
     return file;
 }
 
 void Core::attach(File *file)
 {
     m_files.insert(file->fileName(), file);
+    m_fileNameList.append(file->fileName());
 }
 
 void Core::detach(File *file)
 {
+    QString removedKey = m_files.key(file);
     m_files.remove(m_files.key(file));
+    m_fileNameList.removeOne(removedKey);
 }
 
 QuillUndoCommand *Core::findInAllStacks(int id) const
@@ -341,11 +347,10 @@ File *Core::prioritySaveFile() const
     return 0;
 }
 
-const QMap<QString, File*> Core::allFiles() const
+const QHash<QString, File*> Core::allFiles() const
 {
     return m_files;
 }
-
 void Core::suggestNewTask()
 {
     // The D-Bus thumbnailer runs on a different process instead of
@@ -472,6 +477,7 @@ bool Core::isDBusThumbnailingEnabled() const
 void Core::insertFile(File *file, const QString &key)
 {
     m_files.insert(key, file);
+    m_fileNameList.append(key);
 }
 
 void Core::processFinishedTask(Task *task, QuillImage resultImage)
@@ -669,4 +675,9 @@ void Core::emitError(QuillError quillError)
 {
     emit error(quillError);
     Logger::log("[Core] "+QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+}
+
+const QList<QString> Core::fileNameList() const
+{
+    return m_fileNameList;
 }

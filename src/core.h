@@ -544,7 +544,7 @@ public:
       Return all existing files.
     */
 
-    const QMap<QString, File*> allFiles() const;
+    const QHash<QString, File*> allFiles() const;
 
     /*!
       Emits a saved signal.
@@ -560,6 +560,11 @@ public:
       Emits an error signal.
     */
     void emitError(QuillError error);
+
+    /*!
+      Returns the file name list.
+    */
+    const QList<QString> fileNameList() const;
 
 private:
     ~Core();
@@ -636,7 +641,7 @@ private:
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;
 
-    QMap<QString, File*> m_files;
+    QHash<QString, File*> m_files;
 
     QSize m_defaultTileSize;
     int m_saveBufferSize;
@@ -654,6 +659,8 @@ private:
     DBusThumbnailer *m_dBusThumbnailer;
 
     QEventLoop m_loop;
+    //The list for the QuillFile names
+    QList<QString> m_fileNameList;
 };
 
 #endif
