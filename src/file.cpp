@@ -887,7 +887,7 @@ File *File::original()
     original->setReadOnly();
     //We set a flag for the original file, then we can distinguish original one from edited one
     original->setOriginal(true);
-    Core::instance()->insertFile(original, indexName);
+    Core::instance()->insertFile(original);
     return original;
 }
 

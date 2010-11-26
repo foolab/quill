@@ -138,7 +138,7 @@ public:
       Inserts a new file.
      */
 
-    void insertFile(File *file, const QString &key);
+    void insertFile(File *file);
 
     /*!
       Callback from ThreadManager.
@@ -562,9 +562,9 @@ public:
     void emitError(QuillError error);
 
     /*!
-      Returns the file name list.
+      Returns the file pointer list.
     */
-    const QList<QString> fileNameList() const;
+    const QList<File*> fileList() const;
 
 private:
     ~Core();
@@ -641,8 +641,6 @@ private:
     bool m_thumbnailCreationEnabled;
     bool m_dBusThumbnailingEnabled;
 
-    QHash<QString, File*> m_files;
-
     QSize m_defaultTileSize;
     int m_saveBufferSize;
 
@@ -659,8 +657,8 @@ private:
     DBusThumbnailer *m_dBusThumbnailer;
 
     QEventLoop m_loop;
-    //The list for the QuillFile names
-    QList<QString> m_fileNameList;
+    //The list for the file objects in the creation order
+    QList<File*> m_fileList;
 };
 
 #endif

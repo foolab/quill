@@ -118,7 +118,7 @@ private:
       trying to find a normal task
      */
 
-    Task *newNormalTask(const QHash<QString, File*> &files, int minPriority);
+    Task *newNormalTask(const QList<File*> &fileList, int minPriority);
 
     /*!
       Used by core to indicate that there may be a save task waiting
@@ -140,7 +140,7 @@ private:
       trying to find a thumbnail load task
      */
 
-    Task *newThumbnailLoadTask(const QHash<QString, File*> &files, int minPriority);
+    Task *newThumbnailLoadTask(const QList<File*> &fileList, int minPriority);
 
     /*
       Suggest to load a pre-generated thumbnail from a file.

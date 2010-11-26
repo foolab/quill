@@ -96,15 +96,11 @@ Core::Core(Quill::ThreadingMode threadingMode) :
             SLOT(processDBusThumbnailerError(const QString, uint, const QString)));
 
     m_writableImageFormats = QImageWriter::supportedImageFormats();
-    m_files.clear();
-    m_fileNameList.clear();
+    m_fileList.clear();
 }
 
 Core::~Core()
 {
-    foreach(File *file, m_files)
-        delete file;
-
     while (!m_displayLevel.isEmpty()) {
         delete m_displayLevel.first();
         m_displayLevel.removeFirst();
@@ -113,7 +109,7 @@ Core::~Core()
     delete m_threadManager;
     delete m_scheduler;
     delete m_dBusThumbnailer;
-    m_fileNameList.clear();
+    m_fileList.clear();
 }
 
 void Core::init()
@@ -144,9 +140,9 @@ Core *Core::instance()
 void Core::setPreviewLevelCount(int count)
 {
     // Only works with empty stack and count >= 1
-    if (!m_files.isEmpty() || (count <= 0))
-        return;
 
+    if (!m_fileList.isEmpty() || (count <= 0))
+        return;
     int oldCount = m_displayLevel.count()-1;
     if (count > oldCount)
         for (int i = oldCount; i < count; i++) {
@@ -268,17 +264,23 @@ int Core::editHistoryCacheSize(int level)
 
 bool Core::fileExists(const QString &fileName)
 {
-    return m_files.contains(fileName);
+    foreach(File* file, m_fileList){
+        if(file->fileName()==fileName)
+            return true;
+    }
+
+    return false;
 }
 
 File *Core::file(const QString &fileName,
                  const QString &fileFormat)
 {
-    File *file = m_files.value(fileName);
+    File* file = 0;
 
-    if (file)
-        return file;
-
+    foreach(File* file, m_fileList){
+        if(file->fileName()==fileName)
+            return file;
+    }
     QFileInfo fileInfo(fileName);
     QString originalFileName =
         fileInfo.path() + "/.original/" + fileInfo.fileName();
@@ -290,34 +292,31 @@ File *Core::file(const QString &fileName,
     file->setFileFormat(fileFormat);
     file->setTargetFormat(fileFormat);
 
-    m_files.insert(fileName, file);
-    m_fileNameList.append(fileName);
+    m_fileList.append(file);
     return file;
 }
 
 void Core::attach(File *file)
 {
-    m_files.insert(file->fileName(), file);
-    m_fileNameList.append(file->fileName());
+    m_fileList.append(file);
 }
 
 void Core::detach(File *file)
 {
-    QString removedKey = m_files.key(file);
-    m_files.remove(m_files.key(file));
-    m_fileNameList.removeOne(removedKey);
+    m_fileList.removeOne(file);
 }
 
 QuillUndoCommand *Core::findInAllStacks(int id) const
 {
     QuillUndoCommand *command = 0;
 
-    foreach (File *file, m_files)
+    foreach(File* file, m_fileList){
         if (file->exists()) {
             command = file->stack()->find(id);
             if (command)
                 break;
         }
+    }
     return command;
 }
 
@@ -327,19 +326,19 @@ File *Core::priorityFile() const
     int level = -1;
     File *priorityFile = 0;
 
-    foreach (File *file, m_files)
+    foreach(File* file, m_fileList){
         if (file->supportsViewing() &&
             (file->displayLevel() > level)) {
             priorityFile = file;
             level = file->displayLevel();
         }
-
+    }
     return priorityFile;
 }
 
 File *Core::prioritySaveFile() const
 {
-    foreach (File *file, m_files) {
+    foreach(File* file, m_fileList){
         if (file->isSaveInProgress())
             return file;
     }
@@ -347,10 +346,6 @@ File *Core::prioritySaveFile() const
     return 0;
 }
 
-const QHash<QString, File*> Core::allFiles() const
-{
-    return m_files;
-}
 void Core::suggestNewTask()
 {
     // The D-Bus thumbnailer runs on a different process instead of
@@ -474,10 +469,9 @@ bool Core::isDBusThumbnailingEnabled() const
     return m_dBusThumbnailingEnabled;
 }
 
-void Core::insertFile(File *file, const QString &key)
+void Core::insertFile(File *file)
 {
-    m_files.insert(key, file);
-    m_fileNameList.append(key);
+    m_fileList.append(file);
 }
 
 void Core::processFinishedTask(Task *task, QuillImage resultImage)
@@ -494,10 +488,11 @@ void Core::releaseAndWait()
 int Core::numFilesAtLevel(int level) const
 {
     int n = 0;
-    foreach (File *file, m_files)
+
+    foreach(File* file, m_fileList){
         if (file->displayLevel() >= level)
             n++;
-
+    }
     return n;
 }
 
@@ -610,7 +605,8 @@ void Core::activateDBusThumbnailer()
     for (int level=0; level<=previewLevelCount()-1; level++)
         // using m_files instead of existingFiles() since this will potentially
         // be called often and the existing file list creation is a slow task.
-        foreach (File *file, m_files){
+
+        foreach(File* file, m_fileList){
             if ((file->state() == File::State_ExternallySupportedFormat) &&
                 (level <= file->displayLevel()) &&
                 !thumbnailDirectory(level).isNull() &&
@@ -653,11 +649,16 @@ void Core::processDBusThumbnailerError(const QString fileName,
 
     if(fileExists(fileName)){
 
-        m_files.value(fileName)->emitError(QuillError(QuillError::FileFormatUnsupportedError,
-                                                 QuillError::ImageFileErrorSource,
-                                                 fileName));
+        foreach(File* file, m_fileList)
+            if(file->fileName()==fileName){
+                file->emitError(QuillError(QuillError::FileFormatUnsupportedError,
+                                           QuillError::ImageFileErrorSource,
+                                           fileName));
+                break;
+            }
     }
 }
+
 
 void Core::emitSaved(QString fileName)
 {
@@ -677,7 +678,7 @@ void Core::emitError(QuillError quillError)
     Logger::log("[Core] "+QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }
 
-const QList<QString> Core::fileNameList() const
+const QList<File*> Core::fileList() const
 {
-    return m_fileNameList;
+    return m_fileList;
 }
