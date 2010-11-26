@@ -347,13 +347,15 @@ void ut_thumbnail::testDownscaledFromSetImage()
 
     QuillFile *file = new QuillFile("/tmp/quill/test.png", "video/avi");
     QVERIFY(file);
+    file->removeThumbnails(); // Make sure there are no thumbs from previous run
+    QVERIFY(!file->hasThumbnail(0));
 
     file->setDisplayLevel(0);
     file->setImage(0, image); // Set too big image
 
     QString thumbName = file->thumbnailFileName(0);
 
-    Quill::releaseAndWait(); // try and fail load
+    Quill::releaseAndWait(); // downscale
     Quill::releaseAndWait(); // save lv0
 
     // We should now have a newly created thumbnail.
