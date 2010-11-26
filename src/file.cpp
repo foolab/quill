@@ -353,7 +353,9 @@ void File::setImage(int level, const QuillImage &image)
     // Initialize stack for nonexistent files
     if (m_stack->isClean())
         m_stack->load();
-    m_stack->setImage(level, image.convertToFormat(QImage::Format_RGB32));
+    m_stack->setImage(level,
+                      QuillImage(image,
+                                 image.convertToFormat(QImage::Format_RGB32)));
 
     Core::instance()->suggestNewTask();
 }
