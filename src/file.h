@@ -616,6 +616,16 @@ public:
       If the edit history is read
     */
     bool readEditHistory() const;
+
+    /*!
+      Sets the file index name for original files
+    */
+    void setFileIndexName(const QString indexName);
+
+    /*!
+      Gets the file index name for original files
+    */
+    QString fileIndexName() const;
 signals:
 
     /*!
@@ -681,6 +691,8 @@ private:
     bool m_original;
     //the flag for the stack when we read the edit history xml file
     bool m_hasReadEditHistory;
+    //just for the original file
+    QString m_fileIndexName;
 
     Q_DISABLE_COPY(File)
 };

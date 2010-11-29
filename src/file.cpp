@@ -59,7 +59,7 @@ File::File() : m_state(State_Normal),
                m_hasThumbnail(false), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false),
-               m_hasReadEditHistory(false)
+               m_hasReadEditHistory(false),m_fileIndexName("")
 {
     m_stack = new QuillUndoStack(this);
 }
@@ -891,6 +891,7 @@ File *File::original()
     original->setReadOnly();
     //We set a flag for the original file, then we can distinguish original one from edited one
     original->setOriginal(true);
+    original->setFileIndexName(indexName);
     Core::instance()->insertFile(original);
     return original;
 }
@@ -1080,4 +1081,14 @@ void File::setOriginal(bool flag)
 bool File::readEditHistory() const
 {
     return m_hasReadEditHistory;
+}
+
+void File::setFileIndexName(const QString indexName)
+{
+    m_fileIndexName = indexName;
+}
+
+QString File::fileIndexName() const
+{
+    return m_fileIndexName;
 }
