@@ -101,6 +101,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
 
 Core::~Core()
 {
+    foreach(File *file, m_fileList)
+        delete file;
     while (!m_displayLevel.isEmpty()) {
         delete m_displayLevel.first();
         m_displayLevel.removeFirst();
@@ -109,7 +111,6 @@ Core::~Core()
     delete m_threadManager;
     delete m_scheduler;
     delete m_dBusThumbnailer;
-    m_fileList.clear();
 }
 
 void Core::init()

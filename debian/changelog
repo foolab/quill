@@ -1,3 +1,8 @@
+libquill (1.101129.0) unstable; urgency=low
+  * Implemented: SWP#HImag-2514
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 29 Nov 2010 08:15:00 +0200
+
 libquill (1.101126.0) unstable; urgency=low
   * Fixes: NB#207430 - Blank screen shown after setImage()
 
