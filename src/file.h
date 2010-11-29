@@ -623,7 +623,8 @@ public:
     void setFileIndexName(const QString indexName);
 
     /*!
-      Gets the file index name for original files
+      Gets the file index name for original files, if the file is
+      non-original file, the file name is returned.
     */
     QString fileIndexName() const;
 signals:
@@ -691,7 +692,7 @@ private:
     bool m_original;
     //the flag for the stack when we read the edit history xml file
     bool m_hasReadEditHistory;
-    //just for the original file
+    //the index name is different from file name, for orignial file, the index name starts with "\",
     QString m_fileIndexName;
 
     Q_DISABLE_COPY(File)

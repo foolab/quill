@@ -266,11 +266,8 @@ int Core::editHistoryCacheSize(int level)
 bool Core::fileExists(const QString &fileName)
 {
     foreach(File* file, m_fileList){
-        if(file->isOriginal()&&file->fileIndexName()==fileName)
+        if(file->fileIndexName()==fileName)
             return true;
-        else
-            if(file->fileName()==fileName)
-                return true;
     }
 
     return false;
@@ -282,18 +279,14 @@ File *Core::file(const QString &fileName,
     File* file = 0;
 
     foreach(File* file, m_fileList){
-        if(file->isOriginal()&&file->fileIndexName()==fileName)
+        if(file->fileIndexName()==fileName)
             return file;
-        else
-            if(file->fileName()==fileName)
-                return file;
     }
     QFileInfo fileInfo(fileName);
     QString originalFileName =
         fileInfo.path() + "/.original/" + fileInfo.fileName();
     file = new File();
     file->setFileName(fileName);
-
     file->setOriginalFileName(originalFileName);
 
     file->setFileFormat(fileFormat);

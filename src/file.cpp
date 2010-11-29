@@ -455,7 +455,7 @@ bool File::hasThumbnail(int level)
 
     if (!info.exists())
         return false;
-    
+
     return (info.lastModified() >= lastModified());
 }
 
@@ -1090,5 +1090,8 @@ void File::setFileIndexName(const QString indexName)
 
 QString File::fileIndexName() const
 {
-    return m_fileIndexName;
+    if(isOriginal())
+        return m_fileIndexName;
+    else
+        return m_fileName;
 }
