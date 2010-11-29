@@ -350,11 +350,15 @@ void File::setImage(int level, const QuillImage &image)
     if ((state() == State_NonExistent) || (state() == State_UnsupportedFormat))
         setState(State_Placeholder);
 
+    // Only complete images are approved. Input images are made into such.
+    QuillImage fixedImage(image);
+    fixedImage.setArea(QRect(QPoint(0, 0), image.fullImageSize()));
+
     // Initialize stack for nonexistent files
     if (m_stack->isClean())
         m_stack->load();
     m_stack->setImage(level,
-                      QuillImage(image,
+                      QuillImage(fixedImage,
                                  image.convertToFormat(QImage::Format_RGB32)));
 
     Core::instance()->suggestNewTask();

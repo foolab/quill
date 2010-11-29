@@ -1,3 +1,8 @@
+libquill (1.101126.0) unstable; urgency=low
+  * Fixes: NB#207430 - Blank screen shown after setImage()
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 26 Nov 2010 14:18:00 +0200
+
 libquill (1.101124.0) unstable; urgency=low
   * Fixes: NB#195586 - Image cropped after setImage() not properly visible
 
