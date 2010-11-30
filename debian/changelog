@@ -1,3 +1,8 @@
+libquill (1.101130.1) unstable; urgency=low
+  * Fixes: NB#204012 - libquill-tests fail during execution.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 30 Nov 2010 10:45:00 +0200
+
 libquill (1.101130.0) unstable; urgency=low
   * fixed: ut_file unit test
 
