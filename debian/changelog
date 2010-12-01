@@ -1,3 +1,8 @@
+libquill (1.101201.0) unstable; urgency=low
+  * Fixes: NB#202523 - Gallery application crash observed while resize the image.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 01 Dec 2010 10:15:00 +0200
+
 libquill (1.101130.1) unstable; urgency=low
   * Fixes: NB#204012 - libquill-tests fail during execution.
 
