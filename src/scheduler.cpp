@@ -265,6 +265,9 @@ Task *Scheduler::newTilingTask(File *file)
 Task *Scheduler::newTilingSaveTask(File *file)
 {
     QuillUndoStack *stack = file->stack();
+    //Make sure the m_saveMap is not null pointer from stack.
+    if(!stack->saveMap())
+        return 0;
     if (stack->saveMap()->isBufferComplete())
     {
         Task *task = new Task();
