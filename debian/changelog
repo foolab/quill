@@ -1,3 +1,10 @@
+libquill (1.101206.0) unstable; urgency=low
+  * Fixes: NB#195586 - Image cropped after setImage() not properly visible
+  * Fixes: NB#207430 - Blank screen shown after setImage()
+  * Fixes: NB#205048 - Thumbnail corrupted when capture image in portrait mode and edit in pre-capture view
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Fri, 03 Dec 2010 07:45:00 +0200
+
 libquill (1.101203.0) unstable; urgency=low
   * Revert: NB#195586 - Image cropped after setImage() not properly visible
   * Revert: NB#207430 - Blank screen shown after setImage()
