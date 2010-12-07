@@ -1,10 +1,3 @@
-libquill (1.101206.0) unstable; urgency=low
-  * Fixes: NB#195586 - Image cropped after setImage() not properly visible
-  * Fixes: NB#207430 - Blank screen shown after setImage()
-  * Fixes: NB#205048 - Thumbnail corrupted when capture image in portrait mode and edit in pre-capture view
-
- -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Fri, 03 Dec 2010 07:45:00 +0200
-
 libquill (1.101203.0) unstable; urgency=low
   * Revert: NB#195586 - Image cropped after setImage() not properly visible
   * Revert: NB#207430 - Blank screen shown after setImage()
@@ -30,6 +23,16 @@ libquill (1.101129.0) unstable; urgency=low
   * Implemented: SWP#HImag-2514
 
  -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 29 Nov 2010 08:15:00 +0200
+
+libquill (1.101126.0) unstable; urgency=low
+  * Fixes: NB#207430 - Blank screen shown after setImage()
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 26 Nov 2010 14:18:00 +0200
+
+libquill (1.101124.0) unstable; urgency=low
+  * Fixes: NB#195586 - Image cropped after setImage() not properly visible
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 24 Nov 2010 14:28:00 +0200
 
 libquill (1.101116.0) unstable; urgency=low
   * Fixes: NB#204692 -Opening video in fullscreen gives infinite warnings: "QImage::scaled: Image is a null image"
