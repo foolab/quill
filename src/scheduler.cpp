@@ -246,7 +246,11 @@ Task *Scheduler::newTilingTask(File *file)
     // ...and start working with the next one
     QuillUndoCommand *command = stack->command(index + 1);
     QuillImage prevImage;
-    prevImage = command->tileMap()->tile(tileIndex);
+
+    if (command->filter()->role() == QuillImageFilter::Role_Load)
+        prevImage = command->tileMap()->tile(tileIndex);
+    else
+        prevImage = command->prev()->tileMap()->tile(tileIndex);
 
     Task *task = new Task();
     task->setCommandId(command->uniqueId());
