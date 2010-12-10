@@ -146,10 +146,18 @@ void File::setFileName(const QString &fileName)
     /*the date and time maybe changed if we edit the image with pc and copied to device.
       We need to make sure the last modified time should not be later than the current time
      */
-    if(info.lastModified()>QDateTime::currentDateTime())
+    if(info.lastModified()>QDateTime::currentDateTime()){
         m_lastModified =QDateTime::currentDateTime();
-    else
-        m_lastModified = info.lastModified();
+    }
+    else{
+        //for the camera captured file, info.lastModified() is null, we need give it the current time
+        if(info.lastModified().isNull()){
+            m_lastModified =QDateTime::currentDateTime();
+        }
+        else{
+            m_lastModified = info.lastModified();
+        }
+    }
 }
 
 void File::setFileFormat(const QString &fileFormat)
@@ -438,23 +446,25 @@ QuillUndoStack *File::stack() const
 
 bool File::hasThumbnail(int level)
 {
-    if(isOriginal())
+    if(isOriginal()){
         return false;
-    if (Core::instance()->thumbnailFlavorName(level).isEmpty())
+    }
+    if (Core::instance()->thumbnailFlavorName(level).isEmpty()){
         return false;
-
+    }
     // Optimization currently for level 0 only
     // For externally supported files, thumbnails may appear at any time
     // so they need to be always checked from the file system
     if ((level == 0) &&
         (state() != State_ExternallySupportedFormat) &&
-        (m_displayLevel >= 0))
+        (m_displayLevel >= 0)){
         return m_hasThumbnail;
-
+    }
     QFileInfo info(thumbnailFileName(level));
 
-    if (!info.exists())
+    if (!info.exists()){
         return false;
+    }
 
     return (info.lastModified() >= lastModified());
 }
