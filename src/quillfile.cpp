@@ -327,7 +327,8 @@ QRect QuillFile::viewPort() const
 bool QuillFile::hasThumbnail(int level) const
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO)+Logger::intToString(level));
-    if (priv->m_file)
+    //make sure level has a valid value
+    if (priv->m_file&&level>=0)
         return priv->m_file->hasThumbnail(level);
     else
         return false;
