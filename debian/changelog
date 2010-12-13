@@ -1,3 +1,8 @@
+libquill (1.101213.1) unstable; urgency=low
+  * Fixes: NB#211092 - QuillFile::HasThumbnail(-1) causes segmentation fault
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 13 Dec 2010 11:00:00 +0200
+
 libquill (1.101213.0) unstable; urgency=low
   * Fixes: NB#210411 - Previously captured image is displayed when undo the edited changes on the just captured image.
 
