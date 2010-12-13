@@ -50,6 +50,7 @@
 #include "quillundocommand.h"
 #include "historyxml.h"
 #include "tilemap.h"
+#include "filesystem.h"
 #include "quillerror.h"
 #include "logger.h"
 
@@ -143,13 +144,8 @@ void File::setFileName(const QString &fileName)
     }
     else if (!(info.permissions() & QFile::WriteUser))
         setReadOnly();
-    /*the date and time maybe changed if we edit the image with pc and copied to device.
-      We need to make sure the last modified time should not be later than the current time
-     */
-    if(info.lastModified()>QDateTime::currentDateTime())
-        m_lastModified =QDateTime::currentDateTime();
-    else
-        m_lastModified = info.lastModified();
+
+    m_lastModified = info.lastModified();
 }
 
 void File::setFileFormat(const QString &fileFormat)
@@ -455,8 +451,8 @@ bool File::hasThumbnail(int level)
 
     if (!info.exists())
         return false;
-    
-    return (info.lastModified() >= lastModified());
+
+    return (info.lastModified() == lastModified());
 }
 
 QString File::fileNameHash(const QString &fileName)
@@ -717,14 +713,17 @@ void File::removeThumbnails()
     m_hasThumbnail = false;
 }
 
+void File::touchThumbnail(int level)
+{
+    if (hasThumbnail(level))
+        FileSystem::setFileModificationDateTime(thumbnailFileName(level),
+                                                m_lastModified);
+}
+
 void File::touchThumbnails()
 {
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
-        if (hasThumbnail(level)) {
-            QFile file(thumbnailFileName(level));
-            file.open(QIODevice::Append);
-            file.close();
-        }
+        touchThumbnail(level);
 }
 
 void File::prepareSave()
@@ -869,6 +868,7 @@ void File::registerThumbnail(int level)
 {
     if (level == 0)
         m_hasThumbnail = true;
+    touchThumbnail(level);
 }
 
 bool File::hasOriginal()

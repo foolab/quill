@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+** Copyright (C) 2009-10 Nokia Corporation and/or its subsidiary(-ies).
 ** Contact: Alexander Bokovoy <alexander.bokovoy@nokia.com>
 **
 ** This file is part of the Quill package.
@@ -37,37 +37,23 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_THUMBNAIL_H
-#define TEST_LIBQUILL_THUMBNAIL_H
+#ifndef FILESYSTEM_H
+#define FILESYSTEM_H
 
-#include <QObject>
-#include <QImage>
+#include <QDateTime>
+#include <QString>
 
-class ut_thumbnail : public QObject {
-Q_OBJECT
-public:
-    ut_thumbnail();
+class FileSystem {
 
-private slots:
-    void init();
-    void cleanup();
-    void initTestCase();
-    void cleanupTestCase();
+ public:
+    /*!
+      Sets the last-modified datetime for the file. The file must be open.
 
-    void testName();
-    void testInvalid();
-    void testValid();
+      @returns true if success, false if failed
+    */
 
-    void testLoad();
-    void testSave();
-    void testUpdate();
-    void testExternalUpdate();
-    void testLoadUnsupported();
-
-    void testFailedWrite();
-
-    void testFromSetImage();
-    void testDownscaledFromSetImage();
+    static bool setFileModificationDateTime(const QString &fileName,
+                                            const QDateTime &dateTime);
 };
 
-#endif  // TEST_LIBQUILL_THUMBNAIL_H
+#endif //FILESYSTEM_H
