@@ -135,7 +135,13 @@ void ut_quill::testQuillFile()
     QImage laterPreview = file->image();
 
     QCOMPARE(laterPreview.size(), QSize(4, 1));
+
+    QuillImageFilter *filter1 =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter1);
+    filter1->setOption(QuillImageFilter::Brightness, QVariant(16));
     QCOMPARE(laterPreview, (QImage)filter->apply(initialPreview));
+    delete filter1;
 
     QCOMPARE(laterPreview, (QImage)file->image(0));
     QVERIFY(Unittests::compareImage(file->image(1), QImage()));
@@ -226,6 +232,10 @@ void ut_quill::testDisableCache()
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
+    QuillImageFilter *filterb =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filterb);
+    filterb->setOption(QuillImageFilter::Brightness, QVariant(16));
 
     file->runFilter(filter);
 
@@ -246,7 +256,7 @@ void ut_quill::testDisableCache()
 
     QuillImage laterMid = file->image();
     QVERIFY(Unittests::compareImage(laterMid,
-                                    filter->apply(initialMid)));
+                                    filterb->apply(initialMid)));
     QVERIFY(Unittests::compareImage(file->image(0), laterPreview));
     QVERIFY(Unittests::compareImage(file->image(1), laterMid));
     QVERIFY(file->image(2).isNull());
@@ -257,7 +267,7 @@ void ut_quill::testDisableCache()
 
     QuillImage laterFull = file->image();
     QVERIFY(Unittests::compareImage(laterFull,
-                                    filter->apply(initialFull)));
+                                    filterb->apply(initialFull)));
     QVERIFY(Unittests::compareImage(file->image(0), laterPreview));
     QVERIFY(Unittests::compareImage(file->image(1), laterMid));
     QVERIFY(Unittests::compareImage(file->image(2), laterFull));
@@ -289,6 +299,7 @@ void ut_quill::testDisableCache()
     QCOMPARE(initialFull, file->image(2));
 
     delete file;
+    delete filterb;
 }
 
 void ut_quill::testSignals()
@@ -341,13 +352,21 @@ void ut_quill::testSignals()
 
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
-    QuillImageFilter *filter2 =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
-
+    QuillImageFilter *filterb =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filterb);
+    filterb->setOption(QuillImageFilter::Brightness, QVariant(20));
+    QuillImageFilter *filter2 =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter2);
     filter2->setOption(QuillImageFilter::Contrast, QVariant(25));
+    QuillImageFilter *filter2b =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filter2b);
+    filter2b->setOption(QuillImageFilter::Contrast, QVariant(25));
+
 
     file->runFilter(filter);
     file->runFilter(filter2);
@@ -360,7 +379,7 @@ void ut_quill::testSignals()
     spyImage = spy.last().first().value<QuillImageList>().first();
 
     QVERIFY(Unittests::compareImage(spyImage,
-                                    filter2->apply(filter->apply(smallImage))));
+                                    filter2b->apply(filterb->apply(smallImage))));
     QCOMPARE(spyImage.z(), 0);
 
     Quill::releaseAndWait();
@@ -370,7 +389,7 @@ void ut_quill::testSignals()
     spyImage = spy.last().first().value<QuillImageList>().first();
 
     QVERIFY(Unittests::compareImage(spyImage,
-                                    filter2->apply(filter->apply(midImage))));
+                                    filter2b->apply(filterb->apply(midImage))));
     QCOMPARE(spyImage.z(), 1);
 
     Quill::releaseAndWait(); // full image
@@ -378,10 +397,12 @@ void ut_quill::testSignals()
     QCOMPARE(spy.count(), 6);
     spyImage = spy.last().first().value<QuillImageList>().first();
     QVERIFY(Unittests::compareImage(spyImage,
-                                    filter2->apply(filter->apply(image))));
+                                    filter2b->apply(filterb->apply(image))));
     QCOMPARE(spyImage.z(), 2);
 
     delete file;
+    delete filterb;
+    delete filter2b;
 }
 
 void ut_quill::testLoadSave()

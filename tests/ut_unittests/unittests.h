@@ -51,6 +51,7 @@ class Unittests
 {
 public:
     QImage static generatePaletteImage();
+    QImage static generatePaletteImage(int minValue, int maxValue);
     void static compareReal(qreal real1, qreal real2);
     void static fuzzyCompareRgb(QRgb rgb1, QRgb rgb2);
     bool static compareImage(QImage image1, QImage image2);

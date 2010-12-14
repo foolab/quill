@@ -48,6 +48,8 @@ Q_OBJECT
 public:
     ut_filtergenerator();
 
+    void testAutoLevels();
+
 private slots:
     void init();
     void cleanup();

@@ -182,6 +182,10 @@ void ut_thumbnail::testUpdate()
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
+    QuillImageFilter *filterb =
+        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+    QVERIFY(filterb);
+    filterb->setOption(QuillImageFilter::Brightness, QVariant(16));
 
     file->runFilter(filter);
     Quill::releaseAndWait(); // preview up to date
@@ -191,16 +195,17 @@ void ut_thumbnail::testUpdate()
     Quill::releaseAndWait();
     Quill::releaseAndWait(); // save, should also clear thumbnails
 
-    QVERIFY(Unittests::compareImage(filter->apply(image),
+    QVERIFY(Unittests::compareImage(filterb->apply(image),
                                     QImage(testFile.fileName())));
     QVERIFY(!QFile::exists(thumbName));
 
     Quill::releaseAndWait(); // thumbnail created
 
     QVERIFY(QFile::exists(thumbName));
-    QVERIFY(Unittests::compareImage(filter->apply(image), QImage(thumbName)));
+    QVERIFY(Unittests::compareImage(filterb->apply(image), QImage(thumbName)));
 
     delete file;
+    delete filterb;
 }
 
 void ut_thumbnail::testLoadUnsupported()

@@ -459,7 +459,7 @@ void ut_file::testRevertRestore()
    QuillImageFilter *filter2 =
        QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
 
-   filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
+   filter2->setOption(QuillImageFilter::Angle, QVariant(-90));
    file->runFilter(filter2);
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);

@@ -91,6 +91,7 @@ void ut_filtergenerator::testAutoContrast()
     QuillImageFilter *filter =
         QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
     QVERIFY(filter);
+    QCOMPARE(filter->name(), QLatin1String("com.meego.composite.brightness.contrast"));
 
     filter->setOption(QuillImageFilter::Contrast, -50);
 
@@ -99,10 +100,15 @@ void ut_filtergenerator::testAutoContrast()
     // Also update big picture
     Quill::releaseAndWait();
 
+
     QuillImageFilter *filterGenerator =
         QuillImageFilterFactory::createImageFilter("org.maemo.auto.contrast");
+    QCOMPARE(filterGenerator->name(), QLatin1String("com.meego.auto.contrast"));
+    QVERIFY(dynamic_cast<QuillImageFilterGenerator*>(filterGenerator));
 
     file.runFilter(filterGenerator);
+
+
     // Generator
     Quill::releaseAndWait();
     // Generated
@@ -110,6 +116,8 @@ void ut_filtergenerator::testAutoContrast()
 
     QImage image = file.image();
     QImage refImage = Unittests::generatePaletteImage();
+
+    QCOMPARE(image.size(), refImage.size());
 
     // Original image should now be restored - An offset of +-1 is
     // tolerated.
@@ -122,6 +130,55 @@ void ut_filtergenerator::testAutoContrast()
         QVERIFY(abs(qRed(rgb)-qRed(rgb2)) <= 1);
         QVERIFY(abs(qGreen(rgb)-qGreen(rgb2)) <= 1);
         QVERIFY(abs(qBlue(rgb)-qBlue(rgb2)) <= 1);
+    }
+}
+
+/*!
+  Test use through quill.
+*/
+
+void ut_filtergenerator::testAutoLevels()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    Unittests::generatePaletteImage(20, 235).save(testFile.fileName(), "png");
+
+    QuillFile file(testFile.fileName());
+    file.setDisplayLevel(0);
+
+    Quill::releaseAndWait();
+    QCOMPARE((QImage)file.image(), Unittests::generatePaletteImage(20, 235));
+
+
+    QuillImageFilter *filterGenerator =
+        QuillImageFilterFactory::createImageFilter("com.meego.auto.levels");
+    QCOMPARE(filterGenerator->name(), QLatin1String("com.meego.auto.levels"));
+    QVERIFY(dynamic_cast<QuillImageFilterGenerator*>(filterGenerator));
+
+    file.runFilter(filterGenerator);
+
+
+    // Generator
+    Quill::releaseAndWait();
+    // Generated
+    Quill::releaseAndWait();
+
+    QImage image = file.image();
+    QImage refImage = Unittests::generatePaletteImage();
+
+    QCOMPARE(image.size(), refImage.size());
+
+    // Original image should now be restored - An offset of +-2 is
+    // tolerated.
+
+    for (int p=0; p<16; p++)
+    {
+        int rgb = image.pixel(p%8, p/8);
+        int rgb2 = refImage.pixel(p%8, p/8);
+
+        QVERIFY(abs(qRed(rgb)-qRed(rgb2)) <= 2);
+        QVERIFY(abs(qGreen(rgb)-qGreen(rgb2)) <= 2);
+        QVERIFY(abs(qBlue(rgb)-qBlue(rgb2)) <= 2);
     }
 }
 

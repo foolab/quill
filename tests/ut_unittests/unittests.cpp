@@ -62,6 +62,19 @@ QImage Unittests::generatePaletteImage()
     return image;
 }
 
+QImage Unittests::generatePaletteImage(int minValue, int maxValue)
+{
+    QImage image = QImage(QSize(8, 2), QImage::Format_RGB32);
+    for (int p=0; p<16; p++)
+    {
+        image.setPixel(p%8, p/8, qRgb(
+                palette16[p][0] * ((maxValue - minValue)/255.0) + minValue,
+                palette16[p][1] * ((maxValue - minValue)/255.0) + minValue,
+                palette16[p][2] * ((maxValue - minValue)/255.0) + minValue));
+    }
+    return image;
+}
+
 void Unittests::compareReal(qreal real1, qreal real2)
 {
     if (fabs(real1 - real2) > .00001)
