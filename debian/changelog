@@ -1,3 +1,8 @@
+libquill (1.101214.0) unstable; urgency=low
+  * Fixes: NB#207298 - Images shown that have been replaced (overwritten)
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 14 Dec 2010 10:48:00 +0200
+
 libquill (1.101213.1) unstable; urgency=low
   * Fixes: NB#211092 - QuillFile::HasThumbnail(-1) causes segmentation fault
 
