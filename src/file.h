@@ -659,6 +659,14 @@ private:
     void writeEditHistory(const QString &history, QuillError *error);
 
     /*!
+      Touches one thumbnail for a file. This needs to be called after
+      a thumbnail has been created so that the thumbnail date can be set
+      to the same date as the main file since without it, the thumbnail
+      will be considered invalid.
+     */
+    void touchThumbnail(int level);
+
+    /*!
       Touches all thumbnails for a file. This is usable if the main
       file has been changed and thumbnails don't need regenerating.
      */
