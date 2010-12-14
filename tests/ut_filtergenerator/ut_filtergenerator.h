@@ -48,7 +48,6 @@ Q_OBJECT
 public:
     ut_filtergenerator();
 
-    void testAutoLevels();
 
 private slots:
     void init();
@@ -57,6 +56,7 @@ private slots:
     void cleanupTestCase();
 
     void testAutoContrast();
+    void testAutoLevels();
     void testRedEyeRemoval();
 };
 
