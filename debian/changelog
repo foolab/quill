@@ -1,3 +1,8 @@
+libquill (1.101215.0) unstable; urgency=low
+  * Fixes to previous commit
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 15 Dec 2010 10:22:00 +0200
+
 libquill (1.101214.0) unstable; urgency=low
   * Fixes: NB#207298 - Images shown that have been replaced (overwritten)
 
