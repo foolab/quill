@@ -709,16 +709,14 @@ QuillError File::overwritingCopy(const QString &fileName,
 void File::removeThumbnails()
 {
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
-        if (hasThumbnail(level))
-            QFile::remove(thumbnailFileName(level));
+        QFile::remove(thumbnailFileName(level));
     m_hasThumbnail = false;
 }
 
 void File::touchThumbnail(int level)
 {
-    if (hasThumbnail(level))
-        FileSystem::setFileModificationDateTime(thumbnailFileName(level),
-                                                m_lastModified);
+    FileSystem::setFileModificationDateTime(thumbnailFileName(level),
+                                            m_lastModified);
 }
 
 void File::touchThumbnails()
