@@ -385,6 +385,8 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
+    filter->setOption("timestamp",
+                      file->lastModified());
 
     Task *task = new Task();
     task->setCommandId(file->stack()->command()->uniqueId());
@@ -503,9 +505,8 @@ Task *Scheduler::newSaveTask(File *file)
 
 Task *Scheduler::newPreviewImprovementTask(File *file)
 {
-    if(file->fileName().endsWith((".mp4"),Qt::CaseInsensitive))
-        return 0;
-    if (!file->exists())
+    if (!file->exists() ||
+        (file->state() == File::State_ExternallySupportedFormat))
         return 0;
 
     QuillUndoStack *stack = file->stack();

@@ -633,6 +633,9 @@ void Core::processDBusThumbnailerGenerated(const QString fileName,
     Logger::log("[Core] D-Bus thumbnailer finished with "+ fileName);
     Q_UNUSED(flavor);
     int level = levelFromFlavor(flavor);
+
+    // currently exists to offset a video thumbnailer problem
+    file(fileName, "")->touchThumbnail(level);
     if (!file(fileName, "")->hasThumbnail(level))
         processDBusThumbnailerError(fileName, -1, "No thumbnail found");
     suggestNewTask();
