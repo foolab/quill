@@ -1,3 +1,8 @@
+libquill (1.101216.0) unstable; urgency=low
+  * Fixes to previous commits
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 15 Dec 2010 15:30:00 +0200
+
 libquill (1.101215.0) unstable; urgency=low
   * Fixes to previous commit
 
