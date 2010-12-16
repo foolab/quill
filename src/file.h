@@ -430,6 +430,12 @@ public:
     QDateTime lastModified() const;
 
     /*!
+      Refreshes (reads from file) the last modification time of a file.
+    */
+
+    void refreshLastModified();
+
+    /*!
       Sets file existence status
      */
 
@@ -627,6 +633,15 @@ public:
       non-original file, the file name is returned.
     */
     QString fileIndexName() const;
+
+    /*!
+      Touches one thumbnail for a file. This needs to be called after
+      a thumbnail has been created so that the thumbnail date can be set
+      to the same date as the main file since without it, the thumbnail
+      will be considered invalid.
+     */
+    void touchThumbnail(int level);
+
 signals:
 
     /*!
@@ -657,14 +672,6 @@ private:
      */
 
     void writeEditHistory(const QString &history, QuillError *error);
-
-    /*!
-      Touches one thumbnail for a file. This needs to be called after
-      a thumbnail has been created so that the thumbnail date can be set
-      to the same date as the main file since without it, the thumbnail
-      will be considered invalid.
-     */
-    void touchThumbnail(int level);
 
     /*!
       Touches all thumbnails for a file. This is usable if the main

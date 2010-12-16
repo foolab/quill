@@ -453,7 +453,7 @@ bool File::hasThumbnail(int level)
     if (!info.exists())
         return false;
 
-    return (info.lastModified() == lastModified());
+    return (info.lastModified() == m_lastModified);
 }
 
 QString File::fileNameHash(const QString &fileName)
@@ -648,6 +648,11 @@ QDateTime File::lastModified() const
     return m_lastModified;
 }
 
+void File::refreshLastModified()
+{
+    m_lastModified = QFileInfo(m_fileName).lastModified();
+}
+
 void File::setSupported(bool supported)
 {
     if (supported && (state() == State_UnsupportedFormat))
@@ -840,8 +845,7 @@ void File::concludeSave()
     }
 
     removeThumbnails();
-
-    m_lastModified = QDateTime::currentDateTime();
+    refreshLastModified();
 
     emit saved();
     Core::instance()->emitSaved(m_fileName);
@@ -940,6 +944,8 @@ void File::imageSizeError()
 
 void File::refresh()
 {
+    refreshLastModified();
+
     // Purge temporary images from cache
     if (state() != State_Placeholder)
         for (int l=0; l<=m_displayLevel; l++)
