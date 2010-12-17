@@ -43,6 +43,11 @@
 #include "file.h"
 #include "historyxml.h"
 
+// values defined in the header
+const int QuillFile::Priority_Low;
+const int QuillFile::Priority_Normal;
+const int QuillFile::Priority_High;
+
 class QuillFilePrivate {
 public:
     File *m_file;
