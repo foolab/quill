@@ -1,3 +1,8 @@
+libquill (1.101217.0) unstable; urgency=low
+  * Unit-test additions & Coverity fixes
+
+ -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Mon, 17 Dec 2010 15:15:00 +0200
+
 libquill (1.101213.1) unstable; urgency=low
   * Fixes: NB#211092 - QuillFile::HasThumbnail(-1) causes segmentation fault
 
