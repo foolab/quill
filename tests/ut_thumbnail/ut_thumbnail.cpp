@@ -47,6 +47,7 @@
 #include "file.h"
 #include "ut_thumbnail.h"
 #include "unittests.h"
+#include "../../src/filesystem.h"
 
 ut_thumbnail::ut_thumbnail()
 {
@@ -75,8 +76,7 @@ void ut_thumbnail::cleanup()
 
 void ut_thumbnail::testName()
 {
-    QuillFile *file = new QuillFile("/tmp/test.png", "");
-    QVERIFY(file);
+    QuillFile file("/tmp/test.png", "");
 
     // This should be safe to run in any environment as this test does
     // not really create, or check existence of, any files.
@@ -85,10 +85,51 @@ void ut_thumbnail::testName()
     Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailExtension("jpeg");
 
-    QCOMPARE(file->thumbnailFileName(0),
+    QCOMPARE(file.thumbnailFileName(0),
              QString("/home/user/normal/6756f54a791d53a4ece8ebb70471b573.jpeg"));
+}
 
-    delete file;
+void ut_thumbnail::testInvalid()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    Unittests::generatePaletteImage().save(testFile.fileName(), "png");
+
+    QuillFile file(testFile.fileName(), "png");
+
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
+    Quill::setThumbnailExtension("png");
+
+    QImage image = Unittests::generatePaletteImage();
+    image.save(file.thumbnailFileName(0));
+
+    // A thumbnail with a creation date in the future is invalid
+    FileSystem::setFileModificationDateTime(file.thumbnailFileName(0),
+                                            QDateTime().addSecs(1));
+
+    QVERIFY(!file.hasThumbnail(0));
+}
+
+void ut_thumbnail::testValid()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    Unittests::generatePaletteImage().save(testFile.fileName(), "png");
+
+    QuillFile file(testFile.fileName(), "png");
+
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
+    Quill::setThumbnailExtension("png");
+
+    QImage image = Unittests::generatePaletteImage();
+    image.save(file.thumbnailFileName(0));
+
+    FileSystem::setFileModificationDateTime(file.thumbnailFileName(0),
+                                            file.lastModified());
+
+    QVERIFY(file.hasThumbnail(0));
 }
 
 void ut_thumbnail::testLoad()
@@ -206,6 +247,57 @@ void ut_thumbnail::testUpdate()
 
     delete file;
     delete filterb;
+}
+
+void ut_thumbnail::testExternalUpdate()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    Quill::setPreviewSize(0, QSize(8, 2));
+
+    Quill::setEditHistoryPath("/tmp/quill/history");
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
+    Quill::setThumbnailExtension("png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // thumb save
+
+    QVERIFY(file->hasThumbnail(0));
+
+    delete file;
+
+    // modify the file
+    QImage blankImage(QSize(8, 2), QImage::Format_RGB32);
+    blankImage.fill(qRgb(255, 255, 255));
+    blankImage.save(testFile.fileName(), "png");
+
+    // make sure that the file datetime will be different so that old
+    // thumbnails get invalidated!
+    FileSystem::setFileModificationDateTime(testFile.fileName(),
+                                            QDateTime().addSecs(1));
+
+    file = new QuillFile(testFile.fileName(), "png");
+
+    // thumbnail should be treated as invalid
+    QVERIFY(!file->hasThumbnail(0));
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // thumb save
+
+    // thumbnail should be recreated
+    QVERIFY(file->hasThumbnail(0));
+
+    QVERIFY(Unittests::compareImage(blankImage,
+                                    QImage(file->thumbnailFileName(0))));
+    delete file;
 }
 
 void ut_thumbnail::testLoadUnsupported()

@@ -50,6 +50,7 @@
 #include "quillundocommand.h"
 #include "historyxml.h"
 #include "tilemap.h"
+#include "filesystem.h"
 #include "quillerror.h"
 #include "logger.h"
 
@@ -143,21 +144,8 @@ void File::setFileName(const QString &fileName)
     }
     else if (!(info.permissions() & QFile::WriteUser))
         setReadOnly();
-    /*the date and time maybe changed if we edit the image with pc and copied to device.
-      We need to make sure the last modified time should not be later than the current time
-     */
-    if(info.lastModified()>QDateTime::currentDateTime()){
-        m_lastModified =QDateTime::currentDateTime();
-    }
-    else{
-        //for the camera captured file, info.lastModified() is null, we need give it the current time
-        if(info.lastModified().isNull()){
-            m_lastModified =QDateTime::currentDateTime();
-        }
-        else{
-            m_lastModified = info.lastModified();
-        }
-    }
+
+    m_lastModified = info.lastModified();
 }
 
 void File::setFileFormat(const QString &fileFormat)
@@ -462,11 +450,10 @@ bool File::hasThumbnail(int level)
     }
     QFileInfo info(thumbnailFileName(level));
 
-    if (!info.exists()){
+    if (!info.exists())
         return false;
-    }
 
-    return (info.lastModified() >= lastModified());
+    return (info.lastModified() == m_lastModified);
 }
 
 QString File::fileNameHash(const QString &fileName)
@@ -661,6 +648,11 @@ QDateTime File::lastModified() const
     return m_lastModified;
 }
 
+void File::refreshLastModified()
+{
+    m_lastModified = QFileInfo(m_fileName).lastModified();
+}
+
 void File::setSupported(bool supported)
 {
     if (supported && (state() == State_UnsupportedFormat))
@@ -722,19 +714,20 @@ QuillError File::overwritingCopy(const QString &fileName,
 void File::removeThumbnails()
 {
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
-        if (hasThumbnail(level))
-            QFile::remove(thumbnailFileName(level));
+        QFile::remove(thumbnailFileName(level));
     m_hasThumbnail = false;
+}
+
+void File::touchThumbnail(int level)
+{
+    FileSystem::setFileModificationDateTime(thumbnailFileName(level),
+                                            m_lastModified);
 }
 
 void File::touchThumbnails()
 {
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
-        if (hasThumbnail(level)) {
-            QFile file(thumbnailFileName(level));
-            file.open(QIODevice::Append);
-            file.close();
-        }
+        touchThumbnail(level);
 }
 
 void File::prepareSave()
@@ -852,8 +845,7 @@ void File::concludeSave()
     }
 
     removeThumbnails();
-
-    m_lastModified = QDateTime::currentDateTime();
+    refreshLastModified();
 
     emit saved();
     Core::instance()->emitSaved(m_fileName);
@@ -879,6 +871,7 @@ void File::registerThumbnail(int level)
 {
     if (level == 0)
         m_hasThumbnail = true;
+    touchThumbnail(level);
 }
 
 bool File::hasOriginal()
@@ -951,6 +944,8 @@ void File::imageSizeError()
 
 void File::refresh()
 {
+    refreshLastModified();
+
     // Purge temporary images from cache
     if (state() != State_Placeholder)
         for (int l=0; l<=m_displayLevel; l++)

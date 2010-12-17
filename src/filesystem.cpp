@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+** Copyright (C) 2009-10 Nokia Corporation and/or its subsidiary(-ies).
 ** Contact: Alexander Bokovoy <alexander.bokovoy@nokia.com>
 **
 ** This file is part of the Quill package.
@@ -37,37 +37,14 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_THUMBNAIL_H
-#define TEST_LIBQUILL_THUMBNAIL_H
+#include "utime.h"
+#include "filesystem.h"
 
-#include <QObject>
-#include <QImage>
-
-class ut_thumbnail : public QObject {
-Q_OBJECT
-public:
-    ut_thumbnail();
-
-private slots:
-    void init();
-    void cleanup();
-    void initTestCase();
-    void cleanupTestCase();
-
-    void testName();
-    void testInvalid();
-    void testValid();
-
-    void testLoad();
-    void testSave();
-    void testUpdate();
-    void testExternalUpdate();
-    void testLoadUnsupported();
-
-    void testFailedWrite();
-
-    void testFromSetImage();
-    void testDownscaledFromSetImage();
-};
-
-#endif  // TEST_LIBQUILL_THUMBNAIL_H
+bool FileSystem::setFileModificationDateTime(const QString &fileName,
+                                             const QDateTime &dateTime)
+{
+    struct utimbuf times;
+    times.actime = times.modtime = dateTime.toTime_t();
+    int result = utime(fileName.toAscii().constData(), &times);
+    return (result != 0);
+}
