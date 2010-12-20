@@ -403,6 +403,9 @@ void ut_thumbnail::testFromSetImage()
     Quill::setThumbnailFlavorName(1, "large");
     Quill::setThumbnailExtension("png");
 
+    // Not testing D-Bus thumbnailer here
+    Quill::setDBusThumbnailingEnabled(false);
+
     QuillFile *file = new QuillFile(testFile.fileName(), "video/avi");
     QVERIFY(file);
 
