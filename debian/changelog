@@ -1,3 +1,8 @@
+libquill (1.101220.0) unstable; urgency=low
+  * Fixed automated test in previous build
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 20 Dec 2010 10:10:00 +0200
+
 libquill (1.101217.1) unstable; urgency=low
   * Unit-test additions & Coverity fixes
 
