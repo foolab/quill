@@ -91,8 +91,13 @@ QuillFile::~QuillFile()
 
     if (priv->m_file) {
         priv->m_file->removeReference(this);
+        //if thumbnail exists, we delete the quillFile object completely without delay.
+        if(hasThumbnail(priv->m_file->displayLevel())){
+            if(priv->m_file->allowDelete()){
+                delete priv->m_file;
+            }
+        }
     }
-
     delete priv;
 }
 
