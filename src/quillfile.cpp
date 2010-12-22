@@ -85,19 +85,12 @@ QuillFile::QuillFile(File *file)
 QuillFile::~QuillFile()
 {
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
-    /*we will not delete file object here any more when the quillFile is deleted from gallery.
-      We will delete it from scheduler after the thumbnails is saved.
-     */
-
     if (priv->m_file) {
         priv->m_file->removeReference(this);
-        //if thumbnail exists, we delete the quillFile object completely without delay.
-        if(hasThumbnail(priv->m_file->displayLevel())){
-            if(priv->m_file->allowDelete()){
-                delete priv->m_file;
-            }
-        }
+        if (priv->m_file->allowDelete())
+            delete priv->m_file;
     }
+
     delete priv;
 }
 
