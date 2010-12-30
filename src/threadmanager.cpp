@@ -95,15 +95,9 @@ QuillImage applyFilter(QuillImageFilter *filter, QuillImage image,
 void ThreadManager::run(Task *task)
 {
     Logger::log("[ThreadManager] Applying filter " + task->filter()->name());
-    m_task = task;
-    //wait here if the previous command is still running.
-    if(resultImage&&(!resultImage->isFinished())){
-        resultImage->waitForFinished();
-        //check if wather emits the signal, if not, taskFinnished() is called.
-        if(m_isRunning)
-            taskFinished();
-    }
     m_isRunning = true;
+    m_task = task;
+
     resultImage = new QFuture<QuillImage>;
     *resultImage =
         QtConcurrent::run(applyFilter, task->filter(), task->inputImage(),
@@ -116,19 +110,18 @@ void ThreadManager::run(Task *task)
 
 void ThreadManager::taskFinished()
 {
-    //if it is executed i run(), we skip it here
-    if(m_isRunning){
-        m_isRunning = false;
-        Logger::log("[ThreadManager] Finished applying " + m_task->filter()->name());
-        QuillImage image = resultImage->result();
-        delete resultImage;
-        resultImage = 0;
-        Core::instance()->processFinishedTask(m_task, image);
+    Logger::log("[ThreadManager] Finished applying " + m_task->filter()->name());
+    QuillImage image = resultImage->result();
+    delete resultImage;
+    resultImage = 0;
+    m_isRunning = false;
 
-        if (threadingMode == Quill::ThreadingTest)
-            eventLoop->exit();
-    }
+    Core::instance()->processFinishedTask(m_task, image);
+
+    if (threadingMode == Quill::ThreadingTest)
+        eventLoop->exit();
 }
+
 bool ThreadManager::allowDelete(QuillImageFilter *filter) const
 {
     return (!m_isRunning || !m_task || (filter != m_task->filter()));

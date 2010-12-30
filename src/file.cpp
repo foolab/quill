@@ -67,9 +67,11 @@ File::File() : m_state(State_Normal),
 
 File::~File()
 {
-    detach();
-    delete m_stack;
-    delete m_temporaryFile;
+        //Trying to lower the display level to purge the cached images
+        setDisplayLevel(-1);
+        detach();
+        delete m_stack;
+        delete m_temporaryFile;
 }
 
 void File::addReference(QuillFile *file)
@@ -82,9 +84,6 @@ void File::removeReference(QuillFile *file)
 {
     if (m_references.contains(file)) {
         m_references.removeOne(file);
-        // Trying to lower the display level, remaining references will
-        // prevent this from happening.
-        setDisplayLevel(-1);
         // Recalculate priority from remaining references
         calculatePriority();
         if (m_references.isEmpty() && !isSaveInProgress()) {
