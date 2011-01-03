@@ -87,10 +87,11 @@ QuillFile::~QuillFile()
     Logger::log("[QuillFile] "+QString(Q_FUNC_INFO));
     if (priv->m_file) {
         priv->m_file->removeReference(this);
-        if (priv->m_file->allowDelete())
+        //we delete file that has the thumbnail immediately
+        if (hasThumbnail(priv->m_displayLevel)&&priv->m_file->allowDelete()){
             delete priv->m_file;
+        }
     }
-
     delete priv;
 }
 
