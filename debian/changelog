@@ -1,3 +1,8 @@
+libquill (1.110107.0) unstable; urgency=low
+  * Fixed document generation rules to work outside scratchbox
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 07 Jan 2011 12:30:00 +0200
+
 libquill (1.110103.0) unstable; urgency=low
   * Fixes: NB#216005 - [TASK](HImag-2574) Always save thumbnails for loaded data.
   * Put to staging again
