@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QuillImageFilter>
 
 #include "batchrotate.h"
 #include "generatethumbs.h"
@@ -44,6 +45,10 @@ extern int opterr;
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+
+    // Initialize the filter plugin framework here so that it will not
+    // disturb the benchmark
+    QuillImageFilter initPluginFramework("invalid");
 
     if (argc < 3)
         help();

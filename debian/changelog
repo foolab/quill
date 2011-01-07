@@ -1,3 +1,19 @@
+libquill (1.110103.0) unstable; urgency=low
+  * Fixes: NB#216005 - [TASK](HImag-2574) Always save thumbnails for loaded data.
+  * Put to staging again
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Fri, 31 Dec 2010 13:45:00 +0200
+
+libquill (1.101231.0) unstable; urgency=low
+  * Fixes: NB#216005 - [TASK](HImag-2574) Always save thumbnails for loaded data.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Fri, 31 Dec 2010 13:45:00 +0200
+
+libquill (1.101230.0) unstable; urgency=low
+  * Implemented: SWP#HImag-2574
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 30 Dec 2010 14:50:00 +0200
+
 libquill (1.101223.0) unstable; urgency=low
   * Disabled two automated tests due to changes in environment
 
