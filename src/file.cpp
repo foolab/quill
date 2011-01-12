@@ -1045,6 +1045,7 @@ bool File::supportsEditing() const
     // this needs to be called to determine if the file has a read only format
     if (m_stack->isClean()&&m_hasReadEditHistory)
         m_stack->load();
+
     //if it supports editting, we read the edit history
     if((m_state != State_NonExistent) &&
        (m_state != State_UnsupportedFormat) &&
@@ -1064,7 +1065,13 @@ bool File::supportsEditing() const
             if (m_stack->isClean()){
                 m_stack->load();
             }
+
             Core::instance()->suggestNewTask();
+            if((m_state == State_NonExistent) ||
+               (m_state == State_UnsupportedFormat) ||
+               (m_state == State_ExternallySupportedFormat) ||
+               (m_state == State_ReadOnly))
+                return false;
         }
         return true;
     }
