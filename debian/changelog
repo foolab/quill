@@ -1,3 +1,9 @@
+libquill (1.110113.0) unstable; urgency=low
+  * Fixes: NB#216626 application consumes almost 95% CPU constantly
+  * Fixes: NB#215042 QuillFile::supportsEditing() is returning true for .gif files
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 13 Jan 2011 09:26:00 +0200
+
 libquill (1.110107.0) unstable; urgency=low
   * Fixed document generation rules to work outside scratchbox
 
