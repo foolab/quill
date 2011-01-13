@@ -457,8 +457,11 @@ bool File::hasThumbnail(int level)
 
 QString File::fileNameHash(const QString &fileName)
 {
-    const QUrl uri =
-        QUrl::fromLocalFile(QFileInfo(fileName).canonicalFilePath());
+    QFileInfo info(fileName);
+    // canonicalFilePath() will not work unless the file exists
+    // Here we only assume that the directory exists
+    const QUrl uri = QUrl::fromLocalFile(info.dir().canonicalPath() + "/"
+                            + info.fileName());
 
     const QByteArray hashValue =
         QCryptographicHash::hash(uri.toString().toLatin1(),
