@@ -391,8 +391,14 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
                 break;
             }
         }
-        else
+        // FilterOption with empty content (like in eye reduction)
+        else if (token == QXmlStreamReader::EndElement && reader->name() == "FilterOption")
         {
+            filter->setOption(option, value);
+            token = reader->readNext();
+            continue;
+
+        } else {
             success = false;
             break;
         }
