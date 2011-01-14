@@ -635,8 +635,9 @@ void Core::processDBusThumbnailerGenerated(const QString fileName,
     int level = levelFromFlavor(flavor);
 
     // currently exists to offset a video thumbnailer problem
-    file(fileName, "")->touchThumbnail(level);
-    if (!file(fileName, "")->hasThumbnail(level))
+    if (level >= 0)
+        file(fileName, "")->touchThumbnail(level);
+    if ((level < 0) || (!file(fileName, "")->hasThumbnail(level)))
         processDBusThumbnailerError(fileName, -1, "No thumbnail found");
     suggestNewTask();
 }
