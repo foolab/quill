@@ -1,3 +1,9 @@
+libquill (1.110114.0) unstable; urgency=low
+  * Fixes: NB#206836 application crashed on returning from D-Bus thumbnailer
+  * Fixes: NB#216218 history XML corrupted
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 14 Jan 2011 14:55:00 +0200
+
 libquill (1.110113.0) unstable; urgency=low
   * Fixes: NB#216626 application consumes almost 95% CPU constantly
   * Fixes: NB#215042 QuillFile::supportsEditing() is returning true for .gif files
