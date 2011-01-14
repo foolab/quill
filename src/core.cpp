@@ -602,29 +602,29 @@ void Core::activateDBusThumbnailer()
     Logger::log("[Core]"+QString(Q_FUNC_INFO));
     if (m_dBusThumbnailer->isRunning())
         return;
-    for (int level=0; level<=previewLevelCount()-1; level++)
-        // using m_files instead of existingFiles() since this will potentially
-        // be called often and the existing file list creation is a slow task.
+    for (int level=0; level<=previewLevelCount()-1; level++) {
+        QString flavor = thumbnailFlavorName(level);
+        if (!flavor.isNull())
+            // using m_files instead of existingFiles() since this
+            // will potentially be called often and the existing file
+            // list creation is a slow task.
+            foreach(File* file, m_fileList){
+                if ((file->state() == File::State_ExternallySupportedFormat) &&
+                    (level <= file->displayLevel()) &&
+                    file->stack() &&
+                    file->stack()->image(level).isNull() &&
+                    !file->hasThumbnail(level) &&
+                    m_dBusThumbnailer->supports(file->fileFormat())) {
 
-        foreach(File* file, m_fileList){
-            if ((file->state() == File::State_ExternallySupportedFormat) &&
-                (level <= file->displayLevel()) &&
-                !thumbnailDirectory(level).isNull() &&
-                file->stack() &&
-                file->stack()->image(level).isNull() &&
-                !file->hasThumbnail(level) &&
-                m_dBusThumbnailer->supports(file->fileFormat())) {
+                    Logger::log("[Core] Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
 
-                QString flavor = thumbnailFlavorName(level);
-
-                Logger::log("[Core] Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
-
-                m_dBusThumbnailer->newThumbnailerTask(file->fileName(),
-                                                      file->fileFormat(),
-                                                      flavor);
-                return;
+                    m_dBusThumbnailer->newThumbnailerTask(file->fileName(),
+                                                          file->fileFormat(),
+                                                          flavor);
+                    return;
+                }
             }
-        }
+    }
 }
 
 void Core::processDBusThumbnailerGenerated(const QString fileName,
