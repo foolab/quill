@@ -434,13 +434,6 @@ void ut_quill::testLoadSave()
 
     QuillImage targetImage = filter->apply(image);
 
-    // construct a copy of the filter, since original filter will be lost
-
-    QuillImageFilter *backupFilter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
-    QVERIFY(backupFilter);
-    backupFilter->setOption(QuillImageFilter::Brightness, QVariant(20));
-
     file->runFilter(filter);
     Quill::releaseAndWait();
     Quill::releaseAndWait();
@@ -494,7 +487,6 @@ void ut_quill::testLoadSave()
 
     QVERIFY(Unittests::compareImage(file2->image(), loadedImage));
 
-    delete backupFilter;
     delete file;
     delete file2;
 }

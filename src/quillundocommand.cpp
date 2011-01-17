@@ -128,6 +128,11 @@ int QuillUndoCommand::uniqueId() const
     return m_id;
 }
 
+void QuillUndoCommand::setUniqueId(int id)
+{
+    m_id = id;
+}
+
 QuillUndoCommand *QuillUndoCommand::prev() const
 {
     if (!m_stack || !m_index)

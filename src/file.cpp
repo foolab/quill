@@ -1067,7 +1067,6 @@ bool File::supportsEditing() const
             if (m_stack->isClean()){
                 m_stack->load();
             }
-            Core::instance()->suggestNewTask();
         }
         return true;
     }
