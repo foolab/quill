@@ -1,3 +1,8 @@
+libquill (1.110117.0) unstable; urgency=low
+  * Removed double loading of images
+
+ -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Mon, 17 Jan 2011 19:15:00 +0200
+
 libquill (1.110114.0) unstable; urgency=low
   * Fixes: NB#206836 application crashed on returning from D-Bus thumbnailer
   * Fixes: NB#216218 history XML corrupted
