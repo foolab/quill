@@ -1069,12 +1069,6 @@ bool File::supportsEditing() const
                 m_stack->load();
             }
 
-            Core::instance()->suggestNewTask();
-            if((m_state == State_NonExistent) ||
-               (m_state == State_UnsupportedFormat) ||
-               (m_state == State_ExternallySupportedFormat) ||
-               (m_state == State_ReadOnly))
-                return false;
         }
         return true;
     }

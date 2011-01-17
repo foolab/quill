@@ -104,6 +104,15 @@ public:
     int uniqueId() const;
 
     /*!
+      Redefines the unique identifier for this command. Usable if the
+      original command has been destroyed and any possible ongoing
+      progress (directed by the command id) by the background thread
+      needs to be kept. Use in any other case will probably break everything.
+     */
+
+    void setUniqueId(int id);
+
+    /*!
       Get the previous command in stack.
       Returns null if command has not been added to a stack or
       if it is the first one in the stack.

@@ -272,11 +272,28 @@ bool HistoryXml::decode(const QByteArray & array,File* file)
     QString fileFormat = QString();
     QString targetFormat = QString();
 
-    // This method will overwrite the stack, let's make sure that we start with a clean one
-    file->stack()->clear();
-
     if(!readEditHistoryHeader(reader,token))
         return false;
+
+    // If stack was originally setup with just the load filter, already
+    // loaded images need to be kept
+    bool hadCommand = false;
+    int commandId = 0;
+    QSize fullImageSize;
+    QList<QuillImage> imageList;
+
+    if (!file->stack()->isClean()) {
+        hadCommand = true;
+        commandId = file->stack()->command()->uniqueId();
+        fullImageSize = file->stack()->command()->fullImageSize();
+        for (int i=0; i<=Core::instance()->previewLevelCount(); i++)
+            imageList << file->stack()->command()->image(i);
+    }
+
+    // This method will overwrite the stack, let's make sure that we
+    // start with a clean one
+
+    file->stack()->clear();
 
     while (token != QXmlStreamReader::EndElement)
     {
@@ -288,6 +305,15 @@ bool HistoryXml::decode(const QByteArray & array,File* file)
 
         stack->load();
         handleStack(reader, stack, savedIndex, targetIndex, fileName,revertIndex);
+        // Redirecting images and ongoing operations from the old load
+        // filter of the stack to the complete one
+        if (hadCommand) {
+            stack->command()->setUniqueId(commandId);
+            stack->command()->setFullImageSize(fullImageSize);
+            for (int i=0; i<=Core::instance()->previewLevelCount(); i++)
+                stack->command()->setImage(i, imageList[i]);
+        }
+
         token = readToken(&reader);
     }
 
