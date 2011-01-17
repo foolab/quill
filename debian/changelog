@@ -1,3 +1,8 @@
+libquill (1.110117.1) unstable; urgency=low
+  * Removed double loading of images
+
+ -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Mon, 17 Jan 2011 19:30:00 +0200
+
 libquill (1.110117.0) unstable; urgency=low
   * Removed double loading of images
 
