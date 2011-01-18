@@ -1,3 +1,8 @@
+libquill (1.110118.0) unstable; urgency=low
+  * Fixes: NB#201814 Random crashes related to all edit operations
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 18 Jan 2011 12:41:00 +0200
+
 libquill (1.110117.0) unstable; urgency=low
   * Removed double loading of images
 
