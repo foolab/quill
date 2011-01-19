@@ -1,3 +1,8 @@
+libquill (1.110119.0) unstable; urgency=low
+  * Fix to QuillFile::supportsEditing
+
+ -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Wed, 19 Jan 2011 16:00:00 +0200
+
 libquill (1.110118.0) unstable; urgency=low
   * Fixes: NB#201814 Random crashes related to all edit operations
 
