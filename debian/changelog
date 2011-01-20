@@ -1,3 +1,8 @@
+libquill (1.110120.0) unstable; urgency=low
+  * Fixes: NB#208572 - Red eye removal not updated in image thumbnail.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 20 Jan 2011 10:45:00 +0200
+
 libquill (1.110119.0) unstable; urgency=low
   * Fix to QuillFile::supportsEditing
 
