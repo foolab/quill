@@ -1,3 +1,8 @@
+libquill (1.110125.0) unstable; urgency=low
+  * Fixes: NB#215042 gif file edit support 
+
+ -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Tue, 25 Jan 2011 10:05:00 +0200
+
 libquill (1.110120.0) unstable; urgency=low
   * Fixes: NB#208572 - Red eye removal not updated in image thumbnail.
 
