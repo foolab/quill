@@ -847,7 +847,7 @@ void File::concludeSave()
     }
 
     removeThumbnails();
-    refreshLastModified();
+    FileSystem::setFileModificationDateTime(m_fileName, m_lastModified);
 
     emit saved();
     Core::instance()->emitSaved(m_fileName);
@@ -1069,6 +1069,11 @@ bool File::supportsEditing() const
                 m_stack->load();
             }
 
+            if ((m_state == State_NonExistent) ||
+                (m_state == State_UnsupportedFormat) ||
+                (m_state == State_ExternallySupportedFormat) ||
+                (m_state == State_ReadOnly))
+                return false;
         }
         return true;
     }
