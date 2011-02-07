@@ -68,6 +68,7 @@ private slots:
 
     void testFromSetImage();
     void testDownscaledFromSetImage();
+    void testCreationAfterQuillFileRemoval();
 };
 
 #endif  // TEST_LIBQUILL_THUMBNAIL_H

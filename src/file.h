@@ -383,6 +383,12 @@ public:
     QString thumbnailFileName(int level);
 
     /*!
+      If there are unsaved thumbnails available
+     */
+
+    bool hasUnsavedThumbnails();
+
+    /*!
       Returns the associated undo stack.
 
       Internal/testing use only.

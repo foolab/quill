@@ -84,9 +84,11 @@ void File::removeReference(QuillFile *file)
 {
     if (m_references.contains(file)) {
         m_references.removeOne(file);
+        //Trying to lower the display level to purge the cached images
+        setDisplayLevel(-1);
         // Recalculate priority from remaining references
         calculatePriority();
-        if (m_references.isEmpty() && !isSaveInProgress()) {
+        if (allowDelete()) {
             detach();
         }
     }
@@ -94,7 +96,8 @@ void File::removeReference(QuillFile *file)
 
 bool File::allowDelete()
 {
-    return m_references.isEmpty() && !isSaveInProgress();
+    return m_references.isEmpty() && !isSaveInProgress()
+        && !hasUnsavedThumbnails();
 }
 
 void File::detach()
@@ -189,7 +192,9 @@ bool File::setDisplayLevel(int level)
     for (int l=originalDisplayLevel; l>level; l--)
         if ((l < Core::instance()->previewLevelCount()) ||
             (!isSaveInProgress()))
-            Core::instance()->cache(l)->purge(this);
+            // Hack: level 0 thumbs are not removed if they can be saved
+            if ((l > 0) || !hasUnsavedThumbnails())
+                Core::instance()->cache(l)->purge(this);
 
     // Optimization: check thumbnail existence in file system here
     // and only here!
@@ -429,6 +434,13 @@ bool File::checkImageSize(const QSize &fullImageSize)
 QuillUndoStack *File::stack() const
 {
     return m_stack;
+}
+
+bool File::hasUnsavedThumbnails()
+{
+    return (m_stack && m_stack->hasImage(0) &&
+            !Core::instance()->thumbnailFlavorName(0).isEmpty() &&
+            !hasThumbnail(0) && Core::instance()->isThumbnailCreationEnabled());
 }
 
 bool File::hasThumbnail(int level)

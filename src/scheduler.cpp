@@ -51,6 +51,7 @@
 #include "quillundostack.h"
 #include "tilemap.h"
 #include "savemap.h"
+#include "imagecache.h"
 #include "logger.h"
 
 Scheduler::Scheduler()
@@ -648,12 +649,17 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 Logger::log("[Scheduler] Thumbnail save failed!");
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
-            else{
+            else
                 file->registerThumbnail(task->displayLevel());
-                //when the thumbnail is saved, we delete the file object as gallery does
-                if(file->allowDelete())
-                    delete file;
-            }
+
+            // if we can release stored thumbnails now
+            if ((file->displayLevel() < 0) && (file->stack()->hasImage(0)))
+                Core::instance()->cache(0)->purge(file);
+
+            // if the whole file can be deleted now
+            if(file->allowDelete())
+                delete file;
+
             // Thumbnail saving - delete temporary filter
             delete filter;
         }

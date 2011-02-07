@@ -467,6 +467,32 @@ void ut_thumbnail::testDownscaledFromSetImage()
     delete file;
 }
 
+void ut_thumbnail::testCreationAfterQuillFileRemoval()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile.fileName(), "png");
+
+    Quill::setPreviewSize(0, QSize(4, 1));
+
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
+    Quill::setThumbnailExtension("png");
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "image/png");
+    QVERIFY(file);
+    QString thumbName = file->thumbnailFileName(0);
+    QVERIFY(!QFile::exists(thumbName));
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait(); // load
+    delete file; // delete immediately afterwards
+    Quill::releaseAndWait(); // save should still happen
+
+    QVERIFY(QFile::exists(thumbName));
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_thumbnail test;
