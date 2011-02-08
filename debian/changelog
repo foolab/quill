@@ -1,3 +1,9 @@
+libquill (1.110208.0) unstable; urgency=low
+  * Fixes: NB#222698 Pseudo memory leak
+  * Fixes: NB#221701 Pseudo memory leak
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 08 Feb 2011 12:36:10 +0200
+
 libquill (1.110125.1) unstable; urgency=low
   * Fixes: NB#215042 gif file edit support 
 
