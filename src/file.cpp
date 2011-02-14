@@ -138,6 +138,8 @@ void File::setFileName(const QString &fileName)
     m_fileName = fileName;
 
     QFileInfo info(fileName);
+    m_originalFileName = info.path() + "/.original/" + info.fileName();
+
     if (!info.exists()) {
         emitError(QuillError(QuillError::FileNotFoundError,
                              QuillError::ImageFileErrorSource,

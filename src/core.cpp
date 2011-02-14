@@ -282,12 +282,9 @@ File *Core::file(const QString &fileName,
         if(file->fileIndexName()==fileName)
             return file;
     }
-    QFileInfo fileInfo(fileName);
-    QString originalFileName =
-        fileInfo.path() + "/.original/" + fileInfo.fileName();
     file = new File();
+    // also sets the original file name
     file->setFileName(fileName);
-    file->setOriginalFileName(originalFileName);
 
     file->setFileFormat(fileFormat);
     file->setTargetFormat(fileFormat);
