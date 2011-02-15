@@ -148,7 +148,7 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
         m_file->imageSizeError();
 
     // Vector graphics are always rendered to a fixed size
-    if ((m_file->isSvg()) &&
+    if ((m_file->fileFormat() == "image/svg+xml") &&
         Core::instance()->vectorGraphicsRenderingSize().isValid()) {
         QSize maximumSize = Core::instance()->vectorGraphicsRenderingSize().
             boundedTo(Core::instance()->previewSize(Core::instance()->previewLevelCount()-1));
