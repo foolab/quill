@@ -668,6 +668,8 @@ signals:
 private:
     bool isJpeg() const;
 
+    bool isSvg() const;
+
     void prepareSave();
 
     static QString editHistoryFileName(const QString &fileName,
