@@ -1,3 +1,8 @@
+libquill (1.110215.0) unstable; urgency=low
+  * QuillFile constructor minor refactoring optimization
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 15 Feb 2011 12:23:20 +0200
+
 libquill (1.110208.0) unstable; urgency=low
   * Fixes: NB#222698 Pseudo memory leak
   * Fixes: NB#221701 Pseudo memory leak
