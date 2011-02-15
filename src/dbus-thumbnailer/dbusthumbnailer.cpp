@@ -2,8 +2,8 @@
 #include "thumbnailer_generic.h"
 #include "logger.h"
 #include <QDebug>
-QString DBusThumbnailer::tumblerService = "org.freedesktop.thumbnails.Thumbnailer1";
-QString DBusThumbnailer::tumblerCache = "/org/freedesktop/thumbnails/Thumbnailer1";
+QLatin1String DBusThumbnailer::tumblerService("org.freedesktop.thumbnails.Thumbnailer1");
+QLatin1String DBusThumbnailer::tumblerCache("/org/freedesktop/thumbnails/Thumbnailer1");
 
 DBusThumbnailer::DBusThumbnailer() : m_taskInProgress(false),
                                      m_tumbler(0)
@@ -44,7 +44,7 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
                                          const QString &mimeType,
                                          const QString &flavor)
 {
-    Logger::log("[DBusThumbnailer] "+QString(Q_FUNC_INFO));
+    Logger::log(Logger::Module_DBusThumbnailer, QString(Q_FUNC_INFO));
 
     if (isRunning())
         return;

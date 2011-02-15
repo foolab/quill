@@ -49,14 +49,23 @@ class Logger : public QObject
 friend class ut_logger;
 
 public:
+    static const QLatin1String Module_Quill;
+    static const QLatin1String Module_QuillFile;
+    static const QLatin1String Module_File;
+    static const QLatin1String Module_Core;
+    static const QLatin1String Module_Stack;
+    static const QLatin1String Module_Scheduler;
+    static const QLatin1String Module_ThreadManager;
+    static const QLatin1String Module_DBusThumbnailer;
 
     Logger();
 
-    static void log(const QString logInfo);
+    static void log(const QString &module,
+                    const QString &logInfo);
 
     static QString intToString(const int value);
 
-    static QString qsizeToString(const QSize size);
+    static QString qsizeToString(const QSize &size);
 
     static QString boolToString(const bool value);
 

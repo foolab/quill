@@ -83,7 +83,7 @@ void ut_logger::testLog()
     QCOMPARE(data.exists(),true);
 
     QString logString ="this is logging info!";
-    Logger::log(logString);
+    Logger::log("Test", logString);
 
     data.open(QFile::ReadOnly);
     QTextStream stream(&data);
