@@ -94,7 +94,7 @@ QuillImage applyFilter(QuillImageFilter *filter, QuillImage image,
 
 void ThreadManager::run(Task *task)
 {
-    Logger::log("[ThreadManager] Applying filter " + task->filter()->name());
+    Logger::log(Logger::Module_ThreadManager, "Applying filter " + task->filter()->name());
     m_isRunning = true;
     m_task = task;
 
@@ -110,7 +110,7 @@ void ThreadManager::run(Task *task)
 
 void ThreadManager::taskFinished()
 {
-    Logger::log("[ThreadManager] Finished applying " + m_task->filter()->name());
+    Logger::log(Logger::Module_ThreadManager, "Finished applying " + m_task->filter()->name());
     QuillImage image = resultImage->result();
     delete resultImage;
     resultImage = 0;

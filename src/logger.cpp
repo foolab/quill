@@ -42,6 +42,15 @@
 #include <QSize>
 #include "logger.h"
 
+const QLatin1String Logger::Module_Quill("[Quill]");
+const QLatin1String Logger::Module_QuillFile("[QuillFile]");
+const QLatin1String Logger::Module_File("[File]");
+const QLatin1String Logger::Module_Core("[Core]");
+const QLatin1String Logger::Module_Stack("[Stack]");
+const QLatin1String Logger::Module_Scheduler("[Scheduler]");
+const QLatin1String Logger::Module_ThreadManager("[ThreadManager]");
+const QLatin1String Logger::Module_DBusThumbnailer("[DBusThumbnailer]");
+
 bool Logger::existFlag = true;
 QFile Logger::data(QDir::homePath()+"/.local/share/quill/log.txt");
 bool Logger::firstTimeFlag = true;
@@ -51,7 +60,7 @@ Logger::Logger()
     //empty
 }
 
-void Logger::log(const QString logInfo)
+void Logger::log(const QString &module, const QString &logInfo)
 {
     if(existFlag){
         if(firstTimeFlag){
@@ -64,7 +73,7 @@ void Logger::log(const QString logInfo)
             QDateTime timeStamp = QDateTime::currentDateTime();
             QDate date = timeStamp.date();
             QTime time = timeStamp.time();
-            out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<logInfo<<endl;
+            out << date.toString("yyyy-MM-dd")<<" "<<time.toString("hh:mm:ss:zzz")<<" "<<module<<" "<<logInfo<<endl;
             data.flush();
             existFlag = true;
         }
@@ -78,7 +87,7 @@ QString Logger::intToString(const int value)
     return QString(":")+QString::number(value);
 }
 
-QString Logger::qsizeToString(const QSize size)
+QString Logger::qsizeToString(const QSize &size)
 {
     return QString(":")+QString("QSize(")+QString::number(size.width())+QString("x")+QString::number(size.height())+QString(")");
 }

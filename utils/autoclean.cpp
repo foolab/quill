@@ -82,13 +82,13 @@ void Autoclean::run(int nItemsToCheck) const
     if (nItemsToCheck > nItems)
         nItemsToCheck = nItems;
 
-    Logger::log("[Autoclean] Found" + QString::number(nItems) +
+    Logger::log("[Autoclean]", "Found" + QString::number(nItems) +
                 " edit history files in " + m_editHistoryPath);
 
     if (nItems == 0)
         return;
 
-    Logger::log("[Autoclean] Scanning " + QString::number(nItems) +
+    Logger::log("[Autoclean]", "Scanning " + QString::number(nItems) +
                 " edit history files.");
 
     int item = (qrand() / 10000) % nItems;
@@ -105,7 +105,7 @@ void Autoclean::run(int nItemsToCheck) const
         if (!QFile::exists(mainFileName) &&
             verifyMainFileName(mainFileName, editHistoryFileName)) {
 
-            Logger::log("[Autoclean] File " + mainFileName +
+            Logger::log("[Autoclean]", "File " + mainFileName +
                         "no longer exists, deleting support files.");
 
             QFile::remove(originalFileName(mainFileName));

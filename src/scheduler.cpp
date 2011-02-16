@@ -646,7 +646,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 error = QuillError(QuillError::FileWriteError,
                                    QuillError::ThumbnailErrorSource,
                                    filter->option(QuillImageFilter::FileName).toString());
-                Logger::log("[Scheduler] Thumbnail save failed!");
+                Logger::log(Logger::Module_Scheduler, "Thumbnail save failed!");
                 Core::instance()->setThumbnailCreationEnabled(false);
             }
             else
@@ -744,8 +744,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
             QString fileName = filter->option(QuillImageFilter::FileName).toString();
             QuillError::ErrorSource errorSource;
-            Logger::log("[Scheduler] Normal load failed from file " +
-                        file->fileName());
+            Logger::log(Logger::Module_Scheduler,
+                        "Normal load failed from file " + file->fileName());
 
             if (fileName == file->fileName()) {
                 errorSource = QuillError::ImageFileErrorSource;
