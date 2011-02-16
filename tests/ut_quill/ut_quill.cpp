@@ -737,6 +737,7 @@ void ut_quill::testSaveIndex()
 
     file2->save();
     Quill::releaseAndWait();
+    Quill::releaseAndWait();
 
     // Now, even if the save index is exactly the same as before,
     // we should see changes happen

@@ -180,6 +180,16 @@ QuillUndoCommand *Scheduler::getTask(QuillUndoStack *stack, int level) const
         if (!stack->command(index)->image(level).isNull())
             break;
 
+        // Check if there's any loadCommand associated with this index
+        if (stack->loadCommand() && stack->savedIndex() == index) {
+            QuillUndoCommand *command = stack->loadCommand();
+            // it can be used only once
+            stack->clearLoadCommand();
+
+            return command;
+        }
+
+        // Not sure if this case still happens, but the code is still here =/
         // Load filters can be re-executed
         if (stack->command(index)->filter()->role() == QuillImageFilter::Role_Load)
         {
@@ -630,7 +640,9 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
         // since it is now orphan and we could not delete it
         // in QuillUndoCommand::~QuillUndoCommand().
 
-        delete filter;
+        // Load filter can be outside the stack
+        if (filter->role() != QuillImageFilter::Role_Load)
+            delete filter;
     }
     else if (filter->role() == QuillImageFilter::Role_Overlay)
     {

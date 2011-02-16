@@ -382,7 +382,6 @@ void HistoryXml::readEditSession(QXmlStreamReader *reader,
                     filter->setOption(QuillImageFilter::BackgroundColor,
                                       Core::instance()->backgroundRenderingColor());
                     stack->add(filter);
-                    (*targetIndex)++;
                 }
             }
         } else {
