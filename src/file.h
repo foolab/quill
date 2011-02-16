@@ -660,10 +660,12 @@ signals:
      */
     void removed();
 
-    /*
+    /*!
       There was an error in the file.
      */
     void error(QuillError error);
+
+    bool isSvg() const;
 
 private:
     bool isJpeg() const;

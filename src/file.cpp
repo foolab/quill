@@ -123,6 +123,11 @@ bool File::isJpeg() const
         m_fileFormat == "image/jpeg";
 }
 
+bool File::isSvg() const
+{
+    return m_fileFormat == "image/svg+xml";
+}
+
 QString File::originalFileName() const
 {
     return m_originalFileName;
@@ -415,6 +420,10 @@ QRect File::viewPort() const
 bool File::checkImageSize(const QSize &fullImageSize)
 {
     const QSize imageSizeLimit = Core::instance()->imageSizeLimit();
+
+    if (isSvg()) // Vector graphics are always rendered to a fixed size
+        return true;
+
     if (imageSizeLimit.isValid() &&
         (fullImageSize.boundedTo(imageSizeLimit) != fullImageSize))
         return false;
