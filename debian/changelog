@@ -1,5 +1,10 @@
+libquill (1.110217.0) unstable; urgency=low
+  * Fix to file.h
+
+ -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Wed, 17 Feb 2011 15:40:00 +0200
+
 libquill (1.110216.1) unstable; urgency=low
-  * Fixes: NB##206523 Large SVG image cannot be viewed
+  * Fixes: NB#206523 Large SVG image cannot be viewed
 
  -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Wed, 16 Feb 2011 12:40:00 +0200
 

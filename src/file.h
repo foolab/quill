@@ -648,6 +648,11 @@ public:
      */
     void touchThumbnail(int level);
 
+     /*!
+      If the file is a SVG file
+     */
+    bool isSvg() const;
+
 signals:
 
     /*!
@@ -664,8 +669,6 @@ signals:
       There was an error in the file.
      */
     void error(QuillError error);
-
-    bool isSvg() const;
 
 private:
     bool isJpeg() const;
