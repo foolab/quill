@@ -5,7 +5,8 @@ INCLUDEPATH += .
 
 QT += testlib
 DEFINES     += 
-CONFIG += debug
+
+include(../../common.pri)
 
 # Input
 HEADERS += unittests.h

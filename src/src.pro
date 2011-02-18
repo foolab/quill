@@ -12,7 +12,7 @@ DEFINES     +=
 MOC_DIR = .moc
 QT += dbus
 
-CONFIG += release
+include(../common.pri)
 
 CONFIG += quillimagefilter quillmetadata
 

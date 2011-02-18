@@ -8,7 +8,8 @@ QMAKE_LIBDIR += ../../src ../bin ../ut_unittests
 QMAKEFEATURES += ../../src
 CONFIG += quill
 CONFIG += quillimagefilter
-CONFIG += debug
+
+include(../common.pri)
 
 # Generate pkg-config support by default
 # Note that we HAVE TO also create prl config as QMake implementation

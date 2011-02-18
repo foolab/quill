@@ -5,7 +5,7 @@ INCLUDEPATH += .
 LIBS += -lquill
 QMAKE_LIBDIR += ../src/
 
-CONFIG += debug
+include(../common.pri)
 
 # Input
 HEADERS += autoclean.h
