@@ -6,8 +6,7 @@ TEMPLATE = app
 TARGET =
 DEPENDPATH += .
 INCLUDEPATH += . ../../src
-LIBPATH += ../../src
-LIBS += -lquill
+LIBS += -L../../src -lquill
 
 CONFIG += quill
 CONFIG += quillimagefilter
