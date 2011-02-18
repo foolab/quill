@@ -41,6 +41,12 @@
 #include <QObject>
 #include <QFile>
 
+#ifdef QT_NO_DEBUG_OUTPUT
+# define QUILL_LOG(x,y) ((void)0)
+#else
+# define QUILL_LOG(x,y) Logger::log(x,y)
+#endif
+
 class QSize;
 
 class Logger : public QObject

@@ -44,7 +44,7 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
                                          const QString &mimeType,
                                          const QString &flavor)
 {
-    Logger::log(Logger::Module_DBusThumbnailer, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_DBusThumbnailer, QString(Q_FUNC_INFO));
 
     if (isRunning())
         return;

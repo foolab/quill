@@ -171,7 +171,7 @@ void QuillUndoStack::add(QuillImageFilter *filter)
     // add to stack
     m_stack->push(cmd);
 
-    Logger::log(Logger::Module_Stack, filter->name()+" added to stack");
+    QUILL_LOG(Logger::Module_Stack, filter->name()+" added to stack");
 
     // full image size should not be loaded for waiting
     if (!m_file->isWaitingForData() ||

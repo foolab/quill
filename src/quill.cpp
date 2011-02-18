@@ -67,211 +67,211 @@ void Quill::cleanup()
 void Quill::setDefaultTileSize(const QSize &defaultTileSize)
 {
     Core::instance()->setDefaultTileSize(defaultTileSize);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::qsizeToString(defaultTileSize));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::qsizeToString(defaultTileSize));
     }
 
 void Quill::setTileCacheSize(int size)
 {
     Core::instance()->setTileCacheSize(size);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(size));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(size));
 }
 
 void Quill::setSaveBufferSize(int size)
 {
     Core::instance()->setSaveBufferSize(size);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(size));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(size));
 }
 
 void Quill::setEditHistoryCacheSize(int level, int limit)
 {
     Core::instance()->setEditHistoryCacheSize(level, limit);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::intToString(limit));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::intToString(limit));
 }
 
 int Quill::editHistoryCacheSize(int level)
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level));
     return Core::instance()->editHistoryCacheSize(level);
 }
 
 void Quill::setPreviewLevelCount(int count)
 {
     Core::instance()->setPreviewLevelCount(count);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(count));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(count));
 }
 
 int Quill::previewLevelCount()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->previewLevelCount();
 }
 
 void Quill::setPreviewSize(int level, const QSize &size)
 {
     Core::instance()->setPreviewSize(level, size);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::qsizeToString(size));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::qsizeToString(size));
 }
 
 QSize Quill::previewSize(int level)
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level));
     return Core::instance()->previewSize(level);
 }
 
 void Quill::setMinimumPreviewSize(int level, const QSize &size)
 {
     Core::instance()->setMinimumPreviewSize(level, size);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::qsizeToString(size));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+Logger::qsizeToString(size));
 }
 
 QSize Quill::minimumPreviewSize(int level)
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level));
     return Core::instance()->minimumPreviewSize(level);
 }
 
 void Quill::setImageSizeLimit(const QSize &size)
 {
     Core::instance()->setImageSizeLimit(size);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::qsizeToString(size));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::qsizeToString(size));
 }
 
 QSize Quill::imageSizeLimit()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->imageSizeLimit();
 }
 
 void Quill::setImagePixelsLimit(int pixels)
 {
     Core::instance()->setImagePixelsLimit(pixels);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(pixels));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(pixels));
 }
 
 int Quill::imagePixelsLimit()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->imagePixelsLimit();
 }
 
 void Quill::setNonTiledImagePixelsLimit(int pixels)
 {
     Core::instance()->setNonTiledImagePixelsLimit(pixels);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(pixels));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(pixels));
 }
 
 int Quill::nonTiledImagePixelsLimit()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->nonTiledImagePixelsLimit();
 }
 
 void Quill::setEditHistoryPath(const QString &path)
 {
     Core::instance()->setEditHistoryPath(path);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+path);
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+path);
 }
 
 void Quill::setThumbnailBasePath(const QString &path)
 {
     Core::instance()->setThumbnailBasePath(path);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+path);
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+path);
 }
 
 void Quill::setThumbnailFlavorName(int level, const QString &name)
 {
     Core::instance()->setThumbnailFlavorName(level, name);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+" "+name);
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::intToString(level)+" "+name);
 }
 
 void Quill::setThumbnailExtension(const QString &extension)
 {
     Core::instance()->setThumbnailExtension(extension);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+extension);
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+extension);
 }
 
 void Quill::setThumbnailCreationEnabled(bool enabled)
 {
     Core::instance()->setThumbnailCreationEnabled(enabled);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::boolToString(enabled));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::boolToString(enabled));
 }
 
 bool Quill::isThumbnailCreationEnabled()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->isThumbnailCreationEnabled();
 }
 
 void Quill::setDBusThumbnailingEnabled(bool enabled)
 {
     Core::instance()->setDBusThumbnailingEnabled(enabled);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::boolToString(enabled));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::boolToString(enabled));
 }
 
 bool Quill::isDBusThumbnailingEnabled()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->isDBusThumbnailingEnabled();
 }
 
 void Quill::setBackgroundRenderingColor(const QColor &color)
 {
     Core::instance()->setBackgroundRenderingColor(color);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
 }
 
 QColor Quill::backgroundRenderingColor()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->backgroundRenderingColor();
 }
 
 void Quill::setVectorGraphicsRenderingSize(const QSize &size)
 {
     Core::instance()->setVectorGraphicsRenderingSize(size);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
 }
 
 QSize Quill::vectorGraphicsRenderingSize()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->vectorGraphicsRenderingSize();
 }
 
 void Quill::setTemporaryFilePath(const QString &path)
 {
     Core::instance()->setTemporaryFilePath(path);
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+path);
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+path);
 }
 
 QString Quill::temporaryFilePath()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->temporaryFilePath();
 }
 
 bool Quill::isCalculationInProgress()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->isCalculationInProgress();
 }
 
 bool Quill::isSaveInProgress()
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::boolToString(Core::instance()->isSaveInProgress()));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO)+Logger::boolToString(Core::instance()->isSaveInProgress()));
     return Core::instance()->isSaveInProgress();
 }
 
 bool Quill::waitUntilFinished(int msec)
 {
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return Core::instance()->waitUntilFinished(msec);
 }
 
 void Quill::releaseAndWait()
 {
     Core::instance()->releaseAndWait();
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
 }
 
 Quill* Quill::instance()
@@ -288,7 +288,7 @@ Quill* Quill::instance()
                             SIGNAL(error(QuillError)),
                             SIGNAL(error(QuillError)));
     }
-    Logger::log(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
     return g_instance;
 }
 

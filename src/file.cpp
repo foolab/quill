@@ -533,7 +533,7 @@ void File::readFromEditHistory(const QString &fileName,
     QFile file(editHistoryFileName(fileName,
                                    Core::instance()->editHistoryPath()));
 
-    Logger::log(Logger::Module_File,
+    QUILL_LOG(Logger::Module_File,
                 "Reading edit history from "+file.fileName());
 
     if (!file.exists()) {
@@ -569,9 +569,9 @@ void File::readFromEditHistory(const QString &fileName,
     file.close();
     if(readOnly)
         setReadOnly();
-    Logger::log(Logger::Module_File,
+    QUILL_LOG(Logger::Module_File,
                 "Edit history size is "+QString::number(history.size())+" bytes");
-    Logger::log(Logger::Module_File,"Edit history dump: "+history);
+    QUILL_LOG(Logger::Module_File,"Edit history dump: "+history);
 
     if(!HistoryXml::decodeOne(history,this)){
         *error = QuillError(QuillError::FileCorruptError,
@@ -591,7 +591,7 @@ void File::writeEditHistory(const QString &history, QuillError *error)
     QFile file(editHistoryFileName(m_fileName,
                                    Core::instance()->editHistoryPath()));
 
-    Logger::log(Logger::Module_File,"Writing edit history to "+file.fileName());
+    QUILL_LOG(Logger::Module_File,"Writing edit history to "+file.fileName());
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         *error = QuillError(QuillError::FileOpenForWriteError,
                             QuillError::EditHistoryErrorSource,
@@ -1006,7 +1006,7 @@ void File::emitError(QuillError quillError)
 {
     emit error(quillError);
     Core::instance()->emitError(quillError);
-    Logger::log(Logger::Module_File,QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+    QUILL_LOG(Logger::Module_File,QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }
 
 bool File::canRevert() const

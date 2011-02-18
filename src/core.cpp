@@ -520,12 +520,12 @@ bool Core::waitUntilFinished(int msec)
 
     while (isSaveInProgress())
         if (m_loop.exec()) {
-            Logger::log(Logger::Module_Core,
+            QUILL_LOG(Logger::Module_Core,
                         "WaitUntilFinished: interrupted by timeout");
             return false;
         }
 
-    Logger::log(Logger::Module_Core, "WaitUntilFinished: success");
+    QUILL_LOG(Logger::Module_Core, "WaitUntilFinished: success");
     return true;
 }
 
@@ -597,7 +597,7 @@ bool Core::isExternallySupportedFormat(const QString &format) const
 
 void Core::activateDBusThumbnailer()
 {
-    Logger::log(Logger::Module_Core, QString(Q_FUNC_INFO));
+    QUILL_LOG(Logger::Module_Core, QString(Q_FUNC_INFO));
     if (m_dBusThumbnailer->isRunning())
         return;
     for (int level=0; level<=previewLevelCount()-1; level++) {
@@ -614,7 +614,7 @@ void Core::activateDBusThumbnailer()
                     !file->hasThumbnail(level) &&
                     m_dBusThumbnailer->supports(file->fileFormat())) {
 
-                    Logger::log(Logger::Module_Core, "Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
+                    QUILL_LOG(Logger::Module_Core, "Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
 
                     m_dBusThumbnailer->newThumbnailerTask(file->fileName(),
                                                           file->fileFormat(),
@@ -628,7 +628,7 @@ void Core::activateDBusThumbnailer()
 void Core::processDBusThumbnailerGenerated(const QString fileName,
                                            const QString flavor)
 {
-    Logger::log(Logger::Module_Core, "D-Bus thumbnailer finished with "+ fileName);
+    QUILL_LOG(Logger::Module_Core, "D-Bus thumbnailer finished with "+ fileName);
     Q_UNUSED(flavor);
     int level = levelFromFlavor(flavor);
 
@@ -647,7 +647,7 @@ void Core::processDBusThumbnailerError(const QString fileName,
     Q_UNUSED(errorCode);
     Q_UNUSED(message);
 
-    Logger::log(Logger::Module_Core, "D-Bus thumbnailer error with "+ fileName);
+    QUILL_LOG(Logger::Module_Core, "D-Bus thumbnailer error with "+ fileName);
 
     if(fileExists(fileName)){
 
@@ -665,19 +665,19 @@ void Core::processDBusThumbnailerError(const QString fileName,
 void Core::emitSaved(QString fileName)
 {
     emit saved(fileName);
-    Logger::log(Logger::Module_Core, QString(Q_FUNC_INFO)+fileName);
+    QUILL_LOG(Logger::Module_Core, QString(Q_FUNC_INFO)+fileName);
 }
 
 void Core::emitRemoved(QString fileName)
 {
     emit removed(fileName);
-    Logger::log(Logger::Module_Core, QString(Q_FUNC_INFO)+fileName);
+    QUILL_LOG(Logger::Module_Core, QString(Q_FUNC_INFO)+fileName);
 }
 
 void Core::emitError(QuillError quillError)
 {
     emit error(quillError);
-    Logger::log(Logger::Module_Core, QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
+    QUILL_LOG(Logger::Module_Core, QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
 }
 
 const QList<File*> Core::fileList() const
