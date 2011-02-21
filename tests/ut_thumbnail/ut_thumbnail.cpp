@@ -48,6 +48,7 @@
 #include "ut_thumbnail.h"
 #include "unittests.h"
 #include "../../src/filesystem.h"
+#include "../../src/strings.h"
 
 ut_thumbnail::ut_thumbnail()
 {
@@ -83,7 +84,7 @@ void ut_thumbnail::testName()
 
     Quill::setThumbnailBasePath("/home/user");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("jpeg");
+    Quill::setThumbnailExtension(Strings::jpeg);
 
     QCOMPARE(file.thumbnailFileName(0),
              QString("/home/user/normal/6756f54a791d53a4ece8ebb70471b573.jpeg"));
@@ -95,11 +96,11 @@ void ut_thumbnail::testInvalid()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    QuillFile file(testFile.fileName(), "png");
+    QuillFile file(testFile.fileName(), Strings::png);
 
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     QImage image = Unittests::generatePaletteImage();
     image.save(file.thumbnailFileName(0));
@@ -117,11 +118,11 @@ void ut_thumbnail::testValid()
     testFile.open();
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
-    QuillFile file(testFile.fileName(), "png");
+    QuillFile file(testFile.fileName(), Strings::png);
 
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     QImage image = Unittests::generatePaletteImage();
     image.save(file.thumbnailFileName(0));
@@ -141,7 +142,7 @@ void ut_thumbnail::testLoad()
     Quill::setPreviewSize(0, QSize(4, 1));
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     QuillFile *file = new QuillFile(testFile.fileName());
     QVERIFY(file);
@@ -176,7 +177,7 @@ void ut_thumbnail::testSave()
 
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     QuillFile *file = new QuillFile(testFile.fileName());
     QVERIFY(file);
@@ -210,9 +211,9 @@ void ut_thumbnail::testUpdate()
     Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QString thumbName = file->thumbnailFileName(0);
     image.save(thumbName);
 
@@ -220,11 +221,11 @@ void ut_thumbnail::testUpdate()
     Quill::releaseAndWait();
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
     QuillImageFilter *filterb =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filterb);
     filterb->setOption(QuillImageFilter::Brightness, QVariant(16));
 
@@ -261,9 +262,9 @@ void ut_thumbnail::testExternalUpdate()
     Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     file->setDisplayLevel(0);
     Quill::releaseAndWait(); // load
@@ -283,7 +284,7 @@ void ut_thumbnail::testExternalUpdate()
     FileSystem::setFileModificationDateTime(testFile.fileName(),
                                             QDateTime().addSecs(1));
 
-    file = new QuillFile(testFile.fileName(), "png");
+    file = new QuillFile(testFile.fileName(), Strings::png);
 
     // thumbnail should be treated as invalid
     QVERIFY(!file->hasThumbnail(0));
@@ -316,7 +317,7 @@ void ut_thumbnail::testLoadUnsupported()
     Quill::setPreviewSize(0, QSize(4, 1));
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     QString thumbName = "/tmp/quill/thumbnails/normal/" +
         File::fileNameHash(fileName) + ".png";
@@ -355,7 +356,7 @@ void ut_thumbnail::testFailedWrite()
 
     Quill::setThumbnailBasePath("/tmp/");
     Quill::setThumbnailFlavorName(0, "invalid");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     QuillFile *file = new QuillFile(testFile.fileName());
 
@@ -401,12 +402,12 @@ void ut_thumbnail::testFromSetImage()
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
     Quill::setThumbnailFlavorName(1, "large");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     // Not testing D-Bus thumbnailer here
     Quill::setDBusThumbnailingEnabled(false);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "video/avi");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::aviMimeType);
     QVERIFY(file);
 
     file->setDisplayLevel(1);
@@ -443,9 +444,9 @@ void ut_thumbnail::testDownscaledFromSetImage()
 
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
-    QuillFile *file = new QuillFile("/tmp/quill/test.png", "video/avi");
+    QuillFile *file = new QuillFile("/tmp/quill/test.png", Strings::aviMimeType);
     QVERIFY(file);
     file->removeThumbnails(); // Make sure there are no thumbs from previous run
     QVERIFY(!file->hasThumbnail(0));
@@ -478,9 +479,9 @@ void ut_thumbnail::testCreationAfterQuillFileRemoval()
 
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "image/png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::pngMimeType);
     QVERIFY(file);
     QString thumbName = file->thumbnailFileName(0);
     QVERIFY(!QFile::exists(thumbName));

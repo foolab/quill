@@ -46,6 +46,7 @@
 #include "quillfile.h"
 #include "ut_quillmetadata.h"
 #include "unittests.h"
+#include "../../src/strings.h"
 
 ut_quillmetadata::ut_quillmetadata()
 {
@@ -88,9 +89,9 @@ void ut_quillmetadata::testPreserveXMP()
     QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
 
     Quill::initTestingMode();
-    QuillFile *quillFile = new QuillFile(file.fileName(), "jpg");
+    QuillFile *quillFile = new QuillFile(file.fileName(), Strings::jpg);
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.scale");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Scale);
     filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
     quillFile->runFilter(filter);
     quillFile->save();
@@ -133,9 +134,9 @@ void ut_quillmetadata::testPreserveIptc()
     QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
 
     Quill::initTestingMode();
-    QuillFile *quillFile = new QuillFile(file.fileName(), "jpg");
+    QuillFile *quillFile = new QuillFile(file.fileName(), Strings::jpg);
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.scale");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Scale);
     filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
     quillFile->runFilter(filter);
     quillFile->save();
@@ -170,9 +171,9 @@ void ut_quillmetadata::testPreserveExif()
     QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
 
     Quill::initTestingMode();
-    QuillFile *quillFile = new QuillFile(file.fileName(), "jpg");
+    QuillFile *quillFile = new QuillFile(file.fileName(), Strings::jpg);
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.scale");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Scale);
     filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
     quillFile->runFilter(filter);
     quillFile->save();

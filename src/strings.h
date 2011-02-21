@@ -46,11 +46,18 @@ namespace Strings
 
     // Please keep sorted by variable name
 
+    S(aviMimeType,           "video/avi");
+
+    S(gifMimeType,           "image/gif");
+
     S(historyPath,           "/.config/quill/history");
 
     S(jpegMimeType,          "image/jpeg");
     S(jpeg,                  "jpeg");
     S(jpg,                   "jpg");
+
+    S(pngMimeType,           "image/png");
+    S(png,                   "png");
 
     S(slashOriginal,         "/.original/");
     S(svgMimeType,           "image/svg+xml");
@@ -61,6 +68,8 @@ namespace Strings
     S(thumbsNormal,          "/.thumbnails/normal");
     S(thumbsScreen,          "/.thumbnails/screen");
     S(thumbsWide,            "/.thumbnails/wide");
+    S(testsTempDir,          "/.config/quill/tmp/");
+    S(testsTempFilePattern,  "/.config/quill/tmp/XXXXXX");
 
     S(xmlAttributeAlpha,     "alpha");
     S(xmlAttributeBlue,      "blue");

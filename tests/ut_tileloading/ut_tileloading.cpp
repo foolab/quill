@@ -49,6 +49,7 @@
 #include "unittests.h"
 #include "ut_tileloading.h"
 #include "../test_utils/test_utils.h"
+#include "../../src/strings.h"
 
 ut_tileloading::ut_tileloading()
 {
@@ -191,13 +192,13 @@ void ut_tileloading::testMultiOperation()
     Quill::setDefaultTileSize(QSize(2, 2));
 
     QuillFile *file =
-        new QuillFile(tempFile.fileName(), "jpg");
+        new QuillFile(tempFile.fileName(), Strings::jpg);
 
     file->setViewPort(QRect(-8, -2, 16, 4));
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     filter->setOption(QuillImageFilter::Brightness,
                       QVariant(20));
 

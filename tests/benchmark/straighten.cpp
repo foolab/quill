@@ -9,6 +9,7 @@
 #include <QuillFile>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
+#include "../../src/strings.h"
 
 void straighten(QString originalFileName, int numFiles, QSize size)
 {
@@ -17,7 +18,7 @@ void straighten(QString originalFileName, int numFiles, QSize size)
     QEventLoop loop;
     QTime time;
 
-    Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
+    Quill::setTemporaryFilePath(QDir::homePath() + Strings::testsTempDir);
     Quill::setPreviewSize(0, size);
 
     QString fileName[numFiles];
@@ -26,7 +27,7 @@ void straighten(QString originalFileName, int numFiles, QSize size)
     for (int i=0; i<numFiles; i++) {
         {   // Needed for the life of the QTemporaryFile
             QTemporaryFile file;
-            file.setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX");
+            file.setFileTemplate(QDir::homePath() + Strings::testsTempFilePattern);
             file.open();
             fileName[i] = file.fileName();
             file.close();
@@ -38,7 +39,7 @@ void straighten(QString originalFileName, int numFiles, QSize size)
     time.start();
 
     for (int i=0; i<numFiles; i++) {
-        quillFile[i] = new QuillFile(fileName[i], "image/jpeg");
+        quillFile[i] = new QuillFile(fileName[i], Strings::jpegMimeType);
         QObject::connect(quillFile[i], SIGNAL(imageAvailable(const QuillImageList)),
                          &loop, SLOT(quit()));
     }
@@ -66,7 +67,7 @@ void straighten(QString originalFileName, int numFiles, QSize size)
 
     for (int i=0; i<numFiles; i++) {
         QuillImageFilter *filter =
-            QuillImageFilterFactory::createImageFilter("org.maemo.free-rotate");
+            QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_FreeRotate);
         filter->setOption(QuillImageFilter::Angle, QVariant(5));
         quillFile[i]->runFilter(filter);
     }

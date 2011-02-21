@@ -48,6 +48,7 @@
 #include "tilecache.h"
 #include "unittests.h"
 #include "ut_partialloader.h"
+#include "../../src/strings.h"
 
 
 ut_partialloader::ut_partialloader()
@@ -207,7 +208,7 @@ void ut_partialloader::testMultiOperation()
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     filter->setOption(QuillImageFilter::Brightness,
                       QVariant(20));
 

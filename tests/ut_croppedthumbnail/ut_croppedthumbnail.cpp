@@ -47,6 +47,7 @@
 #include "file.h"
 #include "ut_croppedthumbnail.h"
 #include "unittests.h"
+#include "../../src/strings.h"
 
 ut_croppedthumbnail::ut_croppedthumbnail()
 {
@@ -133,7 +134,7 @@ void ut_croppedthumbnail::testCroppedThumbnailAfterEdit()
 
     QuillFile *file = new QuillFile(testFile.fileName());
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.crop");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Crop);
     filter->setOption(QuillImageFilter::CropRectangle, QRect(0, 0, 4, 2));
     file->runFilter(filter);
 

@@ -53,6 +53,7 @@
 #include "ut_file.h"
 #include "unittests.h"
 #include "quillfile.h"
+#include "../../src/strings.h"
 
 ut_file::ut_file()
 {
@@ -85,14 +86,14 @@ void ut_file::testRemove()
     QSignalSpy spy(Quill::instance(),
                    SIGNAL(removed(const QString)));
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QVERIFY(file);
     QVERIFY(file->exists());
 
     QString originalFileName = file->originalFileName();
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -126,10 +127,10 @@ void ut_file::testOriginal()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -169,13 +170,13 @@ void ut_file::testOriginalAfterSave()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QuillFile *original = file->original();
     // This makes us to setup the original's undo stack
     QCOMPARE(original->fullImageSize(), image.size());
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -206,14 +207,14 @@ void ut_file::testMultipleAccess()
     image.save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
     QuillImage imageAfter = filter->apply(image);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
-    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
+    QuillFile *file2 = new QuillFile(testFile.fileName(), Strings::png);
 
     QVERIFY(file != file2);
 
@@ -251,7 +252,7 @@ void ut_file::testDifferentPreviewLevels()
     image.save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -259,8 +260,8 @@ void ut_file::testDifferentPreviewLevels()
 
     Quill::setPreviewSize(0, QSize(4, 1));
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
-    QuillFile *file2 = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
+    QuillFile *file2 = new QuillFile(testFile.fileName(), Strings::png);
 
     QSignalSpy spy(file, SIGNAL(imageAvailable(const QuillImageList)));
     QSignalSpy spy2(file2, SIGNAL(imageAvailable(const QuillImageList)));
@@ -312,13 +313,13 @@ void ut_file::testSaveAfterDelete()
     image.save(testFile.fileName(), "png");
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
     QuillImage imageAfter = filter->apply(image);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     file->runFilter(filter);
 
@@ -362,7 +363,7 @@ void ut_file::testReadOnly()
     QFile qFile(testFile.fileName());
     qFile.setPermissions(QFile::ReadOwner);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QVERIFY(!file->supportsEditing());
     delete file;
 }
@@ -377,7 +378,7 @@ void ut_file::testLastModified()
 
     QDateTime lastModified = QFileInfo(testFile.fileName()).lastModified();
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QCOMPARE(file->lastModified(), lastModified);
     delete file;
 }
@@ -391,12 +392,12 @@ void ut_file::testRevertRestore()
    image.save(testFile.fileName(), "png");
 
    QuillImageFilter *filter =
-       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+       QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
    QVERIFY(filter);
    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
    QuillImage imageAfter = filter->apply(image);
 
-   QuillFile *file = new QuillFile(testFile.fileName(), "png");
+   QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
    QVERIFY(file->setDisplayLevel(0));
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),false);
@@ -406,7 +407,7 @@ void ut_file::testRevertRestore()
    QCOMPARE(file->canRestore(),false);
    QCOMPARE(file->canRevert(),true);
    QuillImageFilter *filter1 =
-       QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
+       QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Rotate);
 
    filter1->setOption(QuillImageFilter::Angle, QVariant(-90));
    QuillImage imageAfter1 = filter1->apply(imageAfter);
@@ -457,7 +458,7 @@ void ut_file::testRevertRestore()
    QCOMPARE(file->canRevert(),false);
    QCOMPARE(file->internalFile()->m_stack->revertIndex(),2);
    QuillImageFilter *filter2 =
-       QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
+       QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Rotate);
 
    filter2->setOption(QuillImageFilter::Angle, QVariant(-90));
    file->runFilter(filter2);
@@ -479,16 +480,16 @@ void ut_file::testDoubleRevertRestore()
    image.save(testFile.fileName(), "png");
 
    QuillImageFilter *filter =
-       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+       QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
    QVERIFY(filter);
    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
    QuillImageFilter *filter2 =
-       QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+       QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
    QVERIFY(filter2);
    filter2->setOption(QuillImageFilter::Brightness, QVariant(-20));
 
-   QuillFile *file = new QuillFile(testFile.fileName(), "png");
+   QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
    file->runFilter(filter);
    QVERIFY(file->canRevert());
    file->revert();
