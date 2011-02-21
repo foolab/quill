@@ -60,6 +60,7 @@
 #include "historyxml.h"
 #include "logger.h"
 #include "dbus-thumbnailer/dbusthumbnailer.h"
+#include "strings.h"
 
 Core *Core::g_instance = 0;
 
@@ -67,8 +68,8 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     m_imageSizeLimit(QSize()),
     m_imagePixelsLimit(0),
     m_nonTiledImagePixelsLimit(0),
-    m_editHistoryPath(QDir::homePath() + "/.config/quill/history"),
-    m_thumbnailBasePath(QDir::homePath() + "/.thumbnails"),
+    m_editHistoryPath(QDir::homePath() + Strings::historyPath),
+    m_thumbnailBasePath(QDir::homePath() + Strings::thumbsBasePath),
     m_thumbnailCreationEnabled(true),
     m_dBusThumbnailingEnabled(true),
     m_saveBufferSize(65536*16),

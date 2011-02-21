@@ -50,6 +50,7 @@
 #include "file.h"
 #include "quillundostack.h"
 #include "quillundocommand.h"
+#include "strings.h"
 
 QByteArray HistoryXml::encode(File *file)
 {
@@ -71,24 +72,28 @@ QByteArray HistoryXml::encode(QList<File *> files)
     QXmlStreamWriter writer(&result);
 
     writer.writeStartDocument();
-    writer.writeDTD("<!DOCTYPE QuillEditHistory>");
+    writer.writeDTD(Strings::xmlHistoryDoctype);
 
-    writer.writeStartElement("", "Core");
+    writer.writeStartElement(Strings::xmlNamespace,
+                             Strings::xmlNodeCore);
 
     foreach (File *file, files)
     {
         QuillUndoStack *stack = file->stack();
 
-        writer.writeStartElement("", "QuillUndoStack");
+        writer.writeStartElement(Strings::xmlNamespace,
+                                 Strings::xmlNodeQuillUndoStack);
 
-        writer.writeStartElement("", "File");
-        writer.writeAttribute("name", file->fileName());
-        writer.writeAttribute("format", file->targetFormat());
+        writer.writeStartElement(Strings::xmlNamespace,
+                                 Strings::xmlNodeFile);
+        writer.writeAttribute(Strings::xmlAttributeName, file->fileName());
+        writer.writeAttribute(Strings::xmlAttributeFormat, file->targetFormat());
         writer.writeEndElement();
 
-        writer.writeStartElement("", "OriginalFile");
-        writer.writeAttribute("name", file->originalFileName());
-        writer.writeAttribute("format", file->fileFormat());
+        writer.writeStartElement(Strings::xmlNamespace,
+                                 Strings::xmlNodeOriginalFile);
+        writer.writeAttribute(Strings::xmlAttributeName, file->originalFileName());
+        writer.writeAttribute(Strings::xmlAttributeFormat, file->fileFormat());
         writer.writeEndElement();
 
         int targetIndex = 0;
@@ -108,13 +113,16 @@ QByteArray HistoryXml::encode(QList<File *> files)
                 saveIndex--;
             }
 
-        writer.writeTextElement("", "TargetIndex",
+        writer.writeTextElement(Strings::xmlNamespace,
+                                Strings::xmlNodeTargetIndex,
                                 QString::number(targetIndex));
 
-        writer.writeTextElement("", "SavedIndex",
+        writer.writeTextElement(Strings::xmlNamespace,
+                                Strings::xmlNodeSavedIndex,
                                 QString::number(saveIndex));
         //for revert
-        writer.writeTextElement("", "RevertIndex",
+        writer.writeTextElement(Strings::xmlNamespace,
+                                Strings::xmlNodeRevertIndex,
                                 QString::number(revertIndex));
         //end
         bool isSession = false;;
@@ -130,7 +138,8 @@ QByteArray HistoryXml::encode(QList<File *> files)
                     isSession = false;
                 }
                 if (!isSession && stack->command(i)->belongsToSession()) {
-                    writer.writeStartElement("", "Session");
+                    writer.writeStartElement(Strings::xmlNamespace,
+                                             Strings::xmlNodeSession);
                     isSession = true;
                     sessionId = stack->command(i)->sessionId();
                 }
@@ -153,16 +162,18 @@ QByteArray HistoryXml::encode(QList<File *> files)
 
 void HistoryXml::writeFilter(QuillImageFilter *filter, QXmlStreamWriter *writer)
 {
-    writer->writeStartElement("", "Filter");
+    writer->writeStartElement(Strings::xmlNamespace,
+                              Strings::xmlNodeFilter);
 
-    writer->writeAttribute("name", filter->name());
+    writer->writeAttribute(Strings::xmlAttributeName, filter->name());
 
     foreach (QString option, filter->supportedOptions()) {
         const QVariant value = filter->option(option);
 
-        writer->writeStartElement("", "FilterOption");
-        writer->writeAttribute("name", option);
-        writer->writeAttribute("type", QString::number(value.type()));
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeFilterOption);
+        writer->writeAttribute(Strings::xmlAttributeName, option);
+        writer->writeAttribute(Strings::xmlAttributeType, QString::number(value.type()));
 
         if (!writeComplexType(value, writer))
             writer->writeCharacters(value.toString());
@@ -178,45 +189,61 @@ bool HistoryXml::writeComplexType(const QVariant &variant, QXmlStreamWriter *wri
     {
     case QVariant::Point:
     case QVariant::PointF:
-        writer->writeStartElement("", "QPoint");
-        writer->writeAttribute("", "x",
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeQPoint);
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeX,
                                QString::number(variant.toPoint().x()));
-        writer->writeAttribute("", "y",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeY,
                                QString::number(variant.toPoint().y()));
         writer->writeEndElement();
         break;
 
     case QVariant::Size:
-        writer->writeStartElement("", "QSize");
-        writer->writeAttribute("", "width",
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeQSize);
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeWidth,
                                QString::number(variant.toSize().width()));
-        writer->writeAttribute("", "height",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeHeight,
                                QString::number(variant.toSize().height()));
         writer->writeEndElement();
         break;
 
     case QVariant::Rect:
-        writer->writeStartElement("", "QRect");
-        writer->writeAttribute("", "left",
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeQRect);
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeLeft,
                                QString::number(variant.toRect().left()));
-        writer->writeAttribute("", "top",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeTop,
                                QString::number(variant.toRect().top()));
-        writer->writeAttribute("", "width",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeWidth,
                                QString::number(variant.toRect().width()));
-        writer->writeAttribute("", "height",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeHeight,
                                QString::number(variant.toRect().height()));
         writer->writeEndElement();
         break;
 
     case QVariant::Color:
-        writer->writeStartElement("", "QRgba");
-        writer->writeAttribute("", "red",
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeQRgba);
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeRed,
                                QString::number(variant.value<QColor>().red()));
-        writer->writeAttribute("", "green",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeGreen,
                                QString::number(variant.value<QColor>().green()));
-        writer->writeAttribute("", "blue",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeBlue,
                                QString::number(variant.value<QColor>().blue()));
-        writer->writeAttribute("", "alpha",
+        writer->writeAttribute(Strings::xmlNamespace,
+                               Strings::xmlAttributeAlpha,
                                QString::number(variant.value<QColor>().alpha()));
         writer->writeEndElement();
         break;
@@ -224,7 +251,8 @@ bool HistoryXml::writeComplexType(const QVariant &variant, QXmlStreamWriter *wri
     case QVariant::Polygon:
     {
         const QPolygon poly = variant.value<QPolygon>();
-        writer->writeStartElement("", "QPolygon");
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeQPolygon);
         for (int i=0; i<poly.count(); i++)
             writeComplexType(QVariant(poly.at(i)), writer);
         writer->writeEndElement();
@@ -233,14 +261,16 @@ bool HistoryXml::writeComplexType(const QVariant &variant, QXmlStreamWriter *wri
 
     // Not implemented yet.
     case QVariant::Font:
-        writer->writeStartElement("", "QFont");
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeQFont);
         writer->writeEndElement();
         break;
 
 
     // Not implemented yet.
     case QVariant::Pen:
-        writer->writeStartElement("", "QPen");
+        writer->writeStartElement(Strings::xmlNamespace,
+                                  Strings::xmlNodeQPen);
         writer->writeEndElement();
         break;
 
@@ -333,10 +363,11 @@ void HistoryXml::readEditSession(QXmlStreamReader *reader,
     while (token != QXmlStreamReader::EndElement)
     {
         if ((token != QXmlStreamReader::StartElement) ||
-            ((reader->name() != "Filter") && (reader->name() != "Session")))
+            ((reader->name() != Strings::xmlNodeFilter) &&
+             (reader->name() != Strings::xmlNodeSession)))
             return;
 
-        if (reader->name() == "Filter") {
+        if (reader->name() == Strings::xmlNodeFilter) {
             QuillImageFilter *filter = readFilter(reader);
 
             if (filter != 0) {
@@ -368,7 +399,8 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
 {
     bool success = true;
 
-    const QString name = reader->attributes().value("", "name").toString();
+    const QString name = reader->attributes().value(Strings::xmlNamespace,
+                                                    Strings::xmlAttributeName).toString();
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(name);
 
@@ -379,16 +411,16 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
     while (token != QXmlStreamReader::EndElement)
     {
         if ((token != QXmlStreamReader::StartElement) ||
-            (reader->name() != "FilterOption"))
+            (reader->name() != Strings::xmlNodeFilterOption))
         {
             success = false;
             break;
         }
 
-        QString option =
-            reader->attributes().value("", "name").toString();
-        int optionType =
-            reader->attributes().value("", "type").toString().toInt();
+        QString option = reader->attributes().value(Strings::xmlNamespace,
+                                                    Strings::xmlAttributeName).toString();
+        int optionType = reader->attributes().value(Strings::xmlNamespace,
+                                                    Strings::xmlAttributeType).toString().toInt();
 
         token = reader->readNext();
 
@@ -418,7 +450,8 @@ QuillImageFilter *HistoryXml::readFilter(QXmlStreamReader *reader)
             }
         }
         // FilterOption with empty content (like in eye reduction)
-        else if (token == QXmlStreamReader::EndElement && reader->name() == "FilterOption")
+        else if (token == QXmlStreamReader::EndElement &&
+                 reader->name() == Strings::xmlNodeFilterOption)
         {
             filter->setOption(option, value);
             token = reader->readNext();
@@ -464,7 +497,7 @@ QVariant HistoryXml::recoverVariant(QVariant::Type variantType, const QString &s
     case QVariant::String:
         return QVariant(string);
     case QVariant::Bool:
-        if (string == "false")
+        if (string == Strings::xmlValueFalse)
             return QVariant(false);
         else
             return QVariant(true);
@@ -481,13 +514,13 @@ QVariant HistoryXml::recoverComplexType(QVariant::Type variantType,
     case QVariant::Point:
     case QVariant::PointF:
     {
-        if ((reader->name() != "QPoint"))
+        if ((reader->name() != Strings::xmlNodeQPoint))
             return QVariant();
 
-        int x =
-            reader->attributes().value("", "x").toString().toInt();
-        int y =
-            reader->attributes().value("", "y").toString().toInt();
+        int x = reader->attributes().value(Strings::xmlNamespace,
+                                           Strings::xmlAttributeX).toString().toInt();
+        int y = reader->attributes().value(Strings::xmlNamespace,
+                                           Strings::xmlAttributeY).toString().toInt();
 
         if (reader->readNext() != QXmlStreamReader::EndElement)
             return QVariant();
@@ -496,13 +529,13 @@ QVariant HistoryXml::recoverComplexType(QVariant::Type variantType,
     }
     case QVariant::Size:
     {
-        if (reader->name() != "QSize")
+        if (reader->name() != Strings::xmlNodeQSize)
             return QVariant();
 
-        int width =
-            reader->attributes().value("", "width").toString().toInt();
-        int height =
-            reader->attributes().value("", "height").toString().toInt();
+        int width  = reader->attributes().value(Strings::xmlNamespace,
+                                                Strings::xmlAttributeWidth).toString().toInt();
+        int height = reader->attributes().value(Strings::xmlNamespace,
+                                                Strings::xmlAttributeHeight).toString().toInt();
 
         if (reader->readNext() != QXmlStreamReader::EndElement)
             return QVariant();
@@ -511,17 +544,17 @@ QVariant HistoryXml::recoverComplexType(QVariant::Type variantType,
     }
     case QVariant::Rect:
     {
-        if (reader->name() != "QRect")
+        if (reader->name() != Strings::xmlNodeQRect)
             return QVariant();
 
-        int left =
-            reader->attributes().value("", "left").toString().toInt();
-        int top =
-            reader->attributes().value("", "top").toString().toInt();
-        int width =
-            reader->attributes().value("", "width").toString().toInt();
-        int height =
-            reader->attributes().value("", "height").toString().toInt();
+        int left   = reader->attributes().value(Strings::xmlNamespace,
+                                                Strings::xmlAttributeLeft).toString().toInt();
+        int top    = reader->attributes().value(Strings::xmlNamespace,
+                                                Strings::xmlAttributeTop).toString().toInt();
+        int width  = reader->attributes().value(Strings::xmlNamespace,
+                                                Strings::xmlAttributeWidth).toString().toInt();
+        int height = reader->attributes().value(Strings::xmlNamespace,
+                                                Strings::xmlAttributeHeight).toString().toInt();
 
         if (reader->readNext() != QXmlStreamReader::EndElement)
             return QVariant();
@@ -530,17 +563,17 @@ QVariant HistoryXml::recoverComplexType(QVariant::Type variantType,
     }
     case QVariant::Color:
     {
-        if (reader->name() != "QRgba")
+        if (reader->name() != Strings::xmlNodeQRgba)
             return QVariant();
 
-        int red =
-            reader->attributes().value("", "red").toString().toInt();
-        int green =
-            reader->attributes().value("", "green").toString().toInt();
-        int blue =
-            reader->attributes().value("", "blue").toString().toInt();
-        int alpha =
-            reader->attributes().value("", "alpha").toString().toInt();
+        int red   = reader->attributes().value(Strings::xmlNamespace,
+                                               Strings::xmlAttributeRed).toString().toInt();
+        int green = reader->attributes().value(Strings::xmlNamespace,
+                                               Strings::xmlAttributeGreen).toString().toInt();
+        int blue  = reader->attributes().value(Strings::xmlNamespace,
+                                               Strings::xmlAttributeBlue).toString().toInt();
+        int alpha = reader->attributes().value(Strings::xmlNamespace,
+                                               Strings::xmlAttributeAlpha).toString().toInt();
 
         if (reader->readNext() != QXmlStreamReader::EndElement)
             return QVariant();
@@ -550,7 +583,7 @@ QVariant HistoryXml::recoverComplexType(QVariant::Type variantType,
 
     case QVariant::Polygon:
     {
-        if (reader->name() != "QPolygon")
+        if (reader->name() != Strings::xmlNodeQPolygon)
             return QVariant();
 
         QPolygon poly;
@@ -655,30 +688,35 @@ bool HistoryXml::decodeEditHistory(QXmlStreamReader& reader,QXmlStreamReader::To
                                    QString& targetFormat)
 {
     if ((token != QXmlStreamReader::StartElement) ||
-        (reader.name() != "QuillUndoStack"))
+        (reader.name() != Strings::xmlNodeQuillUndoStack))
         return false;
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "File"))
+        (reader.name() != Strings::xmlNodeFile))
         return false;
 
-    fileName = reader.attributes().value("", "name").toString();
-    targetFormat = reader.attributes().value("", "format").toString();
+    fileName     = reader.attributes().value(Strings::xmlNamespace,
+                                             Strings::xmlAttributeName).toString();
+    targetFormat = reader.attributes().value(Strings::xmlNamespace,
+                                             Strings::xmlAttributeFormat).toString();
 
     if (readToken(&reader) != QXmlStreamReader::EndElement)
         return false;
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "OriginalFile"))
+        (reader.name() != Strings::xmlNodeOriginalFile))
         return false;
-    originalFileName = reader.attributes().value("", "name").toString();
-    fileFormat = reader.attributes().value("", "format").toString();
+
+    originalFileName = reader.attributes().value(Strings::xmlNamespace,
+                                                 Strings::xmlAttributeName).toString();
+    fileFormat       = reader.attributes().value(Strings::xmlNamespace,
+                                                 Strings::xmlAttributeFormat).toString();
 
     if (readToken(&reader) != QXmlStreamReader::EndElement)
         return false;
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "TargetIndex"))
+        (reader.name() != Strings::xmlNodeTargetIndex))
         return false;
 
     if (readToken(&reader) != QXmlStreamReader::Characters)
@@ -689,7 +727,7 @@ bool HistoryXml::decodeEditHistory(QXmlStreamReader& reader,QXmlStreamReader::To
         return false;
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "SavedIndex"))
+        (reader.name() != Strings::xmlNodeSavedIndex))
         return false;
 
     if (readToken(&reader) != QXmlStreamReader::Characters)
@@ -700,7 +738,7 @@ bool HistoryXml::decodeEditHistory(QXmlStreamReader& reader,QXmlStreamReader::To
         return false;
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "RevertIndex"))
+        (reader.name() != Strings::xmlNodeRevertIndex))
         return false;
 
     if (readToken(&reader) != QXmlStreamReader::Characters)
@@ -723,7 +761,7 @@ bool HistoryXml::readEditHistoryHeader(QXmlStreamReader& reader,QXmlStreamReader
         return false;
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "Core"))
+        (reader.name() != Strings::xmlNodeCore))
         return false;
 
     token = readToken(&reader);

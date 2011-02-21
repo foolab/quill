@@ -46,11 +46,12 @@
 
 #include "autoclean.h"
 #include "../src/logger.h"
+#include "../src/strings.h"
 
 Autoclean::Autoclean() :
-    m_editHistoryPath(QDir::homePath()+"/.config/quill/history")
+    m_editHistoryPath(QDir::homePath() + Strings::historyPath)
 {
-    m_thumbnailPaths.append(QDir::homePath()+"/.thumbnails/normal");
+    m_thumbnailPaths.append(QDir::homePath() + Strings::thumbsNormal);
     qsrand(QDateTime::currentDateTime().toTime_t());
 }
 
@@ -130,18 +131,19 @@ QString Autoclean::getMainFileName(const QString &editHistoryFileName)
         return QString();
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "Core"))
+        (reader.name() != Strings::xmlNodeCore))
         return QString();
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "QuillUndoStack"))
+        (reader.name() != Strings::xmlNodeQuillUndoStack))
         return QString();
 
     if ((readToken(&reader) != QXmlStreamReader::StartElement) ||
-        (reader.name() != "File"))
+        (reader.name() != Strings::xmlNodeFile))
         return QString();
 
-    return reader.attributes().value("", "name").toString();
+    return reader.attributes().value(Strings::xmlNamespace,
+                                     Strings::xmlAttributeName).toString();
 }
 
 bool Autoclean::verifyMainFileName(const QString &mainFileName,
@@ -153,7 +155,7 @@ bool Autoclean::verifyMainFileName(const QString &mainFileName,
 QString Autoclean::originalFileName(const QString &mainFileName)
 {
     int split = mainFileName.lastIndexOf("/");
-    return mainFileName.left(split) + "/.original/" + mainFileName.mid(split);
+    return mainFileName.left(split) + Strings::slashOriginal + mainFileName.mid(split);
 }
 
 void Autoclean::removeThumbnails(const QString &mainFileName,

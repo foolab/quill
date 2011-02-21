@@ -53,6 +53,7 @@
 #include "savemap.h"
 #include "imagecache.h"
 #include "logger.h"
+#include "strings.h"
 
 Scheduler::Scheduler()
 {
@@ -386,7 +387,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
-    filter->setOption("timestamp",
+    filter->setOption(QuillImageFilter::Timestamp,
                       file->lastModified());
 
     Task *task = new Task();
@@ -691,7 +692,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
         if (filter == 0)
             filter = QuillImageFilterFactory::
-                createImageFilter("org.maemo.red-eye-reduction");
+                createImageFilter(QuillImageFilter::Name_RedEyeReduction);
 
         delete generator;
         command->setFilter(filter);

@@ -40,16 +40,17 @@
 #include <QDir>
 
 #include "autoclean.h"
+#include "../src/strings.h"
 
 int main(int argc, char **argv)
 {
     Autoclean autoclean;
-    autoclean.setEditHistoryPath(QDir::homePath()+"/.config/quill/history");
+    autoclean.setEditHistoryPath(QDir::homePath() + Strings::historyPath);
 
     QList<QString> thumbnailPaths;
-    thumbnailPaths.append(QDir::homePath()+"/.thumbnails/normal");
-    thumbnailPaths.append(QDir::homePath()+"/.thumbnails/wide");
-    thumbnailPaths.append(QDir::homePath()+"/.thumbnails/screen");
+    thumbnailPaths.append(QDir::homePath() + Strings::thumbsNormal);
+    thumbnailPaths.append(QDir::homePath() + Strings::thumbsWide);
+    thumbnailPaths.append(QDir::homePath() + Strings::thumbsScreen);
     autoclean.setThumbnailPaths(thumbnailPaths);
 
     int repeats = 0;

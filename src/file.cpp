@@ -53,6 +53,7 @@
 #include "filesystem.h"
 #include "quillerror.h"
 #include "logger.h"
+#include "strings.h"
 
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false),
@@ -119,13 +120,14 @@ QString File::fileFormat() const
 
 bool File::isJpeg() const
 {
-    return m_fileFormat == "jpeg" || m_fileFormat == "jpg" ||
-        m_fileFormat == "image/jpeg";
+    return m_fileFormat == Strings::jpeg
+        || m_fileFormat == Strings::jpg
+        || m_fileFormat == Strings::jpegMimeType;
 }
 
 bool File::isSvg() const
 {
-    return m_fileFormat == "image/svg+xml";
+    return m_fileFormat == Strings::svgMimeType;
 }
 
 QString File::originalFileName() const
@@ -143,7 +145,7 @@ void File::setFileName(const QString &fileName)
     m_fileName = fileName;
 
     QFileInfo info(fileName);
-    m_originalFileName = info.path() + "/.original/" + info.fileName();
+    m_originalFileName = info.path() + Strings::slashOriginal + info.fileName();
 
     if (!info.exists()) {
         emitError(QuillError(QuillError::FileNotFoundError,
@@ -770,7 +772,7 @@ void File::prepareSave()
 
     QString path = Core::instance()->temporaryFilePath();
     if (path.isNull())
-        path = "/tmp";
+        path = Strings::tempDirDefault;
 
     if (!QDir().mkpath(path)) {
         emitError(QuillError(QuillError::DirCreateError,
@@ -779,8 +781,9 @@ void File::prepareSave()
         return;
     }
 
-    const QString filePath =
-        path + QDir::separator() + "qt_temp.XXXXXX." + info.fileName();
+    const QString filePath = path + QDir::separator()
+                           + Strings::tempFilePattern
+                           + info.fileName();
 
     m_temporaryFile = new QTemporaryFile(filePath);
     if (!m_temporaryFile) {
