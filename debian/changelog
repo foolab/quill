@@ -1,9 +1,14 @@
+libquill (1.110222.3) unstable; urgency=low
+  * Remove Logger unit tests
+
+ -- Simon Pena <spena@igalia.com>  Tue, 22 Feb 2011 13:19:00 +0200
+
 libquill (1.110222.2) unstable; urgency=low
   * Change string literals into static const variables.
 
  -- Adrian Perez <aperez@igalia.com>  Tue, 22 Feb 2011 12:14:14 +0200
 
-libquill (1.110222.1) unstable; urgency=low
+libquill (1.110222.0) unstable; urgency=low
   * Make Logger only available on debugging
 
  -- Simon Pena <spena@igalia.com>  Tue, 22 Feb 2011 10:58:54 +0200
