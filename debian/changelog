@@ -1,3 +1,8 @@
+libquill (1.110222.2) unstable; urgency=low
+  * Change string literals into static const variables.
+
+ -- Adrian Perez <aperez@igalia.com>  Tue, 22 Feb 2011 12:14:14 +0200
+
 libquill (1.110222.1) unstable; urgency=low
   * Make Logger only available on debugging
 
