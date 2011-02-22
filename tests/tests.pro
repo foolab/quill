@@ -32,10 +32,6 @@ SUBDIRS += \
            ut_autoclean \
            benchmark  \
 
-contains( debug, yes ) {
-    SUBDIRS += ut_logger
-}
-
 # --- install
 tatam.files = tests.xml
 tatam.path  = $$(DESTDIR)/usr/share/libquill-tests/
