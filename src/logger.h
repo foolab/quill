@@ -45,7 +45,6 @@
 # define QUILL_LOG(x,y) ((void)0)
 #else
 # define QUILL_LOG(x,y) Logger::log(x,y)
-#endif
 
 class QSize;
 
@@ -81,4 +80,5 @@ private:
     static bool firstTimeFlag;
 };
 
+#endif
 #endif

@@ -77,9 +77,12 @@ SOURCES += quill.cpp \
            imagecache.cpp \
            historyxml.cpp \
            filesystem.cpp \
-           logger.cpp \
            dbus-thumbnailer/dbusthumbnailer.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
+
+contains( debug, yes ) {
+    SOURCES += logger.cpp
+}
 
 INSTALL_HEADERS = \
            Quill \

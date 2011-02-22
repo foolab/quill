@@ -27,11 +27,14 @@ SUBDIRS += \
            ut_format \
            ut_croppedthumbnail \
            ut_scheduler \
-           ut_logger \
            ut_quillmetadata \
            ut_dbusthumbnailer \
            ut_autoclean \
            benchmark  \
+
+contains( debug, yes ) {
+    SUBDIRS += ut_logger
+}
 
 # --- install
 tatam.files = tests.xml
