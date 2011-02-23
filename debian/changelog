@@ -1,3 +1,11 @@
+libquill (1.110223.0) unstable; urgency=low
+  * Current load filter not part of stack any more
+  * Fixes: NB#219172 images stretched when redo
+  * Fixes: NB#222581 images stretched when redo
+  * Fixes: NB#221105 red eye removal does not work with redo
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 23 Feb 2011 15:57:30 +0200
+
 libquill (1.110222.3) unstable; urgency=low
   * Remove Logger unit tests
 
