@@ -49,9 +49,7 @@ QThreadPool on the background.
 
 #ifndef THREADMANAGER_H
 #define THREADMANAGER_H
-
-#include <QFuture>
-#include <QFutureWatcher>
+#include <QObject>
 #include "quill.h"
 
 class QuillImage;
@@ -59,6 +57,9 @@ class Task;
 class Core;
 class QSemaphore;
 class QEventLoop;
+class ThreadManager;
+class QuillImageFilter;
+class BackgroundThread;
 
 class ThreadManager : public QObject
 {
@@ -98,23 +99,18 @@ public:
 
 public slots:
     /*!
-      Used by the future watcher to indicate that
-      an asynchronous calculation has been finished.
-     */
-
-    void taskFinished();
+      Used by the BackgroundThread to emit when
+      asynchronous calculation has been finished.
+      */
+    void onTaskDone(QuillImage& image, Task* task);
 
 private:
-    bool m_isRunning;
-    Task *m_task;
-
-    QFuture<QuillImage> *resultImage;
-    QFutureWatcher<QuillImage> watcher;
-
-    Quill::ThreadingMode threadingMode;
-
-    QSemaphore *semaphore;
-    QEventLoop *eventLoop;
+    bool                    m_isRunning;
+    Task                    *m_task;
+    Quill::ThreadingMode    threadingMode;
+    QSemaphore              *semaphore;
+    QEventLoop              *eventLoop;
+    BackgroundThread        *m_BackgroundThread;
 };
 
 #endif // __QUILL_THREAD_MANAGER_H_
