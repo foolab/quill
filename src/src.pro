@@ -59,6 +59,7 @@ HEADERS += quill.h \
            logger.h \
            dbus-thumbnailer/dbusthumbnailer.h \
            dbus-thumbnailer/thumbnailer_generic.h \
+           backgroundthread.h \
 
 SOURCES += quill.cpp \
            quillfile.cpp \
@@ -79,6 +80,7 @@ SOURCES += quill.cpp \
            filesystem.cpp \
            dbus-thumbnailer/dbusthumbnailer.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
+           backgroundthread.cpp \
 
 contains( debug, yes ) {
     SOURCES += logger.cpp

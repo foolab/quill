@@ -37,10 +37,8 @@
 **
 ****************************************************************************/
 
-#include <QtConcurrentRun>
 #include <QSemaphore>
 #include <QEventLoop>
-
 #include <QuillImageFilter>
 
 #include "quillerror.h"
@@ -48,10 +46,10 @@
 #include "task.h"
 #include "logger.h"
 #include "threadmanager.h"
+#include "backgroundthread.h"
 
 ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
-    m_isRunning(false), m_task(0), resultImage(0),
-    threadingMode(mode),
+    m_isRunning(false), m_task(0), threadingMode(mode),
     semaphore(0), eventLoop(0)
 {
     if (mode == Quill::ThreadingTest)
@@ -60,9 +58,14 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
         eventLoop = new QEventLoop();
     }
 
-    connect(&watcher,
-            SIGNAL(finished()),
-            SLOT(taskFinished()));
+    // TaskProcessor is like a worker thread which processes Task in a same manner
+    // as with QtConcurrent implementation.
+    m_BackgroundThread = new BackgroundThread(this);
+    // Here we can tune thread priority according to our needs.
+    m_BackgroundThread->start(QThread::LowPriority);
+    // As soon as TaskProcessor::run() method applies the required filter, it emits
+    // signal to background thread.
+    QObject::connect(m_BackgroundThread,SIGNAL(taskDone(QuillImage&,Task*)),this,SLOT(onTaskDone(QuillImage&,Task*)),Qt::UniqueConnection);
 }
 
 ThreadManager::~ThreadManager()
@@ -72,11 +75,14 @@ ThreadManager::~ThreadManager()
     if (threadingMode == Quill::ThreadingTest) {
         semaphore->release();
         if (isRunning())
+        {
             eventLoop->exec();
+        }
     }
     delete semaphore;
     delete eventLoop;
-    delete resultImage;
+    // Stoping the task processor, after destruction of this class the instance will be deleted
+    m_BackgroundThread->stopBackgroundThread();
 }
 
 bool ThreadManager::isRunning() const
@@ -84,39 +90,21 @@ bool ThreadManager::isRunning() const
     return m_isRunning;
 }
 
-QuillImage applyFilter(QuillImageFilter *filter, QuillImage image,
-                       QSemaphore *semaphore)
-{
-    if (semaphore != 0)
-        semaphore->acquire();
-    return filter->apply(image);
-}
-
 void ThreadManager::run(Task *task)
 {
     QUILL_LOG(Logger::Module_ThreadManager, "Applying filter " + task->filter()->name());
     m_isRunning = true;
     m_task = task;
-
-    resultImage = new QFuture<QuillImage>;
-    *resultImage =
-        QtConcurrent::run(applyFilter, task->filter(), task->inputImage(),
-                          semaphore);
-    watcher.setFuture(*resultImage);
-
-    // To save memory, clear the input image here since it is not needed.
-    task->setInputImage(QuillImage());
+    // Enqueues the task in the queue to process by TaskProcessor thread.
+    m_BackgroundThread->processTask(task);
 }
 
-void ThreadManager::taskFinished()
+// TaskProcessor emits taskDone signal to this background thread
+void ThreadManager::onTaskDone(QuillImage& image,Task* task)
 {
     QUILL_LOG(Logger::Module_ThreadManager, "Finished applying " + m_task->filter()->name());
-    QuillImage image = resultImage->result();
-    delete resultImage;
-    resultImage = 0;
     m_isRunning = false;
-
-    Core::instance()->processFinishedTask(m_task, image);
+    Core::instance()->processFinishedTask(task, image);
 
     if (threadingMode == Quill::ThreadingTest)
         eventLoop->exit();
@@ -124,7 +112,7 @@ void ThreadManager::taskFinished()
 
 bool ThreadManager::allowDelete(QuillImageFilter *filter) const
 {
-    return (!m_isRunning || !m_task || (filter != m_task->filter()));
+    return (!m_isRunning || !m_task || ( filter != m_task->filter()));
 }
 
 void ThreadManager::releaseAndWait()
