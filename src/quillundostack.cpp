@@ -58,12 +58,13 @@
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
-    m_saveCommand(0), m_saveMap(0),m_revertIndex(0)
+    m_saveCommand(0), m_loadCommand(0), m_loadCommandUsed(false), m_saveMap(0),m_revertIndex(0)
 {
 }
 
 QuillUndoStack::~QuillUndoStack()
 {
+    delete m_loadCommand;
     delete m_stack;
     delete m_saveCommand;
     delete m_saveMap;
@@ -168,10 +169,16 @@ void QuillUndoStack::add(QuillImageFilter *filter)
         (cmd->filter()->role() != QuillImageFilter::Role_Load))
         cmd->setSessionId(m_recordingSessionId);
 
-    // add to stack
-    m_stack->push(cmd);
-
-    QUILL_LOG(Logger::Module_Stack, filter->name()+" added to stack");
+    if (cmd->filter()->role() == QuillImageFilter::Role_Load
+        && m_stack->count() != 0) {
+        m_loadCommand = cmd;
+        cmd->setIndex(cmd->index() -1);
+        m_loadCommand->setUniqueId(command()->uniqueId());
+        QUILL_LOG(Logger::Module_Stack, filter->name()+"stored outside the stack");
+    } else { // add to stack
+        m_stack->push(cmd);
+        QUILL_LOG(Logger::Module_Stack, filter->name()+" added to stack");
+    }
 
     // full image size should not be loaded for waiting
     if (!m_file->isWaitingForData() ||
@@ -200,10 +207,6 @@ bool QuillUndoStack::canUndo() const
 void QuillUndoStack::undo()
 {
     if (canUndo()) {
-        // In case of an intermediate load, we make a double undo
-        if (command()->filter() && (command()->filter()->role() == QuillImageFilter::Role_Load) && (m_stack->index() > 2))
-            m_stack->undo();
-
         // If we are not currently recording a session, an entire
         // session should be undone at once.
         if (!m_isSessionRecording && command()->belongsToSession())
@@ -225,6 +228,7 @@ void QuillUndoStack::undo()
 
 bool QuillUndoStack::canRedo() const
 {
+
     if (!m_stack->canRedo())
         return false;
 
@@ -391,7 +395,11 @@ int QuillUndoStack::savedIndex() const
 
 bool QuillUndoStack::isDirty() const
 {
-    return (m_stack->count() > 0) && (command()->index() != savedIndex());
+    if (m_loadCommand && m_loadCommand->uniqueId() != command()->uniqueId())
+        return true;
+
+    return (m_stack->count() > 0) &&
+           (command()->index() != savedIndex());
 }
 
 void QuillUndoStack::startSession()
@@ -460,6 +468,12 @@ void QuillUndoStack::concludeSave()
         setInitialLoadFilter(command(0)->filter());
     }
 
+    if (m_loadCommand) {
+        m_loadCommandUsed = false;
+        m_loadCommand->setIndex(savedIndex());
+        m_loadCommand->setUniqueId(m_saveCommand->uniqueId());
+    }
+
     delete m_saveCommand;
     m_saveCommand = 0;
 
@@ -496,7 +510,6 @@ int QuillUndoStack::revertIndex() const
     return m_revertIndex;
 }
 
-
 void QuillUndoStack::revert()
 {
     setRevertIndex(index());
@@ -528,4 +541,17 @@ bool QuillUndoStack::canRestore() const
 void QuillUndoStack::clear()
 {
     m_stack->clear();
+}
+
+QuillUndoCommand *QuillUndoStack::loadCommand()
+{
+    if (!m_loadCommandUsed)
+        return m_loadCommand;
+
+    return 0;
+}
+
+void QuillUndoStack::clearLoadCommand()
+{
+    m_loadCommandUsed = true;
 }

@@ -10,6 +10,8 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 
+#include "../../src/strings.h"
+
 void batchrotate(QString fileName)
 {
     QEventLoop loop;
@@ -29,10 +31,10 @@ void batchrotate(QString fileName)
     file.write(buf);
     file.flush();
 
-    QuillFile quillFile(file.fileName(), "jpg");
+    QuillFile quillFile(file.fileName(), Strings::jpg);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Rotate);
     filter->setOption(QuillImageFilter::Angle, QVariant(90));
 
     quillFile.runFilter(filter);

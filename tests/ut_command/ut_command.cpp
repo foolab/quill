@@ -45,6 +45,7 @@
 #include "ut_command.h"
 #include "quillundocommand.h"
 #include "quillundostack.h"
+#include "../../src/strings.h"
 
 ut_command::ut_command()
 {
@@ -64,7 +65,7 @@ void ut_command::cleanupTestCase()
 void ut_command::testFilter()
 {
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
 
     QuillUndoCommand *command = new QuillUndoCommand(stack);

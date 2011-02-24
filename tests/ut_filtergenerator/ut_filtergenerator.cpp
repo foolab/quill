@@ -47,6 +47,7 @@
 #include "unittests.h"
 #include "ut_filtergenerator.h"
 #include "quillfile.h"
+#include "../../src/strings.h"
 #include <Quill>
 
 ut_filtergenerator::ut_filtergenerator()
@@ -89,7 +90,7 @@ void ut_filtergenerator::testAutoContrast()
     QCOMPARE((QImage)file.image(), Unittests::generatePaletteImage());
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     //QCOMPARE(filter->name(), QLatin1String("com.meego.composite.brightness.contrast"));
 
@@ -102,7 +103,7 @@ void ut_filtergenerator::testAutoContrast()
 
 
     QuillImageFilter *filterGenerator =
-        QuillImageFilterFactory::createImageFilter("org.maemo.auto.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_AutoContrast);
     //QCOMPARE(filterGenerator->name(), QLatin1String("com.meego.auto.contrast"));
     QVERIFY(dynamic_cast<QuillImageFilterGenerator*>(filterGenerator));
 
@@ -151,7 +152,7 @@ void ut_filtergenerator::testAutoLevels()
 
 
     QuillImageFilter *filterGenerator =
-        QuillImageFilterFactory::createImageFilter("org.maemo.auto.levels");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_AutoLevels);
     //QCOMPARE(filterGenerator->name(), QLatin1String("com.meego.auto.levels"));
     QVERIFY(dynamic_cast<QuillImageFilterGenerator*>(filterGenerator));
 
@@ -206,7 +207,7 @@ void ut_filtergenerator::testRedEyeRemoval()
     Quill::setPreviewSize(0, QSize(2, 2));
     Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
     Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
     // Create blank thumbnail
     QuillImage blankImage(QImage(QSize(2, 2), QImage::Format_ARGB32));
@@ -223,7 +224,7 @@ void ut_filtergenerator::testRedEyeRemoval()
     QVERIFY(Unittests::compareImage(file.image(), blankImage));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.red-eye-detection");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_RedEyeDetection);
 
     filter->setOption(QuillImageFilter::Center, QVariant(QPoint(1, 1)));
     filter->setOption(QuillImageFilter::Radius, QVariant(2));
@@ -241,7 +242,7 @@ void ut_filtergenerator::testRedEyeRemoval()
     QVERIFY(Unittests::compareImage(file.image(), image));
 
     QuillImageFilter *filter2 =
-        QuillImageFilterFactory::createImageFilter("org.maemo.red-eye-detection");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_RedEyeDetection);
     filter2->setOption(QuillImageFilter::Center, QVariant(QPoint(1, 1)));
     filter2->setOption(QuillImageFilter::Radius, QVariant(2));
 

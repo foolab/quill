@@ -8,6 +8,7 @@
 #include <QuillFile>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
+#include "../../src/strings.h"
 
 void tiling(QString fileName, QSize size)
 {
@@ -19,7 +20,7 @@ void tiling(QString fileName, QSize size)
     Quill::setPreviewSize(0, QSize(320, 200));
     Quill::setDefaultTileSize(QSize(256, 256));
 
-    QuillFile *file = new QuillFile(fileName, "jpg");
+    QuillFile *file = new QuillFile(fileName, Strings::jpg);
     file->setDisplayLevel(1);
     file->setViewPort(QRect(QPoint((file->fullImageSize().width() - size.width()) / 2,
                                    (file->fullImageSize().height() - size.height()) / 2),

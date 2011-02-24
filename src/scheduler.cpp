@@ -53,6 +53,7 @@
 #include "savemap.h"
 #include "imagecache.h"
 #include "logger.h"
+#include "strings.h"
 
 Scheduler::Scheduler()
 {
@@ -179,6 +180,16 @@ QuillUndoCommand *Scheduler::getTask(QuillUndoStack *stack, int level) const
         if (!stack->command(index)->image(level).isNull())
             break;
 
+        // Check if there's any loadCommand associated with this index
+        if (stack->loadCommand() && stack->savedIndex() == index) {
+            QuillUndoCommand *command = stack->loadCommand();
+            // it can be used only once
+            stack->clearLoadCommand();
+
+            return command;
+        }
+
+        // Not sure if this case still happens, but the code is still here =/
         // Load filters can be re-executed
         if (stack->command(index)->filter()->role() == QuillImageFilter::Role_Load)
         {
@@ -386,7 +397,7 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
 
     filter->setOption(QuillImageFilter::FileName,
                       file->thumbnailFileName(level));
-    filter->setOption("timestamp",
+    filter->setOption(QuillImageFilter::Timestamp,
                       file->lastModified());
 
     Task *task = new Task();
@@ -629,7 +640,9 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
         // since it is now orphan and we could not delete it
         // in QuillUndoCommand::~QuillUndoCommand().
 
-        delete filter;
+        // Load filter can be outside the stack
+        if (filter->role() != QuillImageFilter::Role_Load)
+            delete filter;
     }
     else if (filter->role() == QuillImageFilter::Role_Overlay)
     {
@@ -691,7 +704,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
         if (filter == 0)
             filter = QuillImageFilterFactory::
-                createImageFilter("org.maemo.red-eye-reduction");
+                createImageFilter(QuillImageFilter::Name_RedEyeReduction);
 
         delete generator;
         command->setFilter(filter);

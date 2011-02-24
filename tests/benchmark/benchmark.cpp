@@ -10,6 +10,7 @@
 #include "autofix.h"
 #include "straighten.h"
 #include "redeye.h"
+#include "../../src/strings.h"
 
 void help()
 {
@@ -81,7 +82,7 @@ int main(int argc, char **argv)
 
         int n = 100, w = 128, h = 128;
         bool f = false;
-        QString m = "image/jpeg", d = "grid";
+        QString m = Strings::jpegMimeType, d = "grid";
         while ((c = getopt(argc, argv, "n:w:h:fm:d:")) != -1) {
             switch(c) {
             case 'n' :
@@ -135,7 +136,7 @@ int main(int argc, char **argv)
         QString fileName = argv[2];
 
         int n = 100, w = 128, h = 128;
-        QString m = "image/jpeg", d = "grid";
+        QString m = Strings::jpegMimeType, d = "grid";
         while ((c = getopt(argc, argv, "n:w:h:")) != -1) {
             switch(c) {
             case 'n' :
@@ -158,7 +159,7 @@ int main(int argc, char **argv)
         QString fileName = argv[2];
 
         int n = 100, w = 128, h = 128;
-        QString m = "image/jpeg", d = "grid";
+        QString m = Strings::jpegMimeType, d = "grid";
         while ((c = getopt(argc, argv, "n:w:h:")) != -1) {
             switch(c) {
             case 'n' :
@@ -181,7 +182,7 @@ int main(int argc, char **argv)
         QString fileName = argv[2];
 
         int n = 100, w = 128, h = 128, x = 0, y = 0, t = 150;
-        QString m = "image/jpeg", d = "grid";
+        QString m = Strings::jpegMimeType, d = "grid";
         while ((c = getopt(argc, argv, "n:w:h:x:y:t:")) != -1) {
             switch(c) {
             case 'n' :

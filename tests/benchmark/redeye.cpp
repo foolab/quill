@@ -9,6 +9,7 @@
 #include <QuillFile>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
+#include "../../src/strings.h"
 
 int compare(QImage source, QImage target)
 {
@@ -27,7 +28,7 @@ void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, i
     QEventLoop loop;
     QTime time;
 
-    Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
+    Quill::setTemporaryFilePath(QDir::homePath() + Strings::testsTempDir);
     Quill::setPreviewSize(0, size);
 
     QString fileName[numFiles];
@@ -36,7 +37,7 @@ void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, i
     for (int i=0; i<numFiles; i++) {
         {   // Needed for the life of the QTemporaryFile
             QTemporaryFile file;
-            file.setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX");
+            file.setFileTemplate(QDir::homePath() + Strings::testsTempFilePattern);
             file.open();
             fileName[i] = file.fileName();
             file.close();
@@ -48,7 +49,7 @@ void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, i
     time.start();
 
     for (int i=0; i<numFiles; i++) {
-        quillFile[i] = new QuillFile(fileName[i], "image/jpeg");
+        quillFile[i] = new QuillFile(fileName[i], Strings::jpegMimeType);
         QObject::connect(quillFile[i], SIGNAL(imageAvailable(const QuillImageList)),
                          &loop, SLOT(quit()));
     }
@@ -78,7 +79,7 @@ void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, i
 
     for (int i=0; i<numFiles; i++) {
         QuillImageFilter *filter =
-            QuillImageFilterFactory::createImageFilter("org.maemo.red-eye-detection");
+            QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_RedEyeDetection);
         filter->setOption(QuillImageFilter::Radius, QVariant(radius));
         filter->setOption(QuillImageFilter::Center, QVariant(center));
         quillFile[i]->runFilter(filter);

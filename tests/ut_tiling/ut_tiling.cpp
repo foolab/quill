@@ -49,6 +49,7 @@
 #include "ut_tiling.h"
 #include "quillundocommand.h"
 #include "quillundostack.h"
+#include "../../src/strings.h"
 
 ut_tiling::ut_tiling()
 {
@@ -90,7 +91,7 @@ void ut_tiling::testTiledSaving()
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     file->setDisplayLevel(1);
 
     QCOMPARE(file->viewPort(), QRect());
@@ -107,7 +108,7 @@ void ut_tiling::testTiledSaving()
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -157,12 +158,12 @@ void ut_tiling::testTiledSavingSmallCache()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setTileCacheSize(1);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     file->setViewPort(QRect(0, 0, 8, 2));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -222,12 +223,12 @@ void ut_tiling::testTiledSwipe()
     Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setDefaultTileSize(QSize(2, 2));
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     file->setViewPort(QRect(0, 0, 8, 8));
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -237,7 +238,7 @@ void ut_tiling::testTiledSwipe()
     file->save();
     file->setDisplayLevel(-1);
 
-    QuillFile *file2 = new QuillFile(testFile2.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile2.fileName(), Strings::png);
     file2->setViewPort(QRect(0, 0, 8, 8));
     file2->setDisplayLevel(1);
 
@@ -303,11 +304,11 @@ void ut_tiling::testTiledSaveLoad()
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(saved()));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -379,7 +380,7 @@ void ut_tiling::testSaveBuffer()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setSaveBufferSize(4);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     file->setViewPort(QRect(0, 0, 2, 8));
     file->setDisplayLevel(1);
 
@@ -393,7 +394,7 @@ void ut_tiling::testSaveBuffer()
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -450,7 +451,7 @@ void ut_tiling::testSaveBufferUnequal()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setSaveBufferSize(6);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     file->setViewPort(QRect(0, 0, 2, 8));
     file->setDisplayLevel(1);
 
@@ -464,7 +465,7 @@ void ut_tiling::testSaveBufferUnequal()
     QCOMPARE(file->allImageLevels().count(), 5);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -513,7 +514,7 @@ void ut_tiling::testPan()
 
     Quill::setDefaultTileSize(QSize(2, 2));
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(imageAvailable(QuillImageList)));
     file->setDisplayLevel(1);
 
@@ -572,11 +573,11 @@ void ut_tiling::testPreviewSizeChanges()
 
     Quill::setDefaultTileSize(QSize(4, 4));
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     file->setDisplayLevel(1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.rotate");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Rotate);
     filter->setOption(QuillImageFilter::Angle, QVariant(90));
 
     // preview level 0
@@ -615,7 +616,7 @@ void ut_tiling::testViewPortBiggerThanCache()
     Quill::setDefaultTileSize(QSize(2, 2));
     Quill::setTileCacheSize(3);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     file->setDisplayLevel(1);
 
     Quill::releaseAndWait(); // preview
@@ -666,11 +667,11 @@ void ut_tiling::testSaveInterrupted()
     QImage image(testFile.fileName());
     QCOMPARE(image, Unittests::generatePaletteImage());
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     file->setDisplayLevel(-1);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
     QImage targetImage = filter->apply(image);

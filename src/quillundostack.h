@@ -274,6 +274,14 @@ public:
     QuillUndoCommand *saveCommand();
 
     /*!
+      Returns pointer to the load command, to be used by thread
+      manager.
+     */
+
+    QuillUndoCommand *loadCommand();
+    void clearLoadCommand();
+
+    /*!
       Returns pointer to the save map, to be used by thread
       manager.
      */
@@ -324,6 +332,8 @@ private:
     int m_recordingSessionId, m_nextSessionId;
     int m_savedIndex;
     QuillUndoCommand *m_saveCommand;
+    QuillUndoCommand *m_loadCommand;
+    bool m_loadCommandUsed;
     SaveMap *m_saveMap;
     int m_revertIndex;
 };

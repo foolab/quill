@@ -10,6 +10,8 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 
+#include "../../src/strings.h"
+
 void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize, QString mimeType, QString flavor)
 {
     qDebug() << "Generating" << n << flavor << size.width() << "x" << size.height() << "thumbnails for" << originalFileName << "MIME" << mimeType;
@@ -17,11 +19,11 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     QEventLoop loop;
     QTime time;
 
-    Quill::setTemporaryFilePath(QDir::homePath()+"/.config/quill/tmp/");
+    Quill::setTemporaryFilePath(QDir::homePath() + Strings::testsTempDir);
     Quill::setPreviewSize(0, size);
     Quill::setMinimumPreviewSize(0, minimumSize);
     Quill::setThumbnailFlavorName(0, flavor);
-    Quill::setThumbnailExtension("jpeg");
+    Quill::setThumbnailExtension(Strings::jpeg);
     Quill::setThumbnailCreationEnabled(false);
 
     int numFiles = n;
@@ -32,7 +34,7 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
     for (int i=0; i<numFiles; i++) {
         {   // Needed for the life of the QTemporaryFile
             QTemporaryFile file;
-            file.setFileTemplate(QDir::homePath()+"/.config/quill/tmp/XXXXXX");
+            file.setFileTemplate(QDir::homePath() + Strings::testsTempFilePattern);
             file.open();
             fileName[i] = file.fileName();
             file.close();

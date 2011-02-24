@@ -49,6 +49,7 @@
 #include "unittests.h"
 #include "ut_format.h"
 #include "quillfile.h"
+#include "../../src/strings.h"
 
 ut_format::ut_format()
 {
@@ -87,7 +88,7 @@ void ut_format::testSizeLimit()
     image.save(testFile.fileName(), "png");
 
     Quill::setImageSizeLimit(QSize(4, 4));
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     file->setDisplayLevel(0);
 
@@ -112,7 +113,7 @@ void ut_format::testPixelsLimit()
     image.save(testFile.fileName(), "png");
 
     Quill::setImagePixelsLimit(15);
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     file->setDisplayLevel(0);
 
@@ -139,12 +140,12 @@ void ut_format::testNonTiledPixelsLimit()
 
     Quill::setImagePixelsLimit(24);
     Quill::setNonTiledImagePixelsLimit(12);
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     file->setDisplayLevel(0);
     QVERIFY(!file->supportsViewing());
 
-    QuillFile *file2 = new QuillFile(testFile2.fileName(), "jpg");
+    QuillFile *file2 = new QuillFile(testFile2.fileName(), Strings::jpg);
 
     file2->setDisplayLevel(0);
     QVERIFY(file2->supportsViewing());
@@ -164,7 +165,7 @@ void ut_format::testMultipleLimits()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     file->setDisplayLevel(0);
     QVERIFY(!file->supportsViewing());
@@ -183,7 +184,7 @@ void ut_format::testReadOnlyFormat()
     testFile.write(buffer);
     testFile.flush();
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "image/gif");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::gifMimeType);
     file->supportsEditing();
     QVERIFY(!file->supportsEditing());
     delete file;

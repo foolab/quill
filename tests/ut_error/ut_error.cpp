@@ -55,6 +55,7 @@
 #include "core.h"
 #include "ut_error.h"
 #include "unittests.h"
+#include "../../src/strings.h"
 
 ut_error::ut_error() : editHistoryPath("tmp/quill/history"),
                        thumbnailBasePath("/tmp/quill/thumbnails"),
@@ -163,7 +164,7 @@ void ut_error::testForbiddenRead()
     image.save(testFile.fileName(), "png");
     testFile.setPermissions(0);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
@@ -190,7 +191,7 @@ void ut_error::testEmptyFileRead()
     // wait for the D-Bus thumbnailer to finish first.
     Quill::setDBusThumbnailingEnabled(false);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     file->setDisplayLevel(0);
@@ -231,7 +232,7 @@ void ut_error::testCorruptRead()
     testFile.write(buffer);
     testFile.close();
 
-    QuillFile *file = new QuillFile(fileName, "png");
+    QuillFile *file = new QuillFile(fileName, Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     file->setDisplayLevel(0);
@@ -260,11 +261,11 @@ void ut_error::testWriteProtectedFile()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -309,11 +310,11 @@ void ut_error::testForbiddenOriginal()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -330,14 +331,14 @@ void ut_error::testForbiddenOriginal()
     QCOMPARE(spy.count(), 0);
 
     QFileInfo fileInfo(testFile.fileName());
-    QFile originalFile(fileInfo.path() + "/.original/" +
+    QFile originalFile(fileInfo.path() + Strings::slashOriginal +
                        fileInfo.fileName());
     QVERIFY(originalFile.exists());
     originalFile.setPermissions(0);
 
     delete file;
     QSignalSpy spy2(Quill::instance(), SIGNAL(error(QuillError)));
-    file = new QuillFile(testFile.fileName(), "png");
+    file = new QuillFile(testFile.fileName(), Strings::png);
     file->setDisplayLevel(0);
     Quill::releaseAndWait();
     QCOMPARE(file->image(), QuillImage(targetImage));
@@ -377,11 +378,11 @@ void ut_error::testEmptyOriginal()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -398,7 +399,7 @@ void ut_error::testEmptyOriginal()
     QCOMPARE(spy.count(), 0);
 
     QFileInfo fileInfo(testFile.fileName());
-    QFile originalFile(fileInfo.path() + "/.original/" +
+    QFile originalFile(fileInfo.path() + Strings::slashOriginal +
                        fileInfo.fileName());
     QVERIFY(originalFile.exists());
     originalFile.open(QIODevice::WriteOnly);
@@ -407,7 +408,7 @@ void ut_error::testEmptyOriginal()
 
     delete file;
     QSignalSpy spy2(Quill::instance(), SIGNAL(error(QuillError)));
-    file = new QuillFile(testFile.fileName(), "png");
+    file = new QuillFile(testFile.fileName(), Strings::png);
     file->setDisplayLevel(0);
     Quill::releaseAndWait();
     QCOMPARE(file->image(), QuillImage(targetImage));
@@ -449,11 +450,11 @@ void ut_error::testCorruptOriginal()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -470,14 +471,14 @@ void ut_error::testCorruptOriginal()
     QCOMPARE(spy.count(), 0);
 
     QFileInfo fileInfo(testFile.fileName());
-    QFile originalFile(fileInfo.path() + "/.original/" +
+    QFile originalFile(fileInfo.path() + Strings::slashOriginal +
                        fileInfo.fileName());
     QVERIFY(originalFile.exists());
     QVERIFY(originalFile.resize(originalFile.size()-2));
 
     delete file;
     QSignalSpy spy2(Quill::instance(), SIGNAL(error(QuillError)));
-    file = new QuillFile(testFile.fileName(), "png");
+    file = new QuillFile(testFile.fileName(), Strings::png);
     QVERIFY(file->supportsEditing()); //create the error signal
     file->setDisplayLevel(0);
     Quill::releaseAndWait();
@@ -522,11 +523,11 @@ void ut_error::testOriginalDirectoryCreateFailed()
 
     Quill::setEditHistoryPath(editHistoryPath);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -565,7 +566,8 @@ void ut_error::testForbiddenThumbnail()
     image.save(testFile.fileName(), "png");
 
     QString thumbFileName = File::fileNameHash(testFile.fileName());
-    thumbFileName.append(".png");
+    thumbFileName.append(".");
+    thumbFileName.append(Strings::png);
     thumbFileName.prepend(thumbnailFullPath);
 
     QImage thumbImage =
@@ -578,9 +580,9 @@ void ut_error::testForbiddenThumbnail()
     Quill::setPreviewSize(0, QSize(4, 1));
     Quill::setThumbnailBasePath(thumbnailBasePath);
     Quill::setThumbnailFlavorName(0, thumbnailFlavorName);
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     file->setDisplayLevel(0);
@@ -625,7 +627,8 @@ void ut_error::testCorruptThumbnail()
         image.scaled(QSize(4, 1), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     QString thumbFileName = File::fileNameHash(testFile.fileName());
-    thumbFileName.append(".png");
+    thumbFileName.append(".");
+    thumbFileName.append(Strings::png);
     thumbFileName.prepend(thumbnailFullPath);
 
     QFile qFile(thumbFileName);
@@ -636,9 +639,9 @@ void ut_error::testCorruptThumbnail()
     Quill::setPreviewSize(0, QSize(4, 1));
     Quill::setThumbnailBasePath(thumbnailBasePath);
     Quill::setThumbnailFlavorName(0, thumbnailFlavorName);
-    Quill::setThumbnailExtension("png");
+    Quill::setThumbnailExtension(Strings::png);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     file->setDisplayLevel(0);
@@ -683,7 +686,8 @@ void ut_error::testThumbnailDirectoryCreateFailed()
     image.save(testFile.fileName(), "png");
 
     QString thumbFileName = File::fileNameHash(testFile.fileName());
-    thumbFileName.append(".png");
+    thumbFileName.append(".");
+    thumbFileName.append(Strings::png);
     thumbFileName.prepend("/tmp/invalid/");
 
     Quill::setPreviewLevelCount(1);
@@ -691,7 +695,7 @@ void ut_error::testThumbnailDirectoryCreateFailed()
     Quill::setThumbnailBasePath("/tmp");
     Quill::setThumbnailFlavorName(0, "invalid");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     file->setDisplayLevel(0);
@@ -722,11 +726,11 @@ void ut_error::testTemporaryFileDirectoryCreateFailed()
     Quill::setTemporaryFilePath("/tmp/invalid");
     Quill::setEditHistoryPath(editHistoryPath);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -763,8 +767,8 @@ void ut_error::testUnreadableEditHistory()
     // Create original since edit history will be ignored without it
     QFileInfo fileInfo(testFile.fileName());
     QString originalFileName =
-        fileInfo.path() + "/.original/" + fileInfo.fileName();
-    QDir().mkpath(fileInfo.path() + "/.original/");
+        fileInfo.path() + Strings::slashOriginal + fileInfo.fileName();
+    QDir().mkpath(fileInfo.path() + Strings::slashOriginal);
     image.save(originalFileName, "png");
 
     Quill::setEditHistoryPath(editHistoryPath);
@@ -803,8 +807,8 @@ void ut_error::testEmptyEditHistory()
     // Create original since edit history will be ignored without it
     QFileInfo fileInfo(testFile.fileName());
     QString originalFileName =
-        fileInfo.path() + "/.original/" + fileInfo.fileName();
-    QDir().mkpath(fileInfo.path() + "/.original/");
+        fileInfo.path() + Strings::slashOriginal + fileInfo.fileName();
+    QDir().mkpath(fileInfo.path() + Strings::slashOriginal);
     image.save(originalFileName, "png");
 
     Quill::setEditHistoryPath(editHistoryPath);
@@ -839,8 +843,8 @@ void ut_error::testCorruptEditHistory()
     // Create original since edit history will be ignored without it
     QFileInfo fileInfo(testFile.fileName());
     QString originalFileName =
-        fileInfo.path() + "/.original/" + fileInfo.fileName();
-    QDir().mkpath(fileInfo.path() + "/.original/");
+        fileInfo.path() + Strings::slashOriginal + fileInfo.fileName();
+    QDir().mkpath(fileInfo.path() + Strings::slashOriginal);
     image.save(originalFileName, "png");
 
     Quill::setEditHistoryPath(editHistoryPath);
@@ -879,12 +883,12 @@ void ut_error::testEditHistoryDirectoryCreateFailed()
 
     Quill::setEditHistoryPath("/tmp/invalid");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -922,11 +926,11 @@ void ut_error::testWriteProtectedEditHistory()
     const QString editHistoryFileName =
         File::editHistoryFileName(testFile.fileName(), editHistoryPath);
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
     QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::Brightness, QVariant(20));
 
@@ -944,7 +948,7 @@ void ut_error::testWriteProtectedEditHistory()
     editHistoryFile.setPermissions(QFile::ReadOwner);
 
     QuillImageFilter *filter2 =
-        QuillImageFilterFactory::createImageFilter("org.maemo.composite.brightness.contrast");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
     QVERIFY(filter2);
     filter2->setOption(QuillImageFilter::Brightness, QVariant(30));
 
@@ -967,7 +971,7 @@ void ut_error::testWriteProtectedEditHistory()
 
     // The file should be immediately be recognized as write protected
     QSignalSpy spy2(Quill::instance(), SIGNAL(error(QuillError)));
-    file = new QuillFile(testFile.fileName(), "png");
+    file = new QuillFile(testFile.fileName(), Strings::png);
     QVERIFY(!file->supportsEditing()); //generates error sigal
     QCOMPARE(spy2.count(), 1);
     QVERIFY(!file->supportsEditing());
@@ -983,10 +987,10 @@ void ut_error::testDestructiveFilter()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QuillFile *file = new QuillFile(testFile.fileName(), "png");
+    QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
 
     QuillImageFilter *filter =
-        QuillImageFilterFactory::createImageFilter("org.maemo.crop");
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Crop);
     QVERIFY(filter);
     filter->setOption(QuillImageFilter::CropRectangle, QVariant(QRect()));
 

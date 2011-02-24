@@ -136,12 +136,6 @@
       </case>
     </set>
 
-    <set name="quill-logger-tests" feature="errorhandling">
-      <description>quill logger test</description>
-      <case name="ut_logger" type="Functional" level="Component">
-	<step >/usr/lib/libquill-tests/ut_logger </step>
-      </case>
-    </set>
     <set name="quill-metadata-tests" feature="metadata">
       <description>quill error handling test</description>
       <case name="ut_quillmetadata" type="Functional" level="Component">
