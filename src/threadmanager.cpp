@@ -58,12 +58,12 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
         eventLoop = new QEventLoop();
     }
 
-    // TaskProcessor is like a worker thread which processes Task in a same manner
+    // BackgroundThread is like a worker thread which processes Task in a same manner
     // as with QtConcurrent implementation.
     m_BackgroundThread = new BackgroundThread(this);
     // Here we can tune thread priority according to our needs.
     m_BackgroundThread->start(QThread::LowPriority);
-    // As soon as TaskProcessor::run() method applies the required filter, it emits
+    // As soon as BackgroundThread::run() method applies the required filter, it emits
     // signal to background thread.
     QObject::connect(m_BackgroundThread,SIGNAL(taskDone(QuillImage&,Task*)),this,SLOT(onTaskDone(QuillImage&,Task*)),Qt::UniqueConnection);
 }
@@ -79,10 +79,10 @@ ThreadManager::~ThreadManager()
             eventLoop->exec();
         }
     }
-    delete semaphore;
-    delete eventLoop;
     // Stoping the task processor, after destruction of this class the instance will be deleted
     m_BackgroundThread->stopBackgroundThread();
+    delete semaphore;
+    delete eventLoop;
 }
 
 bool ThreadManager::isRunning() const
@@ -95,11 +95,11 @@ void ThreadManager::run(Task *task)
     QUILL_LOG(Logger::Module_ThreadManager, "Applying filter " + task->filter()->name());
     m_isRunning = true;
     m_task = task;
-    // Enqueues the task in the queue to process by TaskProcessor thread.
+    // Enqueues the task in the queue to process by BackgroundThread thread.
     m_BackgroundThread->processTask(task);
 }
 
-// TaskProcessor emits taskDone signal to this background thread
+// BackgroundThread emits taskDone signal to this background thread
 void ThreadManager::onTaskDone(QuillImage& image,Task* task)
 {
     QUILL_LOG(Logger::Module_ThreadManager, "Finished applying " + m_task->filter()->name());
