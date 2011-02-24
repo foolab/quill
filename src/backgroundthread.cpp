@@ -50,7 +50,7 @@ BackgroundThread::BackgroundThread(QObject *parent, QSemaphore* semaphore) :
 {
     // Registering QuillImage and Task type in order to use them in the signal-slot
     qRegisterMetaType<QuillImage>("QuillImage&");
-    qRegisterMetaType<Task>("Task*");
+    qRegisterMetaType<Task>("Task");
 }
 
 BackgroundThread::~BackgroundThread()
