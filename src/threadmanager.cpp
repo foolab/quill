@@ -60,7 +60,7 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
 
     // BackgroundThread is like a worker thread which processes Task in a same manner
     // as with QtConcurrent implementation.
-    m_BackgroundThread = new BackgroundThread(this);
+    m_BackgroundThread = new BackgroundThread(this,semaphore);
     // Here we can tune thread priority according to our needs.
     m_BackgroundThread->start(QThread::LowPriority);
     // As soon as BackgroundThread::run() method applies the required filter, it emits
