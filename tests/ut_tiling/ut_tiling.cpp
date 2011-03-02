@@ -705,8 +705,7 @@ void ut_tiling::testSaveInterrupted()
     // overlay + save
     Quill::releaseAndWait();
     Quill::releaseAndWait();
-    Quill::releaseAndWait();
-
+    Quill::releaseAndWait();    
     QVERIFY(Unittests::compareImage(QImage(testFile.fileName()), targetImage));
 
     delete file;

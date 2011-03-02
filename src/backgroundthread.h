@@ -60,13 +60,12 @@
 
 class Task;
 class QuillImage;
-class QSemaphore;
 
 class BackgroundThread : public QThread
 {
     Q_OBJECT
 public:
-    explicit BackgroundThread(QObject *parent = 0, QSemaphore* semaphore = 0);
+    explicit BackgroundThread(QObject *parent = 0);
     ~BackgroundThread();
     void processTask(Task* task);
     void stopBackgroundThread();
@@ -81,8 +80,7 @@ private:
     QQueue<Task*>   m_TaskQueue;
     bool            m_IsStopped;
     QWaitCondition  m_WaitForTask;
-    QMutex          m_TaskMutex;
-    QSemaphore*     m_Semaphore;
+    QMutex          m_TaskMutex;    
 };
 
 #endif // __BACKGROUNDTHREAD_H

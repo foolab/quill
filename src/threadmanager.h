@@ -55,7 +55,6 @@ QThreadPool on the background.
 class QuillImage;
 class Task;
 class Core;
-class QSemaphore;
 class QEventLoop;
 class ThreadManager;
 class QuillImageFilter;
@@ -107,8 +106,7 @@ public slots:
 private:
     bool                    m_isRunning;
     Task                    *m_task;
-    Quill::ThreadingMode    threadingMode;
-    QSemaphore              *semaphore;
+    Quill::ThreadingMode    threadingMode;  
     QEventLoop              *eventLoop;
     BackgroundThread        *m_BackgroundThread;
 };

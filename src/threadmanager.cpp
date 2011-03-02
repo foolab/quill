@@ -37,10 +37,7 @@
 **
 ****************************************************************************/
 
-#include <QSemaphore>
 #include <QEventLoop>
-#include <QuillImageFilter>
-
 #include "quillerror.h"
 #include "core.h"
 #include "task.h"
@@ -50,17 +47,15 @@
 
 ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
     m_isRunning(false), m_task(0), threadingMode(mode),
-    semaphore(0), eventLoop(0)
+    eventLoop(0)
 {
-    if (mode == Quill::ThreadingTest)
-    {
-        semaphore = new QSemaphore();
+    if (mode == Quill::ThreadingTest) {
         eventLoop = new QEventLoop();
     }
 
     // BackgroundThread is like a worker thread which processes Task in a same manner
     // as with QtConcurrent implementation.
-    m_BackgroundThread = new BackgroundThread(this,semaphore);
+    m_BackgroundThread = new BackgroundThread(this);
     // Here we can tune thread priority according to our needs.
     m_BackgroundThread->start(QThread::LowPriority);
     // As soon as BackgroundThread::run() method applies the required filter, it emits
@@ -69,20 +64,13 @@ ThreadManager::ThreadManager(Quill::ThreadingMode mode) :
 }
 
 ThreadManager::~ThreadManager()
-{
-    // If in test mode, make sure that background thread is not
-    // left hanging on a destroyed semaphore
-    if (threadingMode == Quill::ThreadingTest) {
-        semaphore->release();
-        if (isRunning())
-        {
-            eventLoop->exec();
-        }
-    }
-    // Stoping the task processor, after destruction of this class the instance will be deleted
+{    
+    // Stoping the BackgroundThread.
+    // the instance will be deleted after destruction of this class
     m_BackgroundThread->stopBackgroundThread();
-    delete semaphore;
-    delete eventLoop;
+    if (threadingMode == Quill::ThreadingTest) {
+        delete eventLoop;
+    }
 }
 
 bool ThreadManager::isRunning() const
@@ -95,8 +83,12 @@ void ThreadManager::run(Task *task)
     QUILL_LOG(Logger::Module_ThreadManager, "Applying filter " + task->filter()->name());
     m_isRunning = true;
     m_task = task;
-    // Enqueues the task in the queue to process by BackgroundThread thread.
-    m_BackgroundThread->processTask(task);
+
+    // For unit testing, task will be processed by calling ThreadManager::releaseAndWait()
+    if (threadingMode != Quill::ThreadingTest) {
+        // Enqueues the task in the queue to process by BackgroundThread thread.
+        m_BackgroundThread->processTask(task);
+    }
 }
 
 // BackgroundThread emits taskDone signal to this background thread
@@ -106,8 +98,9 @@ void ThreadManager::onTaskDone(QuillImage& image,Task* task)
     m_isRunning = false;
     Core::instance()->processFinishedTask(task, image);
 
-    if (threadingMode == Quill::ThreadingTest)
+    if (threadingMode == Quill::ThreadingTest) {        
         eventLoop->exit();
+    }
 }
 
 bool ThreadManager::allowDelete(QuillImageFilter *filter) const
@@ -119,8 +112,9 @@ void ThreadManager::releaseAndWait()
 {
     if (threadingMode == Quill::ThreadingTest)
     {
-        semaphore->release();
-        if (isRunning())
+        if (m_isRunning) {
+            m_BackgroundThread->processTask(m_task);
             eventLoop->exec();
+        }
     }
 }

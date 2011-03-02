@@ -126,6 +126,7 @@ void ut_scheduler::testThumbnailLoadingPriority()
     // File 3 is loaded next since it has a thumbnail
 
     Quill::releaseAndWait();
+    Quill::releaseAndWait();
     QVERIFY(Unittests::compareImage(file3->image(), thumbnailImage));
 
     // File 2 is loaded last

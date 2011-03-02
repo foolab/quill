@@ -41,12 +41,10 @@
 #include "task.h"
 #include <QMetaType>
 #include <QuillImageFilter>
-#include <QSemaphore>
 
-BackgroundThread::BackgroundThread(QObject *parent, QSemaphore* semaphore) :
+BackgroundThread::BackgroundThread(QObject *parent) :
     QThread(parent),
-    m_IsStopped(false),
-    m_Semaphore(semaphore)
+    m_IsStopped(false)
 {
     // Registering QuillImage and Task type in order to use them in the signal-slot
     qRegisterMetaType<QuillImage>("QuillImage&");
@@ -77,10 +75,6 @@ void BackgroundThread::run()
         {
             Task* task = m_TaskQueue.dequeue();
             m_TaskMutex.unlock();
-            if (m_Semaphore != 0)
-            {
-                m_Semaphore->acquire();
-            }
             // Task is available, emit the signal which completes processFinishedTask
             QuillImage image = task->filter()->apply(task->inputImage());
             emit taskDone(image,task);
