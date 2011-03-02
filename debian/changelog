@@ -1,3 +1,9 @@
+libquill (1.110302.0) unstable; urgency=low
+
+  * Added QuillFile::error() function
+
+ -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Wed, 02 Mar 2011 11:35:08 +0200
+
 libquill (1.110224.0) unstable; urgency=low
   * BackgroundThread replacing QtConcurrent in ThreadManager.
 
@@ -53,12 +59,12 @@ libquill (1.110208.0) unstable; urgency=low
  -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 08 Feb 2011 12:36:10 +0200
 
 libquill (1.110125.1) unstable; urgency=low
-  * Fixes: NB#215042 gif file edit support 
+  * Fixes: NB#215042 gif file edit support
 
  -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Tue, 25 Jan 2011 11:35:00 +0200
 
 libquill (1.110125.0) unstable; urgency=low
-  * Fixes: NB#215042 gif file edit support 
+  * Fixes: NB#215042 gif file edit support
 
  -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Tue, 25 Jan 2011 10:05:00 +0200
 
