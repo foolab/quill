@@ -98,7 +98,7 @@ void ThreadManager::onTaskDone(QuillImage& image,Task* task)
     m_isRunning = false;
     Core::instance()->processFinishedTask(task, image);
 
-    if (threadingMode == Quill::ThreadingTest) {        
+    if (threadingMode == Quill::ThreadingTest) {
         eventLoop->exit();
     }
 }

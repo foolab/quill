@@ -80,7 +80,7 @@ private:
     QQueue<Task*>   m_TaskQueue;
     bool            m_IsStopped;
     QWaitCondition  m_WaitForTask;
-    QMutex          m_TaskMutex;    
+    QMutex          m_TaskMutex;
 };
 
 #endif // __BACKGROUNDTHREAD_H

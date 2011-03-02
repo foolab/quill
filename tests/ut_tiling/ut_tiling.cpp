@@ -80,9 +80,6 @@ void ut_tiling::testTiledSaving()
     QTemporaryFile testFile;
     testFile.open();
 
-    QTemporaryFile originFile;
-    originFile.open();
-
     Unittests::generatePaletteImage().save(testFile.fileName(), "png");
 
     Quill::setEditHistoryPath("/tmp/quill/history");
