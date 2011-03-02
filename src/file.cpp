@@ -61,7 +61,8 @@ File::File() : m_state(State_Normal),
                m_hasThumbnail(false), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false),
-               m_hasReadEditHistory(false),m_fileIndexName("")
+               m_hasReadEditHistory(false),m_fileIndexName(""),
+               m_error(QuillError::NoError)
 {
     m_stack = new QuillUndoStack(this);
 }
@@ -148,9 +149,9 @@ void File::setFileName(const QString &fileName)
     m_originalFileName = info.path() + Strings::slashOriginal + info.fileName();
 
     if (!info.exists()) {
-        emitError(QuillError(QuillError::FileNotFoundError,
+        m_error = QuillError(QuillError::FileNotFoundError,
                              QuillError::ImageFileErrorSource,
-                             fileName));
+                             fileName);
         setExists(false);
     }
     else if (!(info.permissions() & QFile::WriteUser))
@@ -356,8 +357,10 @@ QuillImage File::image(int level) const
 
 void File::setImage(int level, const QuillImage &image)
 {
-    if ((state() == State_NonExistent) || (state() == State_UnsupportedFormat))
+    if ((state() == State_NonExistent) || (state() == State_UnsupportedFormat)) {
+        m_error = QuillError::NoError;
         setState(State_Placeholder);
+    }
 
     // Only complete images are approved. Input images are made into such.
     QuillImage fixedImage(image);
@@ -408,7 +411,7 @@ void File::setViewPort(const QRect &viewPort)
 
     if ((m_stack->command()) && (m_stack->command()->tileMap()))
         newTiles = m_stack->command()->tileMap()->
-	    newTiles(oldPort, viewPort);
+        newTiles(oldPort, viewPort);
 
     if (!newTiles.isEmpty())
         emitTiles(newTiles);
@@ -973,6 +976,9 @@ void File::imageSizeError()
 
 void File::refresh()
 {
+    // Drop any previous error state
+    m_error = QuillError::NoError;
+
     refreshLastModified();
 
     // Purge temporary images from cache
@@ -1007,6 +1013,7 @@ bool File::hasThumbnailError() const
 
 void File::emitError(QuillError quillError)
 {
+    m_error = quillError;
     emit error(quillError);
     Core::instance()->emitError(quillError);
     QUILL_LOG(Logger::Module_File,QString(Q_FUNC_INFO)+QString(" code")+Logger::intToString((int)(quillError.errorCode()))+QString(" source")+Logger::intToString((int)(quillError.errorSource()))+QString(" data:")+quillError.errorData());
@@ -1135,3 +1142,9 @@ QString File::fileIndexName() const
     else
         return m_fileName;
 }
+
+QuillError File::error() const
+{
+    return m_error;
+}
+

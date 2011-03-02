@@ -477,6 +477,15 @@ void QuillFile::restore()
         priv->m_file->restore();
 }
 
+QuillError QuillFile::error() const
+{
+    if (priv->m_file)
+        return priv->m_file->error();
+
+    // This should never happen, return unspecified just in case
+    return QuillError(QuillError::UnspecifiedError);
+}
+
 File* QuillFile::internalFile()
 {
     return priv->m_file;

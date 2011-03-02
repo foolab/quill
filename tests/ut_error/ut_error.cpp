@@ -93,7 +93,7 @@ void ut_error::testOverwritingCopyFailed()
 
     QuillError error = file->overwritingCopy(QString(), tempFile.fileName());
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForReadError);
 
     delete file;
 }
@@ -106,8 +106,8 @@ void ut_error::testEditHistoryReadFailed()
     File *file = File::readFromEditHistory(QString(), QString(), &error);
 
     QVERIFY(!file);
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileNotFoundError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileNotFoundError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
     delete file;
     */
 }
@@ -126,24 +126,21 @@ void ut_error::testEditHistoryWriteFailed()
 
     file->writeEditHistory(QString(), &error);
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::EditHistoryErrorSource);
     delete file;
 }
 
 void ut_error::testFileNotFound()
 {
-    QSignalSpy spy(Quill::instance(), SIGNAL(error(QuillError)));
-
     QuillFile *file = new QuillFile(QString());
     file->setDisplayLevel(0);
     Quill::releaseAndWait();
 
-    QCOMPARE(spy.count(), 1);
-    QuillError error = spy.first().first().value<QuillError>();
+    QuillError error = file->error();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileNotFoundError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileNotFoundError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
     QCOMPARE(error.errorData(), QString());
 
     QVERIFY(!file->exists());
@@ -165,19 +162,16 @@ void ut_error::testForbiddenRead()
     testFile.setPermissions(0);
 
     QuillFile *file = new QuillFile(testFile.fileName(), Strings::png);
-    
-    QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
     file->setDisplayLevel(0);
     Quill::releaseAndWait();
 
     QVERIFY(file->image().isNull());
-    QCOMPARE(spy.count(), 1);
-    QuillError error = spy.first().first().value<QuillError>();
+    QuillError error = file->error();
 
     QEXPECT_FAIL("", "QImageReader does not differentiate between nonexistent and unreadable files", Continue);
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForReadError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
     QCOMPARE(error.errorData(), testFile.fileName());
     delete file;
 }
@@ -201,8 +195,13 @@ void ut_error::testEmptyFileRead()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorData(), testFile.fileName());
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
     QCOMPARE(error.errorData(), testFile.fileName());
 
     QCOMPARE(file->supportsThumbnails(), false);
@@ -242,9 +241,15 @@ void ut_error::testCorruptRead()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
     QCOMPARE(error.errorData(), fileName);
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorData(), fileName);
+
     delete file;
 }
 
@@ -288,8 +293,13 @@ void ut_error::testWriteProtectedFile()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForWriteError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForWriteError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorData(), testFile.fileName());
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForWriteError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
     QCOMPARE(error.errorData(), testFile.fileName());
 
     QCOMPARE(QImage(testFile.fileName()), QImage(image));
@@ -351,8 +361,14 @@ void ut_error::testForbiddenOriginal()
     QuillError error = spy2.first().first().value<QuillError>();
 
     QEXPECT_FAIL("", "QImageReader does not differentiate between nonexistent and unreadable files", Continue);
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForReadError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorData(), originalFile.fileName());
+
+    error = file->error();
+    QEXPECT_FAIL("", "QImageReader does not differentiate between nonexistent and unreadable files", Continue);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForReadError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
     QCOMPARE(error.errorData(), originalFile.fileName());
 
     // Expect that the file can still be used,
@@ -420,8 +436,13 @@ void ut_error::testEmptyOriginal()
     QCOMPARE(spy2.count(), 1);
     QuillError error = spy2.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorData(), originalFile.fileName());
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
     QCOMPARE(error.errorData(), originalFile.fileName());
 
     // Expect that the file can still be used,
@@ -491,8 +512,13 @@ void ut_error::testCorruptOriginal()
     QCOMPARE(spy2.count(), 1);
     QuillError error = spy2.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorData(), originalFile.fileName());
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
     QCOMPARE(error.errorData(), originalFile.fileName());
 
     // Expect that the file can still be used,
@@ -543,8 +569,13 @@ void ut_error::testOriginalDirectoryCreateFailed()
 
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
+    QCOMPARE(error.errorData(), QString("/tmp/quill/no-original/.original"));
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::ImageOriginalErrorSource);
     QCOMPARE(error.errorData(), QString("/tmp/quill/no-original/.original"));
 
     QCOMPARE(QImage(testFile.fileName()), QImage(image));
@@ -592,8 +623,14 @@ void ut_error::testForbiddenThumbnail()
     QuillError error = spy.first().first().value<QuillError>();
 
     QEXPECT_FAIL("", "QImageReader does not differentiate between nonexistent and unreadable files", Continue);
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ThumbnailErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForReadError);
+    QCOMPARE(error.errorSource(), QuillError::ThumbnailErrorSource);
+    QCOMPARE(error.errorData(), thumbFileName);
+
+    error = file->error();
+    QEXPECT_FAIL("", "QImageReader does not differentiate between nonexistent and unreadable files", Continue);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForReadError);
+    QCOMPARE(error.errorSource(), QuillError::ThumbnailErrorSource);
     QCOMPARE(error.errorData(), thumbFileName);
 
     // Make sure that the offending thumbnail got deleted
@@ -650,8 +687,13 @@ void ut_error::testCorruptThumbnail()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ThumbnailErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ThumbnailErrorSource);
+    QCOMPARE(error.errorData(), thumbFileName);
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::ThumbnailErrorSource);
     QCOMPARE(error.errorData(), thumbFileName);
 
     // Make sure that the offending thumbnail got deleted
@@ -703,8 +745,13 @@ void ut_error::testThumbnailDirectoryCreateFailed()
 
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::ThumbnailErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::ThumbnailErrorSource);
+    QCOMPARE(error.errorData(), QString("/tmp/invalid"));
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::ThumbnailErrorSource);
     QCOMPARE(error.errorData(), QString("/tmp/invalid"));
 
     QVERIFY(!QFile(thumbFileName).exists());
@@ -743,8 +790,13 @@ void ut_error::testTemporaryFileDirectoryCreateFailed()
 
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::TemporaryFileErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::TemporaryFileErrorSource);
+    QCOMPARE(error.errorData(), QString("/tmp/invalid"));
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::TemporaryFileErrorSource);
     QCOMPARE(error.errorData(), QString("/tmp/invalid"));
 
     QCOMPARE(QImage(testFile.fileName()), QImage(image));
@@ -788,8 +840,8 @@ void ut_error::testUnreadableEditHistory()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForReadError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForReadError);
+    QCOMPARE(error.errorSource(), QuillError::EditHistoryErrorSource);
     QCOMPARE(error.errorData(), editHistoryFileName);
 
     editHistoryFile.remove();
@@ -826,8 +878,8 @@ void ut_error::testEmptyEditHistory()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileReadError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileReadError);
+    QCOMPARE(error.errorSource(), QuillError::EditHistoryErrorSource);
     QCOMPARE(error.errorData(), editHistoryFileName);
     delete file;
 }
@@ -863,8 +915,8 @@ void ut_error::testCorruptEditHistory()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileCorruptError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
+    QCOMPARE(error.errorSource(), QuillError::EditHistoryErrorSource);
     QCOMPARE(error.errorData(), editHistoryFileName);
     delete file;
 }
@@ -904,8 +956,8 @@ void ut_error::testEditHistoryDirectoryCreateFailed()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::DirCreateError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::DirCreateError);
+    QCOMPARE(error.errorSource(), QuillError::EditHistoryErrorSource);
     delete file;
 }
 
@@ -963,8 +1015,8 @@ void ut_error::testWriteProtectedEditHistory()
     QCOMPARE(spy.count(), 1);
     QuillError error = spy.first().first().value<QuillError>();
 
-    QCOMPARE((int)error.errorCode(), (int)QuillError::FileOpenForWriteError);
-    QCOMPARE((int)error.errorSource(), (int)QuillError::EditHistoryErrorSource);
+    QCOMPARE(error.errorCode(), QuillError::FileOpenForWriteError);
+    QCOMPARE(error.errorSource(), QuillError::EditHistoryErrorSource);
     QCOMPARE(error.errorData(), editHistoryFile.fileName());
 
     delete file;

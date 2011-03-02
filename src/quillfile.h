@@ -472,6 +472,11 @@ public:
      */
     void restore();
 
+    /*!
+      Returns the current error state
+     */
+    QuillError error() const;
+
 signals:
     /*!
       Triggered when there is a new image representation available on

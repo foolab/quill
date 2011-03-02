@@ -473,7 +473,7 @@ public:
     void readFromEditHistory(const QString &fileName,
                              const QString &originalFileName,
                              QuillError *error);
-    
+
     /*!
       Copies a file over another file in the file system.
 
@@ -653,6 +653,11 @@ public:
      */
     bool isSvg() const;
 
+    /*!
+      Returns the current error state
+     */
+    QuillError error() const;
+
 signals:
 
     /*!
@@ -720,6 +725,8 @@ private:
     bool m_hasReadEditHistory;
     //the index name is different from file name, for orignial file, the index name starts with "\",
     QString m_fileIndexName;
+
+    QuillError m_error;
 
     Q_DISABLE_COPY(File)
 };
