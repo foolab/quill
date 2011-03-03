@@ -442,7 +442,7 @@ Task *Scheduler::newNormalTask(File *file, int level)
     // an equivalent of the full image
     if ((file->state() == File::State_ReadOnly) &&
         (level > Core::instance()->smallestNonCroppedLevel()) &&
-        (file->image(level-1).size() == file->fullImageSize()))
+        (stack->image(level-1).size() == stack->fullImageSize()))
         return 0;
 
     if ((level == Core::instance()->previewLevelCount()) &&
@@ -452,6 +452,13 @@ Task *Scheduler::newNormalTask(File *file, int level)
     // The given resolution level is missing
 
     QuillUndoCommand *command = getTask(stack, level);
+
+    // Full image size has not been calculated
+
+    if (command->fullImageSize().isEmpty() &&
+        file->supportsViewing() &&
+        !file->isWaitingForData())
+        stack->calculateFullImageSize(command);
 
     // If a file is currently waiting for data, load should not be tried
     if ((command->filter()->role() == QuillImageFilter::Role_Load) &&
@@ -518,7 +525,8 @@ Task *Scheduler::newSaveTask(File *file)
 Task *Scheduler::newPreviewImprovementTask(File *file)
 {
     if (!file->exists() ||
-        (file->state() == File::State_ExternallySupportedFormat))
+        (file->state() == File::State_ExternallySupportedFormat) ||
+        (!file->stack()->fullImageSize().isValid()))
         return 0;
 
     QuillUndoStack *stack = file->stack();
@@ -593,7 +601,7 @@ Task *Scheduler::newPreviewImprovementTask(File *file)
 
 QSize Scheduler::fullSizeForAspectRatio(const File *file)
 {
-    QSize fullImageSize = file->fullImageSize();
+    QSize fullImageSize = file->stack()->fullImageSize();
 
     // If the full image size is not valid (unsupported formats), assume that
     // the biggest available preview has the correct aspect ratio

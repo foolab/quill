@@ -128,8 +128,13 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
 
     if (filter->role() == QuillImageFilter::Role_Load)
         previousFullSize = QSize();
-    else
+    else {
         previousFullSize = command->prev()->fullImageSize();
+        if (!previousFullSize.isValid()) {
+            calculateFullImageSize(command->prev());
+            previousFullSize = command->prev()->fullImageSize();
+        }
+    }
 
     QSize fullSize = filter->newFullImageSize(previousFullSize);
 
@@ -180,9 +185,11 @@ void QuillUndoStack::add(QuillImageFilter *filter)
         QUILL_LOG(Logger::Module_Stack, filter->name()+" added to stack");
     }
 
-    // full image size should not be loaded for waiting
-    if (!m_file->isWaitingForData() ||
-        (filter->role() != QuillImageFilter::Role_Load))
+    // full image size should not be calculated for waiting
+    // also not calculated for initial load
+    if ((!m_file->isWaitingForData() ||
+         (filter->role() != QuillImageFilter::Role_Load)) &&
+        (count() != 1))
         calculateFullImageSize(cmd);
     setRevertIndex(0);
 }
@@ -377,8 +384,9 @@ QSize QuillUndoStack::fullImageSize()
     if (isClean())
         load();
 
-    if (command())
-        return command()->fullImageSize();
+    QuillUndoCommand *cmd = command();
+    if (cmd)
+        return cmd->fullImageSize();
     else
         return QSize();
 }
