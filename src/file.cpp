@@ -392,6 +392,14 @@ QSize File::fullImageSize() const
 {
     if (!exists())
         return QSize();
+
+    QSize size = m_stack->fullImageSize();
+
+    if (size.isValid())
+        return size;
+    else if (!size.isValid() && supportsViewing() && m_stack->command())
+        m_stack->calculateFullImageSize(m_stack->command());
+
     return m_stack->fullImageSize();
 }
 
@@ -933,8 +941,7 @@ File *File::original()
 
 void File::processFilterError(QuillImageFilter *filter)
 {
-    if ((fullImageSize().isEmpty()) &&
-        (filter->role() == QuillImageFilter::Role_Load)) {
+    if (filter->role() == QuillImageFilter::Role_Load) {
         QuillError::ErrorCode errorCode =
             QuillError::translateFilterError(filter->error());
 
