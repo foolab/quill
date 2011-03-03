@@ -1,3 +1,9 @@
+libquill (1.110303.1) unstable; urgency=low
+  * Optimization: full image size calculations made on-demand only.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 03 Feb 2011 12:07:30 +0200
+
+
 libquill (1.110303.0) unstable; urgency=low
 
   * Semaphore Cleanup & UnitTest Fix.
