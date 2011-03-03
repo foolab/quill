@@ -1,3 +1,11 @@
+libquill (1.110304.0) unstable; urgency=low
+
+  * Add options in build system to pass --as-needed to the linker and avoid
+    having unused libraries listed as dependencies in binaries.
+
+
+ -- Adrian Perez <aperez@igalia.com>  Fri, 04 Mar 2011 14:15:51 +0200
+
 libquill (1.110303.1) unstable; urgency=low
   * Optimization: full image size calculations made on-demand only.
 
