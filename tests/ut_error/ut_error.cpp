@@ -309,9 +309,6 @@ void ut_error::testWriteProtectedFile()
 
 void ut_error::testForbiddenOriginal()
 {
-    qDebug() << "Test disabled!";
-    return;
-
     if (Unittests::isRoot()) {
         qDebug() << "Running as root, disabling file permissions test!";
         return;
@@ -360,7 +357,8 @@ void ut_error::testForbiddenOriginal()
     file->undo();
     Quill::releaseAndWait();
 
-    QCOMPARE(spy2.count(), 1);
+    // Size calculation is actually made 3 times
+    QCOMPARE(spy2.count(), 3);
     QuillError error = spy2.first().first().value<QuillError>();
 
     QEXPECT_FAIL("", "QImageReader does not differentiate between nonexistent and unreadable files", Continue);
@@ -382,7 +380,7 @@ void ut_error::testForbiddenOriginal()
 
     QVERIFY(file->canRedo());
     file->redo();
-    QCOMPARE(spy2.count(), 1); // No further errors
+    QCOMPARE(spy2.count(), 3); // No further errors
     Quill::releaseAndWait();
     QCOMPARE(file->image(), QuillImage(targetImage));
 
@@ -391,9 +389,6 @@ void ut_error::testForbiddenOriginal()
 
 void ut_error::testEmptyOriginal()
 {
-    qDebug() << "Test disabled!";
-    return;
-
     QTemporaryFile testFile;
     testFile.open();
 
@@ -439,7 +434,8 @@ void ut_error::testEmptyOriginal()
     file->undo();
     Quill::releaseAndWait();
 
-    QCOMPARE(spy2.count(), 1);
+    // Size calculation is actually made 3 times
+    QCOMPARE(spy2.count(), 3);
     QuillError error = spy2.first().first().value<QuillError>();
 
     QCOMPARE(error.errorCode(), QuillError::FileCorruptError);
@@ -459,7 +455,7 @@ void ut_error::testEmptyOriginal()
 
     QVERIFY(file->canRedo());
     file->redo();
-    QCOMPARE(spy2.count(), 1); // No further errors
+    QCOMPARE(spy2.count(), 3); // No further errors
     Quill::releaseAndWait();
     QCOMPARE(file->image(), QuillImage(targetImage));
 
