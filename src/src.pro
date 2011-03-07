@@ -116,3 +116,4 @@ QMAKE_CLEAN += *.gcov *.gcno *.log *.moc_* *.gcda
 
 QMAKE_EXTRA_TARGETS += generateproxy
 
+QMAKE_LFLAGS += -Wl,--as-needed
