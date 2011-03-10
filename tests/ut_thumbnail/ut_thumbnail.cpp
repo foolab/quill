@@ -420,49 +420,10 @@ void ut_thumbnail::testFromSetImage()
     Quill::releaseAndWait(); // save lv0
     Quill::releaseAndWait(); // save lv1
 
-    // We should now have a newly created thumbnail.
+    // We should not have a thumbnail.
 
-    QVERIFY(Unittests::compareImage(QImage(thumbName),
-                                    image.copy(3, 0, 2, 2)));
-    QVERIFY(Unittests::compareImage(QImage(thumbName1),
-                                    image));
-
-    delete file;
-}
-
-void ut_thumbnail::testDownscaledFromSetImage()
-{
-    QString fileName = "/tmp/quill/test.png";
-
-    QFile::remove(fileName);
-    QVERIFY(!QFile::exists(fileName));
-
-    QuillImage image = Unittests::generatePaletteImage();
-
-    Quill::setPreviewSize(0, QSize(4, 1));
-
-    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
-    Quill::setThumbnailFlavorName(0, "normal");
-    Quill::setThumbnailExtension("png");
-
-    QuillFile *file = new QuillFile("/tmp/quill/test.png", "video/avi");
-    QVERIFY(file);
-    file->removeThumbnails(); // Make sure there are no thumbs from previous run
-    QVERIFY(!file->hasThumbnail(0));
-
-    file->setDisplayLevel(0);
-    file->setImage(0, image); // Set too big image
-
-    QString thumbName = file->thumbnailFileName(0);
-
-    Quill::releaseAndWait(); // downscale
-    Quill::releaseAndWait(); // save lv0
-
-    // We should now have a newly created thumbnail.
-    // Note that this approach uses fast transformation instead of smooth!
-
-    QVERIFY(Unittests::compareImage(QImage(thumbName),
-                                    image.scaled(QSize(4, 1))));
+    QVERIFY(!QFile::exists(thumbName));
+    QVERIFY(!QFile::exists(thumbName1));
 
     delete file;
 }

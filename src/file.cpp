@@ -963,12 +963,8 @@ void File::refresh()
 {
     refreshLastModified();
 
-    // Purge temporary images from cache
-    if (state() != State_Placeholder)
-        for (int l=0; l<=m_displayLevel; l++)
-            Core::instance()->cache(l)->purge(this);
-    else
-        touchThumbnails();
+    for (int l=0; l<=m_displayLevel; l++)
+        Core::instance()->cache(l)->purge(this);
 
     setState(State_Normal);
 
