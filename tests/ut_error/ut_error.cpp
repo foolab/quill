@@ -210,6 +210,47 @@ void ut_error::testEmptyFileRead()
     delete file;
 }
 
+void ut_error::testCorruptedImageWithoutMime()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+    QString fileName = testFile.fileName();
+
+    // Construct a corrupt image
+    QuillImage image = Unittests::generatePaletteImage();
+
+    QByteArray buffer;
+    QBuffer device(&buffer);
+    QImageWriter writer(&device, QByteArray("jpg"));
+    writer.write(image);
+
+    buffer.remove(0, 2); // remove first two bytes (JPEG magic number)
+    testFile.write(buffer);
+    testFile.close();
+
+    // MIME is empty
+    QuillFile *file = new QuillFile(fileName, "");
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+
+    QVERIFY(file->image().isNull());
+    QCOMPARE(spy.count(), 1);
+    QuillError error = spy.first().first().value<QuillError>();
+
+    QCOMPARE(error.errorCode(), QuillError::FileFormatUnsupportedError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorData(), fileName);
+
+    error = file->error();
+    QCOMPARE(error.errorCode(), QuillError::FileFormatUnsupportedError);
+    QCOMPARE(error.errorSource(), QuillError::ImageFileErrorSource);
+    QCOMPARE(error.errorData(), fileName);
+
+    delete file;
+}
+
 void ut_error::testCorruptRead()
 {
     qDebug() << "Test disabled!";
@@ -227,7 +268,8 @@ void ut_error::testCorruptRead()
     QImageWriter writer(&device, QByteArray("png"));
     writer.write(image);
 
-    buffer.chop(2); // remove 2 bytes from end
+//    buffer.chop(2); // remove 2 bytes from end
+    buffer.remove(0, 2); // remove first two bytes
     testFile.write(buffer);
     testFile.close();
 

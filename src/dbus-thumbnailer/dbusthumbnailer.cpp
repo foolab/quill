@@ -32,7 +32,7 @@ void DBusThumbnailer::connectDBus()
 bool DBusThumbnailer::supports(const QString mimeType)
 {
 
-    return (!mimeType.isNull() && !mimeType.startsWith("image"));
+    return (!mimeType.isEmpty() && !mimeType.startsWith("image"));
 }
 
 bool DBusThumbnailer::isRunning()

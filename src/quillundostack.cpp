@@ -107,6 +107,10 @@ void QuillUndoStack::setInitialLoadFilter(QuillImageFilter *filter)
 
     if (m_file->fileFormat().isEmpty())
         m_file->setFileFormat(filter->option(QuillImageFilter::MimeType).toByteArray());
+
+    // No MIME given and format detection failed, image cannot be loaded
+    if (m_file->fileFormat().isEmpty())
+        m_file->processFilterError(filter);
 }
 
 void QuillUndoStack::load()

@@ -66,6 +66,7 @@ private slots:
     void testFileNotFound();
     void testForbiddenRead();
     void testEmptyFileRead();
+    void testCorruptedImageWithoutMime();
     void testCorruptRead();
     void testWriteProtectedFile();
 
