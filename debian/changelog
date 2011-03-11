@@ -1,3 +1,9 @@
+libquill (1.110311.0) unstable; urgency=low
+  * Disabled saving of temporary images
+  * Fixes: NB#227993 Thumbnail saving in busy loop
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 11 Mar 2011 11:11:11 +0200
+
 libquill (1.110309.0) unstable; urgency=low
 
   * Fixed error handling bug
