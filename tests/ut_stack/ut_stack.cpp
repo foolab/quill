@@ -369,9 +369,10 @@ void ut_stack::testRefresh()
     file->refresh();
     QVERIFY(file->exists());
     QCOMPARE(file->displayLevel(), 1);
-    QVERIFY(!file->image(0).isNull()); // Temporary images are not thrown away
+    QVERIFY(file->image(0).isNull()); // Temporary images are thrown away
     QVERIFY(file->image(1).isNull());
 
+    Quill::releaseAndWait(); // 0
     Quill::releaseAndWait(); // 1
 
     QVERIFY(Unittests::compareImage(file->image(0), image));
