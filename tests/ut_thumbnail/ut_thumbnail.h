@@ -67,7 +67,6 @@ private slots:
     void testFailedWrite();
 
     void testFromSetImage();
-    void testDownscaledFromSetImage();
     void testCreationAfterQuillFileRemoval();
 };
 

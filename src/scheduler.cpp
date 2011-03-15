@@ -371,7 +371,7 @@ Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
 
 Task *Scheduler::newThumbnailSaveTask(File *file, int level)
 {
-    if(file->isOriginal())
+    if (file->isOriginal() || (file->isWaitingForData()))
         return 0;
     QuillUndoStack *stack = file->stack();
 
