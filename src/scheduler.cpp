@@ -748,7 +748,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
               thumbnails in grid view
             */
             if(task->displayLevel()==0){
-                QSize fullSize = command->fullImageSize();
+                //We get the full image size from file pointer instead of command pointer.
+                QSize fullSize = file->fullImageSize();
                 QSize targetSize = Core::instance()->targetSizeForLevel(0, fullSize);
                 image.setArea(Core::instance()->targetAreaForLevel(0, targetSize, fullSize));
             }
