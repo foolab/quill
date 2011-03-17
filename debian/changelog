@@ -1,3 +1,8 @@
+libquill (1.110317.0) unstable; urgency=low
+  * Fixes: NB#234142 - Original image thumbnail always displays in grid after edit also
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 17 Mar 2011 13:15:00 +0200
+
 libquill (1.110311.0) unstable; urgency=low
   * Disabled saving of temporary images
   * Fixes: NB#227993 Thumbnail saving in busy loop
