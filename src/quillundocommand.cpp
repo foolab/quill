@@ -222,6 +222,17 @@ QList<QuillImage> QuillUndoCommand::allImageLevels(int maxLevel) const
 void QuillUndoCommand::setFullImageSize(const QSize &size)
 {
     m_fullImageSize = size;
+    //We need set the full image size to thumbnails
+    int displayLevel = Core::instance()->previewLevelCount();
+    for(int i=0;i<=displayLevel;i++){
+        QuillImage imageCopy(image(i));
+        if(!imageCopy.isNull()){
+            imageCopy.setFullImageSize(m_fullImageSize);
+            QSize targetSize = Core::instance()->targetSizeForLevel(i, m_fullImageSize);
+            imageCopy.setArea(Core::instance()->targetAreaForLevel(i, targetSize, m_fullImageSize));
+            setImage(i,imageCopy);
+        }
+    }
 }
 
 QSize QuillUndoCommand::fullImageSize() const

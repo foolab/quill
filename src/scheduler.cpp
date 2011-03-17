@@ -742,18 +742,9 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
             image = QuillImage(image, command->fullImageSize());
             image.setZ(task->displayLevel());
-            /*
-              when loading thumbnails from disk,the thumbnails might be cropped, we could not get information about
-              cropping area, we need to calculate this cropping area. This is very important for red eye removel from
-              thumbnails in grid view
-            */
-            if(task->displayLevel()==0){
-                //We get the full image size from file pointer instead of command pointer.
-                QSize fullSize = file->fullImageSize();
-                QSize targetSize = Core::instance()->targetSizeForLevel(0, fullSize);
-                image.setArea(Core::instance()->targetAreaForLevel(0, targetSize, fullSize));
-            }
+
             delete filter;
+
         } else if ((image.isNull()) &&
                    (command->filter()->role() == QuillImageFilter::Role_Load)) {
 

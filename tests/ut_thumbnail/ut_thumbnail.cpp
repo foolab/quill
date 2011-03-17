@@ -455,6 +455,42 @@ void ut_thumbnail::testCreationAfterQuillFileRemoval()
     QVERIFY(QFile::exists(thumbName));
 }
 
+void ut_thumbnail::testFullImageSize()
+{
+    QTemporaryFile testFile1;
+    testFile1.open();
+    Unittests::generatePaletteImage().save(testFile1.fileName(), "png");
+
+    Quill::setPreviewSize(0, QSize(4, 1));
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
+    Quill::setThumbnailExtension(Strings::png);
+    QuillFile *file = new QuillFile(testFile1.fileName());
+    QVERIFY(file);
+    QVERIFY(file->exists());
+    QuillImage image = QuillImage(QImage(QSize(4, 1), QImage::Format_ARGB32));
+    image.fill(qRgb(255, 255, 255));
+    QString thumbName = file->thumbnailFileName(0);
+    image.save(thumbName);
+
+    file->setDisplayLevel(0);
+    Quill::releaseAndWait();
+    QVERIFY(!file->image(0).isNull());
+    //the full image size is not calculated yet.
+    QCOMPARE(file->image(0).fullImageSize(),QSize());
+    // run a brightness filter
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(16));
+    file->runFilter(filter);
+    Quill::releaseAndWait();
+    QVERIFY(!file->image(0).isNull());
+    //The full image size should be available
+    QCOMPARE(file->image(0).fullImageSize(),QSize(8,2));
+    delete file;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_thumbnail test;
