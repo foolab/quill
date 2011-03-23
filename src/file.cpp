@@ -885,7 +885,7 @@ void File::concludeSave()
     }
 
     removeThumbnails();
-    FileSystem::setFileModificationDateTime(m_fileName, m_lastModified);
+    refreshLastModified();
 
     emit saved();
     Core::instance()->emitSaved(m_fileName);
