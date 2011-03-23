@@ -814,7 +814,10 @@ void File::prepareSave()
     QByteArray rawExifDump;
     if (isJpeg()) {
         QuillMetadata metadata(m_fileName, QuillMetadata::ExifFormat);
-        metadata.removeEntry(QuillMetadata::Tag_Orientation);
+	QVariant orientation = metadata.entry(QuillMetadata::Tag_Orientation);
+	if (!orientation.isNull()) {
+	    metadata.setEntry(QuillMetadata::Tag_Orientation, QVariant(1));
+	}
         rawExifDump = metadata.dump(QuillMetadata::ExifFormat);
     }
 
@@ -851,8 +854,11 @@ void File::concludeSave()
 
     if (isJpeg()) {
         QuillMetadata metadata(m_fileName);
-        metadata.removeEntry(QuillMetadata::Tag_Orientation);
-        if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
+	QVariant orientation = metadata.entry(QuillMetadata::Tag_Orientation);
+	if (!orientation.isNull())
+	    metadata.setEntry(QuillMetadata::Tag_Orientation, QVariant(1));
+	}
+	if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
             // If metadata write failed, the temp file is likely corrupt
             emitError(QuillError(QuillError::FileWriteError,
                                  QuillError::TemporaryFileErrorSource,
