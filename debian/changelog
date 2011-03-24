@@ -1,3 +1,8 @@
+libquill (1.110324.0) unstable; urgency=low
+  * Fixes: NB#232429 Incorrect thumbnail in other applications for edited images which have been previously opened
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 24 Mar 2011 09:04:30 +0200
+
 libquill (1.110317.0) unstable; urgency=low
   * Fixes: NB#234142 - Original image thumbnail always displays in grid after edit also
 
