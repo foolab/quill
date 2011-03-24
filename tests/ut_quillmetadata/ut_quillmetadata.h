@@ -60,6 +60,8 @@ private slots:
     void testPreserveXMP();
     void testPreserveIptc();
     void testPreserveExif();
+    void testResetOrientation();
+    void testNoOrientation();
 
 private:
     QuillMetadata *metadata;

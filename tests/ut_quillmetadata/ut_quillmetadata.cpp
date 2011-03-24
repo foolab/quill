@@ -199,6 +199,80 @@ void ut_quillmetadata::testPreserveExif()
     delete quillFile;
 }
 
+void ut_quillmetadata::testResetOrientation()
+{
+    QTemporaryFile file;
+    file.open();
+
+    // Perform an overwriting copy since Qt does not have such function
+    QFile originalFile("/usr/share/libquill-tests/images/exif_orientation.jpg");
+    originalFile.open(QIODevice::ReadOnly);
+    QByteArray buffer = originalFile.readAll();
+    file.write(buffer);
+    file.flush();
+
+    QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
+
+    Quill::initTestingMode();
+    QuillFile *quillFile = new QuillFile(file.fileName(), Strings::jpg);
+    QuillMetadata originalMetadata(file.fileName());
+    QCOMPARE(originalMetadata.entry(QuillMetadata::Tag_Orientation).toInt(),
+	     2);
+    QuillImageFilter *filter =
+	QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Scale);
+    filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
+    quillFile->runFilter(filter);
+    quillFile->save();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // scale
+    Quill::releaseAndWait(); // save
+
+    // Verify that file image size has changed
+    QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
+    QuillMetadata writtenMetadata(file.fileName());
+    QVERIFY(writtenMetadata.isValid());
+
+    QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Orientation).toInt(),
+	     1);
+    delete quillFile;
+}
+
+void ut_quillmetadata::testNoOrientation()
+{
+    QTemporaryFile file;
+    file.open();
+
+    // Perform an overwriting copy since Qt does not have such function
+    QFile originalFile("/usr/share/libquill-tests/images/exif.jpg");
+    originalFile.open(QIODevice::ReadOnly);
+    QByteArray buffer = originalFile.readAll();
+    file.write(buffer);
+    file.flush();
+
+    QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
+
+    Quill::initTestingMode();
+    QuillFile *quillFile = new QuillFile(file.fileName(), Strings::jpg);
+    QuillMetadata originalMetadata(file.fileName());
+    QVERIFY(originalMetadata.entry(QuillMetadata::Tag_Orientation).isNull());
+    QuillImageFilter *filter =
+	QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Scale);
+    filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
+    quillFile->runFilter(filter);
+    quillFile->save();
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // scale
+    Quill::releaseAndWait(); // save
+
+    // Verify that file image size has changed
+    QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
+    QuillMetadata writtenMetadata(file.fileName());
+    QVERIFY(writtenMetadata.isValid());
+
+    QVERIFY(writtenMetadata.entry(QuillMetadata::Tag_Orientation).isNull());
+    delete quillFile;
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_quillmetadata test;

@@ -40,6 +40,7 @@ tatamimages.files += images/image_16x4.jpg
 tatamimages.files += images/image_16x4.png
 tatamimages.files += images/image_16x4.gif
 tatamimages.files += images/exif.jpg
+tatamimages.files += images/exif_orientation.jpg
 tatamimages.files += images/xmp.jpg
 tatamimages.files += images/iptc.jpg
 tatamvideo.files += video/Alvin_2.mp4
