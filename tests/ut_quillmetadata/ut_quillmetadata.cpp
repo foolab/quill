@@ -211,13 +211,13 @@ void ut_quillmetadata::testResetOrientation()
     file.write(buffer);
     file.flush();
 
-    QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
-
     Quill::initTestingMode();
     QuillFile *quillFile = new QuillFile(file.fileName(), Strings::jpg);
     QuillMetadata originalMetadata(file.fileName());
+    // Verify original orientation
     QCOMPARE(originalMetadata.entry(QuillMetadata::Tag_Orientation).toInt(),
 	     2);
+
     QuillImageFilter *filter =
 	QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Scale);
     filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
@@ -227,11 +227,9 @@ void ut_quillmetadata::testResetOrientation()
     Quill::releaseAndWait(); // scale
     Quill::releaseAndWait(); // save
 
-    // Verify that file image size has changed
-    QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
+    // Verify that orientation has changed to default
     QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
-
     QCOMPARE(writtenMetadata.entry(QuillMetadata::Tag_Orientation).toInt(),
 	     1);
     delete quillFile;
@@ -249,12 +247,12 @@ void ut_quillmetadata::testNoOrientation()
     file.write(buffer);
     file.flush();
 
-    QCOMPARE(QImage(file.fileName()).size(), QSize(2, 2));
-
     Quill::initTestingMode();
     QuillFile *quillFile = new QuillFile(file.fileName(), Strings::jpg);
     QuillMetadata originalMetadata(file.fileName());
+    // Verify empty orientation info
     QVERIFY(originalMetadata.entry(QuillMetadata::Tag_Orientation).isNull());
+
     QuillImageFilter *filter =
 	QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_Scale);
     filter->setOption(QuillImageFilter::SizeAfter, QSize(4, 4));
@@ -264,11 +262,9 @@ void ut_quillmetadata::testNoOrientation()
     Quill::releaseAndWait(); // scale
     Quill::releaseAndWait(); // save
 
-    // Verify that file image size has changed
-    QCOMPARE(QImage(file.fileName()).size(), QSize(4, 4));
+    // Verify that no orientation info has been added
     QuillMetadata writtenMetadata(file.fileName());
     QVERIFY(writtenMetadata.isValid());
-
     QVERIFY(writtenMetadata.entry(QuillMetadata::Tag_Orientation).isNull());
     delete quillFile;
 }
