@@ -697,6 +697,15 @@ private:
     void touchThumbnails();
 
 private:
+    /*!
+      Enumeration for thumbnail existence: yes, no, or not yet known
+      */
+    enum ThumbnailExistenceState {
+        Thumbnail_Exists,
+        Thumbnail_NotExists,
+        Thumbnail_UnknownExists
+    };
+
     QList<QuillFile*> m_references;
 
     State m_state;
@@ -708,8 +717,8 @@ private:
 
     int m_displayLevel;
     int m_priority;
-    int m_hasThumbnail; // If a thumbnail exists in the file system
-                        // optimization is currently for level 0 only
+    ThumbnailExistenceState m_hasThumbnail; // If a thumbnail exists in the file system
+                                            // optimization is currently for level 0 only
 
     QString m_fileName;
     QString m_originalFileName;

@@ -615,6 +615,8 @@ QSize Scheduler::fullSizeForAspectRatio(const File *file)
     return fullImageSize;
 }
 
+#include <QDebug>
+
 void Scheduler::processFinishedTask(Task *task, QuillImage image)
 {
     bool imageUpdated = false;
@@ -764,6 +766,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                 errorSource = QuillError::ImageFileErrorSource;
                 if ((errorCode == QuillError::FileFormatUnsupportedError) ||
                     (errorCode == QuillError::FileCorruptError)) {
+                    qCritical() << "XXXXXXXXXXXXX" << Q_FUNC_INFO << "file->setSupported(false)";
                     file->setSupported(false);
                     if (Core::instance()->isDBusThumbnailingEnabled() &&
                         Core::instance()->isExternallySupportedFormat(file->fileFormat()))

@@ -43,6 +43,8 @@
 #include "file.h"
 #include "historyxml.h"
 
+#include <QDebug>
+
 // values defined in the header
 const int QuillFile::Priority_Low;
 const int QuillFile::Priority_Normal;
@@ -66,6 +68,8 @@ QuillFile::QuillFile()
 QuillFile::QuillFile(const QString &fileName,
                      const QString &fileFormat)
 {
+//    qCritical() << Q_FUNC_INFO << this;
+
     QUILL_LOG(Logger::Module_QuillFile,
                 QString(Q_FUNC_INFO)+" file name: "+fileName+" file format: "+fileFormat);
     priv = new QuillFilePrivate;
@@ -83,8 +87,10 @@ QuillFile::QuillFile(File *file)
     attach(file);
 }
 
+
 QuillFile::~QuillFile()
 {
+//    qCritical() << Q_FUNC_INFO << this;
     QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO));
     if (priv->m_file) {
         priv->m_file->removeReference(this);
@@ -306,6 +312,8 @@ QList<QuillImage> QuillFile::allImageLevels() const
 
 QSize QuillFile::fullImageSize() const
 {
+//     qCritical() << Q_FUNC_INFO << this;
+
     QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO));
     if (priv->m_file)
         return priv->m_file->fullImageSize();

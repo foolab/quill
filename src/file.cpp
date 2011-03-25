@@ -55,10 +55,12 @@
 #include "logger.h"
 #include "strings.h"
 
+#include <QDebug>
+
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
-               m_hasThumbnail(false), m_fileName(""), m_originalFileName(""),
+               m_hasThumbnail(Thumbnail_UnknownExists), m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false),
                m_hasReadEditHistory(false),m_fileIndexName(""),
@@ -69,6 +71,8 @@ File::File() : m_state(State_Normal),
 
 File::~File()
 {
+//    qCritical() << Q_FUNC_INFO << "this:" << this;
+
         //Trying to lower the display level to purge the cached images
         setDisplayLevel(-1);
         detach();
@@ -208,8 +212,9 @@ bool File::setDisplayLevel(int level)
 
     // Optimization: check thumbnail existence in file system here
     // and only here!
-    if ((level >= 0) && (m_displayLevel < 0))
-        m_hasThumbnail = hasThumbnail(0);
+    // FIXME: not needed when we have unknown existence state
+//    if ((level >= 0) && (m_displayLevel < 0))
+//        m_hasThumbnail = hasThumbnail(0);
 
     m_displayLevel = level;
 
@@ -390,6 +395,8 @@ QList<QuillImage> File::allImageLevels(int displayLevel) const
 
 QSize File::fullImageSize() const
 {
+//    qCritical() << Q_FUNC_INFO << "this:" << this;
+
     if (!exists())
         return QSize();
 
@@ -467,6 +474,44 @@ bool File::hasUnsavedThumbnails()
             !hasThumbnail(0) && Core::instance()->isThumbnailCreationEnabled());
 }
 
+#include <QDebug>
+bool File::hasThumbnail(int level)
+{
+    if(isOriginal()){
+        return false;
+    }
+    if (Core::instance()->thumbnailFlavorName(level).isEmpty()) {
+        return false;
+    }
+    // Optimization currently for level 0 only
+    // For externally supported files, thumbnails may appear at any time
+    // so they need to be always checked from the file system
+    if ((level == 0) &&
+        (state() != State_ExternallySupportedFormat) &&
+        (m_hasThumbnail != File::Thumbnail_UnknownExists)) {
+         return m_hasThumbnail == File::Thumbnail_Exists;
+    }
+
+    // Information about thumbnail existence not known, it must be calculated now
+    QFileInfo info(thumbnailFileName(level));
+
+    if (!info.exists()) {
+        m_hasThumbnail = File::Thumbnail_NotExists;
+        return false;
+    }
+
+    if (info.lastModified() == m_lastModified) {
+        m_hasThumbnail = File::Thumbnail_Exists;
+    } else {
+        m_hasThumbnail = File::Thumbnail_NotExists;
+    }
+
+    return m_hasThumbnail == File::Thumbnail_Exists;
+
+//    return (info.lastModified() == m_lastModified);
+}
+
+#if 0
 bool File::hasThumbnail(int level)
 {
     if(isOriginal()){
@@ -490,6 +535,7 @@ bool File::hasThumbnail(int level)
 
     return (info.lastModified() == m_lastModified);
 }
+#endif
 
 QString File::fileNameHash(const QString &fileName)
 {
@@ -754,7 +800,7 @@ void File::removeThumbnails()
 {
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
         QFile::remove(thumbnailFileName(level));
-    m_hasThumbnail = false;
+    m_hasThumbnail = File::Thumbnail_NotExists;
 }
 
 void File::touchThumbnail(int level)
@@ -917,7 +963,7 @@ void File::abortSave()
 void File::registerThumbnail(int level)
 {
     if (level == 0)
-        m_hasThumbnail = true;
+        m_hasThumbnail = File::Thumbnail_Exists;
     touchThumbnail(level);
 }
 
@@ -959,6 +1005,9 @@ void File::processFilterError(QuillImageFilter *filter)
             errorSource = QuillError::ImageFileErrorSource;
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
                 (errorCode == QuillError::FileCorruptError)) {
+                qCritical() << "XXXXXXXXXXXXX"<< Q_FUNC_INFO
+                        << "got FileFormatUnsupportedError:" << m_fileName;
+
                 setSupported(false);
                 if (Core::instance()->isDBusThumbnailingEnabled() &&
                     Core::instance()->isExternallySupportedFormat(m_fileFormat)) {
@@ -993,6 +1042,9 @@ void File::refresh()
     // Drop any previous error state
     m_error = QuillError::NoError;
 
+    // Forces re-checking thumbnails existence
+    m_hasThumbnail = File::Thumbnail_UnknownExists;
+
     refreshLastModified();
 
     for (int l=0; l<=m_displayLevel; l++)
@@ -1000,8 +1052,9 @@ void File::refresh()
 
     setState(State_Normal);
 
-    if (!m_stack->isClean())
-        m_stack->calculateFullImageSize(m_stack->command(0));
+    // FIXME: remove this for preview image thingy
+//    if (!m_stack->isClean())
+//        m_stack->calculateFullImageSize(m_stack->command(0));
 
     Core::instance()->suggestNewTask();
 }
