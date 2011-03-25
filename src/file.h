@@ -50,6 +50,7 @@
 #include "quillundostack.h"
 
 class QTemporaryFile;
+class QuillMetadata;
 
 class File : public QObject
 {
@@ -727,6 +728,9 @@ private:
     QString m_fileIndexName;
 
     QuillError m_error;
+
+
+    void ResetOrientationTag(QuillMetadata &metadata);
 
     Q_DISABLE_COPY(File)
 };
