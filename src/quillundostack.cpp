@@ -123,8 +123,16 @@ void QuillUndoStack::load()
         QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
     filter->setOption(QuillImageFilter::BackgroundColor,
                       Core::instance()->backgroundRenderingColor());
-    setInitialLoadFilter(filter);
+    if (!m_file->isWaitingForData())
+        setInitialLoadFilter(filter);
     add(filter);
+}
+
+void QuillUndoStack::refresh()
+{
+    if (!m_stack->isClean()) {
+        setInitialLoadFilter(command(0)->filter());
+    }
 }
 
 void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)

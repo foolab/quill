@@ -82,6 +82,12 @@ public:
 
     void load();
 
+    /*
+     Refresh the load filter by detecting the format of the given file again.
+     Typically used together with File::refresh().
+     */
+    void refresh();
+
     void add(QuillImageFilter *filter);
 
     /*!
