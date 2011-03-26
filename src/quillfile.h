@@ -327,6 +327,10 @@ public:
       dropped at any time. The specific parameters (full image size)
       in QuillImage are currently ignored. This can currently only modify
       a full image or a preview, not tiles.
+
+      setImage will not try to generate any display level thumbnails to file system.
+      If application needs the thumbnails, image should be first saved
+      and then loaded from the existing file.
     */
 
     void setImage(int level, const QuillImage &image);

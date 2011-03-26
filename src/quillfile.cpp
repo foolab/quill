@@ -297,8 +297,10 @@ QuillImage QuillFile::image(int level) const
 void QuillFile::setImage(int level, const QuillImage &image)
 {
     QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO)+Logger::intToString(level));
-    if ((level <= priv->m_displayLevel) && priv->m_file)
+    if (priv->m_file) {
         priv->m_file->setImage(level, image);
+        setDisplayLevel(level);
+    }
 }
 
 QList<QuillImage> QuillFile::allImageLevels() const
