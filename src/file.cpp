@@ -982,7 +982,14 @@ void File::processFilterError(QuillImageFilter *filter)
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
                 (errorCode == QuillError::FileCorruptError)) {
                 qCritical() << "XXXXXXXXXXXXX"<< Q_FUNC_INFO
-                        << "got FileFormatUnsupportedError:" << m_fileName;
+                        << "failed item:" << m_fileName
+                        << "errorCode:" << errorCode
+                        << "\n\tCore::instance()->isDBusThumbnailingEnabled():"
+                        << Core::instance()->isDBusThumbnailingEnabled()
+                        << "\n\tCore::instance()->isExternallySupportedFormat(m_fileFormat):"
+                        << Core::instance()->isExternallySupportedFormat(m_fileFormat)
+                        << "\n\tdisplayLevel():" << displayLevel()
+                        << "\n\thasThumbnail(displayLevel()):" << hasThumbnail(displayLevel());
 
                 setSupported(false);
                 if (Core::instance()->isDBusThumbnailingEnabled() &&
@@ -990,7 +997,16 @@ void File::processFilterError(QuillImageFilter *filter)
                     setThumbnailSupported(true);
                     // Not emitting an error yet, as D-Bus thumbnailer might
                     // still find an use for the file
+                    qCritical() << "XXXXXXXXXXXXX"<< Q_FUNC_INFO << "Skip emitting error";
                     return;
+                }
+                // Corner-case: thumbnailer is disabled but thumbnails do already exist
+                else if (!Core::instance()->isDBusThumbnailingEnabled() &&
+                             Core::instance()->isExternallySupportedFormat(m_fileFormat) &&
+                             hasThumbnail(displayLevel())) {
+                     qCritical() << "SKIP CORNER CASE";
+                     setThumbnailSupported(true);
+                     return;
                 }
             }
             else
