@@ -696,6 +696,13 @@ private:
      */
     void touchThumbnails();
 
+    /*!
+      Internal implementation of setting the display level without scheduling
+      a new task. It is used by \ref setImage function that implicates no loading
+      from file system should happen.
+      */
+    bool setDisplayLevelInternal(int level);
+
 private:
     /*!
       Enumeration for thumbnail existence: yes, no, or not yet known

@@ -194,6 +194,18 @@ bool File::setDisplayLevel(int level)
 {
     int originalDisplayLevel = m_displayLevel;
 
+    bool isSet = setDisplayLevelInternal(level);
+
+    if (level > originalDisplayLevel)
+            Core::instance()->suggestNewTask();
+
+    return isSet;
+}
+
+bool File::setDisplayLevelInternal(int level)
+{
+    int originalDisplayLevel = m_displayLevel;
+
     if (level <= originalDisplayLevel) {
         // If some other file object wants to keep the display level up
         foreach (QuillFile *file, m_references)
@@ -210,20 +222,12 @@ bool File::setDisplayLevel(int level)
             if ((l > 0) || !hasUnsavedThumbnails())
                 Core::instance()->cache(l)->purge(this);
 
-    // Optimization: check thumbnail existence in file system here
-    // and only here!
-    // FIXME: not needed when we have unknown existence state
-//    if ((level >= 0) && (m_displayLevel < 0))
-//        m_hasThumbnail = hasThumbnail(0);
-
     m_displayLevel = level;
 
     // setup stack here
     if (m_stack->isClean() && (state() != State_NonExistent))
         m_stack->load();
 
-    if (level > originalDisplayLevel)
-        Core::instance()->suggestNewTask();
     return true;
 }
 
@@ -362,14 +366,17 @@ QuillImage File::image(int level) const
 
 void File::setImage(int level, const QuillImage &image)
 {
-    if ((state() == State_NonExistent) || (state() == State_UnsupportedFormat)) {
-        m_error = QuillError::NoError;
-        setState(State_Placeholder);
-    }
+    m_error = QuillError::NoError;
+    setState(State_Placeholder);
+
+    for (int l=0; l<=m_displayLevel; l++)
+        Core::instance()->cache(l)->purge(this);
 
     // Only complete images are approved. Input images are made into such.
     QuillImage fixedImage(image);
     fixedImage.setArea(QRect(QPoint(0, 0), image.fullImageSize()));
+
+    setDisplayLevelInternal(level);
 
     // Initialize stack for nonexistent files
     if (m_stack->isClean())
@@ -495,47 +502,16 @@ bool File::hasThumbnail(int level)
     // Information about thumbnail existence not known, it must be calculated now
     QFileInfo info(thumbnailFileName(level));
 
-    if (!info.exists()) {
-        m_hasThumbnail = File::Thumbnail_NotExists;
-        return false;
-    }
+    File::ThumbnailExistenceState result = File::Thumbnail_NotExists;
 
-    if (info.lastModified() == m_lastModified) {
-        m_hasThumbnail = File::Thumbnail_Exists;
-    } else {
-        m_hasThumbnail = File::Thumbnail_NotExists;
-    }
+    if (info.exists() && (info.lastModified() == m_lastModified))
+        result = File::Thumbnail_Exists;
 
-    return m_hasThumbnail == File::Thumbnail_Exists;
+    if (level == 0)
+        m_hasThumbnail = result;
 
-//    return (info.lastModified() == m_lastModified);
+    return result == File::Thumbnail_Exists;
 }
-
-#if 0
-bool File::hasThumbnail(int level)
-{
-    if(isOriginal()){
-        return false;
-    }
-    if (Core::instance()->thumbnailFlavorName(level).isEmpty()){
-        return false;
-    }
-    // Optimization currently for level 0 only
-    // For externally supported files, thumbnails may appear at any time
-    // so they need to be always checked from the file system
-    if ((level == 0) &&
-        (state() != State_ExternallySupportedFormat) &&
-        (m_displayLevel >= 0)){
-        return m_hasThumbnail;
-    }
-    QFileInfo info(thumbnailFileName(level));
-
-    if (!info.exists())
-        return false;
-
-    return (info.lastModified() == m_lastModified);
-}
-#endif
 
 QString File::fileNameHash(const QString &fileName)
 {
@@ -860,8 +836,8 @@ void File::prepareSave()
     QByteArray rawExifDump;
     if (isJpeg()) {
         QuillMetadata metadata(m_fileName, QuillMetadata::ExifFormat);
-	ResetOrientationTag(metadata);
-	rawExifDump = metadata.dump(QuillMetadata::ExifFormat);
+        ResetOrientationTag(metadata);
+        rawExifDump = metadata.dump(QuillMetadata::ExifFormat);
     }
 
     m_stack->prepareSave(m_temporaryFile->fileName(), rawExifDump);
@@ -873,7 +849,7 @@ void File::ResetOrientationTag(QuillMetadata &metadata)
 {
     QVariant orientation = metadata.entry(QuillMetadata::Tag_Orientation);
     if (!orientation.isNull())
-	metadata.setEntry(QuillMetadata::Tag_Orientation, QVariant(1));
+        metadata.setEntry(QuillMetadata::Tag_Orientation, QVariant(1));
 }
 
 void File::concludeSave()
@@ -904,8 +880,8 @@ void File::concludeSave()
 
     if (isJpeg()) {
         QuillMetadata metadata(m_fileName);
-	ResetOrientationTag(metadata);
-	if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
+        ResetOrientationTag(metadata);
+        if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
             // If metadata write failed, the temp file is likely corrupt
             emitError(QuillError(QuillError::FileWriteError,
                                  QuillError::TemporaryFileErrorSource,
@@ -1052,9 +1028,7 @@ void File::refresh()
 
     setState(State_Normal);
 
-    // FIXME: remove this for preview image thingy
-//    if (!m_stack->isClean())
-//        m_stack->calculateFullImageSize(m_stack->command(0));
+    m_stack->refresh();
 
     Core::instance()->suggestNewTask();
 }
