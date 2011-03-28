@@ -1,3 +1,9 @@
+libquill (1.110328.0) unstable; urgency=low
+
+  * Added proper support for using image data from memory
+  
+ -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Mon, 28 Mar 2011 15:11:15 +0300
+
 libquill (1.110325.0) unstable; urgency=low
   * Fixes: NB#208795 - Orientation metadata gets deleted when image is edited in post captured mode.
 
