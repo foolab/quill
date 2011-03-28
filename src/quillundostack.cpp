@@ -119,8 +119,14 @@ void QuillUndoStack::load()
         QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
     filter->setOption(QuillImageFilter::BackgroundColor,
                       Core::instance()->backgroundRenderingColor());
+
+    // in waiting/placeholder state, the load filter is not initialized since
+    // it might trigger an error since file may not exist at this point.
+    // It is initialized in QuillUndoStack::refresh() instead when the
+    // full image is known to be available again.
     if (!m_file->isWaitingForData())
         setInitialLoadFilter(filter);
+
     add(filter);
 }
 

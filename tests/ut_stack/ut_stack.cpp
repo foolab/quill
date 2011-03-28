@@ -330,19 +330,34 @@ void ut_stack::testSessionSaveLoad()
 
 void ut_stack::testSetImage()
 {
+    Quill::setPreviewLevelCount(3);
+
     QImage image = Unittests::generatePaletteImage();
 
     Quill::setEditHistoryPath("/tmp/quill/history");
     Quill::setEditHistoryCacheSize(0, 2);
 
     QuillFile *file = new QuillFile("/tmp/quill/invalid", Strings::jpegMimeType);
+    QSignalSpy spy(file, SIGNAL(error(QuillError)));
 
-    file->setDisplayLevel(0);
     QuillImage quillImage(image);
     quillImage.setFullImageSize(QSize(8, 2));
     file->setImage(0, quillImage);
 
+    QCOMPARE(file->displayLevel(), 0);
+
+    // There should be no errors from setting an image
+    QCOMPARE(spy.count(), 0);
+    QVERIFY(file->error().errorCode() == QuillError::NoError);
+    // Check that data is correct
     QVERIFY(Unittests::compareImage(file->image(), image));
+
+    // Check that higher display levels are also set
+    file->setImage(1, quillImage);
+    QCOMPARE(file->displayLevel(), 1);
+
+    file->setImage(2, quillImage);
+    QCOMPARE(file->displayLevel(), 2);
 
     delete file;
 }

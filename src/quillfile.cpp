@@ -293,6 +293,8 @@ void QuillFile::setImage(int level, const QuillImage &image)
     QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO)+Logger::intToString(level));
     if (priv->m_file) {
         priv->m_file->setImage(level, image);
+        // setImage() may modify the internal display level of File object,
+        // update the level for this QuillFile instance.
         setDisplayLevel(level);
     }
 }
