@@ -55,8 +55,6 @@
 #include "logger.h"
 #include "displaylevel.h"
 
-#include <QDebug>
-
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
@@ -66,8 +64,6 @@ QuillUndoStack::QuillUndoStack(File *file) :
 
 QuillUndoStack::~QuillUndoStack()
 {
-//    qCritical() << Q_FUNC_INFO <<  "this:" << this;
-
     delete m_loadCommand;
     delete m_stack;
     delete m_saveCommand;
@@ -156,8 +152,6 @@ void QuillUndoStack::calculateFullImageSize(QuillUndoCommand *command)
 
     if (fullSize.isEmpty()) {
         if (filter->role() == QuillImageFilter::Role_Load) {
-            qCritical() << "XXXXXXXXXXXX" << Q_FUNC_INFO
-                    << "fullsize empty for load:" << m_file->fileName();
             m_file->processFilterError(filter);
         }
         else if (previousFullSize.isValid()) {
@@ -395,8 +389,6 @@ QuillUndoCommand *QuillUndoStack::find(int id) const
 
 bool QuillUndoStack::isClean() const
 {
-//    qCritical() << Q_FUNC_INFO << "this:" << this;
-//    qCritical() << Q_FUNC_INFO << "stack:" << m_stack << "this:" << this;
     return m_stack->isClean();
 }
 

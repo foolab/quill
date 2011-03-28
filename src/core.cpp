@@ -641,7 +641,6 @@ void Core::processDBusThumbnailerGenerated(const QString fileName,
     suggestNewTask();
 }
 
-#include <QDebug>
 void Core::processDBusThumbnailerError(const QString fileName,
                                        uint errorCode,
                                        const QString message)
@@ -655,7 +654,6 @@ void Core::processDBusThumbnailerError(const QString fileName,
 
         foreach(File* file, m_fileList)
             if(file->fileName()==fileName){
-            qCritical() << "XXXXXXXXXXXXX" << Q_FUNC_INFO << "emit FileFormatUnsupportedError";
                 file->emitError(QuillError(QuillError::FileFormatUnsupportedError,
                                            QuillError::ImageFileErrorSource,
                                            fileName));

@@ -55,8 +55,6 @@
 #include "logger.h"
 #include "strings.h"
 
-#include <QDebug>
-
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
@@ -71,8 +69,6 @@ File::File() : m_state(State_Normal),
 
 File::~File()
 {
-//    qCritical() << Q_FUNC_INFO << "this:" << this;
-
         //Trying to lower the display level to purge the cached images
         setDisplayLevel(-1);
         detach();
@@ -402,8 +398,6 @@ QList<QuillImage> File::allImageLevels(int displayLevel) const
 
 QSize File::fullImageSize() const
 {
-//    qCritical() << Q_FUNC_INFO << "this:" << this;
-
     if (!exists())
         return QSize();
 
@@ -481,7 +475,6 @@ bool File::hasUnsavedThumbnails()
             !hasThumbnail(0) && Core::instance()->isThumbnailCreationEnabled());
 }
 
-#include <QDebug>
 bool File::hasThumbnail(int level)
 {
     if(isOriginal()){
@@ -981,30 +974,18 @@ void File::processFilterError(QuillImageFilter *filter)
             errorSource = QuillError::ImageFileErrorSource;
             if ((errorCode == QuillError::FileFormatUnsupportedError) ||
                 (errorCode == QuillError::FileCorruptError)) {
-                qCritical() << "XXXXXXXXXXXXX"<< Q_FUNC_INFO
-                        << "failed item:" << m_fileName
-                        << "errorCode:" << errorCode
-                        << "\n\tCore::instance()->isDBusThumbnailingEnabled():"
-                        << Core::instance()->isDBusThumbnailingEnabled()
-                        << "\n\tCore::instance()->isExternallySupportedFormat(m_fileFormat):"
-                        << Core::instance()->isExternallySupportedFormat(m_fileFormat)
-                        << "\n\tdisplayLevel():" << displayLevel()
-                        << "\n\thasThumbnail(displayLevel()):" << hasThumbnail(displayLevel());
-
                 setSupported(false);
                 if (Core::instance()->isDBusThumbnailingEnabled() &&
                     Core::instance()->isExternallySupportedFormat(m_fileFormat)) {
                     setThumbnailSupported(true);
                     // Not emitting an error yet, as D-Bus thumbnailer might
                     // still find an use for the file
-                    qCritical() << "XXXXXXXXXXXXX"<< Q_FUNC_INFO << "Skip emitting error";
                     return;
                 }
                 // Corner-case: thumbnailer is disabled but thumbnails do already exist
                 else if (!Core::instance()->isDBusThumbnailingEnabled() &&
                              Core::instance()->isExternallySupportedFormat(m_fileFormat) &&
                              hasThumbnail(displayLevel())) {
-                     qCritical() << "SKIP CORNER CASE";
                      setThumbnailSupported(true);
                      return;
                 }
