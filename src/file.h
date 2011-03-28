@@ -701,7 +701,7 @@ private:
       a new task. It is used by \ref setImage function that implicates no loading
       from file system should happen.
       */
-    bool setDisplayLevelInternal(int level);
+    void setDisplayLevelInternal(int level);
 
 private:
     /*!

@@ -190,15 +190,18 @@ bool File::setDisplayLevel(int level)
 {
     int originalDisplayLevel = m_displayLevel;
 
-    bool isSet = setDisplayLevelInternal(level);
+    if (level < -1 || level > Core::instance()->previewLevelCount())
+        return false;
+
+    setDisplayLevelInternal(level);
 
     if (level > originalDisplayLevel)
             Core::instance()->suggestNewTask();
 
-    return isSet;
+    return true;
 }
 
-bool File::setDisplayLevelInternal(int level)
+void File::setDisplayLevelInternal(int level)
 {
     int originalDisplayLevel = m_displayLevel;
 
@@ -223,8 +226,6 @@ bool File::setDisplayLevelInternal(int level)
     // setup stack here
     if (m_stack->isClean() && (state() != State_NonExistent))
         m_stack->load();
-
-    return true;
 }
 
 int File::displayLevel() const
