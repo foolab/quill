@@ -1,3 +1,10 @@
+libquill (1.110407.0) unstable; urgency=low
+
+  * Honor DEB_BUILD_OPTIONS for Debian packaging. Options "debug", "noopt"
+  	(builds with -O0) and "cov" (for adding coverage info) are supported.
+
+ -- Adrian Perez <aperez@igalia.com>  Thu, 07 Apr 2011 16:05:27 +0300
+
 libquill (1.110328.0) unstable; urgency=low
 
   * Added proper support for using image data from memory
