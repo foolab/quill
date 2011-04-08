@@ -82,7 +82,7 @@ SOURCES += quill.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
            backgroundthread.cpp \
 
-contains( debug, yes ) {
+debug {
     SOURCES += logger.cpp
 }
 

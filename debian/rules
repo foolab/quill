@@ -6,10 +6,10 @@
 QMAKE_OPTIONS := -makefile -nocache
 
 ifneq (,$(filter debug,$(DEB_BUILD_OPTIONS)))
-  QMAKE_OPTIONS += CONFIG+=debug
+  QMAKE_OPTIONS += CONFIG*=debug CONFIG-=release
   CFLAGS = -O0 -g
 else
-  QMAKE_OPTIONS += CONFIG+=release
+  QMAKE_OPTIONS += CONFIG*=release CONFIG-=debug
 endif
 
 ifneq (,$(filter cov,$(DEB_BUILD_OPTIONS)))
