@@ -66,7 +66,7 @@ QuillUndoCommand::~QuillUndoCommand()
     // Deleting a command with the intermediate load filter
     // forces save when closing
 
-    if (m_stack && m_filter && (m_filter->role() == QuillImageFilter::Role_Load))
+    if (m_stack && (m_index > 0) && (m_index == m_stack->savedIndex()))
         m_stack->setSavedIndex(-1);
 
     // If the background thread is currently running the filter,

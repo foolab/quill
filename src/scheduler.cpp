@@ -181,24 +181,11 @@ QuillUndoCommand *Scheduler::getTask(QuillUndoStack *stack, int level) const
             break;
 
         // Check if there's any loadCommand associated with this index
-        if (stack->loadCommand() && stack->savedIndex() == index) {
-            QuillUndoCommand *command = stack->loadCommand();
-            // it can be used only once
-            stack->clearLoadCommand();
-
-            return command;
-        }
-
-        // Not sure if this case still happens, but the code is still here =/
-        // Load filters can be re-executed
-        if (stack->command(index)->filter()->role() == QuillImageFilter::Role_Load)
-        {
-            index--;
-            break;
-        }
+        if ((stack->savedIndex() > 0) && (stack->savedIndex() == index))
+            return stack->loadCommand();
     }
 
-    // ...and start working with the next one
+    // If nothing else, this will return the initial load command.
     return stack->command(index + 1);
 }
 
@@ -462,8 +449,9 @@ Task *Scheduler::newNormalTask(File *file, int level)
 
     // If a file is currently waiting for data, load should not be tried
     if ((command->filter()->role() == QuillImageFilter::Role_Load) &&
-        (file->isWaitingForData()))
+        (file->isWaitingForData())) {
         return 0;
+    }
 
     QuillUndoCommand *prev = 0;
     if (command->filter()->role() != QuillImageFilter::Role_Load)
@@ -648,9 +636,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
         // since it is now orphan and we could not delete it
         // in QuillUndoCommand::~QuillUndoCommand().
 
-        // Load filter can be outside the stack
-        if (filter->role() != QuillImageFilter::Role_Load)
-            delete filter;
+        delete filter;
     }
     else if (filter->role() == QuillImageFilter::Role_Overlay)
     {
@@ -728,8 +714,13 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
     else
     {
         // Ad-hoc filters (preview improvement and thumbnail loading)
-        if (command->filter() != filter)
+        // Uses the Exif orientation option to differentiate from load command
+        if ((command->filter() != filter) &&
+            ((filter->role() != QuillImageFilter::Role_Load) ||
+             filter->option(QuillImageFilter::IgnoreExifOrientation).toBool()))
         {
+            if (command->filter()->role() != QuillImageFilter::Role_Load)
+
             // Thumbnail load failed
             if ((image.isNull()) &&
                 (filter->role() == QuillImageFilter::Role_Load)) {

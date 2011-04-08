@@ -280,12 +280,11 @@ public:
     QuillUndoCommand *saveCommand();
 
     /*!
-      Returns pointer to the load command, to be used by thread
-      manager.
-     */
+      Returns pointer to the load command, creates it on demand
+      if it does not exist.
+    */
 
     QuillUndoCommand *loadCommand();
-    void clearLoadCommand();
 
     /*!
       Returns pointer to the save map, to be used by thread
@@ -339,7 +338,6 @@ private:
     int m_savedIndex;
     QuillUndoCommand *m_saveCommand;
     QuillUndoCommand *m_loadCommand;
-    bool m_loadCommandUsed;
     SaveMap *m_saveMap;
     int m_revertIndex;
 };

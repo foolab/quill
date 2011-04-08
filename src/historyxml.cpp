@@ -370,20 +370,8 @@ void HistoryXml::readEditSession(QXmlStreamReader *reader,
         if (reader->name() == Strings::xmlNodeFilter) {
             QuillImageFilter *filter = readFilter(reader);
 
-            if (filter != 0) {
-
+            if (filter != 0)
                 stack->add(filter);
-
-                if (stack->index()-1 == *savedIndex) {
-
-                    filter =
-                        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
-                    filter->setOption(QuillImageFilter::FileName, fileName);
-                    filter->setOption(QuillImageFilter::BackgroundColor,
-                                      Core::instance()->backgroundRenderingColor());
-                    stack->add(filter);
-                }
-            }
         } else {
             stack->startSession();
             readEditSession(reader, stack, savedIndex, targetIndex, fileName);
@@ -777,11 +765,7 @@ void HistoryXml::handleStack(QXmlStreamReader& reader, QuillUndoStack *stack,
     while (stack->index()-1 > targetIndex)
         stack->undo();
 
-    // If a load filter was inserted, treat indexes accordingly.
-    if (savedIndex > 0)
-        stack->setSavedIndex(savedIndex+1);
-    else
-        stack->setSavedIndex(0);
+    stack->setSavedIndex(savedIndex);
     stack->setRevertIndex(revertIndex);
 
 }

@@ -58,7 +58,7 @@
 QuillUndoStack::QuillUndoStack(File *file) :
     m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
-    m_saveCommand(0), m_loadCommand(0), m_loadCommandUsed(false), m_saveMap(0),m_revertIndex(0)
+    m_saveCommand(0), m_loadCommand(0), m_saveMap(0),m_revertIndex(0)
 {
 }
 
@@ -189,20 +189,11 @@ void QuillUndoStack::add(QuillImageFilter *filter)
 
     cmd->setFilter(filter);
     cmd->setIndex(index());
-    if (m_isSessionRecording &&
-        (cmd->filter()->role() != QuillImageFilter::Role_Load))
+    if (m_isSessionRecording)
         cmd->setSessionId(m_recordingSessionId);
 
-    if (cmd->filter()->role() == QuillImageFilter::Role_Load
-        && m_stack->count() != 0) {
-        m_loadCommand = cmd;
-        cmd->setIndex(cmd->index() -1);
-        m_loadCommand->setUniqueId(command()->uniqueId());
-        QUILL_LOG(Logger::Module_Stack, filter->name()+"stored outside the stack");
-    } else { // add to stack
-        m_stack->push(cmd);
-        QUILL_LOG(Logger::Module_Stack, filter->name()+" added to stack");
-    }
+    m_stack->push(cmd);
+    QUILL_LOG(Logger::Module_Stack, filter->name()+" added to stack");
 
     // full image size should not be calculated for waiting
     // also not calculated for initial load
@@ -286,10 +277,6 @@ void QuillUndoStack::redo()
                    command(index())->belongsToSession(toRedoSessionId));
         }
         else m_stack->redo();
-
-        // In case of intermediate load, double redo
-        if (canRedo() && (command(index())->filter()->role() == QuillImageFilter::Role_Load))
-            m_stack->redo();
 
         // If we have any stored images in cache, move them to protected
         // This is here instead of command::redo() so that intermediate steps
@@ -422,9 +409,6 @@ int QuillUndoStack::savedIndex() const
 
 bool QuillUndoStack::isDirty() const
 {
-    if (m_loadCommand && m_loadCommand->uniqueId() != command()->uniqueId())
-        return true;
-
     return (m_stack->count() > 0) &&
            (command()->index() != savedIndex());
 }
@@ -493,12 +477,6 @@ void QuillUndoStack::concludeSave()
 
         // Update initial load filter to point to modified file
         setInitialLoadFilter(command(0)->filter());
-    }
-
-    if (m_loadCommand) {
-        m_loadCommandUsed = false;
-        m_loadCommand->setIndex(savedIndex());
-        m_loadCommand->setUniqueId(m_saveCommand->uniqueId());
     }
 
     delete m_saveCommand;
@@ -572,13 +550,22 @@ void QuillUndoStack::clear()
 
 QuillUndoCommand *QuillUndoStack::loadCommand()
 {
-    if (!m_loadCommandUsed)
-        return m_loadCommand;
+    if (m_savedIndex == 0)
+        return 0;
 
-    return 0;
-}
+    if (!m_loadCommand) {
+        QuillImageFilter *filter =
+            QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
+        filter->setOption(QuillImageFilter::FileName, m_file->fileName());
+        filter->setOption(QuillImageFilter::BackgroundColor,
+                          Core::instance()->backgroundRenderingColor());
 
-void QuillUndoStack::clearLoadCommand()
-{
-    m_loadCommandUsed = true;
+        m_loadCommand = new QuillUndoCommand(this);
+        m_loadCommand->setFilter(filter);
+    }
+
+    m_loadCommand->setIndex(m_savedIndex);
+    m_loadCommand->setUniqueId(command(m_savedIndex)->uniqueId());
+
+    return m_loadCommand;
 }
