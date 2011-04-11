@@ -1,3 +1,8 @@
+libquill (1.110411.0) unstable; urgency=low
+  * Fixes: NB#236159 No image displayed in FSM from Gallery grid.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Mon, 11 Apr 2011 11:50:30 +0300
+
 libquill (1.110407.0) unstable; urgency=low
 
   * Honor DEB_BUILD_OPTIONS for Debian packaging. Options "debug", "noopt"
