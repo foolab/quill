@@ -335,8 +335,7 @@ Task *Scheduler::newThumbnailLoadTask(File *file, int level) const
 
     QuillUndoCommand *command = getTask(stack, level);
 
-    if ((command->filter()->role() != QuillImageFilter::Role_Load) ||
-        (command->index() != stack->savedIndex()))
+    if (command->index() != stack->savedIndex())
         return 0;
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Load);
@@ -719,8 +718,6 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             ((filter->role() != QuillImageFilter::Role_Load) ||
              filter->option(QuillImageFilter::IgnoreExifOrientation).toBool()))
         {
-            if (command->filter()->role() != QuillImageFilter::Role_Load)
-
             // Thumbnail load failed
             if ((image.isNull()) &&
                 (filter->role() == QuillImageFilter::Role_Load)) {
