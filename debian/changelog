@@ -1,3 +1,8 @@
+libquill (1.110413.0) unstable; urgency=low
+  * Restored logging support on DEBUG mode.
+
+ -- Simon Pena <spena@igalia.com>  Wed, 13 Apr 2011 10:06:26 +0200
+
 libquill (1.110411.0) unstable; urgency=low
   * Fixes: NB#236159 No image displayed in FSM from Gallery grid.
 
