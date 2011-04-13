@@ -346,11 +346,6 @@ File *Core::prioritySaveFile() const
 
 void Core::suggestNewTask()
 {
-    // The D-Bus thumbnailer runs on a different process instead of
-    // Quill's background thread so it can always be invoked.
-    if (m_dBusThumbnailingEnabled)
-        activateDBusThumbnailer();
-
     // Make sure that nothing is already running on the background.
 
     if (m_threadManager->isRunning())
@@ -360,6 +355,11 @@ void Core::suggestNewTask()
 
     if (task)
         m_threadManager->run(task);
+
+    // The D-Bus thumbnailer runs on a different process instead of
+    // Quill's background thread so it can always be invoked.
+    if (m_dBusThumbnailingEnabled)
+        activateDBusThumbnailer();
 }
 
 bool Core::allowDelete(QuillImageFilter *filter) const
