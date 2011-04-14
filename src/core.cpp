@@ -348,13 +348,13 @@ void Core::suggestNewTask()
 {
     // Make sure that nothing is already running on the background.
 
-    if (m_threadManager->isRunning())
-        return;
+    if (!m_threadManager->isRunning()) {
 
-    Task *task = m_scheduler->newTask();
+        Task *task = m_scheduler->newTask();
 
-    if (task)
-        m_threadManager->run(task);
+        if (task)
+            m_threadManager->run(task);
+    }
 
     // The D-Bus thumbnailer runs on a different process instead of
     // Quill's background thread so it can always be invoked.
