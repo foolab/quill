@@ -1,3 +1,11 @@
+libquill (1.110414.0) unstable; urgency=low
+  * Fixes: NB#212559 - Sometimes Corrupted video thumbnails are displayed in
+    gallery
+  * Fixes: NB#219693 - Device captured Videos are displayed as corrupted in
+    gallery when received via bluetooth
+
+ -- Simon Pena <spena@igalia.com>  Thu, 14 Apr 2011 13:05:49 +0200
+
 libquill (1.110413.0) unstable; urgency=low
   * Restored logging support on DEBUG mode.
 
