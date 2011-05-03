@@ -374,10 +374,10 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
         Core::instance()->targetSizeForLevel(level, fullSizeForAspectRatio(file)))
         return 0;
 
-    if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
+    if(!QDir().mkpath(Core::instance()->thumbnailPath(level)))
         file->emitError(QuillError(QuillError::DirCreateError,
                                    QuillError::ThumbnailErrorSource,
-                                   Core::instance()->thumbnailDirectory(level)));
+                                   Core::instance()->thumbnailPath(level)));
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 

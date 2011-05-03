@@ -741,7 +741,6 @@ private:
     int m_priority;
     ThumbnailExistenceState m_hasThumbnail; // If a thumbnail exists in the file system
                                             // optimization is currently for level 0 only
-    ThumbnailExistenceState m_hasFailedThumbnail; // If a failed thumbnail exists in the file system
 
     QString m_fileName;
     QString m_originalFileName;

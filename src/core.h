@@ -328,7 +328,7 @@ public:
       level are stored.
     */
 
-    QString thumbnailDirectory(int level) const;
+    QString thumbnailPath(int level) const;
 
     /*!
       Sets the base path for thumbnails.

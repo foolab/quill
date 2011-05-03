@@ -48,6 +48,9 @@ namespace Strings
 
     S(aviMimeType,           "video/avi");
 
+    S(dot,                   ".");
+    S(dotXml,                ".xml");
+
     S(gifMimeType,           "image/gif");
 
     S(historyPath,           "/.config/quill/history");
@@ -59,12 +62,14 @@ namespace Strings
     S(pngMimeType,           "image/png");
     S(png,                   "png");
 
+    S(slash,                 "/");
     S(slashOriginal,         "/.original/");
     S(svgMimeType,           "image/svg+xml");
 
     S(tempDirDefault,        "/tmp");
     S(tempFilePattern,       "qt_temp.XXXXXX.");
     S(thumbsBasePath,        "/.thumbnails");
+    S(thumbsFail,            "/fail/quill");
     S(thumbsNormal,          "/.thumbnails/normal");
     S(thumbsScreen,          "/.thumbnails/screen");
     S(thumbsWide,            "/.thumbnails/wide");
