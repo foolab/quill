@@ -58,7 +58,8 @@
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
-               m_hasThumbnail(Thumbnail_UnknownExists), m_fileName(""), m_originalFileName(""),
+               m_hasThumbnail(Thumbnail_UnknownExists),
+               m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false),
                m_hasReadEditHistory(false),m_fileIndexName(""),
@@ -507,13 +508,29 @@ bool File::hasThumbnail(int level)
     return result == File::Thumbnail_Exists;
 }
 
+bool File::hasFailedThumbnail()
+{
+    QFileInfo info(failedThumbnailFileName());
+    return (info.exists() && (info.lastModified() == m_lastModified));
+}
+
+void File::addFailedThumbnail()
+{
+    QDir().mkpath(Core::instance()->failedThumbnailPath());
+    QString fileName = failedThumbnailFileName();
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+    file.close();
+    FileSystem::setFileModificationDateTime(fileName, m_lastModified);
+}
+
 QString File::fileNameHash(const QString &fileName)
 {
     QFileInfo info(fileName);
     // canonicalFilePath() will not work unless the file exists
     // Here we only assume that the directory exists
-    const QUrl uri = QUrl::fromLocalFile(info.dir().canonicalPath() + "/"
-                            + info.fileName());
+    const QUrl uri = QUrl::fromLocalFile(info.dir().canonicalPath() +
+                                         Strings::slash + info.fileName());
 
     const QByteArray hashValue =
         QCryptographicHash::hash(uri.toString().toLatin1(),
@@ -530,8 +547,23 @@ QString File::thumbnailFileName(int level)
         m_fileNameHash = fileNameHash(m_fileName);
 
     QString hashValueString = m_fileNameHash;
-    hashValueString.append("." + Core::instance()->thumbnailExtension());
-    hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
+    hashValueString.append(Strings::dot +
+                           Core::instance()->thumbnailExtension());
+    hashValueString.prepend(Core::instance()->thumbnailPath(level) +
+                            QDir::separator());
+
+    return hashValueString;
+}
+
+QString File::failedThumbnailFileName()
+{
+    if (m_fileNameHash.isEmpty())
+        m_fileNameHash = fileNameHash(m_fileName);
+
+    QString hashValueString = m_fileNameHash;
+    hashValueString.append(Strings::dot +
+                           Core::instance()->thumbnailExtension());
+    hashValueString.prepend(Core::instance()->failedThumbnailPath() +
                             QDir::separator());
 
     return hashValueString;
@@ -541,7 +573,7 @@ QString File::editHistoryFileName(const QString &fileName,
                                   const QString &editHistoryPath)
 {
     QString hashValueString = fileNameHash(fileName);
-    hashValueString.append(".xml");
+    hashValueString.append(Strings::dotXml);
     hashValueString.prepend(editHistoryPath + QDir::separator());
 
     return hashValueString;
@@ -770,6 +802,7 @@ void File::removeThumbnails()
 {
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
         QFile::remove(thumbnailFileName(level));
+    QFile::remove(failedThumbnailFileName());
     m_hasThumbnail = File::Thumbnail_NotExists;
 }
 

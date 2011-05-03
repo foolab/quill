@@ -352,6 +352,15 @@ QString QuillFile::thumbnailFileName(int level) const
         return QString();
 }
 
+QString QuillFile::failedThumbnailFileName() const
+{
+    QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->failedThumbnailFileName();
+    else
+        return QString();
+}
+
 bool QuillFile::exists() const
 {
     QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO));

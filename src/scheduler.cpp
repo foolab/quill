@@ -374,10 +374,10 @@ Task *Scheduler::newThumbnailSaveTask(File *file, int level)
         Core::instance()->targetSizeForLevel(level, fullSizeForAspectRatio(file)))
         return 0;
 
-    if(!QDir().mkpath(Core::instance()->thumbnailDirectory(level)))
+    if(!QDir().mkpath(Core::instance()->thumbnailPath(level)))
         file->emitError(QuillError(QuillError::DirCreateError,
                                    QuillError::ThumbnailErrorSource,
-                                   Core::instance()->thumbnailDirectory(level)));
+                                   Core::instance()->thumbnailPath(level)));
 
     QuillImageFilter *filter = QuillImageFilterFactory::createImageFilter(QuillImageFilter::Role_Save);
 
@@ -455,6 +455,16 @@ Task *Scheduler::newNormalTask(File *file, int level)
     QuillUndoCommand *prev = 0;
     if (command->filter()->role() != QuillImageFilter::Role_Load)
         prev = command->prev();
+    else {
+        // Stop loading if file is known to be corrupt
+        if (file->hasFailedThumbnail()) {
+            file->setSupported(false);
+            file->emitError(QuillError(QuillError::FileCorruptError,
+                                       QuillError::ImageFileErrorSource,
+                                       file->fileName()));
+            return 0;
+        }
+    }
 
     QuillImage prevImage;
     if ((prev == 0) && (level == Core::instance()->previewLevelCount()))
@@ -756,6 +766,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
                     if (Core::instance()->isDBusThumbnailingEnabled() &&
                         Core::instance()->isExternallySupportedFormat(file->fileFormat()))
                         file->setThumbnailSupported(true);
+                    else
+                        file->addFailedThumbnail();
                 }
                 else
                     file->setExists(false);

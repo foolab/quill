@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#include <QDebug>
+#include <QImageWriter>
 #include <QtTest/QtTest>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
@@ -88,6 +88,8 @@ void ut_thumbnail::testName()
 
     QCOMPARE(file.thumbnailFileName(0),
              QString("/home/user/normal/6756f54a791d53a4ece8ebb70471b573.jpeg"));
+    QCOMPARE(file.failedThumbnailFileName(),
+             QString("/home/user/fail/quill/6756f54a791d53a4ece8ebb70471b573.jpeg"));
 }
 
 void ut_thumbnail::testInvalid()
@@ -489,6 +491,57 @@ void ut_thumbnail::testFullImageSize()
     //The full image size should be available
     QCOMPARE(file->image(0).fullImageSize(),QSize(8,2));
     delete file;
+}
+
+void ut_thumbnail::testFailedThumbnail()
+{
+    QTemporaryFile testFile;
+    testFile.open();
+
+    // Construct a corrupt PNG image
+    QuillImage image = Unittests::generatePaletteImage();
+
+    QByteArray buffer;
+    QBuffer device(&buffer);
+    QImageWriter writer(&device, QByteArray("png"));
+    writer.write(image);
+
+    buffer.chop(4); // remove last 4 bytes
+    testFile.write(buffer);
+    testFile.close();
+
+    Quill::setPreviewSize(0, QSize(4, 1));
+    Quill::setThumbnailBasePath("/tmp/quill/thumbnails");
+    Quill::setThumbnailFlavorName(0, "normal");
+    Quill::setThumbnailExtension(Strings::png);
+
+    QuillFile *file = new QuillFile(testFile.fileName(), "image/png");
+    file->setDisplayLevel(0);
+
+    QVERIFY(file);
+    QVERIFY(file->exists());
+    QVERIFY(file->supportsViewing());
+
+    Quill::releaseAndWait();
+
+    QVERIFY(!file->supportsViewing());
+
+    // The failed thumbnail should be in place now
+    QVERIFY(QFile::exists(file->failedThumbnailFileName()));
+
+    delete file;
+
+    QuillFile *file2 = new QuillFile(testFile.fileName(), "image/png");
+    file2->setDisplayLevel(0);
+
+    QVERIFY(file2);
+    QVERIFY(file2->exists());
+
+    // The file should now instantly classify as failed, without a
+    // releaseAndWait() call.
+    QVERIFY(!file2->supportsViewing());
+
+    delete file2;
 }
 
 int main ( int argc, char *argv[] ){

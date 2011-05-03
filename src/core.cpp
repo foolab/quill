@@ -412,6 +412,11 @@ void Core::setThumbnailBasePath(const QString &path)
     m_thumbnailBasePath = path;
 }
 
+QString Core::failedThumbnailPath()
+{
+    return m_thumbnailBasePath + Strings::thumbsFail;
+}
+
 void Core::setThumbnailFlavorName(int level, const QString &name)
 {
     m_displayLevel[level]->setThumbnailFlavorName(name);
@@ -422,7 +427,7 @@ QString Core::thumbnailFlavorName(int level) const
     return m_displayLevel[level]->thumbnailFlavorName();
 }
 
-QString Core::thumbnailDirectory(int level) const
+QString Core::thumbnailPath(int level) const
 {
     if ((level < 0) || (level >= m_displayLevel.count()))
         return QString();
@@ -432,7 +437,7 @@ QString Core::thumbnailDirectory(int level) const
     if (flavorName.isEmpty())
         return QString();
 
-    return m_thumbnailBasePath + "/" + flavorName;
+    return m_thumbnailBasePath + Strings::slash + flavorName;
 }
 
 void Core::setThumbnailExtension(const QString &extension)

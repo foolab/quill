@@ -328,13 +328,20 @@ public:
       level are stored.
     */
 
-    QString thumbnailDirectory(int level) const;
+    QString thumbnailPath(int level) const;
 
     /*!
       Sets the base path for thumbnails.
      */
 
     void setThumbnailBasePath(const QString &path);
+
+    /*!
+      Returns the path to store failed thumbnails, calculated from the base
+      path.
+     */
+
+    QString failedThumbnailPath();
 
     /*!
       Sets the thumbnail flavor name for a given preview level. Thumbnails
