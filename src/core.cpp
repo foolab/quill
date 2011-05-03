@@ -412,6 +412,11 @@ void Core::setThumbnailBasePath(const QString &path)
     m_thumbnailBasePath = path;
 }
 
+QString Core::failedThumbnailPath()
+{
+    return m_thumbnailBasePath + "/fail/quill";
+}
+
 void Core::setThumbnailFlavorName(int level, const QString &name)
 {
     m_displayLevel[level]->setThumbnailFlavorName(name);

@@ -374,6 +374,19 @@ public:
     bool hasThumbnail(int level);
 
     /*!
+      If a related "failed" thumbnail has been cached to the file system.
+     */
+
+    bool hasFailedThumbnail();
+
+    /*!
+      Adds a "failed" thumbnail for the file to the file system,
+      preventing further thumbnailing or loading attempts.
+     */
+
+    void addFailedThumbnail();
+
+    /*!
       Gets the file name associated with the given preview level.
 
       @return the file name associated with the given preview level,
@@ -382,6 +395,8 @@ public:
      */
 
     QString thumbnailFileName(int level);
+
+    QString failedThumbnailFileName();
 
     /*!
       If there are unsaved thumbnails available
@@ -710,7 +725,7 @@ private:
     enum ThumbnailExistenceState {
         Thumbnail_Exists,
         Thumbnail_NotExists,
-        Thumbnail_UnknownExists
+        Thumbnail_UnknownExists,
     };
 
     QList<QuillFile*> m_references;
@@ -726,6 +741,7 @@ private:
     int m_priority;
     ThumbnailExistenceState m_hasThumbnail; // If a thumbnail exists in the file system
                                             // optimization is currently for level 0 only
+    ThumbnailExistenceState m_hasFailedThumbnail; // If a failed thumbnail exists in the file system
 
     QString m_fileName;
     QString m_originalFileName;

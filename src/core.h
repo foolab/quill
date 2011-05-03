@@ -337,6 +337,13 @@ public:
     void setThumbnailBasePath(const QString &path);
 
     /*!
+      Returns the path to store failed thumbnails, calculated from the base
+      path.
+     */
+
+    QString failedThumbnailPath();
+
+    /*!
       Sets the thumbnail flavor name for a given preview level. Thumbnails
       for a given level are stored under the base path, in a subdirectory
       with a same name than the flavor name.

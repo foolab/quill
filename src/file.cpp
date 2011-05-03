@@ -58,7 +58,9 @@
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
-               m_hasThumbnail(Thumbnail_UnknownExists), m_fileName(""), m_originalFileName(""),
+               m_hasThumbnail(Thumbnail_UnknownExists),
+               m_hasFailedThumbnail(Thumbnail_UnknownExists),
+               m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false),
                m_hasReadEditHistory(false),m_fileIndexName(""),
@@ -507,6 +509,22 @@ bool File::hasThumbnail(int level)
     return result == File::Thumbnail_Exists;
 }
 
+bool File::hasFailedThumbnail()
+{
+    QFileInfo info(failedThumbnailFileName());
+    return (info.exists() && (info.lastModified() == m_lastModified));
+}
+
+void File::addFailedThumbnail()
+{
+    QDir().mkpath(Core::instance()->failedThumbnailPath());
+    QString fileName = failedThumbnailFileName();
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+    file.close();
+    FileSystem::setFileModificationDateTime(fileName, m_lastModified);
+}
+
 QString File::fileNameHash(const QString &fileName)
 {
     QFileInfo info(fileName);
@@ -532,6 +550,19 @@ QString File::thumbnailFileName(int level)
     QString hashValueString = m_fileNameHash;
     hashValueString.append("." + Core::instance()->thumbnailExtension());
     hashValueString.prepend(Core::instance()->thumbnailDirectory(level) +
+                            QDir::separator());
+
+    return hashValueString;
+}
+
+QString File::failedThumbnailFileName()
+{
+    if (m_fileNameHash.isEmpty())
+        m_fileNameHash = fileNameHash(m_fileName);
+
+    QString hashValueString = m_fileNameHash;
+    hashValueString.append("." + Core::instance()->thumbnailExtension());
+    hashValueString.prepend(Core::instance()->failedThumbnailPath() +
                             QDir::separator());
 
     return hashValueString;

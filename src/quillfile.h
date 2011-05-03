@@ -376,6 +376,15 @@ public:
     QString thumbnailFileName(int level) const;
 
     /*!
+      Gets the file name associated with a failed thumbnail for this file.
+
+      @return the file name where the failed thumbnail is put if the
+      file loading fails for some reason.
+     */
+
+    QString failedThumbnailFileName() const;
+
+    /*!
       If the file exists in the file system.
      */
 
