@@ -1,3 +1,9 @@
+libquill (1.110503.0) unstable; urgency=low
+  * Now creates failed thumbnails for corrupt files
+  * Fixes: NB#242904 Corrupt thumbnail creation delays other thumbnails
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Tue, 03 May 2011 10:39:30 +0300
+
 libquill (1.110414.0) unstable; urgency=low
   * Fixes: NB#212559 - Sometimes Corrupted video thumbnails are displayed in
     gallery
