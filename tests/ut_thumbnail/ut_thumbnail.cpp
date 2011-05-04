@@ -506,7 +506,7 @@ void ut_thumbnail::testFailedThumbnail()
     QImageWriter writer(&device, QByteArray("png"));
     writer.write(image);
 
-    buffer.chop(4); // remove last 4 bytes
+    buffer.chop(8); // last 8 bytes needs to be removed to recognize as corrupt
     testFile.write(buffer);
     testFile.close();
 

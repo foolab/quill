@@ -1,3 +1,8 @@
+libquill (1.110504.0) unstable; urgency=low
+  * Fixed automated test so that corrupt PNG is detected in all environments
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Wed, 04 May 2011 09:09:09 +0300
+
 libquill (1.110503.0) unstable; urgency=low
   * Now creates failed thumbnails for corrupt files
   * Fixes: NB#242904 Corrupt thumbnail creation delays other thumbnails
