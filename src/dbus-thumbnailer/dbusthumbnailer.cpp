@@ -1,6 +1,7 @@
 #include "dbusthumbnailer.h"
 #include "thumbnailer_generic.h"
 #include "logger.h"
+#include "../file.h"
 #include <QDebug>
 QLatin1String DBusThumbnailer::tumblerService("org.freedesktop.thumbnails.Thumbnailer1");
 QLatin1String DBusThumbnailer::tumblerCache("/org/freedesktop/thumbnails/Thumbnailer1");
@@ -40,7 +41,7 @@ bool DBusThumbnailer::isRunning()
     return m_taskInProgress;
 }
 
-void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
+void DBusThumbnailer::newThumbnailerTask(const QString &filePath,
                                          const QString &mimeType,
                                          const QString &flavor)
 {
@@ -50,13 +51,11 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
         return;
 
     m_taskInProgress = true;
-    m_taskFileName = fileName;
+    m_taskFilePath = filePath;
     m_flavor = flavor;
 
-    const QUrl uri =
-        QUrl::fromLocalFile(QFileInfo(fileName).canonicalFilePath());
     QStringList uris;
-    uris.append(uri.toString());
+    uris.append(File::filePathToUri(filePath));
 
     QStringList mimes;
     mimes.append(mimeType);
@@ -72,7 +71,7 @@ void DBusThumbnailer::newThumbnailerTask(const QString &fileName,
 void DBusThumbnailer::finishedHandler(uint handle)
 {
     Q_UNUSED(handle);
-    emit thumbnailGenerated(m_taskFileName, m_flavor);
+    emit thumbnailGenerated(m_taskFilePath, m_flavor);
     m_taskInProgress = false;
 }
 
@@ -81,7 +80,7 @@ void DBusThumbnailer::errorHandler(uint handle, const QStringList failedUris,
 {
     Q_UNUSED(handle);
     Q_UNUSED(failedUris);
-    emit thumbnailError(m_taskFileName, errorCode, message);
+    emit thumbnailError(m_taskFilePath, errorCode, message);
 
 }
 

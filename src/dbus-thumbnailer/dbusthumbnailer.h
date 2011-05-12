@@ -17,13 +17,13 @@ friend class ut_dbusthumbnailer;
 
     bool isRunning();
 
-    void newThumbnailerTask(const QString &fileName,
+    void newThumbnailerTask(const QString &filePath,
                             const QString &mimeType,
                             const QString &flavor);
 
  signals:
-    void thumbnailGenerated(const QString fileName, const QString flavor);
-    void thumbnailError(const QString fileName, uint errorCode,
+    void thumbnailGenerated(const QString filePath, const QString flavor);
+    void thumbnailError(const QString filePath, uint errorCode,
                         const QString message);
 
  private slots:
@@ -39,7 +39,7 @@ friend class ut_dbusthumbnailer;
     static QLatin1String tumblerService, tumblerCache;
 
     bool m_taskInProgress;
-    QString m_taskFileName;
+    QString m_taskFilePath;
     QString m_flavor;
     ThumbnailerGenericProxy *m_tumbler;
 };

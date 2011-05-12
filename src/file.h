@@ -628,7 +628,9 @@ public:
      */
     void restore();
 
-    static QString fileNameHash(const QString &fileName);
+    static QByteArray filePathToUri(const QString &filePath);
+
+    static QString filePathHash(const QString &filePath);
 
     /*!
       If the file is an original one

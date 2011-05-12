@@ -524,19 +524,21 @@ void File::addFailedThumbnail()
     FileSystem::setFileModificationDateTime(fileName, m_lastModified);
 }
 
-QString File::fileNameHash(const QString &fileName)
+QByteArray File::filePathToUri(const QString &filePath)
 {
-    QFileInfo info(fileName);
+    QFileInfo info(filePath);
     // canonicalFilePath() will not work unless the file exists
     // Here we only assume that the directory exists
-    const QUrl uri = QUrl::fromLocalFile(info.dir().canonicalPath() +
-                                         Strings::slash + info.fileName());
+    return QUrl::fromLocalFile(info.dir().canonicalPath() +
+                               Strings::slash + info.fileName())
+        .toEncoded();
+}
 
-    const QByteArray hashValue =
-        QCryptographicHash::hash(uri.toString().toLatin1(),
-                                 QCryptographicHash::Md5);
-
-    return hashValue.toHex();
+QString File::filePathHash(const QString &filePath)
+{
+    return QCryptographicHash::hash(filePathToUri(filePath),
+                                    QCryptographicHash::Md5)
+        .toHex();
 }
 
 QString File::thumbnailFileName(int level)
@@ -544,7 +546,7 @@ QString File::thumbnailFileName(int level)
     if(isOriginal())
         return QString();
     if (m_fileNameHash.isEmpty())
-        m_fileNameHash = fileNameHash(m_fileName);
+        m_fileNameHash = filePathHash(m_fileName);
 
     QString hashValueString = m_fileNameHash;
     hashValueString.append(Strings::dot +
@@ -558,7 +560,7 @@ QString File::thumbnailFileName(int level)
 QString File::failedThumbnailFileName()
 {
     if (m_fileNameHash.isEmpty())
-        m_fileNameHash = fileNameHash(m_fileName);
+        m_fileNameHash = filePathHash(m_fileName);
 
     QString hashValueString = m_fileNameHash;
     hashValueString.append(Strings::dot +
@@ -572,7 +574,7 @@ QString File::failedThumbnailFileName()
 QString File::editHistoryFileName(const QString &fileName,
                                   const QString &editHistoryPath)
 {
-    QString hashValueString = fileNameHash(fileName);
+    QString hashValueString = filePathHash(fileName);
     hashValueString.append(Strings::dotXml);
     hashValueString.prepend(editHistoryPath + QDir::separator());
 
