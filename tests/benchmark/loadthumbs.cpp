@@ -50,7 +50,7 @@ void loadThumbs(QString originalFileName, int n, QSize size)
 
             QString thumbFileName = QDir::homePath() +
                 "/.thumbnails/quill-benchmark/" +
-                File::fileNameHash(fileName[i]) + ".jpg";
+                File::filePathHash(fileName[i]) + ".jpg";
 
             QFile::copy(thumbFile.fileName(), thumbFileName);
         }

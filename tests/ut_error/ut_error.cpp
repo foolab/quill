@@ -640,7 +640,7 @@ void ut_error::testForbiddenThumbnail()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QString thumbFileName = File::fileNameHash(testFile.fileName());
+    QString thumbFileName = File::filePathHash(testFile.fileName());
     thumbFileName.append(".");
     thumbFileName.append(Strings::png);
     thumbFileName.prepend(thumbnailFullPath);
@@ -707,7 +707,7 @@ void ut_error::testCorruptThumbnail()
     QImage thumbImage =
         image.scaled(QSize(4, 1), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    QString thumbFileName = File::fileNameHash(testFile.fileName());
+    QString thumbFileName = File::filePathHash(testFile.fileName());
     thumbFileName.append(".");
     thumbFileName.append(Strings::png);
     thumbFileName.prepend(thumbnailFullPath);
@@ -771,7 +771,7 @@ void ut_error::testThumbnailDirectoryCreateFailed()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
 
-    QString thumbFileName = File::fileNameHash(testFile.fileName());
+    QString thumbFileName = File::filePathHash(testFile.fileName());
     thumbFileName.append(".");
     thumbFileName.append(Strings::png);
     thumbFileName.prepend("/tmp/invalid/");

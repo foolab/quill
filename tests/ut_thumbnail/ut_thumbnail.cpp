@@ -322,7 +322,7 @@ void ut_thumbnail::testLoadUnsupported()
     Quill::setThumbnailExtension(Strings::png);
 
     QString thumbName = "/tmp/quill/thumbnails/normal/" +
-        File::fileNameHash(fileName) + ".png";
+        File::filePathHash(fileName) + ".png";
     image.save(thumbName, "png");
 
     QuillFile *file = new QuillFile(fileName, "");
