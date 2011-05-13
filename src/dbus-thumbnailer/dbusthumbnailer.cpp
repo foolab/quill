@@ -1,8 +1,8 @@
 #include "dbusthumbnailer.h"
 #include "thumbnailer_generic.h"
 #include "logger.h"
-#include "../file.h"
-#include <QDebug>
+#include "file.h"
+
 QLatin1String DBusThumbnailer::tumblerService("org.freedesktop.thumbnails.Thumbnailer1");
 QLatin1String DBusThumbnailer::tumblerCache("/org/freedesktop/thumbnails/Thumbnailer1");
 
