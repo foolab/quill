@@ -1,3 +1,8 @@
+libquill (1.110513.0) unstable; urgency=low
+  * Fixes: NB#254923 Thumbnails not generated for files with "#" in the filename
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 13 May 2011 13:18:30 +0300
+
 libquill (1.110504.0) unstable; urgency=low
   * Fixed automated test so that corrupt PNG is detected in all environments
 
