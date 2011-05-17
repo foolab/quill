@@ -470,6 +470,11 @@ QuillUndoStack *File::stack() const
     return m_stack;
 }
 
+bool File::isMatchingTimestamp(QDateTime stamp1, QDateTime stamp2)
+{
+    return (abs(stamp1.toTime_t() - stamp2.toTime_t()) < 2);
+}
+
 bool File::hasUnsavedThumbnails()
 {
     return (m_stack && m_stack->hasImage(0) &&
@@ -499,7 +504,8 @@ bool File::hasThumbnail(int level)
 
     File::ThumbnailExistenceState result = File::Thumbnail_NotExists;
 
-    if (info.exists() && (info.lastModified() == m_lastModified))
+    if (info.exists() &&
+        isMatchingTimestamp(info.lastModified(), m_lastModified))
         result = File::Thumbnail_Exists;
 
     if (level == 0)

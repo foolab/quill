@@ -368,6 +368,14 @@ public:
     bool checkImageSize(const QSize &fullImageSize);
 
     /*!
+      If two timestamps match so closely that they can be
+      considered the same.  Currently, since to FAT file system
+      inaccuracies, the tolerance is 1 second.
+     */
+
+    static bool isMatchingTimestamp(QDateTime stamp1, QDateTime stamp2);
+
+    /*!
       If a related thumbnail has been cached to the file system.
      */
 
