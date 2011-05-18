@@ -55,6 +55,8 @@
 #include "logger.h"
 #include "strings.h"
 
+const int File::timestampTolerance = 1;
+
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
@@ -472,7 +474,7 @@ QuillUndoStack *File::stack() const
 
 bool File::isMatchingTimestamp(QDateTime stamp1, QDateTime stamp2)
 {
-    return (abs(stamp1.toTime_t() - stamp2.toTime_t()) < 2);
+    return (abs(stamp1.toTime_t() - stamp2.toTime_t()) <= timestampTolerance);
 }
 
 bool File::hasUnsavedThumbnails()

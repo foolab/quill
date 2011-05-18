@@ -729,6 +729,9 @@ private:
     void setDisplayLevelInternal(int level);
 
 private:
+
+    static const int timestampTolerance;
+
     /*!
       Enumeration for thumbnail existence: yes, no, or not yet known
       */
