@@ -273,6 +273,12 @@ public:
     void abortSave();
 
     /*!
+      Frees resources related to saving.
+    */
+
+    void cleanupAfterSave();
+
+    /*!
       Returns pointer to the save command, to be used by thread
       manager.
      */
