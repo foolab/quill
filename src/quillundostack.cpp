@@ -52,6 +52,7 @@
 #include "core.h"
 #include "tilemap.h"
 #include "savemap.h"
+#include "tilecache.h"
 #include "logger.h"
 #include "displaylevel.h"
 
@@ -479,14 +480,20 @@ void QuillUndoStack::concludeSave()
         setInitialLoadFilter(command(0)->filter());
     }
 
-    delete m_saveCommand;
-    m_saveCommand = 0;
+    cleanupAfterSave();
 
-    delete m_saveMap;
-    m_saveMap = 0;
+    // Flush the tile cache to save memory
+    // Only do this after save has really finished, not from abortSave
+    // which gets called from lots of places
+    Core::instance()->tileCache()->clear();
 }
 
 void QuillUndoStack::abortSave()
+{
+    cleanupAfterSave();
+}
+
+void QuillUndoStack::cleanupAfterSave()
 {
     delete m_saveCommand;
     m_saveCommand = 0;

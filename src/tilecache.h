@@ -59,6 +59,8 @@ preview images - instead, ImageCache is used for that.
 #ifndef __QUILL_TILE_CACHE_H__
 #define __QUILL_TILE_CACHE_H__
 
+#include <QCache>
+
 class QuillImage;
 class TileCachePrivate;
 class ImageTile;

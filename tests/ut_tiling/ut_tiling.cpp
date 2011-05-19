@@ -354,6 +354,12 @@ void ut_tiling::testTiledSaveLoad()
     Quill::releaseAndWait();
     Quill::releaseAndWait();
 
+    // Tiles still loaded from the original
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+    Quill::releaseAndWait();
+
     QCOMPARE(file->allImageLevels().count(), 5);
 
     delete file;
