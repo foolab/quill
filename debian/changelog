@@ -1,3 +1,8 @@
+libquill (1.110519.0) unstable; urgency=low
+  * Fixes: NB#257521 Memory use permanently increased
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 19 May 2011 16:24:30 +0300
+
 libquill (1.110518.0) unstable; urgency=low
   * Fixes: NB#256266 Thumbnails recreated after reboot due to inaccuracy of modified time field provided by FAT file system
 
