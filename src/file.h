@@ -736,9 +736,9 @@ private:
       Enumeration for thumbnail existence: yes, no, or not yet known
       */
     enum ThumbnailExistenceState {
+        Thumbnail_UnknownExists = 0,
         Thumbnail_Exists,
         Thumbnail_NotExists,
-        Thumbnail_UnknownExists,
     };
 
     QList<QuillFile*> m_references;
@@ -752,8 +752,7 @@ private:
 
     int m_displayLevel;
     int m_priority;
-    ThumbnailExistenceState m_hasThumbnail; // If a thumbnail exists in the file system
-                                            // optimization is currently for level 0 only
+    QMap<int, ThumbnailExistenceState> m_hasThumbnail; //! Caches information of thumbnail existence in the file system. Absent values are interpreted as Thumbnail_UnknownExists.
 
     QString m_fileName;
     QString m_originalFileName;

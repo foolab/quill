@@ -60,7 +60,6 @@ const int File::timestampTolerance = 1;
 File::File() : m_state(State_Normal),
                m_hasThumbnailError(false),
                m_displayLevel(-1), m_priority(QuillFile::Priority_Normal),
-               m_hasThumbnail(Thumbnail_UnknownExists),
                m_fileName(""), m_originalFileName(""),
                m_fileFormat(""), m_targetFormat(""), m_viewPort(QRect()),
                m_temporaryFile(0),m_original(false),
@@ -492,13 +491,15 @@ bool File::hasThumbnail(int level)
     if (Core::instance()->thumbnailFlavorName(level).isEmpty()) {
         return false;
     }
-    // Optimization currently for level 0 only
+
     // For externally supported files, thumbnails may appear at any time
     // so they need to be always checked from the file system
-    if ((level == 0) &&
-        (state() != State_ExternallySupportedFormat) &&
-        (m_hasThumbnail != File::Thumbnail_UnknownExists)) {
-         return m_hasThumbnail == File::Thumbnail_Exists;
+    if (state() != State_ExternallySupportedFormat) {
+        File::ThumbnailExistenceState isCached =
+            m_hasThumbnail.value(level, File::Thumbnail_UnknownExists);
+
+        if (isCached != File::Thumbnail_UnknownExists)
+            return isCached == File::Thumbnail_Exists;
     }
 
     // Information about thumbnail existence not known, it must be calculated now
@@ -510,8 +511,7 @@ bool File::hasThumbnail(int level)
         isMatchingTimestamp(info.lastModified(), m_lastModified))
         result = File::Thumbnail_Exists;
 
-    if (level == 0)
-        m_hasThumbnail = result;
+    m_hasThumbnail.insert(level, result);
 
     return result == File::Thumbnail_Exists;
 }
@@ -813,7 +813,7 @@ void File::removeThumbnails()
     for (int level=0; level<Core::instance()->previewLevelCount(); level++)
         QFile::remove(thumbnailFileName(level));
     QFile::remove(failedThumbnailFileName());
-    m_hasThumbnail = File::Thumbnail_NotExists;
+    m_hasThumbnail.clear();
 }
 
 void File::touchThumbnail(int level)
@@ -975,8 +975,7 @@ void File::abortSave()
 
 void File::registerThumbnail(int level)
 {
-    if (level == 0)
-        m_hasThumbnail = File::Thumbnail_Exists;
+    m_hasThumbnail.insert(level, File::Thumbnail_Exists);
     touchThumbnail(level);
 }
 
@@ -1060,7 +1059,7 @@ void File::refresh()
     m_error = QuillError::NoError;
 
     // Forces re-checking thumbnails existence
-    m_hasThumbnail = File::Thumbnail_UnknownExists;
+    m_hasThumbnail.clear();
 
     refreshLastModified();
 
