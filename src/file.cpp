@@ -485,22 +485,20 @@ bool File::hasUnsavedThumbnails()
 
 bool File::hasThumbnail(int level)
 {
-    if(isOriginal()){
+    if (Core::instance()->thumbnailFlavorName(level).isEmpty() || isOriginal())
         return false;
-    }
-    if (Core::instance()->thumbnailFlavorName(level).isEmpty()) {
-        return false;
-    }
+
+    File::ThumbnailExistenceState isCached =
+        m_hasThumbnail.value(level, File::Thumbnail_UnknownExists);
+
+    if (isCached == File::Thumbnail_Exists)
+        return true;
 
     // For externally supported files, thumbnails may appear at any time
     // so they need to be always checked from the file system
-    if (state() != State_ExternallySupportedFormat) {
-        File::ThumbnailExistenceState isCached =
-            m_hasThumbnail.value(level, File::Thumbnail_UnknownExists);
-
-        if (isCached != File::Thumbnail_UnknownExists)
-            return isCached == File::Thumbnail_Exists;
-    }
+    else if ((isCached == File::Thumbnail_NotExists) &&
+             (state() != State_ExternallySupportedFormat))
+        return false;
 
     // Information about thumbnail existence not known, it must be calculated now
     QFileInfo info(thumbnailFileName(level));
