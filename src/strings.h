@@ -59,6 +59,8 @@ namespace Strings
     S(jpeg,                  "jpeg");
     S(jpg,                   "jpg");
 
+    S(mp4MimeType,           "video/mp4");
+
     S(pngMimeType,           "image/png");
     S(png,                   "png");
 

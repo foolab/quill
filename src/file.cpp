@@ -505,9 +505,18 @@ bool File::hasThumbnail(int level)
 
     File::ThumbnailExistenceState result = File::Thumbnail_NotExists;
 
-    if (info.exists() &&
-        isMatchingTimestamp(info.lastModified(), m_lastModified))
-        result = File::Thumbnail_Exists;
+    if (info.exists()) {
+        // For files of an externally supported format, if the
+        // external thumbnailer is deactivated an outdated thumbnail
+        // is preferred to no thumbnail at all.
+        // This should check the state instead of the mime type,
+        // but currently this can be visited before the state is determined.
+        if (!Core::instance()->isDBusThumbnailingEnabled() &&
+            (m_fileFormat == Strings::mp4MimeType))
+            result = File::Thumbnail_Exists;
+        else if (isMatchingTimestamp(info.lastModified(), m_lastModified))
+            result = File::Thumbnail_Exists;
+    }
 
     m_hasThumbnail.insert(level, result);
 
