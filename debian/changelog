@@ -1,3 +1,8 @@
+libquill (1.110526.0) unstable; urgency=low
+  * Fixes: NB#255811 Editing metadata with tracker invalidates thumbnails
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 26 May 2011 09:49:30 +0300
+
 libquill (1.110524.0) unstable; urgency=low
   * Fixes: NB#258478 Unnecessary stat64 system calls
 
