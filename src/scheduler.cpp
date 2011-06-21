@@ -614,6 +614,7 @@ QSize Scheduler::fullSizeForAspectRatio(const File *file)
 
 void Scheduler::processFinishedTask(Task *task, QuillImage image)
 {
+    bool fileDeletionAllowed = false;
     bool imageUpdated = false;
     image.setZ(task->displayLevel());
 
@@ -674,7 +675,7 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
             // if the whole file can be deleted now
             if(file->allowDelete())
-                delete file;
+                fileDeletionAllowed = true;
 
             // Thumbnail saving - delete temporary filter
             delete filter;
@@ -687,10 +688,8 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
 
             file->concludeSave();
 
-            if (file->allowDelete()){
-                delete file;
-                file = 0;
-            }
+            if (file->allowDelete())
+                fileDeletionAllowed = true;
         }
         else
             // Full image saving proceeds
@@ -798,6 +797,11 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
     }
     delete task;
 
-    if (file&&error.errorCode() != QuillError::NoError)
-        file->emitError(error);
+    if (file) {
+        if (error.errorCode() != QuillError::NoError)
+            file->emitError(error);
+
+        if (fileDeletionAllowed)
+            delete file;
+    }
 }

@@ -1,3 +1,10 @@
+libquill (1.110628.1) unstable; urgency=low
+
+  * Fixed possible usage of invalid (already freed) File instances
+    when emitting errors.
+
+ -- Adrian Perez <aperez@igalia.com>  Tue, 28 Jun 2011 14:12:54 +0300
+
 libquill (1.110628.0) unstable; urgency=low
 
   * Fixes: NB#253776 - [TASK] Redo edit history lost for images if all operations are undone within a short time
