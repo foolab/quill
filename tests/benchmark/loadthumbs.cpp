@@ -2,7 +2,7 @@
 #include <QEventLoop>
 #include <QDir>
 #include <QTime>
-#include <QDebug>
+#include <iostream>
 #include <QTemporaryFile>
 
 #include <Quill>
@@ -14,7 +14,8 @@
 
 void loadThumbs(QString originalFileName, int n, QSize size)
 {
-    qDebug() << "Loading" << n << size.width() << "x" << size.height() << "generated thumbnails for" << originalFileName;
+    std::cout << "Loading " << n << " " <<size.width() << "x" << size.height()
+              << " generated thumbnails for " << originalFileName.toAscii().constData() << "\n";
 
     QEventLoop loop;
     QTime time;
@@ -78,18 +79,18 @@ void loadThumbs(QString originalFileName, int n, QSize size)
 
     for (int i=0; i<numFiles; i++)
         if (quillFile[i]->image(0).isNull()) {
-            qDebug("Error: not all images are loaded!");
+            std::cout<<"Error: not all images are loaded!\n";
             return;
         }
 
-    qDebug() << "Initialize" << numFiles << "QuillFiles:"
-             << initTime << "ms";
+    std::cout << "Initialize " << numFiles << " QuillFiles: "
+             << initTime << "ms " <<"\n";
 
-    qDebug() << "Set display levels of" << numFiles << "QuillFiles:"
-             << displayLevelTime - initTime << "ms";
+    std::cout << "Set display levels of " << numFiles << " QuillFiles: "
+             << displayLevelTime - initTime << "ms " <<"\n";
 
-    qDebug() << "Use case load" << numFiles << "generated thumbnails:"
-             << finalTime << "ms";
+    std::cout << "Use case load " << numFiles << " generated thumbnails: "
+             << finalTime << "ms " <<"\n";
 
     for (int i=0; i<numFiles; i++) {
         delete quillFile[i];

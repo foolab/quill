@@ -2,7 +2,8 @@
 #include <QEventLoop>
 #include <QDir>
 #include <QTime>
-#include <QDebug>
+#include <iostream>
+#include <QRect>
 
 #include <Quill>
 #include <QuillFile>
@@ -29,7 +30,8 @@ void tiling(QString fileName, QSize size)
     QObject::connect(file, SIGNAL(imageAvailable(const QuillImageList)),
                      &loop, SLOT(quit()));
 
-    qDebug() << "Getting 256x256 tiles inside" << file->viewPort();
+    std::cout << "Getting 256x256 tiles inside " << file->viewPort().width() << "x" << file->viewPort().height()
+              << "\n";
 
     int tileCount = 0;
 
@@ -37,9 +39,9 @@ void tiling(QString fileName, QSize size)
         loop.exec();
 
         if (tileCount > 0)
-            qDebug() << "Time elapsed for tile" << time.elapsed();
+            std::cout << "Time elapsed for tile " << time.elapsed();
         else
-            qDebug() << "Time elapsed for setup and preview:" << time.elapsed();
+            std::cout << "Time elapsed for setup and preview: " << time.elapsed();
 
         tileCount++;
 

@@ -2,7 +2,7 @@
 #include <QEventLoop>
 #include <QDir>
 #include <QTime>
-#include <QDebug>
+#include <iostream>
 #include <QTemporaryFile>
 
 #include <Quill>
@@ -45,5 +45,5 @@ void batchrotate(QString fileName)
 
     loop.exec();
 
-    qDebug() << "Use case batch rotate/save:" << time.elapsed() << "ms";
+    std::cout << "Use case batch rotate/save: " << time.elapsed() << "ms" << "\n";
 }

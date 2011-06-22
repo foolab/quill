@@ -2,19 +2,19 @@
 #include <QEventLoop>
 #include <QDir>
 #include <QTime>
-#include <QDebug>
 #include <QTemporaryFile>
 
 #include <Quill>
 #include <QuillFile>
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
+#include <iostream>
 
 #include "../../src/strings.h"
 
 void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize, QString mimeType, QString flavor)
 {
-    qDebug() << "Generating" << n << flavor << size.width() << "x" << size.height() << "thumbnails for" << originalFileName << "MIME" << mimeType;
+    std::cout << "Generating " << n <<" "<< flavor.toAscii().constData() << size.width() << "x" << size.height() << " thumbnails for " << originalFileName.toAscii().constData() << " MIME " << mimeType.toAscii().constData() << "\n";
 
     QEventLoop loop;
     QTime time;
@@ -66,18 +66,18 @@ void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSi
 
     for (int i=0; i<numFiles; i++)
         if (quillFile[i]->image(0).isNull()) {
-            qDebug("Error: not all images are loaded!");
+            std::cout<<"Error: not all images are loaded!\n";
             return;
         }
 
-    qDebug() << "Initialize" << numFiles << "QuillFiles:"
-             << initTime << "ms";
+    std::cout << "Initialize " << numFiles << " QuillFiles: "
+             << initTime << "ms" << "\n";
 
-    qDebug() << "Set display levels of" << numFiles << "QuillFiles:"
-             << displayLevelTime - initTime << "ms";
+    std::cout << "Set display levels of " << numFiles << " QuillFiles: "
+             << displayLevelTime - initTime << "ms" << "\n";
 
-    qDebug() << "Use case generate" << numFiles << "thumbnails:"
-             << finalTime << "ms";
+    std::cout << "Use case generate " << numFiles << " thumbnails: "
+             << finalTime << "ms" << "\n";
 
     for (int i=0; i<numFiles; i++) {
         delete quillFile[i];

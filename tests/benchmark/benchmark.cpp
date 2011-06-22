@@ -1,8 +1,7 @@
 #include <unistd.h>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QuillImageFilter>
-
+#include <iostream>
 #include "batchrotate.h"
 #include "generatethumbs.h"
 #include "loadthumbs.h"
@@ -14,27 +13,27 @@
 
 void help()
 {
-    qDebug() << "Usage: benchmark [case] [filename] <options>";
-    qDebug();
-    qDebug() << "Cases:";
-    qDebug() << "00 rotate         - Batch load/rotate/save";
-    qDebug() << "01 loadthumbs     - Load multiple thumbnails";
-    qDebug() << "02 generatethumbs - Generate multiple thumbnails for viewing";
-    qDebug() << "03 tiling         - Load tiles, use -w and -h for the size of the interest area";
-    qDebug() << "04 autofix        - Thumbnail response for Autofix edit";
-    qDebug() << "05 straighten     - Thumbnail responses for Straighten edit";
-    qDebug() << "06 redeye         - Thumbnail response for Red eye removal";
-    qDebug();
-    qDebug() << "Options:";
-    qDebug() << "-n  number of files, default 100";
-    qDebug() << "-w  thumbnail width, default 128";
-    qDebug() << "-h  thumbnail height, default 128";
-    qDebug() << "-f  force thumbnail size";
-    qDebug() << "-m  mime type, default image/jpeg";
-    qDebug() << "-d  D-Bus thumbnailing flavor name, default grid";
-    qDebug() << "-x  Effect centerpoint X, full-image coords (red eye removal)";
-    qDebug() << "-y  Effect centerpoint Y, full-image coords (red eye removal)";
-    qDebug() << "-t  Effect tolerance radius, full-image coords (red eye removal)";
+    std::cout << "Usage: benchmark [case] [filename] <options>\n";
+    std::cout << "\n";
+    std::cout << "Cases:";
+    std::cout << "00 rotate         - Batch load/rotate/save\n";
+    std::cout << "01 loadthumbs     - Load multiple thumbnails\n";
+    std::cout << "02 generatethumbs - Generate multiple thumbnails for viewing\n";
+    std::cout << "03 tiling         - Load tiles, use -w and -h for the size of the interest area\n";
+    std::cout << "04 autofix        - Thumbnail response for Autofix edit\n";
+    std::cout << "05 straighten     - Thumbnail responses for Straighten edit\n";
+    std::cout << "06 redeye         - Thumbnail response for Red eye removal\n";
+    std::cout << "\n";
+    std::cout << "Options:\n";
+    std::cout << "-n  number of files, default 100\n";
+    std::cout << "-w  thumbnail width, default 128\n";
+    std::cout << "-h  thumbnail height, default 128\n";
+    std::cout << "-f  force thumbnail size\n";
+    std::cout << "-m  mime type, default image/jpeg\n";
+    std::cout << "-d  D-Bus thumbnailing flavor name, default grid\n";
+    std::cout << "-x  Effect centerpoint X, full-image coords (red eye removal)\n";
+    std::cout << "-y  Effect centerpoint Y, full-image coords (red eye removal)\n";
+    std::cout << "-t  Effect tolerance radius, full-image coords (red eye removal)\n";
 }
 
 int c;

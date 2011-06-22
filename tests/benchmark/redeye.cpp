@@ -2,8 +2,9 @@
 #include <QEventLoop>
 #include <QDir>
 #include <QTime>
-#include <QDebug>
+#include <iostream>
 #include <QTemporaryFile>
+#include <QPoint>
 
 #include <Quill>
 #include <QuillFile>
@@ -23,7 +24,10 @@ int compare(QImage source, QImage target)
 
 void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, int radius)
 {
-    qDebug() << "Removing red eyes from" << numFiles << size.width() << "x" << size.height() << "thumbnails of" << originalFileName << "at point" << center << "with tolerance" << radius;
+    std::cout << "Removing red eyes from " << numFiles << size.width() << "x" << size.height()
+              << " thumbnails of " << originalFileName.toAscii().constData() << " at point "
+              << center.x() << "x" << center.y()
+              << " with tolerance " << radius << "\n";
 
     QEventLoop loop;
     QTime time;
@@ -69,7 +73,7 @@ void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, i
 
     for (int i=0; i<numFiles; i++)
         if (quillFile[i]->image(0).isNull()) {
-            qDebug("Error: not all images are loaded!");
+            std::cout<<"Error: not all images are loaded!\n";
             return;
         }
 
@@ -93,24 +97,24 @@ void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, i
 
     for (int i=0; i<numFiles; i++)
         if (quillFile[i]->image(0).isNull()) {
-            qDebug("Error: not all images are edited!");
+            std::cout<<"Error: not all images are edited!\n";
             return;
         }
 
-    qDebug() << "Initialize" << numFiles << "QuillFiles:"
+    std::cout << "Initialize " << numFiles << " QuillFiles: "
              << initTime << "ms";
 
-    qDebug() << "Set display levels of" << numFiles << "QuillFiles:"
-             << displayLevelTime - initTime << "ms";
+    std::cout << "Set display levels of " << numFiles << " QuillFiles: "
+             << displayLevelTime - initTime << "ms" << "\n";
 
-    qDebug() << "Total prepare" << numFiles << "QuillFiles:"
-             << prepareTime << "ms";
+    std::cout << "Total prepare " << numFiles << " QuillFiles: "
+             << prepareTime << "ms" << "\n";
 
-    qDebug() << "Use case edit response for" << numFiles << "QuillFiles:"
-             << finalTime << "ms";
+    std::cout << "Use case edit response for " << numFiles << " QuillFiles: "
+             << finalTime << "ms" << "\n";
 
     int differences = compare(quillFile[0]->image(0), beforeEdit);
-    qDebug() << differences << "pixels were changed by the edit.";
+    std::cout << differences << " pixels were changed by the edit." << "\n";
 
     for (int i=0; i<numFiles; i++) {
         delete quillFile[i];
