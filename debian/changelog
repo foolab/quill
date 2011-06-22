@@ -1,3 +1,9 @@
+libquill (1.110622.0) unstable; urgency=low
+
+  * Fixed Avoid using QDebug for stdout in quill benchmark application
+
+ -- Muhammad Islam <muhammad.k.islam@nokia.com>  Wed, 22 Jun 2011 14:33:33 +0300
+
 libquill (1.110526.0) unstable; urgency=low
   * Fixes: NB#255811 Editing metadata with tracker invalidates thumbnails
 
