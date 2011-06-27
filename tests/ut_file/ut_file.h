@@ -66,6 +66,7 @@ private slots:
 
     void testRevertRestore();
     void testDoubleRevertRestore();
+    void testEdittingHistory();
 };
 
 #endif  // TEST_LIBQUILL_FILE_H

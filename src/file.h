@@ -495,7 +495,6 @@ public:
      */
 
     void readFromEditHistory(const QString &fileName,
-                             const QString &originalFileName,
                              QuillError *error);
 
     /*!

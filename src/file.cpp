@@ -597,17 +597,8 @@ QString File::editHistoryFileName(const QString &fileName,
 }
 
 void File::readFromEditHistory(const QString &fileName,
-                                const QString &originalFileName,
-                                QuillError *error)
+                               QuillError *error)
 {
-    // If original is not found, we will ignore any edit history.
-    if (!QFile::exists(originalFileName)) {
-        *error = QuillError(QuillError::FileNotFoundError,
-                            QuillError::ImageOriginalErrorSource,
-                            originalFileName);
-        return;
-    }
-
     QFile file(editHistoryFileName(fileName,
                                    Core::instance()->editHistoryPath()));
 
@@ -974,6 +965,9 @@ void File::concludeSave()
 
 void File::abortSave()
 {
+    QuillError result = QuillError::NoError;
+    writeEditHistory(HistoryXml::encode(this), &result);
+    //Before we call abortSave() from stack class, we make sure the edit history is saved.
     m_stack->abortSave();
     delete m_temporaryFile;
     m_temporaryFile = 0;
@@ -1174,8 +1168,8 @@ bool File::supportsEditing() const
        (m_state != State_ReadOnly)){
         if(!m_hasReadEditHistory&&!m_original&&(m_state != State_Placeholder)){
             const_cast<File *>(this)->m_hasReadEditHistory = true;
-            QuillError error;
-            const_cast<File *>(this)->readFromEditHistory(m_fileName,m_originalFileName,&error);
+            QuillError error = QuillError::NoError;
+            const_cast<File *>(this)->readFromEditHistory(m_fileName,&error);
             if ((error.errorCode() != QuillError::NoError) &&
                 (error.errorCode() != QuillError::FileNotFoundError)){
                 Core::instance()->emitError(error);

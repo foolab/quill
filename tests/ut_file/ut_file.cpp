@@ -502,6 +502,32 @@ void ut_file::testDoubleRevertRestore()
    delete file;
 }
 
+void ut_file::testEdittingHistory()
+{
+    QTemporaryFile testFile1;
+    testFile1.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(testFile1.fileName(), "png");
+
+    QuillImageFilter *filter =
+        QuillImageFilterFactory::createImageFilter(QuillImageFilter::Name_BrightnessContrast);
+    QVERIFY(filter);
+    filter->setOption(QuillImageFilter::Brightness, QVariant(20));
+
+    QuillFile *file = new QuillFile(testFile1.fileName(), Strings::png);
+    File *fileObject = file->internalFile();
+    QVERIFY(file->setDisplayLevel(0));
+    QVERIFY(!fileObject->hasOriginal());
+    QFile editHistory(fileObject->editHistoryFileName(fileObject->fileName(),
+                                          Core::instance()->editHistoryPath()));
+    QVERIFY(!editHistory.exists());
+    file->runFilter(filter);
+    file->undo();
+    QVERIFY(editHistory.exists());
+    QVERIFY(!fileObject->hasOriginal());
+
+}
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_file test;
