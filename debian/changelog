@@ -1,3 +1,9 @@
+libquill (1.110628.0) unstable; urgency=low
+
+  * Fixes: NB#253776 - [TASK] Redo edit history lost for images if all operations are undone within a short time
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 28 Jun 2011 13:33:33 +0300
+
 libquill (1.110622.0) unstable; urgency=low
 
   * Fixed Avoid using QDebug for stdout in quill benchmark application
