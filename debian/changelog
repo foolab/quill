@@ -1,3 +1,9 @@
+libquill (1.110630.0) unstable; urgency=low
+
+  * Fixes: NB#224813 - Source packages still generating -docs packages for arm targets
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Thu, 30 Jun 2011 11:00:33 +0300
+
 libquill (1.110628.1) unstable; urgency=low
 
   * Fixed possible usage of invalid (already freed) File instances
