@@ -424,7 +424,10 @@ void Core::setThumbnailFlavorName(int level, const QString &name)
 
 QString Core::thumbnailFlavorName(int level) const
 {
-    return m_displayLevel[level]->thumbnailFlavorName();
+    if ((level < 0) || (level >= m_displayLevel.count()))
+        return QString();
+    else
+        return m_displayLevel[level]->thumbnailFlavorName();
 }
 
 QString Core::thumbnailPath(int level) const
