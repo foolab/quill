@@ -52,6 +52,7 @@
 #include "tilemap.h"
 #include "filesystem.h"
 #include "quillerror.h"
+#include "regionsofinterest.h"
 #include "logger.h"
 #include "strings.h"
 
@@ -916,6 +917,21 @@ void File::concludeSave()
     if (isJpeg()) {
         QuillMetadata metadata(m_fileName);
         ResetOrientationTag(metadata);
+
+        QuillMetadataRegionBag regions =
+            metadata.entry(QuillMetadata::Tag_Regions).value<QuillMetadataRegionBag>();
+
+        QuillMetadataRegionBag newRegions =
+            RegionsOfInterest::applyStackToRegions(m_stack, regions);
+
+        if (!newRegions.isEmpty()) {
+            QVariant variant;
+            variant.setValue(newRegions);
+            metadata.setEntry(QuillMetadata::Tag_Regions, variant);
+        }
+        else
+            metadata.removeEntry(QuillMetadata::Tag_Regions);
+
         if (!metadata.write(temporaryName, QuillMetadata::XmpFormat)) {
             // If metadata write failed, the temp file is likely corrupt
             emitError(QuillError(QuillError::FileWriteError,
