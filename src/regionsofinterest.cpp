@@ -1,13 +1,13 @@
 #include "quillundocommand.h"
 #include "regionsofinterest.h"
 
-QuillMetadataRegionBag RegionsOfInterest::applyFilterToRegions(QuillImageFilter *filter,
-                                                               QuillMetadataRegionBag regions)
+QuillMetadataRegionList RegionsOfInterest::applyFilterToRegions(QuillImageFilter *filter,
+                                                               QuillMetadataRegionList regions)
 {
     QSize size = regions.fullImageSize();
     QSize newSize = filter->newFullImageSize(size);
 
-    QuillMetadataRegionBag result;
+    QuillMetadataRegionList result;
     result.setFullImageSize(newSize);
 
     foreach (QuillMetadataRegion region, regions) {
@@ -19,15 +19,15 @@ QuillMetadataRegionBag RegionsOfInterest::applyFilterToRegions(QuillImageFilter 
     return result;
 }
 
-QuillMetadataRegionBag
+QuillMetadataRegionList
     RegionsOfInterest::applyStackToRegions(QuillUndoStack *stack,
-                                           QuillMetadataRegionBag regions)
+                                           QuillMetadataRegionList regions)
 {
     int savedIndex = stack->savedIndex();
     int index = stack->index();
 
     if (savedIndex > index)
-        return QuillMetadataRegionBag();
+        return QuillMetadataRegionList();
 
     for (int i=savedIndex+1; i<index; i++) {
         QuillImageFilter *filter = stack->command(i)->filter();

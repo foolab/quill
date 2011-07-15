@@ -16,15 +16,15 @@ class RegionsOfInterest {
       Applies one filter to a region bag
     */
 
-    static QuillMetadataRegionBag applyFilterToRegions(QuillImageFilter *filter,
-                                                       QuillMetadataRegionBag regions);
+    static QuillMetadataRegionList applyFilterToRegions(QuillImageFilter *filter,
+                                                        QuillMetadataRegionList regions);
 
     /*!
       Applies a whole stack of filters to a QuillMetadata object
     */
 
-    static QuillMetadataRegionBag applyStackToRegions(QuillUndoStack *stack,
-                                                      QuillMetadataRegionBag regions);
+    static QuillMetadataRegionList applyStackToRegions(QuillUndoStack *stack,
+                                                       QuillMetadataRegionList regions);
 };
 
 #endif // REGIONS_OF_INTEREST_H

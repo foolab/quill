@@ -918,10 +918,10 @@ void File::concludeSave()
         QuillMetadata metadata(m_fileName);
         ResetOrientationTag(metadata);
 
-        QuillMetadataRegionBag regions =
-            metadata.entry(QuillMetadata::Tag_Regions).value<QuillMetadataRegionBag>();
+        QuillMetadataRegionList regions =
+            metadata.entry(QuillMetadata::Tag_Regions).value<QuillMetadataRegionList>();
 
-        QuillMetadataRegionBag newRegions =
+        QuillMetadataRegionList newRegions =
             RegionsOfInterest::applyStackToRegions(m_stack, regions);
 
         if (!newRegions.isEmpty()) {
