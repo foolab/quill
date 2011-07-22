@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2009-10 Nokia Corporation and/or its subsidiary(-ies).
-** Contact: Alexander Bokovoy <alexander.bokovoy@nokia.com>
+** Copyright (C) 2009-11 Nokia Corporation and/or its subsidiary(-ies).
+** Contact: Pekka Marjola <pekka.marjola@nokia.com>
 **
 ** This file is part of the Quill package.
 **
