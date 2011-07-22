@@ -1,3 +1,9 @@
+libquill (1.110722.0) unstable; urgency=low
+
+  * Updated years and contact person in copyright notice.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 22 Jul 2011 13:01:30 +0300
+
 libquill (1.110630.1) unstable; urgency=low
 
   * Sanity check for checking full image size before setting display level.
