@@ -53,7 +53,7 @@
 
 void generateThumbs(QString originalFileName, int n, QSize size, QSize minimumSize, QString mimeType, QString flavor)
 {
-    std::cout << "Generating " << n <<" "<< flavor.toAscii().constData() << size.width() << "x" << size.height() << " thumbnails for " << originalFileName.toAscii().constData() << " MIME " << mimeType.toAscii().constData() << "\n";
+    std::cout << "Generating " << n <<" "<< flavor.toAscii().constData() << size.width() << "x" << size.height() << " thumbnails for " << originalFileName.toLocal8Bit().constData() << " MIME " << mimeType.toAscii().constData() << "\n";
 
     QEventLoop loop;
     QTime time;

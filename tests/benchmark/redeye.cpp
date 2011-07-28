@@ -64,7 +64,7 @@ int compare(QImage source, QImage target)
 void redeye(QString originalFileName, int numFiles, QSize size, QPoint center, int radius)
 {
     std::cout << "Removing red eyes from " << numFiles << size.width() << "x" << size.height()
-              << " thumbnails of " << originalFileName.toAscii().constData() << " at point "
+              << " thumbnails of " << originalFileName.toLocal8Bit().constData() << " at point "
               << center.x() << "x" << center.y()
               << " with tolerance " << radius << "\n";
 

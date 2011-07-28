@@ -45,6 +45,6 @@ bool FileSystem::setFileModificationDateTime(const QString &fileName,
 {
     struct utimbuf times;
     times.actime = times.modtime = dateTime.toTime_t();
-    int result = utime(fileName.toAscii().constData(), &times);
+    int result = utime(fileName.toLocal8Bit().constData(), &times);
     return (result != 0);
 }

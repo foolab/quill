@@ -54,7 +54,7 @@
 void loadThumbs(QString originalFileName, int n, QSize size)
 {
     std::cout << "Loading " << n << " " <<size.width() << "x" << size.height()
-              << " generated thumbnails for " << originalFileName.toAscii().constData() << "\n";
+              << " generated thumbnails for " << originalFileName.toLocal8Bit().constData() << "\n";
 
     QEventLoop loop;
     QTime time;

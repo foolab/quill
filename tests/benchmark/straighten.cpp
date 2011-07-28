@@ -53,7 +53,7 @@
 void straighten(QString originalFileName, int numFiles, QSize size)
 {
     std::cout << "Straightening " << numFiles << size.width() << "x"
-              << size.height() << " thumbnails of " << originalFileName.toAscii().constData()<<"\n";
+              << size.height() << " thumbnails of " << originalFileName.toLocal8Bit().constData()<<"\n";
 
     QEventLoop loop;
     QTime time;

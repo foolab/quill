@@ -54,7 +54,7 @@
 void autofix(QString originalFileName, int numFiles, QSize size)
 {
     std::cout << "Autofixing " << numFiles << size.width() << "x" << size.height()
-              << " thumbnails of " << originalFileName.toAscii().constData() << "\n";
+              << " thumbnails of " << originalFileName.toLocal8Bit().constData() << "\n";
 
     QEventLoop loop;
     QTime time;
