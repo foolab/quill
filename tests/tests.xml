@@ -143,6 +143,13 @@
       </case>
     </set>
 
+    <set name="quill-regions-of-interest-tests" feature="regions">
+      <description>testing xmp metadata regions of interest</description>
+      <case name="ut_regions" type="Functional" level="Component">
+	<step >/usr/lib/libquill-tests/ut_regions </step>
+      </case>
+    </set>
+
     <set name="quill-dbus-thumbnail-tests" feature="dbusthumbnail">
       <description>d-bus thumbnailer test</description>
       <case name="ut_dbusthumbnailer" type="Functional" level="Component">

@@ -60,6 +60,7 @@ HEADERS += quill.h \
            dbus-thumbnailer/dbusthumbnailer.h \
            dbus-thumbnailer/thumbnailer_generic.h \
            backgroundthread.h \
+           regionsofinterest.h
 
 SOURCES += quill.cpp \
            quillfile.cpp \
@@ -81,6 +82,7 @@ SOURCES += quill.cpp \
            dbus-thumbnailer/dbusthumbnailer.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
            backgroundthread.cpp \
+           regionsofinterest.cpp
 
 debug {
     SOURCES += logger.cpp
