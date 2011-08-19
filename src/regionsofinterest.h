@@ -4,6 +4,7 @@
 #include <QuillImageFilter>
 #include <quillmetadata/QuillMetadata>
 #include <quillmetadata/QuillMetadataRegion>
+#include <quillmetadata/QuillMetadataRegionList>
 #include "quillundostack.h"
 
 class RegionsOfInterest {

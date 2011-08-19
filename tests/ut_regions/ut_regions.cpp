@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
-** Contact: Alexander Bokovoy <alexander.bokovoy@nokia.com>
+** Copyright (C) 2009-11 Nokia Corporation and/or its subsidiary(-ies).
+** Contact: Pekka Marjola <pekka.marjola@nokia.com>
 **
 ** This file is part of the Quill package.
 **
@@ -74,7 +74,7 @@ void ut_regions::cleanup()
 
 void ut_regions::testCropRegions()
 {
-    QuillMetadataRegionBag regions;
+    QuillMetadataRegionList regions;
     QuillMetadataRegion region1, region2, region3;
 
     region1.setArea(QRect(100, 300, 100, 100));
@@ -93,7 +93,7 @@ void ut_regions::testCropRegions()
     filter->setOption(QuillImageFilter::CropRectangle,
                       QRect(200, 200, 600, 600));
 
-    QuillMetadataRegionBag result =
+    QuillMetadataRegionList result =
         RegionsOfInterest::applyFilterToRegions(filter, regions);
 
     QCOMPARE(result.fullImageSize(), QSize(600, 600));
@@ -117,7 +117,7 @@ void ut_regions::testCropImage()
     QuillImage image = Unittests::generatePaletteImage();
     image.save(file.fileName(), "jpeg");
 
-    QuillMetadataRegionBag regions;
+    QuillMetadataRegionList regions;
     QuillMetadataRegion region1, region2, region3;
 
     region1.setArea(QRect(0, 0, 2, 2));
@@ -138,10 +138,10 @@ void ut_regions::testCropImage()
     QVERIFY(metadata.write(file.fileName()));
 
     QuillMetadata iMetadata(file.fileName());
-    QVERIFY(iMetadata.entry(QuillMetadata::Tag_Regions).canConvert<QuillMetadataRegionBag>());
-    QuillMetadataRegionBag iResult =
+    QVERIFY(iMetadata.entry(QuillMetadata::Tag_Regions).canConvert<QuillMetadataRegionList>());
+    QuillMetadataRegionList iResult =
         iMetadata.entry(QuillMetadata::Tag_Regions).
-        value<QuillMetadataRegionBag>();
+        value<QuillMetadataRegionList>();
 
     QCOMPARE(iResult.fullImageSize(), QSize(8, 2));
     QCOMPARE(iResult.count(), 3);
@@ -170,11 +170,11 @@ void ut_regions::testCropImage()
 
     QuillMetadata resultMetadata(file.fileName());
 
-    QVERIFY(resultMetadata.entry(QuillMetadata::Tag_Regions).canConvert<QuillMetadataRegionBag>());
+    QVERIFY(resultMetadata.entry(QuillMetadata::Tag_Regions).canConvert<QuillMetadataRegionList>());
 
-    QuillMetadataRegionBag result =
+    QuillMetadataRegionList result =
         resultMetadata.entry(QuillMetadata::Tag_Regions).
-        value<QuillMetadataRegionBag>();
+        value<QuillMetadataRegionList>();
 
     QCOMPARE(result.fullImageSize(), QSize(6, 2));
     QCOMPARE(result.count(), 2);
