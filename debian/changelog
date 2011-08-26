@@ -1,3 +1,9 @@
+libquill (1.110826.0) unstable; urgency=low
+
+  * Fixes: NB#271068 - Autofix not working properly in some cases
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com> Fri, 26 Aug 2011 15:00:46 +0300
+
 libquill (1.110819.1) unstable; urgency=low
 
   * Updates according to QuillMetadata changes
