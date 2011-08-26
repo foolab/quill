@@ -487,8 +487,13 @@ Task *Scheduler::newNormalTask(File *file, int level)
         // Red eye detection always uses the best available image
         if (generator && (!generator->isUsedOnPreview()))
             prevImage = prev->bestImage(Core::instance()->previewLevelCount());
-        else
+        else{
+            //Becuase grid thumbnail is cropped, we can not use it to generate the color histogram for
+            //autofix. We use full screen thumbnail
+            if(command->filter()->name()=="com.meego.auto.levels")
+                level = 1;
             prevImage = prev->image(level);
+        }
     }
 
     // Commands with errors should be ignored
