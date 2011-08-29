@@ -1,3 +1,9 @@
+libquill (1.110829.1) unstable; urgency=low
+
+  * Updated bug entry for pr1.2.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Mon, 29 Aug 2011 11:00:30 +0300
+
 libquill (1.110829.0) unstable; urgency=low
 
   * Updated date in the tag 1.110826.0.
