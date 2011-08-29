@@ -210,7 +210,7 @@ bool Core::isSubstituteLevel(int level, int targetLevel) const
           !minimumPreviewSize(targetLevel).isValid());
 }
 
-bool Core::smallestNonCroppedLevel() const
+int Core::smallestNonCroppedLevel() const
 {
     for (int level=0; level < m_displayLevel.count() - 1; level++)
         if (!minimumPreviewSize(level).isValid())

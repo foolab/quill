@@ -206,7 +206,7 @@ public:
       the full image.
     */
 
-    bool smallestNonCroppedLevel() const;
+    int smallestNonCroppedLevel() const;
 
     /*!
       Sets the default tile size if tiling is in use.
