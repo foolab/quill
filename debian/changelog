@@ -22,12 +22,6 @@ libquill (1.110819.0) unstable; urgency=low
 
  -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Fri, 19 Aug 2011 11:35:00 +0300
 
-libquill (1.110818.0) unstable; urgency=low
-
-  * Fixes: NB#270425 - Respect local encoding on file name usage
-
- -- Simon Pena <spena@igalia.com>  Thu, 18 Aug 2011 12:16:46 +0300
-
 libquill (1.110722.0) unstable; urgency=low
 
   * Updated years and contact person in copyright notice.
