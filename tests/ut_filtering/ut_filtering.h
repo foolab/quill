@@ -79,6 +79,8 @@ private:
 	    int nRepeat, int nRotateAngle,
 	    int nBrightness, int nContrast, bool bRotateFirst);
 
+    QList<QTemporaryFile*> m_tmpFileList;
+
 private slots:
     void init();
     void cleanup();

@@ -62,10 +62,15 @@ ut_filtering::ut_filtering()
 
 void ut_filtering::initTestCase()
 {
+    m_tmpFileList.clear();
 }
 
 void ut_filtering::cleanupTestCase()
 {
+    foreach (QTemporaryFile *pTmpFile, m_tmpFileList) {
+	pTmpFile->setAutoRemove(true);
+	delete pTmpFile;
+    }
 }
 
 void ut_filtering::init()
@@ -92,8 +97,10 @@ QTemporaryFile* ut_filtering::createTempFile(QString fileName)
     pTmpFile->open();
     pTmpFile->write(buf);
     pTmpFile->flush();
-    // Uncomment to view results
     pTmpFile->setAutoRemove(false);
+
+    if (!m_tmpFileList.contains(pTmpFile))
+	m_tmpFileList.append(pTmpFile);
 
     return pTmpFile;
 }
@@ -209,7 +216,7 @@ QuillTempFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
 	tmpFile1a->close();
 
 	// Create file 'b' by copying file where image 'a' is written to
-	delete tmpFile1b;
+	//delete tmpFile1b;
 	tmpFile1b = createTempFile(tmpFile1a->fileName());
 
 	// Create image 'b' from file
@@ -233,11 +240,11 @@ QuillTempFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
 	tmpFile1b->close();
 
 	// Create file 'a' by copying file where image 'b' is written to
-	delete tmpFile1a;
+	//delete tmpFile1a;
 	tmpFile1a = createTempFile(tmpFile1b->fileName());
     }
 
-    delete tmpFile1b;
+    //delete tmpFile1b;
     quillFile1b->remove();
     delete quillFile1b;
 
@@ -285,15 +292,15 @@ void ut_filtering::testFreerotateWithBrightnessContrast_noSaving()
     QVERIFY(dPSNR > 30);
 
     // Cleanup:
-    tmpFile1->setAutoRemove(true);
-    delete tmpFile1;
-    quillFile1->remove();
-    delete quillFile1;
+    //tmpFile1->setAutoRemove(true);
+    //delete tmpFile1;
+    //quillFile1->remove();
+    //delete quillFile1;
 
-    tmpFile2->setAutoRemove(true);
-    delete tmpFile2;
-    quillFile2->remove();
-    delete quillFile2;
+    //tmpFile2->setAutoRemove(true);
+    //delete tmpFile2;
+    //quillFile2->remove();
+    //delete quillFile2;
 }
 
 
@@ -335,21 +342,21 @@ void ut_filtering::testFreerotateWithBrightnessContrast_savingInBetween()
     QVERIFY(dPSNR > 30);
 
     // Cleanup:
-    tmpFile1a->setAutoRemove(true);
-    delete tmpFile1a;
-    quillFile1a->remove();
-    delete quillFile1a;
+    //tmpFile1a->setAutoRemove(true);
+    //delete tmpFile1a;
+    //quillFile1a->remove();
+    //delete quillFile1a;
 
-    tmpFile2a->setAutoRemove(true);
-    delete tmpFile2a;
-    quillFile2a->remove();
-    delete quillFile2a;
-
+    //tmpFile2a->setAutoRemove(true);
+    //delete tmpFile2a;
+    //quillFile2a->remove();
+    //delete quillFile2a;
 }
 
 
 void ut_filtering::testRedEyeRemovalWithCrop()
 {
+
     QString fileName = "/usr/share/quillimagefilter-tests/images/redeye01.JPG";
 
     int nRepeat = 4;
@@ -361,7 +368,6 @@ void ut_filtering::testRedEyeRemovalWithCrop()
     // RER first:
     QTemporaryFile *tmpFile1 = createTempFile(fileName);
     QVERIFY(tmpFile1);
-    QImage image(fileName);
     {
 	QuillFile quillFile1(tmpFile1->fileName(), Strings::jpg);
 
@@ -412,16 +418,12 @@ void ut_filtering::testRedEyeRemovalWithCrop()
     tmpFile1->open();
     QByteArray buf1 = tmpFile1->readAll();
     tmpFile1->close();
-    tmpFile1->setAutoRemove(true);
-    delete tmpFile1;
 
     tmpFile2->flush();
     tmpFile2->close();
     tmpFile2->open();
     QByteArray buf2 = tmpFile2->readAll();
     tmpFile2->close();
-    tmpFile2->setAutoRemove(true);
-    delete tmpFile2;
 
     // Should be identical (= same size after compression)
     QCOMPARE(qChecksum(buf1.data(),buf1.capacity()), qChecksum(buf2.data(),buf2.capacity()));
