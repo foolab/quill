@@ -130,6 +130,7 @@ void Core::cleanup()
 {
     delete g_instance;
     g_instance = 0;
+    QuillImageFilter::cleanup();
 }
 
 Core *Core::instance()
