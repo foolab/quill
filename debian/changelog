@@ -1,3 +1,10 @@
+libquill (1.110901.0) unstable; urgency=low
+
+  * Fixes: NB#279397 - large allocation in LoadFilter::readFileToByteArray
+    which is not possible to easily free
+
+ -- Adrian Perez <aperez@igalia.com>  Thu, 01 Sep 2011 12:49:50 +0300
+
 libquill (1.110829.1) unstable; urgency=low
 
   * Updated bug entry for pr1.2.
