@@ -133,6 +133,36 @@ bool Unittests::compareImage(QImage image1, QImage image2)
     return false;
 }
 
+double Unittests::getPSNR(QImage image1, QImage image2)
+{
+    if (image1.size() != image2.size())
+    {
+	qDebug() << "Error: image sizes do not match!";
+	qDebug() << "Actual:" << image1.size() << "Expected:" << image2.size();
+
+	return -1.0;
+    }
+
+    QRgb *pixel1 = (QRgb*) image1.bits(),
+	 *pixel2 = (QRgb*) image2.bits();
+
+    int nPixels = image1.size().width()*image1.size().height();
+    long nSqrSum = 0;
+    for (int i=0; i<nPixels; i++) {
+	int tmp1 = (int)(0.3*qRed(pixel1[i]) + 0.59*qGreen(pixel1[i]) + 0.11*qBlue(pixel1[i]) + 0.5);
+	int tmp2 = (int)(0.3*qRed(pixel2[i]) + 0.59*qGreen(pixel2[i]) + 0.11*qBlue(pixel2[i]) + 0.5);
+	nSqrSum += (tmp1-tmp2) * (tmp1-tmp2);
+    }
+    double dPSNR;
+    double MSE = nSqrSum/nPixels;
+    if (MSE > 0)
+	dPSNR = 10*log10(255*255 / MSE);
+    else
+	dPSNR = 100;
+
+    return dPSNR;
+}
+
 bool Unittests::isRoot()
 {
     return QString(getenv("USER")) == QString("root");
