@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
-** Contact: Alexander Bokovoy <alexander.bokovoy@nokia.com>
+** Copyright (C) 2009-11 Nokia Corporation and/or its subsidiary(-ies).
+** Contact: Pekka Marjola <pekka.marjola@nokia.com>
 **
 ** This file is part of the Quill package.
 **
@@ -37,8 +37,8 @@
 **
 ****************************************************************************/
 
-#ifndef TEST_LIBQUILL_FILE_H
-#define TEST_LIBQUILL_FILE_H
+#ifndef TEST_LIBQUILL_FILTERING_H
+#define TEST_LIBQUILL_FILTERING_H
 
 #include <QObject>
 #include <QImage>
@@ -93,4 +93,4 @@ private slots:
 
 };
 
-#endif  // TEST_LIBQUILL_FILE_H
+#endif  // TEST_LIBQUILL_FILTERING_H
