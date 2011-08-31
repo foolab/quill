@@ -47,14 +47,6 @@
 #include "quillfile.h"
 
 
-struct QuillTempFile
-{
-    QTemporaryFile *pTmpFile;
-    QuillFile *pQFile;
-};
-
-
-
 class QuillImageFilter;
 class ut_filtering : public QObject {
 Q_OBJECT
@@ -71,11 +63,11 @@ private:
 	    QRect cropRect,
 	    QuillImageFilter **f_rer, QuillImageFilter **f_crop);
 
-    QuillTempFile* rotateAndAdjust(QString fileName,
+    QTemporaryFile* rotateAndAdjust(QString fileName,
 	    int nRepeat, int nRotateAngle,
 	    int nBrightness, int nContrast, bool bRotateFirst);
 
-    QuillTempFile* rotateAndAdjustWithSave(QString fileName,
+    QTemporaryFile* rotateAndAdjustWithSave(QString fileName,
 	    int nRepeat, int nRotateAngle,
 	    int nBrightness, int nContrast, bool bRotateFirst);
 

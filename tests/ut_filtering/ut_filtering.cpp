@@ -138,7 +138,7 @@ void ut_filtering::createRER_CropFilters(
 }
 
 
-QuillTempFile* ut_filtering::rotateAndAdjust(QString fileName,
+QTemporaryFile* ut_filtering::rotateAndAdjust(QString fileName,
 	int nRepeat, int nRotateAngle, int nBrightness, int nContrast, bool bRotateFirst)
 {
     QuillImageFilter *f_freerotate;
@@ -173,14 +173,12 @@ QuillTempFile* ut_filtering::rotateAndAdjust(QString fileName,
     tmpFile1->flush();
     tmpFile1->close();
 
-    QuillTempFile* pRetval = new QuillTempFile();
-    pRetval->pQFile	= quillFile1;
-    pRetval->pTmpFile	= tmpFile1;
-    return pRetval;
+    delete quillFile1;
+    return tmpFile1;
 }
 
 
-QuillTempFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
+QTemporaryFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
 	int nRepeat, int nRotateAngle, int nBrightness, int nContrast, bool bRotateFirst)
 {
     QuillImageFilter *f_freerotate;
@@ -248,11 +246,9 @@ QuillTempFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
     //delete tmpFile1b;
     quillFile1b->remove();
     delete quillFile1b;
+    delete quillFile1a;
 
-    QuillTempFile* pRetval = new QuillTempFile;
-    pRetval->pQFile	= quillFile1a;
-    pRetval->pTmpFile	= tmpFile1a;
-    return pRetval;
+    return tmpFile1a;
 }
 
 
@@ -268,18 +264,12 @@ void ut_filtering::testFreerotateWithBrightnessContrast_noSaving()
     Quill::setDefaultTileSize(QSize(64, 64));
 
     // Rotate first:
-    QuillTempFile *pQTemp1 = rotateAndAdjust(
+    QTemporaryFile *tmpFile1 = rotateAndAdjust(
 	    fileName, nRepeat, nAngle, nBrightness, nContrast, true);
 
-    QTemporaryFile *tmpFile1 = pQTemp1->pTmpFile;
-    //QuillFile *quillFile1 = pQTemp1->pQFile;
-
     // Adjust first:
-    QuillTempFile *pQTemp2 = rotateAndAdjust(
+    QTemporaryFile *tmpFile2 = rotateAndAdjust(
 	    fileName, nRepeat, nAngle, nBrightness, nContrast, false);
-
-    QTemporaryFile *tmpFile2 = pQTemp2->pTmpFile;
-    //QuillFile *quillFile2 = pQTemp2->pQFile;
 
     // Created images needed comparing pixel data
     QImage ima1(tmpFile1->fileName());
@@ -291,17 +281,6 @@ void ut_filtering::testFreerotateWithBrightnessContrast_noSaving()
     double dPSNR = Unittests::getPSNR(ima1, ima2);
     qDebug() << dPSNR << "dB";
     QVERIFY(dPSNR > 30);
-
-    // Cleanup:
-    //tmpFile1->setAutoRemove(true);
-    //delete tmpFile1;
-    //quillFile1->remove();
-    //delete quillFile1;
-
-    //tmpFile2->setAutoRemove(true);
-    //delete tmpFile2;
-    //quillFile2->remove();
-    //delete quillFile2;
 }
 
 
@@ -317,18 +296,12 @@ void ut_filtering::testFreerotateWithBrightnessContrast_savingInBetween()
     Quill::setDefaultTileSize(QSize(64, 64));
 
     // Rotate first, with saving:
-    QuillTempFile *tmpQFile1 = rotateAndAdjustWithSave(
+    QTemporaryFile *tmpFile1a = rotateAndAdjustWithSave(
 	    fileName, nRepeat, nAngle, nBrightness, nContrast, true);
 
-    QTemporaryFile *tmpFile1a = tmpQFile1->pTmpFile;
-    //QuillFile *quillFile1a = tmpQFile1->pQFile;
-
     // Adjust first, with saving:
-    QuillTempFile *tmpQFile2 = rotateAndAdjustWithSave(
+    QTemporaryFile *tmpFile2a = rotateAndAdjustWithSave(
 	    fileName, nRepeat, nAngle, nBrightness, nContrast, false);
-
-    QTemporaryFile *tmpFile2a = tmpQFile2->pTmpFile;
-    //QuillFile *quillFile2a = tmpQFile2->pQFile;
 
 
     // Created images needed comparing pixel data
@@ -341,17 +314,6 @@ void ut_filtering::testFreerotateWithBrightnessContrast_savingInBetween()
     double dPSNR = Unittests::getPSNR(ima1, ima2);
     qDebug() << dPSNR << "dB";
     QVERIFY(dPSNR > 30);
-
-    // Cleanup:
-    //tmpFile1a->setAutoRemove(true);
-    //delete tmpFile1a;
-    //quillFile1a->remove();
-    //delete quillFile1a;
-
-    //tmpFile2a->setAutoRemove(true);
-    //delete tmpFile2a;
-    //quillFile2a->remove();
-    //delete quillFile2a;
 }
 
 
