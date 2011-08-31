@@ -83,6 +83,11 @@ void ut_filtering::cleanup()
     Quill::cleanup();
 }
 
+void ut_filtering::myReleaseAndWait()
+{
+    for (int r=0; r<100; r++)
+	Quill::releaseAndWait();
+}
 
 QTemporaryFile* ut_filtering::createTempFile(QString fileName)
 {
@@ -154,8 +159,7 @@ QuillTempFile* ut_filtering::rotateAndAdjust(QString fileName,
 	    quillFile1->runFilter(f_brightness);
 
 	quillFile1->save();
-	for (int r=0; r<100; r++)
-	    Quill::releaseAndWait();
+	myReleaseAndWait();
 
 	if (bRotateFirst)
 	    quillFile1->runFilter(f_brightness);
@@ -163,8 +167,7 @@ QuillTempFile* ut_filtering::rotateAndAdjust(QString fileName,
 	    quillFile1->runFilter(f_freerotate);
 
 	quillFile1->save();
-	for (int r=0; r<100; r++)
-	    Quill::releaseAndWait();
+	myReleaseAndWait();
     }
 
     tmpFile1->flush();
@@ -209,8 +212,7 @@ QuillTempFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
 	    quillFile1a->runFilter(f_brightness);
 
 	quillFile1a->save();
-	for (int r=0; r<100; r++)
-	    Quill::releaseAndWait();
+	myReleaseAndWait();
 
 	tmpFile1a->flush();
 	tmpFile1a->close();
@@ -233,8 +235,7 @@ QuillTempFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
 	    quillFile1b->runFilter(f_freerotate);
 
 	quillFile1b->save();
-	for (int r=0; r<100; r++)
-	    Quill::releaseAndWait();
+	myReleaseAndWait();
 
 	tmpFile1b->flush();
 	tmpFile1b->close();
@@ -379,13 +380,11 @@ void ut_filtering::testRedEyeRemovalWithCrop()
 
 	    quillFile1.runFilter(f_rer);
 	    quillFile1.save();
-	    for (int r=0; r<100; r++)
-		Quill::releaseAndWait();
+	    myReleaseAndWait();
 
 	    quillFile1.runFilter(f_crop);
 	    quillFile1.save();
-	    for (int r=0; r<100; r++)
-		Quill::releaseAndWait();
+	    myReleaseAndWait();
 	}
 	quillFile1.remove();
     }
@@ -401,13 +400,11 @@ void ut_filtering::testRedEyeRemovalWithCrop()
 
 	    quillFile2.runFilter(f_crop);
 	    quillFile2.save();
-	    for (int r=0; r<100; r++)
-		Quill::releaseAndWait();
+	    myReleaseAndWait();
 
 	    quillFile2.runFilter(f_rer);
 	    quillFile2.save();
-	    for (int r=0; r<100; r++)
-		Quill::releaseAndWait();
+	    myReleaseAndWait();
 	}
 	quillFile2.remove();
     }
