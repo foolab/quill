@@ -485,17 +485,20 @@ Task *Scheduler::newNormalTask(File *file, int level)
             dynamic_cast<QuillImageFilterGenerator*>(command->filter());
 
         // Red eye detection always uses the best available image
-        if (generator && (!generator->isUsedOnPreview()))
-            prevImage = prev->bestImage(Core::instance()->previewLevelCount());
-        else{
+        if (generator) {
+            if (!generator->isUsedOnPreview())
+                prevImage = prev->bestImage(Core::instance()->previewLevelCount());
+            else{
             //Becuase grid thumbnail is cropped, we can not use it to generate the color histogram for
             //autofix and other detecter as well. We use thumbnail that is not croppped if it exists
-            int nonCroppedLevel = Core::instance()->smallestNonCroppedLevel();
-            if(prev->hasImage(nonCroppedLevel))
-                level = nonCroppedLevel;
-            prevImage = prev->image(level);
-
+                int nonCroppedLevel = Core::instance()->smallestNonCroppedLevel();
+                if(prev->hasImage(nonCroppedLevel))
+                    level = nonCroppedLevel;
+                prevImage = prev->image(level);
+            }
         }
+        else
+            prevImage = prev->image(level);
     }
 
     // Commands with errors should be ignored

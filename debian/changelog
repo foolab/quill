@@ -1,3 +1,9 @@
+libquill (1.110831.1) unstable; urgency=low
+
+  * Fixed failed unit tests by optimizing the bug fix for 271068.
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Wed, 31 Aug 2011 14:30:30 +0300
+
 libquill (1.110831.0) unstable; urgency=low
 
   * Optimized the bug fix for 271068 - Autofix not working properly in some cases.
