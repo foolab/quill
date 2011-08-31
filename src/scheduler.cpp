@@ -489,13 +489,12 @@ Task *Scheduler::newNormalTask(File *file, int level)
             prevImage = prev->bestImage(Core::instance()->previewLevelCount());
         else{
             //Becuase grid thumbnail is cropped, we can not use it to generate the color histogram for
-            //autofix. We use thumbnail that is not croppped if it exists
-            if(command->filter()->name()=="com.meego.auto.levels"){
-                int nonCroppedLevel = Core::instance()->smallestNonCroppedLevel();
-                if(nonCroppedLevel < Core::instance()->previewLevelCount())
-                    level = nonCroppedLevel;
-            }
+            //autofix and other detecter as well. We use thumbnail that is not croppped if it exists
+            int nonCroppedLevel = Core::instance()->smallestNonCroppedLevel();
+            if(prev->hasImage(nonCroppedLevel))
+                level = nonCroppedLevel;
             prevImage = prev->image(level);
+
         }
     }
 
