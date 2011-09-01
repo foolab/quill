@@ -262,6 +262,12 @@ bool Quill::isSaveInProgress()
     return Core::instance()->isSaveInProgress();
 }
 
+QStringList Quill::saveInProgressList()
+{
+    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
+    return Core::instance()->saveInProgressList();
+}
+
 bool Quill::waitUntilFinished(int msec)
 {
     QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));

@@ -465,6 +465,13 @@ public:
     bool isSaveInProgress() const;
 
     /*!
+      Returns the names list of files which are in the progress of
+      saving.
+     */
+
+    QStringList saveInProgressList() const;
+
+    /*!
       See Quill::waitUntilFinished()
      */
 

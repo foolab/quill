@@ -440,13 +440,24 @@ void ut_quill::testLoadSave()
     Quill::releaseAndWait();
     Quill::releaseAndWait();
 
+    QStringList saveInProgressList, tmpSaveInProgressList;
+
     QVERIFY(!Quill::isSaveInProgress());
+
+    tmpSaveInProgressList = Quill::saveInProgressList();
+    QVERIFY(tmpSaveInProgressList.isEmpty());
 
     file->save();
     QVERIFY(Quill::isSaveInProgress());
+    tmpSaveInProgressList = Quill::saveInProgressList();
+    QVERIFY(!tmpSaveInProgressList.isEmpty());
+    saveInProgressList.append(file->fileName());
+    QVERIFY(saveInProgressList == tmpSaveInProgressList);
 
     Quill::releaseAndWait();
     QVERIFY(!Quill::isSaveInProgress());
+    tmpSaveInProgressList = Quill::saveInProgressList();
+    QVERIFY(tmpSaveInProgressList.isEmpty());
 
     QCOMPARE(spy.count(), 1);
     QCOMPARE(generalSpy.count(), 1);

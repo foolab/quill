@@ -521,6 +521,17 @@ bool Core::isSaveInProgress() const
     return (prioritySaveFile() != 0);
 }
 
+QStringList Core::saveInProgressList() const
+{
+    QStringList stringList;
+    foreach(File* file, m_fileList){
+        if (file->isSaveInProgress())
+            stringList.append(file->fileName());
+    }
+
+    return stringList;
+}
+
 void Core::timeout()
 {
     m_loop.exit(1);
