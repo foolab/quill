@@ -8,7 +8,8 @@ TARGET = quill
 INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter $$[QT_INSTALL_HEADERS]/quillmetadata
 DEPENDPATH += .
 
-DEFINES     +=
+# Avoid automatic casts from QString to QUrl. Dangerous!!!
+DEFINES += QT_NO_URL_CAST_FROM_STRING
 MOC_DIR = .moc
 QT += dbus
 
