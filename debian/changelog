@@ -1,3 +1,9 @@
+libquill (1.110902.1) unstable; urgency=low
+
+  * Fixed full image size query when display level for file is not set.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 02 Sep 2011 13:40:30 +0300
+
 libquill (1.110902.0) unstable; urgency=low
 
   * Automated tests related to repeated filtering operations
