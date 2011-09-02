@@ -37,32 +37,54 @@
 **
 ****************************************************************************/
 
-#ifndef __TEST_QUILL_UNIT_COMMON_H__
-#define __TEST_QUILL_UNIT_COMMON_H__
+#ifndef TEST_LIBQUILL_FILTERING_H
+#define TEST_LIBQUILL_FILTERING_H
 
-#include <QtGlobal>
-#include <QRgb>
+#include <QObject>
+#include <QImage>
+#include <QIODevice>
+#include <QTemporaryFile>
+#include "quillfile.h"
 
-extern int palette16[16][3];
 
-class QImage;
-
-class Unittests
-{
+class QuillImageFilter;
+class ut_filtering : public QObject {
+Q_OBJECT
 public:
-    QImage static generatePaletteImage();
-    QImage static generatePaletteImage(int minValue, int maxValue);
-    void static compareReal(qreal real1, qreal real2);
-    void static fuzzyCompareRgb(QRgb rgb1, QRgb rgb2);
-    bool static compareImage(QImage image1, QImage image2);
-    double static getPSNR(QImage image1, QImage image2);
+    ut_filtering();
 
-    /*!
-      If for some strange reason we are running as root, we cannot test
-      any "permission denied" tests cases.
-     */
+private:
+    QTemporaryFile* createTempFile(QString fileName);
+    void createFreeRotate_BrightnessContrastFilters(
+	    int nRotateAngle, int nBrightness, int nContrast,
+	    QuillImageFilter **f_freerotate,
+	    QuillImageFilter **f_brightness);
+    void createRER_CropFilters(
+	    QRect cropRect,
+	    QuillImageFilter **f_rer, QuillImageFilter **f_crop);
 
-    bool static isRoot();
+    QTemporaryFile* rotateAndAdjust(QString fileName,
+	    int nRepeat, int nRotateAngle,
+	    int nBrightness, int nContrast, bool bRotateFirst);
+
+    QTemporaryFile* rotateAndAdjustWithSave(QString fileName,
+	    int nRepeat, int nRotateAngle,
+	    int nBrightness, int nContrast, bool bRotateFirst);
+
+    void myReleaseAndWait();
+
+    QList<QTemporaryFile*> m_tmpFileList;
+
+private slots:
+    void init();
+    void cleanup();
+    void initTestCase();
+    void cleanupTestCase();
+
+    void testFreerotateWithBrightnessContrast_noSaving();
+    void testFreerotateWithBrightnessContrast_savingInBetween();
+    void testRedEyeRemovalWithCrop();
+
 };
 
-#endif // __TEST_QUILL_UNIT_COMMON_H__
+#endif  // TEST_LIBQUILL_FILTERING_H
