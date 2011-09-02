@@ -219,6 +219,14 @@ int Core::smallestNonCroppedLevel() const
     return m_displayLevel.count();
 }
 
+int Core::smallestCachedLevel() const
+{
+    for (int level=0; level < m_displayLevel.count() - 1; level++)
+        if (!thumbnailFlavorName(level).isEmpty())
+            return level;
+    return -1;
+}
+
 void Core::setImageSizeLimit(const QSize &size)
 {
     m_imageSizeLimit = size;

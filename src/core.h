@@ -209,6 +209,13 @@ public:
     int smallestNonCroppedLevel() const;
 
     /*!
+      Returns the smallest display level cached to the file system,
+      or -1 if no such level exists.
+    */
+
+    int smallestCachedLevel() const;
+
+    /*!
       Sets the default tile size if tiling is in use.
       The default is 0, which disables tiling.
      */
