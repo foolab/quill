@@ -1,3 +1,13 @@
+libquill (1.110907.0) unstable; urgency=low
+
+  * Added new API Quill::saveInProgressList() for getting the list of
+    filenames being saved.
+  * Added macro in qmake project files to avoid automatic QString to
+    QUrl casts.
+  * Adding version dependencies to package build.
+
+ -- Andres Gomez <agomez@igalia.com>  Wed, 07 Sep 2011 15:24:50 +0300
+
 libquill (1.110902.1) unstable; urgency=low
 
   * Fixed full image size query when display level for file is not set.
