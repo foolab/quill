@@ -792,13 +792,17 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
         // loaded image must be discarded if display level has been reduced while loading.
         // If there's still unsaved thumbnails or saving is in progress, cleanup
         // will be done automatically after these operations are finished.
-        bool isDisplayLevelReduced = task->displayLevel() > file->displayLevel();
-        bool isThumbnailUnSaved = task->displayLevel() == 0 &&
-                                  file->hasUnsavedThumbnails();
-        bool isRelatedToSaving = file->isSaveInProgress() &&
-                                 task->displayLevel() == Core::instance()->previewLevelCount();
+        bool skipUpdate = false;
+        if (task->displayLevel() > file->displayLevel())
+        {
+            bool isThumbnailUnSaved = task->displayLevel() == 0 &&
+                                      file->hasUnsavedThumbnails();
+            bool isRelatedToSaving = file->isSaveInProgress() &&
+                                     task->displayLevel() == Core::instance()->previewLevelCount();
 
-        bool skipUpdate = isDisplayLevelReduced && !isRelatedToSaving && !isThumbnailUnSaved;
+            if (!isThumbnailUnSaved && !isRelatedToSaving)
+                skipUpdate = true;
+        }
         if (!skipUpdate)
         {
             // Normal case: a better version of an image has been calculated.
