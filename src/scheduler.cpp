@@ -788,10 +788,23 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             error = QuillError(errorCode, errorSource, fileName);
         }
 
-        // Normal case: a better version of an image has been calculated.
+        // Detect whether the task results to updating the image data to given display level:
+        // loaded image must be discarded if display level has been reduced while loading.
+        // If there's still unsaved thumbnails or saving is in progress, cleanup
+        // will be done automatically after these operations are finished.
+        bool isDisplayLevelReduced = task->displayLevel() > file->displayLevel();
+        bool isThumbnailUnSaved = task->displayLevel() == 0 &&
+                                  file->hasUnsavedThumbnails();
+        bool isRelatedToSaving = file->isSaveInProgress() &&
+                                 task->displayLevel() == Core::instance()->previewLevelCount();
 
-        command->setImage(task->displayLevel(), image);
-        imageUpdated = true;
+        if (isDisplayLevelReduced && !isThumbnailUnSaved && !isRelatedToSaving) {
+            imageUpdated = false;
+        }
+        else { // Normal case: a better version of an image has been calculated.
+            command->setImage(task->displayLevel(), image);
+            imageUpdated = true;
+        }
     }
 
     // If we just got a better version of the active image, emit signal
