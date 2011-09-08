@@ -788,10 +788,10 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
         bool isRelatedToSaving = file->isSaveInProgress() &&
                                  task->displayLevel() == Core::instance()->previewLevelCount();
 
-        if (isDisplayLevelReduced && !isThumbnailUnSaved && !isRelatedToSaving) {
-            imageUpdated = false;
-        }
-        else { // Normal case: a better version of an image has been calculated.
+        bool skipUpdate = isDisplayLevelReduced && !isRelatedToSaving && !isThumbnailUnSaved;
+        if (!skipUpdate)
+        {
+            // Normal case: a better version of an image has been calculated.
             command->setImage(task->displayLevel(), image);
             imageUpdated = true;
         }
