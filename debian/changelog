@@ -1,3 +1,10 @@
+libquill (1.110907.1) unstable; urgency=low
+
+  * Fixes: NB#281264 - Quill doesn't always unload the biggest display
+    level image when the display level is lowered
+
+ -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Thu, 08 Sep 2011 16:16:16 +0300
+
 libquill (1.110907.0) unstable; urgency=low
 
   * Added new API Quill::saveInProgressList() for getting the list of
