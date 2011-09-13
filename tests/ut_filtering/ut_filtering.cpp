@@ -254,7 +254,7 @@ QTemporaryFile* ut_filtering::rotateAndAdjustWithSave(QString fileName,
 
 void ut_filtering::testFreerotateWithBrightnessContrast_noSaving()
 {
-    QString fileName = "/usr/share/quillimagefilter-tests/images/redeye.jpg";
+    QString fileName = "/usr/share/libquill-tests/images/redeye.jpg";
 
     int nAngle = -15;
     int nRepeat = 4;
@@ -286,7 +286,7 @@ void ut_filtering::testFreerotateWithBrightnessContrast_noSaving()
 
 void ut_filtering::testFreerotateWithBrightnessContrast_savingInBetween()
 {
-    QString fileName = "/usr/share/quillimagefilter-tests/images/redeye.jpg";
+    QString fileName = "/usr/share/libquill-tests/images/redeye.jpg";
 
     int nAngle = -15;
     int nRepeat = 4;
@@ -320,7 +320,7 @@ void ut_filtering::testFreerotateWithBrightnessContrast_savingInBetween()
 void ut_filtering::testRedEyeRemovalWithCrop()
 {
 
-    QString fileName = "/usr/share/quillimagefilter-tests/images/redeye01.JPG";
+    QString fileName = "/usr/share/libquill-tests/images/redeye01.JPG";
 
     int nRepeat = 4;
     QuillImageFilter *f_rer;

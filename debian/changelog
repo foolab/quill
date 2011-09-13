@@ -1,3 +1,9 @@
+libquill (1.110913.1) unstable; urgency=low
+
+  * Filtering test update
+
+ -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Fri, 13 Sep 2011 10:37:00 +0300
+
 libquill (1.110913.0) unstable; urgency=low
 
   * Added test files for the filtering tests
