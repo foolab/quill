@@ -4,6 +4,9 @@ TEMPLATE = subdirs
 DEPENDPATH += .
 INCLUDEPATH += .
 
+# Avoid automatic casts from QString to QUrl. Dangerous!!!
+DEFINES += QT_NO_URL_CAST_FROM_STRING
+
 CONFIG += ordered
 
 SUBDIRS += \

@@ -1045,7 +1045,7 @@ void File::processFilterError(QuillImageFilter *filter)
                 // Corner-case: thumbnailer is disabled but thumbnails do already exist
                 else if (!Core::instance()->isDBusThumbnailingEnabled() &&
                              Core::instance()->isExternallySupportedFormat(m_fileFormat) &&
-                             hasThumbnail(displayLevel())) {
+                         hasThumbnail(Core::instance()->smallestCachedLevel())) {
                      setThumbnailSupported(true);
                      return;
                 }

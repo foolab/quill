@@ -209,6 +209,13 @@ public:
     int smallestNonCroppedLevel() const;
 
     /*!
+      Returns the smallest display level cached to the file system,
+      or -1 if no such level exists.
+    */
+
+    int smallestCachedLevel() const;
+
+    /*!
       Sets the default tile size if tiling is in use.
       The default is 0, which disables tiling.
      */
@@ -456,6 +463,13 @@ public:
      */
 
     bool isSaveInProgress() const;
+
+    /*!
+      Returns the names list of files which are in the progress of
+      saving.
+     */
+
+    QStringList saveInProgressList() const;
 
     /*!
       See Quill::waitUntilFinished()

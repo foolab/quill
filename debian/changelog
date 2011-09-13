@@ -4,6 +4,29 @@ libquill (1.110913.0) unstable; urgency=low
 
  -- Martti Kesaniemi <martti.kesaniemi@nokia.com>  Fri, 13 Sep 2011 10:31:00 +0300
 
+libquill (1.110907.1) unstable; urgency=low
+
+  * Fixes: NB#281264 - Quill doesn't always unload the biggest display
+    level image when the display level is lowered
+
+ -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Thu, 08 Sep 2011 16:16:16 +0300
+
+libquill (1.110907.0) unstable; urgency=low
+
+  * Added new API Quill::saveInProgressList() for getting the list of
+    filenames being saved.
+  * Added macro in qmake project files to avoid automatic QString to
+    QUrl casts.
+  * Adding version dependencies to package build.
+
+ -- Andres Gomez <agomez@igalia.com>  Wed, 07 Sep 2011 15:24:50 +0300
+
+libquill (1.110902.1) unstable; urgency=low
+
+  * Fixed full image size query when display level for file is not set.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 02 Sep 2011 13:40:30 +0300
+
 libquill (1.110902.0) unstable; urgency=low
 
   * Automated tests related to repeated filtering operations
