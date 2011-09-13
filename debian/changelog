@@ -1,3 +1,9 @@
+libquill (1.110913.3) unstable; urgency=low
+
+  * Removed dependency on installed libquill for UTs.
+
+ -- Andres Gomez <agomez@igalia.com>  Tue, 13 Sep 2011 16:13:41 +0300
+
 libquill (1.110913.2) unstable; urgency=low
 
   * Fixes: NB#265971 - Delay in loading thumbnails if non jpeg image of size more than 16 megapixels is present at the start of grid
