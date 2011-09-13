@@ -57,7 +57,7 @@
 #include "unittests.h"
 #include "../../src/strings.h"
 
-ut_error::ut_error() : editHistoryPath("tmp/quill/history"),
+ut_error::ut_error() : editHistoryPath("/tmp/quill/history"),
                        thumbnailBasePath("/tmp/quill/thumbnails"),
                        thumbnailFlavorName("normal"),
                        thumbnailFullPath(thumbnailBasePath+"/"+
@@ -586,7 +586,8 @@ void ut_error::testOriginalDirectoryCreateFailed()
     QFile dummyFile("/tmp/quill/no-original/.original");
     dummyFile.open(QIODevice::WriteOnly);
 
-    QFile testFile("/tmp/quill/no-original/test.png");
+    QTemporaryFile testFile("/tmp/quill/no-original/XXXXXX.png");
+    testFile.open();
 
     QuillImage image = Unittests::generatePaletteImage();
     image.save(testFile.fileName(), "png");
