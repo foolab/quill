@@ -474,8 +474,6 @@ Task *Scheduler::newNormalTask(File *file, int level)
         QSize fullSize = command->fullImageSize();
         //We check if the image size exceeds image size limit
         //if exceeds, we will not create a task at all.
-        //Even though we emitted the signal from quillundostack to ask gallery to destroy quillfile object, it is
-        //asynchronous process and probably the file to be removed still exists in the file list in core class.
         if (!file->checkImageSize(fullSize)){
             return 0;
         }

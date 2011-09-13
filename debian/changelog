@@ -1,3 +1,9 @@
+libquill (1.110913.2) unstable; urgency=low
+
+  * Fixes: NB#265971 - Delay in loading thumbnails if non jpeg image of size more than 16 megapixels is present at the start of grid
+
+ -- Wenpeng Zhou <ext-wenpeng.2.zhou@nokia.com>  Tue, 13 Sep 2011 12:15:46 +0300
+
 libquill (1.110913.1) unstable; urgency=low
 
   * Filtering test update
