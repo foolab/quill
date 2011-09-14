@@ -62,6 +62,8 @@ private slots:
     // Test the whole operation chain, including metadata access
 
     void testCropImage();
+
+    void testUndo();
 };
 
 #endif  // TEST_QUILL_METADATA_H

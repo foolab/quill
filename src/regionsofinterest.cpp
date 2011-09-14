@@ -26,7 +26,7 @@ QuillMetadataRegionList
     int savedIndex = stack->savedIndex();
     int index = stack->index();
 
-    if (savedIndex > index)
+    if (savedIndex >= index)
         return QuillMetadataRegionList();
 
     for (int i=savedIndex+1; i<index; i++) {

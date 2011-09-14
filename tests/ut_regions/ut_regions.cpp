@@ -187,6 +187,62 @@ void ut_regions::testCropImage()
     QCOMPARE(result2.name(), QString("Charlie"));
 }
 
+void ut_regions::testUndo()
+{
+    QTemporaryFile file;
+    file.open();
+
+    QuillImage image = Unittests::generatePaletteImage();
+    image.save(file.fileName(), "jpeg");
+
+    QuillMetadataRegionList regions;
+    QuillMetadataRegion region1, region2, region3;
+
+    region1.setArea(QRect(0, 0, 2, 2));
+    region1.setName("Anna");
+    region2.setArea(QRect(3, 0, 2, 2));
+    region2.setName("Bob");
+    region3.setArea(QRect(6, 0, 2, 2));
+    region3.setName("Charlie");
+
+    regions.reserve(3);
+    regions << region1 << region2 << region3;
+    regions.setFullImageSize(QSize(8, 2));
+
+    QuillMetadata metadata;
+    QVariant variant;
+    variant.setValue(regions);
+    metadata.setEntry(QuillMetadata::Tag_Regions, variant);
+    QVERIFY(metadata.write(file.fileName()));
+
+    QuillImageFilter *filter =
+        new QuillImageFilter(QuillImageFilter::Name_Crop);
+
+    filter->setOption(QuillImageFilter::CropRectangle,
+                      QRect(2, 0, 6, 2));
+
+    QuillFile quillFile(file.fileName(), "image/jpeg");
+
+    quillFile.runFilter(filter);
+    quillFile.save();
+
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // crop
+    Quill::releaseAndWait(); // save
+
+    quillFile.undo();
+    quillFile.save();
+
+    Quill::releaseAndWait(); // load
+    Quill::releaseAndWait(); // save
+
+    QCOMPARE(QImage(file.fileName()).size(), QSize(8, 2));
+
+    QuillMetadata resultMetadata(file.fileName());
+
+    QVERIFY(!resultMetadata.entry(QuillMetadata::Tag_Regions).canConvert<QuillMetadataRegionList>());
+}
+
 int main ( int argc, char *argv[] ){
     QCoreApplication app( argc, argv );
     ut_regions test;
