@@ -48,6 +48,8 @@ tatamimages.files += images/exif.jpg
 tatamimages.files += images/exif_orientation.jpg
 tatamimages.files += images/xmp.jpg
 tatamimages.files += images/iptc.jpg
+tatamimages.files += images/redeye.jpg
+tatamimages.files += images/redeye01.JPG
 tatamvideo.files += video/Alvin_2.mp4
 
 tatamimages.path  = $$(DESTDIR)/usr/share/libquill-tests/images/
