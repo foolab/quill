@@ -1,3 +1,9 @@
+libquill (1.110915.0) unstable; urgency=low
+
+  * Fixed errors in automatic test setup.
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 15 Sep 2011 09:05:30 +0300
+
 libquill (1.110913.3) unstable; urgency=low
 
   * Removed dependency on installed libquill for UTs.
