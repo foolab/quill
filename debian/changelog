@@ -1,3 +1,9 @@
+libquill (1.110915.1) unstable; urgency=low
+
+  * Undoing a saved edit will now correctly remove the regions in all cases
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Thu, 15 Sep 2011 09:44:30 +0300
+
 libquill (1.110915.0) unstable; urgency=low
 
   * Fixed errors in automatic test setup.
