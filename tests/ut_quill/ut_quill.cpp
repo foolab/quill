@@ -123,6 +123,8 @@ void ut_quill::testQuillFile()
     QCOMPARE(initialFull.size(), QSize(8, 2));
     QCOMPARE(initialFull, Unittests::generatePaletteImage());
 
+    QVERIFY(!file->isDirty());
+
     // run a brightness filter
 
     QuillImageFilter *filter =
@@ -131,6 +133,8 @@ void ut_quill::testQuillFile()
     filter->setOption(QuillImageFilter::Brightness, QVariant(16));
 
     file->runFilter(filter);
+
+    QVERIFY(file->isDirty());
 
     Quill::releaseAndWait(); // preview
 
