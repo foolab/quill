@@ -230,6 +230,14 @@ public:
     bool isSaveInProgress() const;
 
     /*!
+      Returns true if the file has edits which need to be saved
+      with save().  If they are not, they will be lost when all
+      instances of this QuillFile are deleted.
+    */
+
+    bool isDirty() const;
+
+    /*!
       Starts to asynchronously run an operation.
      */
 

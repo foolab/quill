@@ -201,6 +201,15 @@ bool QuillFile::isSaveInProgress() const
         return false;
 }
 
+bool QuillFile::isDirty() const
+{
+    QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO));
+    if (priv->m_file)
+        return priv->m_file->isDirty();
+    else
+        return false;
+}
+
 void QuillFile::runFilter(QuillImageFilter *filter)
 {
     QUILL_LOG(Logger::Module_QuillFile, QString(Q_FUNC_INFO));
