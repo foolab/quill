@@ -1,3 +1,9 @@
+libquill (1.110916.0) unstable; urgency=low
+
+  * Added QuillFile::isDirty().
+
+ -- Jussi Rautio <ext-jussi.2.rautio@nokia.com>  Fri, 16 Sep 2011 14:01:30 +0300
+
 libquill (1.110915.1) unstable; urgency=low
 
   * Undoing a saved edit will now correctly remove the regions in all cases
