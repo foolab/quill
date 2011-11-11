@@ -74,16 +74,21 @@ public:
 
       @returns true if success, otherwise false
     */
-    static bool lockQuillFile(const QuillFile* quillFile);
+    static bool lockQuillFile(const QString& fileName);
 
     /*!
       Unlock the given QuillFile
 
       @param quillFile QuillFile to be locked
      */
-    static void unlockQuillFile(const QuillFile* quillFile);
+    static void unlockQuillFile(const QString& fileName);
 
-    static bool quillFileLocked(const QuillFile* quillFile);
+    /*!
+      @returns true if this QuillFile is locked by a running process,
+      otherwise false.
+     */
+
+    static bool quillFileLocked(const QString& fileName);
 
 private:
     /*!
@@ -96,7 +101,7 @@ private:
       @returns The prefix part of the lock file name.
       E.g. /foo/bar/image.jpeg --> _foo_bar_image.jpeg_
     */
-    static QString lockfilePrefix(const QuillFile* quillFile);
+    static QString lockfilePrefix(const QString& fileName);
 };
 
 #endif //UNIX_PLATFORM_H

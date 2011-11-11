@@ -493,6 +493,12 @@ public:
     static QStringList saveInProgressList();
 
     /*!
+      Returns the names list of files which are locked for editing
+     */
+
+    static QStringList lockedFiles();
+
+    /*!
       Puts the calling thread (which must be the thread Quill
       object was created in) to sleep until Quill has synchronized its
       state with the file system and it is safe to exit the

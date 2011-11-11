@@ -520,7 +520,7 @@ public:
       @returns true if this QuillFile is locked by a running process,
       otherwise false.
      */
-    bool locked();
+    bool locked() const;
 
 
 signals:

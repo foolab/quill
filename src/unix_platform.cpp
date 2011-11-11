@@ -44,7 +44,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-#include "utime.h"
+#include <utime.h>
 #include <sys/types.h>
 #include <signal.h>
 
@@ -64,13 +64,13 @@ bool FileSystem::setFileModificationDateTime(const QString &fileName,
 }
 
 
-bool LockFile::lockQuillFile(const QuillFile* quillFile)
+bool LockFile::lockQuillFile(const QString& fileName)
 {
-    if (quillFileLocked(quillFile)) {
+    if (quillFileLocked(fileName)) {
         return false;
     }
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile);
+    QString lockfilePrefix = LockFile::lockfilePrefix(fileName);
 
     // create the lock file
     QString lockFilePath = TEMP_PATH
@@ -86,23 +86,23 @@ bool LockFile::lockQuillFile(const QuillFile* quillFile)
     return true;
 }
 
-void LockFile::unlockQuillFile(const QuillFile* quillFile)
+void LockFile::unlockQuillFile(const QString& fileName)
 {
     QDir tempDir = LockFile::tempDir();
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile);
+    QString lockfilePrefix = LockFile::lockfilePrefix(fileName);
 
     QString lockFilePath = TEMP_PATH
                            + lockfilePrefix
                            + LOCKFILE_SEPARATOR
                            + QString::number(QCoreApplication::applicationPid());
 
-    bootempDir.remove(lockFilePath);
+    tempDir.remove(lockFilePath);
 }
 
-bool LockFile::quillFileLocked(const QuillFile* quillFile)
+bool LockFile::quillFileLocked(const QString& fileName)
 {
     QDir tempDir = LockFile::tempDir();
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile);
+    QString lockfilePrefix = LockFile::lockfilePrefix(fileName);
 
     // check if lock exists for any process
     QStringList nameFilter;
@@ -137,10 +137,10 @@ bool LockFile::quillFileLocked(const QuillFile* quillFile)
     return false;
 }
 
-QString LockFile::lockfilePrefix(const QuillFile* quillFile)
+QString LockFile::lockfilePrefix(const QString& fileName)
 {
     // UNIX file system separators cannot be used in filename, replace it
-    QString lockfilePrefix = quillFile->fileName();
+    QString lockfilePrefix = fileName;
     lockfilePrefix.replace(QDir::separator(), LOCKFILE_SEPARATOR);
     return lockfilePrefix;
 }
