@@ -102,6 +102,9 @@ private:
       E.g. /foo/bar/image.jpeg --> _foo_bar_image.jpeg_
     */
     static QString lockfilePrefix(const QString& fileName);
+
+    // Allow unit tests to access private utility functions for simulation
+    friend class ut_quill;
 };
 
 #endif //UNIX_PLATFORM_H

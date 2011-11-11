@@ -34,7 +34,7 @@ SUBDIRS += \
            ut_regions \
            ut_dbusthumbnailer \
            ut_autoclean \
-	   ut_filtering \
+           ut_filtering \
            benchmark  \
 
 # --- install

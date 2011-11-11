@@ -74,6 +74,8 @@ private slots:
     void testLoadSaveSmallPicture();
 
     void testUseAfterSave();
+
+    void testFileLock();
 };
 
 #endif  // _UT_QUILL_H_

@@ -47,7 +47,7 @@
 #include "file.h"
 #include "ut_thumbnail.h"
 #include "unittests.h"
-#include "../../src/filesystem.h"
+#include "../../src/unix_platform.h"
 #include "../../src/strings.h"
 
 ut_thumbnail::ut_thumbnail()

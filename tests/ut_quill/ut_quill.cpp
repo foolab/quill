@@ -50,6 +50,7 @@
 #include "quillundocommand.h"
 #include "quillundostack.h"
 #include "../../src/strings.h"
+#include "../../src/unix_platform.h"
 
 ut_quill::ut_quill()
 {
@@ -1003,6 +1004,48 @@ void ut_quill::testUseAfterSave()
     QVERIFY(Unittests::compareImage(file->image(), targetImage));
 
     delete file;
+}
+
+void ut_quill::testFileLock()
+{
+    QTemporaryFile testFile1;
+    testFile1.open();
+    Unittests::generatePaletteImage().save(testFile1.fileName(), "png");
+    QuillFile *file1 = new QuillFile(testFile1.fileName(), Strings::pngMimeType);
+
+    QVERIFY(!file1->locked());
+    QVERIFY(file1->lock());
+    QVERIFY(file1->locked());
+    file1->unlock();
+    QVERIFY(!file1->locked());
+
+    // TODO: To fully test locking, create the lock but with a fake PID value
+    // This would require either finding/creating such process
+    // or simulating kill() function.
+#if 0
+    const char* LOCKFILE_SEPARATOR = "_";
+    const QString TEMP_PATH = QDir::tempPath()
+                                     + QDir::separator()
+                                     + "quill"
+                                     + QDir::separator();
+
+    QString lockfilePrefix = LockFile::lockfilePrefix(file1->fileName());
+    QString lockFilePath = TEMP_PATH
+                           + lockfilePrefix
+                           + LOCKFILE_SEPARATOR
+                           + QString::number(EXISTING_PROCESS_ID);
+
+    QFile lockFile(lockFilePath);
+    QVERIFY(lockFile.open(QIODevice::WriteOnly));
+
+    // Is locked, and locking attempt should fail
+    QVERIFY(file1->locked());
+    QVERIFY(!file1->lock());
+
+    lockFile.remove();
+#endif
+
+    delete file1;
 }
 
 int main ( int argc, char *argv[] ){
