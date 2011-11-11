@@ -37,14 +37,66 @@
 **
 ****************************************************************************/
 
-#include "utime.h"
-#include "filesystem.h"
+#ifndef UNIX_PLATFORM_H
+#define UNIX_PLATFORM_H
 
-bool FileSystem::setFileModificationDateTime(const QString &fileName,
-                                             const QDateTime &dateTime)
-{
-    struct utimbuf times;
-    times.actime = times.modtime = dateTime.toTime_t();
-    int result = utime(fileName.toLocal8Bit().constData(), &times);
-    return (result != 0);
-}
+#include <QDateTime>
+#include <QString>
+#include <QDir>
+
+/* This source file contains UNIX specific implementation parts.
+ * Adapt these functions when making Quill portable to e.g. Windows
+ */
+
+class QuillFile;
+
+class FileSystem {
+
+ public:
+    /*!
+      Sets the last-modified datetime for the file. The file must be open.
+
+      @returns true if success, false if failed
+    */
+
+    static bool setFileModificationDateTime(const QString &fileName,
+                                            const QDateTime &dateTime);
+};
+
+class LockFile {
+public:
+    /*!
+      Create a UNIX style lock file for given QuillFile. The lock is process
+      specific. If the locking process does not exist anymore, the old lock
+      is removed and new lock is created by this process.
+
+      @param quillFile QuillFile to be locked
+
+      @returns true if success, otherwise false
+    */
+    static bool lockQuillFile(const QuillFile* quillFile);
+
+    /*!
+      Unlock the given QuillFile
+
+      @param quillFile QuillFile to be locked
+     */
+    static void unlockQuillFile(const QuillFile* quillFile);
+
+    static bool quillFileLocked(const QuillFile* quillFile);
+
+private:
+    /*!
+      @returns the temporary directory where lock files are created. The directory
+      is inside the default system temprorary directory.
+    */
+    static QDir tempDir();
+
+    /*!
+      @returns The prefix part of the lock file name.
+      E.g. /foo/bar/image.jpeg --> _foo_bar_image.jpeg_
+    */
+    static QString lockfilePrefix(const QuillFile* quillFile);
+};
+
+#endif //UNIX_PLATFORM_H

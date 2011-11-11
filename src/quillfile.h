@@ -500,6 +500,29 @@ public:
      */
     QuillError error() const;
 
+    /*!
+      Lock this QuillFile. The lock is provided to coordinate inter-process
+      handling of the same image files. When locked, locked() will return true.
+      The lock does not prevent any QuillFile usage, but merely marks the file
+      as being already reserved for editing.
+
+      @returns true if locked successfully, otherwise false
+     */
+    bool lock();
+
+    /*!
+      Unlock this QuillFile. Does nothing if lock() was not called first.
+      Calling unlock() does not affect locks done by other processes.
+     */
+    void unlock();
+
+    /*!
+      @returns true if this QuillFile is locked by a running process,
+      otherwise false.
+     */
+    bool locked();
+
+
 signals:
     /*!
       Triggered when there is a new image representation available on

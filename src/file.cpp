@@ -50,7 +50,7 @@
 #include "quillundocommand.h"
 #include "historyxml.h"
 #include "tilemap.h"
-#include "filesystem.h"
+#include "unix_platform.h"
 #include "quillerror.h"
 #include "regionsofinterest.h"
 #include "logger.h"

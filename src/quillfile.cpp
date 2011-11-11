@@ -42,6 +42,7 @@
 #include "quillfile.h"
 #include "file.h"
 #include "historyxml.h"
+#include "unix_platform.h"
 
 // values defined in the header
 const int QuillFile::Priority_Low;
@@ -511,4 +512,19 @@ QuillError QuillFile::error() const
 File* QuillFile::internalFile()
 {
     return priv->m_file;
+}
+
+bool QuillFile::lock()
+{
+    return LockFile::lockQuillFile(this);
+}
+
+void QuillFile::unlock()
+{
+    LockFile::unlockQuillFile(this);
+}
+
+bool QuillFile::locked()
+{
+    return LockFile::quillFileLocked(this);
 }

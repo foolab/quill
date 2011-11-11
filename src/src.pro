@@ -56,7 +56,7 @@ HEADERS += quill.h \
            quillundostack.h \
            imagecache.h \
            historyxml.h \
-           filesystem.h \
+           unix_platform.h \
            logger.h \
            dbus-thumbnailer/dbusthumbnailer.h \
            dbus-thumbnailer/thumbnailer_generic.h \
@@ -79,7 +79,7 @@ SOURCES += quill.cpp \
            quillundostack.cpp \
            imagecache.cpp \
            historyxml.cpp \
-           filesystem.cpp \
+           unix_platform.cpp \
            dbus-thumbnailer/dbusthumbnailer.cpp \
            dbus-thumbnailer/thumbnailer_generic.cpp \
            backgroundthread.cpp \
