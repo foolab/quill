@@ -1006,46 +1006,51 @@ void ut_quill::testUseAfterSave()
     delete file;
 }
 
+
+
 void ut_quill::testFileLock()
 {
     QTemporaryFile testFile1;
     testFile1.open();
     Unittests::generatePaletteImage().save(testFile1.fileName(), "png");
-    QuillFile *file1 = new QuillFile(testFile1.fileName(), Strings::pngMimeType);
+    QuillFile *file = new QuillFile(testFile1.fileName(), Strings::pngMimeType);
 
-    QVERIFY(!file1->locked());
-    QVERIFY(file1->lock());
-    QVERIFY(file1->locked());
-    file1->unlock();
-    QVERIFY(!file1->locked());
+    QVERIFY(!file->locked());
+    QVERIFY(file->lock());
+    QVERIFY(file->locked());
+    file->unlock();
+    QVERIFY(!file->locked());
 
-    // TODO: To fully test locking, create the lock but with a fake PID value
+    // To fully test locking, create the lock but with a fake PID value
     // This would require either finding/creating such process
-    // or simulating kill() function.
-#if 0
+    // or stubbing kill() function. Stubbing low level components is risky,
+    // so the parent process ID is used instead
+
     const char* LOCKFILE_SEPARATOR = "_";
     const QString TEMP_PATH = QDir::tempPath()
                                      + QDir::separator()
                                      + "quill"
                                      + QDir::separator();
+    pid_t fakePID = getppid();
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(file1->fileName());
+    QString lockfilePrefix = LockFile::lockfilePrefix(file->fileName());
     QString lockFilePath = TEMP_PATH
                            + lockfilePrefix
                            + LOCKFILE_SEPARATOR
-                           + QString::number(EXISTING_PROCESS_ID);
+                           + QString::number(fakePID);
 
     QFile lockFile(lockFilePath);
     QVERIFY(lockFile.open(QIODevice::WriteOnly));
 
     // Is locked, and locking attempt should fail
-    QVERIFY(file1->locked());
-    QVERIFY(!file1->lock());
+    QVERIFY(file->locked());
+    QVERIFY(!file->lock());
 
-    lockFile.remove();
-#endif
+    QVERIFY(lockFile.remove());
+    QVERIFY(!file->locked());
+    QVERIFY(file->lock());
 
-    delete file1;
+    delete file;
 }
 
 int main ( int argc, char *argv[] ){
