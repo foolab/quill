@@ -100,8 +100,8 @@ public:
       otherwise false.
      */
 
-    static bool quillFileLocked(const QString& fileName,
-                                bool overrideOwnLock = false);
+    static bool isQuillFileLocked(const QString& fileName,
+                                  bool overrideOwnLock = false);
 
 private:
     /*!

@@ -526,5 +526,5 @@ void QuillFile::unlock()
 
 bool QuillFile::isLocked(bool overrideOwnLock) const
 {
-    return LockFile::quillFileLocked(fileName(), overrideOwnLock);
+    return LockFile::isQuillFileLocked(fileName(), overrideOwnLock);
 }

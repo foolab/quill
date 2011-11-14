@@ -1244,6 +1244,6 @@ QuillError File::error() const
 
 bool File::locked() const
 {
-    return LockFile::quillFileLocked(m_fileName);
+    return LockFile::isQuillFileLocked(m_fileName);
 }
 

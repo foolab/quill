@@ -66,7 +66,7 @@ bool FileSystem::setFileModificationDateTime(const QString &fileName,
 
 bool LockFile::lockQuillFile(const QString& fileName, bool overrideOwnLock)
 {
-    if (quillFileLocked(fileName, overrideOwnLock)) {
+    if (isQuillFileLocked(fileName, overrideOwnLock)) {
         return false;
     }
 
@@ -98,7 +98,7 @@ void LockFile::unlockQuillFile(const QString& fileName)
     QFile::remove(lockFilePath);
 }
 
-bool LockFile::quillFileLocked(const QString& fileName, bool overrideOwnLock)
+bool LockFile::isQuillFileLocked(const QString& fileName, bool overrideOwnLock)
 {
     QDir tempDir = LockFile::tempDir();
     QString lockfilePrefix = File::filePathHash(fileName) + LOCKFILE_SEPARATOR;
