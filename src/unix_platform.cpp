@@ -64,9 +64,9 @@ bool FileSystem::setFileModificationDateTime(const QString &fileName,
 }
 
 
-bool LockFile::lockQuillFile(const QString& fileName)
+bool LockFile::lockQuillFile(const QString& fileName, bool overrideOwnLock)
 {
-    if (quillFileLocked(fileName)) {
+    if (quillFileLocked(fileName, overrideOwnLock)) {
         return false;
     }
 
@@ -99,7 +99,7 @@ void LockFile::unlockQuillFile(const QString& fileName)
     tempDir.remove(lockFilePath);
 }
 
-bool LockFile::quillFileLocked(const QString& fileName)
+bool LockFile::quillFileLocked(const QString& fileName, bool overrideOwnLock)
 {
     QDir tempDir = LockFile::tempDir();
     QString lockfilePrefix = LockFile::lockfilePrefix(fileName);
@@ -111,6 +111,8 @@ bool LockFile::quillFileLocked(const QString& fileName)
 
     // Found at least one lock, verify if locking process exists
     if (files.count() > 0) {
+        const qint64 ownPid = QCoreApplication::applicationPid();
+
         Q_FOREACH(QString file, files) {
             QStringList strings = file.split(LOCKFILE_SEPARATOR);
 
@@ -118,6 +120,11 @@ bool LockFile::quillFileLocked(const QString& fileName)
             qint64 pid = strings.last().toLongLong(&ok);
             if (!ok) {
                 // conversion failed
+                continue;
+            }
+
+            // Ignore own lock if requested
+            if (overrideOwnLock && pid == ownPid) {
                 continue;
             }
 

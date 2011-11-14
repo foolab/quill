@@ -506,9 +506,14 @@ public:
       The lock does not prevent any QuillFile usage, but merely marks the file
       as being already reserved for editing.
 
+      @param overrideOwnLock If true, override any existing lock set previously by
+      this process. It is safe to apply multiple edit operations from the same
+      process when the previous operation is still being done. Overriding is
+      disabled by default.
+
       @returns true if locked successfully, otherwise false
      */
-    bool lock();
+    bool lock(bool overrideOwnLock = false);
 
     /*!
       Unlock this QuillFile. Does nothing if lock() was not called first.
@@ -517,10 +522,14 @@ public:
     void unlock();
 
     /*!
+      @param overrideOwnLock If true, any previous lock set by this process will
+      be ignored, indicating that locking is available. Overriding is disabled
+      by default.
+
       @returns true if this QuillFile is locked by a running process,
       otherwise false.
      */
-    bool locked() const;
+    bool locked(bool overrideOwnLock = false) const;
 
 
 signals:

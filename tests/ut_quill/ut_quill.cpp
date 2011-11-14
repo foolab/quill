@@ -52,6 +52,12 @@
 #include "../../src/strings.h"
 #include "../../src/unix_platform.h"
 
+static const char* LOCKFILE_SEPARATOR = "_";
+static const QString TEMP_PATH = QDir::tempPath()
+                                 + QDir::separator()
+                                 + "quill"
+                                 + QDir::separator();
+
 ut_quill::ut_quill()
 {
 }
@@ -64,6 +70,12 @@ void ut_quill::initTestCase()
 
 void ut_quill::cleanupTestCase()
 {
+    // Remove file locks
+    QDir tempDir(TEMP_PATH);
+    QStringList files = tempDir.entryList(QDir::Files);
+    Q_FOREACH(QString file, files) {
+        tempDir.remove(file);
+    }
 }
 
 void ut_quill::init()
@@ -1025,12 +1037,6 @@ void ut_quill::testFileLock()
     // This would require either finding/creating such process
     // or stubbing kill() function. Stubbing low level components is risky,
     // so the parent process ID is used instead
-
-    const char* LOCKFILE_SEPARATOR = "_";
-    const QString TEMP_PATH = QDir::tempPath()
-                                     + QDir::separator()
-                                     + "quill"
-                                     + QDir::separator();
     pid_t fakePID = getppid();
 
     QString lockfilePrefix = LockFile::lockfilePrefix(file->fileName());
@@ -1049,6 +1055,16 @@ void ut_quill::testFileLock()
     QVERIFY(lockFile.remove());
     QVERIFY(!file->locked());
     QVERIFY(file->lock());
+
+    // Test overriding the lock
+    file->unlock();
+    QVERIFY(file->lock());
+
+    QVERIFY(file->locked());
+    QVERIFY(!file->locked(true));
+
+    QVERIFY(!file->lock());
+    QVERIFY(file->lock(true));
 
     delete file;
 }

@@ -514,9 +514,9 @@ File* QuillFile::internalFile()
     return priv->m_file;
 }
 
-bool QuillFile::lock()
+bool QuillFile::lock(bool overrideOwnLock)
 {
-    return LockFile::lockQuillFile(fileName());
+    return LockFile::lockQuillFile(fileName(), overrideOwnLock);
 }
 
 void QuillFile::unlock()
@@ -524,7 +524,7 @@ void QuillFile::unlock()
     LockFile::unlockQuillFile(fileName());
 }
 
-bool QuillFile::locked() const
+bool QuillFile::locked(bool overrideOwnLock) const
 {
-    return LockFile::quillFileLocked(fileName());
+    return LockFile::quillFileLocked(fileName(), overrideOwnLock);
 }

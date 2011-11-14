@@ -70,25 +70,38 @@ public:
       specific. If the locking process does not exist anymore, the old lock
       is removed and new lock is created by this process.
 
-      @param quillFile QuillFile to be locked
+      @param fileName absolut path to the image file
+
+      @param overrideOwnLock If true, override any existing lock set previously by
+      this process. It is safe to apply multiple edit operations from the same
+      process when the previous operation is still being done. Overriding is
+      disabled by default.
 
       @returns true if success, otherwise false
     */
-    static bool lockQuillFile(const QString& fileName);
+    static bool lockQuillFile(const QString& fileName,
+                              bool overrideOwnLock = false);
 
     /*!
       Unlock the given QuillFile
 
-      @param quillFile QuillFile to be locked
+      @param fileName absolut path to the image file
      */
     static void unlockQuillFile(const QString& fileName);
 
     /*!
+      @param fileName absolut path to the image file
+
+      @param overrideOwnLock If true, any previous lock set by this process will
+      be ignored, indicating that locking is available. Overriding is disabled
+      by default.
+
       @returns true if this QuillFile is locked by a running process,
       otherwise false.
      */
 
-    static bool quillFileLocked(const QString& fileName);
+    static bool quillFileLocked(const QString& fileName,
+                                bool overrideOwnLock = false);
 
 private:
     /*!
