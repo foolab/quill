@@ -1,3 +1,9 @@
+libquill (1.111114.0) unstable; urgency=low
+
+  * Fixes: NB#290453 - Quill edit locking
+
+ -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Mon, 14 Nov 2011 16:00:48 +0200
+
 libquill (1.110916.0) unstable; urgency=low
 
   * Added QuillFile::isDirty().
