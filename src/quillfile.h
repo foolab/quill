@@ -529,7 +529,7 @@ public:
       @returns true if this QuillFile is locked by a running process,
       otherwise false.
      */
-    bool locked(bool overrideOwnLock = false) const;
+    bool isLocked(bool overrideOwnLock = false) const;
 
 
 signals:

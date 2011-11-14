@@ -1027,11 +1027,11 @@ void ut_quill::testFileLock()
     Unittests::generatePaletteImage().save(testFile1.fileName(), "png");
     QuillFile *file = new QuillFile(testFile1.fileName(), Strings::pngMimeType);
 
-    QVERIFY(!file->locked());
+    QVERIFY(!file->isLocked());
     QVERIFY(file->lock());
-    QVERIFY(file->locked());
+    QVERIFY(file->isLocked());
     file->unlock();
-    QVERIFY(!file->locked());
+    QVERIFY(!file->isLocked());
 
     // To fully test locking, create the lock but with a fake PID value
     // This would require either finding/creating such process
@@ -1049,19 +1049,19 @@ void ut_quill::testFileLock()
     QVERIFY(lockFile.open(QIODevice::WriteOnly));
 
     // Is locked, and locking attempt should fail
-    QVERIFY(file->locked());
+    QVERIFY(file->isLocked());
     QVERIFY(!file->lock());
 
     QVERIFY(lockFile.remove());
-    QVERIFY(!file->locked());
+    QVERIFY(!file->isLocked());
     QVERIFY(file->lock());
 
     // Test overriding the lock
     file->unlock();
     QVERIFY(file->lock());
 
-    QVERIFY(file->locked());
-    QVERIFY(!file->locked(true));
+    QVERIFY(file->isLocked());
+    QVERIFY(!file->isLocked(true));
 
     QVERIFY(!file->lock());
     QVERIFY(file->lock(true));

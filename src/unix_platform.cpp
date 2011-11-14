@@ -39,7 +39,6 @@
 
 #include "unix_platform.h"
 
-#include <QuillFile>
 #include <QDir>
 #include <QCoreApplication>
 #include <QDebug>
@@ -88,7 +87,6 @@ bool LockFile::lockQuillFile(const QString& fileName, bool overrideOwnLock)
 
 void LockFile::unlockQuillFile(const QString& fileName)
 {
-    QDir tempDir = LockFile::tempDir();
     QString lockfilePrefix = LockFile::lockfilePrefix(fileName);
 
     QString lockFilePath = TEMP_PATH
@@ -96,7 +94,7 @@ void LockFile::unlockQuillFile(const QString& fileName)
                            + LOCKFILE_SEPARATOR
                            + QString::number(QCoreApplication::applicationPid());
 
-    tempDir.remove(lockFilePath);
+    QFile::remove(lockFilePath);
 }
 
 bool LockFile::quillFileLocked(const QString& fileName, bool overrideOwnLock)
