@@ -55,8 +55,7 @@
 static const char* LOCKFILE_SEPARATOR = "_";
 static const QString TEMP_PATH = QDir::tempPath()
                                  + QDir::separator()
-                                 + "quill"
-                                 + QDir::separator();
+                                 + "quill";
 
 ut_quill::ut_quill()
 {
@@ -74,7 +73,7 @@ void ut_quill::cleanupTestCase()
     QDir tempDir(TEMP_PATH);
     QStringList files = tempDir.entryList(QDir::Files);
     Q_FOREACH(QString file, files) {
-        tempDir.remove(file);
+        QVERIFY(tempDir.remove(file));
     }
 }
 
@@ -1039,8 +1038,9 @@ void ut_quill::testFileLock()
     // so the parent process ID is used instead
     pid_t fakePID = getppid();
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(file);
+    QString lockfilePrefix = LockFile::lockfilePrefix(file->fileName());
     QString lockFilePath = TEMP_PATH
+                           + QDir::separator()
                            + lockfilePrefix
                            + LOCKFILE_SEPARATOR
                            + QString::number(fakePID);
@@ -1065,8 +1065,55 @@ void ut_quill::testFileLock()
 
     QVERIFY(!file->lock());
     QVERIFY(file->lock(true));
+    file->unlock();
 
     delete file;
+}
+
+void ut_quill::testLockedFilesList()
+{
+    cleanupTestCase();
+    QCOMPARE(Quill::lockedFiles().size(), 0);
+
+    // Create test file with corner case naming schemes
+    QStringList inputFiles;
+    inputFiles << "/foo/bar/image.jpg"
+            << "/_foo/bar/image.jpg"
+            << "/foo/bar/image.jpg_"
+            << "/foo/bar/_image.jpg"
+            << "/foo/bar_/image.jpg"
+            << "/foo/bar_/_image.jpg"
+            << "/foo/bar__/__image.jpg"
+            << "/_foo/bar__/__image.jpg";
+
+    foreach(QString file, inputFiles) {
+        QString lockfilePrefix = LockFile::lockfilePrefix(file);
+        QString lockFilePath = TEMP_PATH
+                               + QDir::separator()
+                               + lockfilePrefix
+                               + LOCKFILE_SEPARATOR
+                               + "1234"; // PID value is irrelevant
+
+        QFile lockFile(lockFilePath);
+        QVERIFY(lockFile.open(QIODevice::WriteOnly));
+    }
+
+    QStringList lockedFiles = Quill::lockedFiles();
+    QCOMPARE(lockedFiles.size(), inputFiles.size());
+
+    // list of locked files is not ordered
+    // verify that each input file is found in the resulting list
+    foreach(QString input, inputFiles) {
+        bool isFound = false;
+        foreach(QString locked, lockedFiles) {
+            if (locked == input) {
+                isFound = true;
+            }
+        }
+
+        QVERIFY(isFound);
+    }
+
 }
 
 int main ( int argc, char *argv[] ){

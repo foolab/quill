@@ -48,7 +48,8 @@
 #include <sys/types.h>
 #include <signal.h>
 
-static const char* LOCKFILE_SEPARATOR = "_";
+static const QLatin1String LOCKFILE_SEPARATOR("_");
+static const QLatin1String INDEX_SEPARATOR(",");
 static const QString TEMP_PATH = QDir::tempPath()
                                  + QDir::separator()
                                  + "quill"
@@ -70,7 +71,7 @@ bool LockFile::lockQuillFile(const QuillFile* quillFile, bool overrideOwnLock)
         return false;
     }
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile);
+    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile->fileName());
 
     // create the lock file
     QString lockFilePath = TEMP_PATH
@@ -88,7 +89,7 @@ bool LockFile::lockQuillFile(const QuillFile* quillFile, bool overrideOwnLock)
 
 void LockFile::unlockQuillFile(const QuillFile* quillFile)
 {
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile);
+    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile->fileName());
     QString lockFilePath = TEMP_PATH
                            + lockfilePrefix
                            + LOCKFILE_SEPARATOR
@@ -100,53 +101,122 @@ void LockFile::unlockQuillFile(const QuillFile* quillFile)
 bool LockFile::isQuillFileLocked(const QuillFile* quillFile, bool overrideOwnLock)
 {
     QDir tempDir = LockFile::tempDir();
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile);
+    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile->fileName());
 
     // check if lock exists for any process
+    QLatin1String wildcard("*");
     QStringList nameFilter;
-    nameFilter << lockfilePrefix + LOCKFILE_SEPARATOR + "*";
+    nameFilter << lockfilePrefix + LOCKFILE_SEPARATOR + wildcard;
     QStringList files = tempDir.entryList(nameFilter, QDir::Files, QDir::NoSort);
 
-    // Found at least one lock, verify if locking process exists
-    if (files.count() > 0) {
-        const qint64 ownPid = QCoreApplication::applicationPid();
+    const qint64 ownPid = QCoreApplication::applicationPid();
 
-        Q_FOREACH(QString file, files) {
-            QStringList strings = file.split(LOCKFILE_SEPARATOR);
+    Q_FOREACH(QString file, files) {
+        QStringList strings = file.split(LOCKFILE_SEPARATOR);
 
-            bool ok;
-            qint64 pid = strings.last().toLongLong(&ok);
-            if (!ok) {
-                // conversion failed
-                continue;
-            }
+        bool ok;
+        qint64 pid = strings.last().toLongLong(&ok);
+        if (!ok) {
+            // conversion failed
+            continue;
+        }
 
-            // Ignore own lock if requested
-            if (overrideOwnLock && pid == ownPid) {
-                continue;
-            }
+        // Ignore own lock if requested
+        if (overrideOwnLock && pid == ownPid) {
+            continue;
+        }
 
-            // Perform error checking without actually signaling to a process
-            int value = kill(pid, 0);
-            // Process with PID exists, cannot lock
-            if (value == 0) {
-                return true;
-            }
-            else {
-                // Remove lock with non-existent process
-                tempDir.remove(file);
-            }
+        // Perform error checking without actually signaling to a process
+        int value = kill(pid, 0);
+        // Process with PID exists, cannot lock
+        if (value == 0) {
+            return true;
+        }
+        else {
+            // Remove lock with non-existent process
+            tempDir.remove(file);
         }
     }
 
     return false;
 }
 
-QString LockFile::lockfilePrefix(const QuillFile* quillFile)
+QStringList LockFile::lockedFiles()
 {
-    // UNIX file system separators cannot be used in filename, replace it
-    QString lockfilePrefix = quillFile->fileName();
+    QDir tempDir = LockFile::tempDir();
+
+    QLatin1String wildcard("*");
+    QStringList nameFilter;
+    // wildcard for name and PID
+    nameFilter << wildcard + LOCKFILE_SEPARATOR + wildcard;
+    QStringList files = tempDir.entryList(nameFilter, QDir::Files, QDir::NoSort);
+
+    QStringList lockedFiles;
+
+    Q_FOREACH(QString file, files) {
+        int index = file.lastIndexOf(LOCKFILE_SEPARATOR);
+        if (index == -1) {
+            // failed to parse the lockfile name
+            continue;
+        }
+        file.truncate(index); // truncate _PID part
+
+        // Find indexes for separators
+        index = file.lastIndexOf(LOCKFILE_SEPARATOR);
+        // Section counting from the end
+        QString indexString = file.section(LOCKFILE_SEPARATOR, -1, -1);
+        QStringList indexList = indexString.split(INDEX_SEPARATOR);
+        // truncate _{comma separated list of indexes}_
+        file.truncate(index);
+
+        // Restore separators base on indexes
+        foreach(QString index, indexList) {
+            bool ok;
+            int i = index.toInt(&ok);
+
+            if (!ok) {
+                continue;
+            }
+
+            file.replace(i, qstrlen(LOCKFILE_SEPARATOR.latin1()), QDir::separator());
+
+        }
+        lockedFiles << file;
+    }
+
+    return lockedFiles;
+}
+
+QString LockFile::lockfilePrefix(const QString& fileName)
+{
+    // UNIX file system separators cannot be used in filename.
+    // Replacing the separator with any valid character leads to collision
+    // when the same character is already used in the file name.
+    // Thus, mark down the separator indexes in the end of the lockfile name.
+    // Format of the lock file:
+    // _path_to_file_{comma separated list of separator indexes}_PID
+    // For example:
+    // /foo/bar__/__image.jpeg
+    // _foo_bar_____image.jpg_0,4,10
+
+    QString lockfilePrefix = fileName;
+    QList<int> indexes;
+    int i = 0;
+    while ((i = lockfilePrefix.indexOf(QDir::separator(), i)) != -1) {
+        indexes << i;
+        ++i;
+    }
+
     lockfilePrefix.replace(QDir::separator(), LOCKFILE_SEPARATOR);
+    lockfilePrefix += LOCKFILE_SEPARATOR;
+
+    foreach(int index, indexes) {
+        lockfilePrefix += QString::number(index);
+        if (index < indexes.last()) {
+            lockfilePrefix += INDEX_SEPARATOR;
+        }
+    }
+
     return lockfilePrefix;
 }
 

@@ -76,6 +76,7 @@ private slots:
     void testUseAfterSave();
 
     void testFileLock();
+    void testLockedFilesList();
 };
 
 #endif  // _UT_QUILL_H_

@@ -61,6 +61,7 @@
 #include "logger.h"
 #include "dbus-thumbnailer/dbusthumbnailer.h"
 #include "strings.h"
+#include "unix_platform.h"
 
 Core *Core::g_instance = 0;
 
@@ -530,6 +531,11 @@ QStringList Core::saveInProgressList() const
     }
 
     return stringList;
+}
+
+QStringList Core::lockedFiles()
+{
+    return LockFile::lockedFiles();
 }
 
 void Core::timeout()

@@ -103,6 +103,11 @@ public:
     static bool isQuillFileLocked(const QuillFile* quillFile,
                                   bool overrideOwnLock = false);
 
+    /*!
+      @returns the names list of files that are locked by any process.
+    */
+    static QStringList lockedFiles();
+
 private:
     /*!
       @returns the temporary directory where lock files are created. The directory
@@ -114,7 +119,7 @@ private:
       @returns The prefix part of the lock file name.
       E.g. /foo/bar/image.jpeg --> _foo_bar_image.jpeg_
     */
-    static QString lockfilePrefix(const QuillFile* quillFile);
+    static QString lockfilePrefix(const QString& fileName);
 
     // Allow unit tests to access private utility functions for simulation
     friend class ut_quill;

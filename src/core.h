@@ -472,6 +472,12 @@ public:
     QStringList saveInProgressList() const;
 
     /*!
+      Returns the names list of files that are locked by any process.
+     */
+
+    static QStringList lockedFiles();
+
+    /*!
       See Quill::waitUntilFinished()
      */
 
