@@ -70,7 +70,7 @@ public:
       specific. If the locking process does not exist anymore, the old lock
       is removed and new lock is created by this process.
 
-      @param fileName path to the image file
+      @param fileName absolut path to the image file
 
       @param overrideOwnLock If true, override any existing lock set previously by
       this process. It is safe to apply multiple edit operations from the same
@@ -85,7 +85,7 @@ public:
     /*!
       Unlock the given QuillFile
 
-      @param fileName path to the image file
+      @param fileName absolut path to the image file
      */
     static void unlockQuillFile(const QString& fileName);
 
@@ -109,6 +109,12 @@ private:
       is inside the default system temprorary directory.
     */
     static QDir tempDir();
+
+    /*!
+      @returns The prefix part of the lock file name.
+      E.g. /foo/bar/image.jpeg --> _foo_bar_image.jpeg_
+    */
+    static QString lockfilePrefix(const QString& fileName);
 
     // Allow unit tests to access private utility functions for simulation
     friend class ut_quill;

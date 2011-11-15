@@ -49,7 +49,6 @@
 #include "quillfile.h"
 #include "quillundocommand.h"
 #include "quillundostack.h"
-#include <file.h>
 #include "../../src/strings.h"
 #include "../../src/unix_platform.h"
 
@@ -1040,7 +1039,7 @@ void ut_quill::testFileLock()
     // so the parent process ID is used instead
     pid_t fakePID = getppid();
 
-    QString lockfilePrefix = File::filePathHash(file->fileName()) + LOCKFILE_SEPARATOR;
+    QString lockfilePrefix = LockFile::lockfilePrefix(file->fileName());
     QString lockFilePath = TEMP_PATH
                            + lockfilePrefix
                            + LOCKFILE_SEPARATOR
