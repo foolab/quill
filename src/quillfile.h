@@ -531,7 +531,6 @@ public:
      */
     bool isLocked(bool overrideOwnLock = false) const;
 
-
 signals:
     /*!
       Triggered when there is a new image representation available on

@@ -532,17 +532,6 @@ QStringList Core::saveInProgressList() const
     return stringList;
 }
 
-QStringList Core::lockedFiles() const
-{
-    QStringList files;
-    foreach(File* file, m_fileList){
-        if (file->locked())
-            files.append(file->fileName());
-    }
-
-    return files;
-}
-
 void Core::timeout()
 {
     m_loop.exit(1);

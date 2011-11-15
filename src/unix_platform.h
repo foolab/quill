@@ -79,7 +79,7 @@ public:
 
       @returns true if success, otherwise false
     */
-    static bool lockQuillFile(const QString& fileName,
+    static bool lockQuillFile(const QuillFile* quillFile,
                               bool overrideOwnLock = false);
 
     /*!
@@ -87,7 +87,7 @@ public:
 
       @param fileName absolut path to the image file
      */
-    static void unlockQuillFile(const QString& fileName);
+    static void unlockQuillFile(const QuillFile* quillFile);
 
     /*!
       @param fileName absolut path to the image file
@@ -100,7 +100,7 @@ public:
       otherwise false.
      */
 
-    static bool isQuillFileLocked(const QString& fileName,
+    static bool isQuillFileLocked(const QuillFile* quillFile,
                                   bool overrideOwnLock = false);
 
 private:
@@ -114,7 +114,7 @@ private:
       @returns The prefix part of the lock file name.
       E.g. /foo/bar/image.jpeg --> _foo_bar_image.jpeg_
     */
-    static QString lockfilePrefix(const QString& fileName);
+    static QString lockfilePrefix(const QuillFile* quillFile);
 
     // Allow unit tests to access private utility functions for simulation
     friend class ut_quill;

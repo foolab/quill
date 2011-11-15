@@ -516,15 +516,15 @@ File* QuillFile::internalFile()
 
 bool QuillFile::lock(bool overrideOwnLock)
 {
-    return LockFile::lockQuillFile(fileName(), overrideOwnLock);
+    return LockFile::lockQuillFile(this, overrideOwnLock);
 }
 
 void QuillFile::unlock()
 {
-    LockFile::unlockQuillFile(fileName());
+    LockFile::unlockQuillFile(this);
 }
 
 bool QuillFile::isLocked(bool overrideOwnLock) const
 {
-    return LockFile::isQuillFileLocked(fileName(), overrideOwnLock);
+    return LockFile::isQuillFileLocked(this, overrideOwnLock);
 }

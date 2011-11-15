@@ -1039,7 +1039,7 @@ void ut_quill::testFileLock()
     // so the parent process ID is used instead
     pid_t fakePID = getppid();
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(file->fileName());
+    QString lockfilePrefix = LockFile::lockfilePrefix(file);
     QString lockFilePath = TEMP_PATH
                            + lockfilePrefix
                            + LOCKFILE_SEPARATOR

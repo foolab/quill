@@ -472,12 +472,6 @@ public:
     QStringList saveInProgressList() const;
 
     /*!
-      Returns the names list of files which are locked for editing
-     */
-
-    QStringList lockedFiles() const;
-
-    /*!
       See Quill::waitUntilFinished()
      */
 

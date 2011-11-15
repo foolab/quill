@@ -683,12 +683,6 @@ public:
      */
     QuillError error() const;
 
-    /*!
-      @returns true if this File is locked by a running process,
-      otherwise false.
-     */
-    bool locked() const;
-
 signals:
 
     /*!

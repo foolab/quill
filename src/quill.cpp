@@ -268,12 +268,6 @@ QStringList Quill::saveInProgressList()
     return Core::instance()->saveInProgressList();
 }
 
-QStringList Quill::lockedFiles()
-{
-    QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
-    return Core::instance()->lockedFiles();
-}
-
 bool Quill::waitUntilFinished(int msec)
 {
     QUILL_LOG(Logger::Module_Quill, QString(Q_FUNC_INFO));
