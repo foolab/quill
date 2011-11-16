@@ -1038,7 +1038,7 @@ void ut_quill::testFileLock()
     // so the parent process ID is used instead
     pid_t fakePID = getppid();
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(file1->fileName());
+    QString lockfilePrefix = QUrl::toPercentEncoding(file1->fileName());
     QString lockFilePath = TEMP_PATH
                            + QDir::separator()
                            + lockfilePrefix
@@ -1103,10 +1103,14 @@ void ut_quill::testLockedFilesList()
             << "/foo/bar_/image.jpg"
             << "/foo/bar_/_image.jpg"
             << "/foo/bar__/__image.jpg"
-            << "/_foo/bar__/__image.jpg";
+            << "/_foo/bar__/__image.jpg"
+            << "/foo/bar/image with empty.jpg"
+            << "/foo/bar/image+foo.jpg"
+            << "/this_is_plus_%2B"
+            << "relative/path/image.jpeg";
 
     foreach(QString file, inputFiles) {
-        QString lockfilePrefix = LockFile::lockfilePrefix(file);
+        QString lockfilePrefix = QUrl::toPercentEncoding(file);
         QString lockFilePath = TEMP_PATH
                                + QDir::separator()
                                + lockfilePrefix

@@ -42,7 +42,7 @@
 
 #include <QDir>
 #include <QCoreApplication>
-#include <QDebug>
+#include <QUrl>
 
 #include <utime.h>
 #include <sys/types.h>
@@ -64,14 +64,13 @@ bool FileSystem::setFileModificationDateTime(const QString &fileName,
     return (result != 0);
 }
 
-
 bool LockFile::lockQuillFile(const QuillFile* quillFile, bool overrideOwnLock)
 {
     if (isQuillFileLocked(quillFile, overrideOwnLock)) {
         return false;
     }
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile->fileName());
+    QString lockfilePrefix = QUrl::toPercentEncoding(quillFile->fileName());
 
     // create the lock file
     QString lockFilePath = TEMP_PATH
@@ -89,7 +88,7 @@ bool LockFile::lockQuillFile(const QuillFile* quillFile, bool overrideOwnLock)
 
 void LockFile::unlockQuillFile(const QuillFile* quillFile)
 {
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile->fileName());
+    QString lockfilePrefix = QUrl::toPercentEncoding(quillFile->fileName());
     QString lockFilePath = TEMP_PATH
                            + lockfilePrefix
                            + LOCKFILE_SEPARATOR
@@ -101,7 +100,7 @@ void LockFile::unlockQuillFile(const QuillFile* quillFile)
 bool LockFile::isQuillFileLocked(const QuillFile* quillFile, bool overrideOwnLock)
 {
     QDir tempDir = LockFile::tempDir();
-    QString lockfilePrefix = LockFile::lockfilePrefix(quillFile->fileName());
+    QString lockfilePrefix = QUrl::toPercentEncoding(quillFile->fileName());
 
     // check if lock exists for any process
     QLatin1String wildcard("*");
@@ -165,73 +164,19 @@ QStringList LockFile::lockedFiles()
     return lockedFiles;
 }
 
-QString LockFile::lockfilePrefix(const QString& fileName)
+QString LockFile::parseLockedfileName(const QString& fileName)
 {
-    // UNIX file system separators cannot be used in filename.
-    // Replacing the separator with any valid character leads to collision
-    // when the same character is already used in the file name.
-    // Thus, mark down the separator indexes in the end of the lockfile name.
-    // Format of the lock file:
-    // _path_to_file_{comma separated list of separator indexes}_PID
-    // For example:
-    // /foo/bar__/__image.jpeg
-    // _foo_bar_____image.jpg_0,4,10
-
-    QString lockfilePrefix = fileName;
-    QList<int> indexes;
-    int i = 0;
-    while ((i = lockfilePrefix.indexOf(QDir::separator(), i)) != -1) {
-        indexes << i;
-        ++i;
-    }
-
-    lockfilePrefix.replace(QDir::separator(), LOCKFILE_SEPARATOR);
-    lockfilePrefix += LOCKFILE_SEPARATOR;
-
-    foreach(int index, indexes) {
-        lockfilePrefix += QString::number(index);
-        if (index < indexes.last()) {
-            lockfilePrefix += INDEX_SEPARATOR;
-        }
-    }
-
-    return lockfilePrefix;
-}
-
-QString LockFile::parseLockedfileName(QString fileName)
-{
-    int index = fileName.lastIndexOf(LOCKFILE_SEPARATOR);
+    QString percentEncoded = fileName;
+    int index = percentEncoded.lastIndexOf(LOCKFILE_SEPARATOR);
     if (index == -1) {
         return QString();
     }
 
-    fileName.truncate(index); // truncate _PID part
+    percentEncoded.truncate(index); // truncate _PID part
 
-    // Find indexes for separators
-    index = fileName.lastIndexOf(LOCKFILE_SEPARATOR);
-    if (index == -1) {
-        return QString();
-    }
-
-    // Section counting from the end
-    QString indexString = fileName.section(LOCKFILE_SEPARATOR, -1, -1);
-    QStringList indexList = indexString.split(INDEX_SEPARATOR);
-    // truncate _{comma separated list of indexes}_
-    fileName.truncate(index);
-
-    // Restore separators based on indexes
-    foreach(QString index, indexList) {
-        bool ok;
-        int i = index.toInt(&ok);
-
-        if (!ok) {
-            return QString();
-        }
-
-        fileName.replace(i, qstrlen(LOCKFILE_SEPARATOR.latin1()), QDir::separator());
-
-    }
-    return fileName;
+    QByteArray array;
+    array.append(percentEncoded);
+    return QUrl::fromPercentEncoding(array);
 }
 
 QDir LockFile::tempDir()

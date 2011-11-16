@@ -116,15 +116,9 @@ private:
     static QDir tempDir();
 
     /*!
-      @returns The prefix part of the lock file name.
-      E.g. /foo/bar/image.jpeg --> _foo_bar_image.jpeg_
-    */
-    static QString lockfilePrefix(const QString& fileName);
-
-    /*!
       @returns The filename of the locked file, parsed from the lockfile name
     */
-    static QString parseLockedfileName(QString fileName);
+    static QString parseLockedfileName(const QString& fileName);
 
     // Allow unit tests to access private utility functions for simulation
     friend class ut_quill;
