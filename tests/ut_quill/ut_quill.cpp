@@ -1107,7 +1107,8 @@ void ut_quill::testLockedFilesList()
             << "/foo/bar/image with empty.jpg"
             << "/foo/bar/image+foo.jpg"
             << "/this_is_plus_%2B"
-            << "relative/path/image.jpeg";
+            << "relative/path/image.jpeg"
+            << "relative/path/image#.jpeg";
 
     foreach(QString file, inputFiles) {
         QString lockfilePrefix = QUrl::toPercentEncoding(file);

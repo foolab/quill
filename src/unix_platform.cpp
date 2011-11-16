@@ -49,7 +49,6 @@
 #include <signal.h>
 
 static const QLatin1String LOCKFILE_SEPARATOR("_");
-static const QLatin1String INDEX_SEPARATOR(",");
 static const QString TEMP_PATH = QDir::tempPath()
                                  + QDir::separator()
                                  + "quill"
