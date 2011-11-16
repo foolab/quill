@@ -1076,7 +1076,7 @@ void ut_quill::testFileLock()
     QVERIFY(!file1->isLocked());
     QVERIFY(file2->lock());
     QVERIFY(!file1->isLocked());
-     QVERIFY(file2->isLocked());
+    QVERIFY(file2->isLocked());
 
     QVERIFY(file1->lock());
     QVERIFY(file1->isLocked());

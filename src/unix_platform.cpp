@@ -38,13 +38,13 @@
 ****************************************************************************/
 
 #include "unix_platform.h"
-#include <quillfile.h>
+#include "quillfile.h"
 
 #include <QDir>
 #include <QCoreApplication>
 #include <QDebug>
 
-#include "utime.h"
+#include <utime.h>
 #include <sys/types.h>
 #include <signal.h>
 
