@@ -1024,13 +1024,13 @@ void ut_quill::testFileLock()
     QTemporaryFile testFile1;
     testFile1.open();
     Unittests::generatePaletteImage().save(testFile1.fileName(), "png");
-    QuillFile *file = new QuillFile(testFile1.fileName(), Strings::pngMimeType);
+    QuillFile *file1 = new QuillFile(testFile1.fileName(), Strings::pngMimeType);
 
-    QVERIFY(!file->isLocked());
-    QVERIFY(file->lock());
-    QVERIFY(file->isLocked());
-    file->unlock();
-    QVERIFY(!file->isLocked());
+    QVERIFY(!file1->isLocked());
+    QVERIFY(file1->lock());
+    QVERIFY(file1->isLocked());
+    file1->unlock();
+    QVERIFY(!file1->isLocked());
 
     // To fully test locking, create the lock but with a fake PID value
     // This would require either finding/creating such process
@@ -1038,7 +1038,7 @@ void ut_quill::testFileLock()
     // so the parent process ID is used instead
     pid_t fakePID = getppid();
 
-    QString lockfilePrefix = LockFile::lockfilePrefix(file->fileName());
+    QString lockfilePrefix = LockFile::lockfilePrefix(file1->fileName());
     QString lockFilePath = TEMP_PATH
                            + QDir::separator()
                            + lockfilePrefix
@@ -1049,29 +1049,48 @@ void ut_quill::testFileLock()
     QVERIFY(lockFile.open(QIODevice::WriteOnly));
 
     // Is locked, and locking attempt should fail
-    QVERIFY(file->isLocked());
-    QVERIFY(!file->lock());
+    QVERIFY(file1->isLocked());
+    QVERIFY(!file1->lock());
 
     QVERIFY(lockFile.remove());
-    QVERIFY(!file->isLocked());
-    QVERIFY(file->lock());
+    QVERIFY(!file1->isLocked());
+    QVERIFY(file1->lock());
 
     // Test overriding the lock
-    file->unlock();
-    QVERIFY(file->lock());
+    file1->unlock();
+    QVERIFY(file1->lock());
 
-    QVERIFY(file->isLocked());
-    QVERIFY(!file->isLocked(true));
+    QVERIFY(file1->isLocked());
+    QVERIFY(!file1->isLocked(true));
 
-    QVERIFY(!file->lock());
-    QVERIFY(file->lock(true));
-    file->unlock();
+    QVERIFY(!file1->lock());
+    QVERIFY(file1->lock(true));
+    file1->unlock();
 
-    delete file;
+    // Test that locking one file does not affect another
+    QTemporaryFile testFile2;
+    testFile2.open();
+    Unittests::generatePaletteImage().save(testFile2.fileName(), "png");
+    QuillFile *file2 = new QuillFile(testFile2.fileName(), Strings::pngMimeType);
+
+    QVERIFY(!file1->isLocked());
+    QVERIFY(file2->lock());
+    QVERIFY(!file1->isLocked());
+     QVERIFY(file2->isLocked());
+
+    QVERIFY(file1->lock());
+    QVERIFY(file1->isLocked());
+
+    file1->unlock();
+    file2->unlock();
+
+    delete file1;
+    delete file2;
 }
 
 void ut_quill::testLockedFilesList()
 {
+    // Cleanup any dangling locks from failed tests
     cleanupTestCase();
     QCOMPARE(Quill::lockedFiles().size(), 0);
 

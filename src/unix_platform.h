@@ -121,6 +121,11 @@ private:
     */
     static QString lockfilePrefix(const QString& fileName);
 
+    /*!
+      @returns The filename of the locked file, parsed from the lockfile name
+    */
+    static QString parseLockedfileName(QString fileName);
+
     // Allow unit tests to access private utility functions for simulation
     friend class ut_quill;
 };

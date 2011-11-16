@@ -111,13 +111,18 @@ bool LockFile::isQuillFileLocked(const QuillFile* quillFile, bool overrideOwnLoc
 
     const qint64 ownPid = QCoreApplication::applicationPid();
 
-    Q_FOREACH(QString file, files) {
-        QStringList strings = file.split(LOCKFILE_SEPARATOR);
+    Q_FOREACH(QString lockFile, files) {
+        QStringList strings = lockFile.split(LOCKFILE_SEPARATOR);
 
         bool ok;
         qint64 pid = strings.last().toLongLong(&ok);
         if (!ok) {
             // conversion failed
+            continue;
+        }
+
+        // Skip lock for another file
+        if (parseLockedfileName(lockFile) != quillFile->fileName()) {
             continue;
         }
 
@@ -134,7 +139,7 @@ bool LockFile::isQuillFileLocked(const QuillFile* quillFile, bool overrideOwnLoc
         }
         else {
             // Remove lock with non-existent process
-            tempDir.remove(file);
+            tempDir.remove(lockFile);
         }
     }
 
@@ -154,34 +159,7 @@ QStringList LockFile::lockedFiles()
     QStringList lockedFiles;
 
     Q_FOREACH(QString file, files) {
-        int index = file.lastIndexOf(LOCKFILE_SEPARATOR);
-        if (index == -1) {
-            // failed to parse the lockfile name
-            continue;
-        }
-        file.truncate(index); // truncate _PID part
-
-        // Find indexes for separators
-        index = file.lastIndexOf(LOCKFILE_SEPARATOR);
-        // Section counting from the end
-        QString indexString = file.section(LOCKFILE_SEPARATOR, -1, -1);
-        QStringList indexList = indexString.split(INDEX_SEPARATOR);
-        // truncate _{comma separated list of indexes}_
-        file.truncate(index);
-
-        // Restore separators base on indexes
-        foreach(QString index, indexList) {
-            bool ok;
-            int i = index.toInt(&ok);
-
-            if (!ok) {
-                continue;
-            }
-
-            file.replace(i, qstrlen(LOCKFILE_SEPARATOR.latin1()), QDir::separator());
-
-        }
-        lockedFiles << file;
+        lockedFiles << parseLockedfileName(file);
     }
 
     return lockedFiles;
@@ -218,6 +196,42 @@ QString LockFile::lockfilePrefix(const QString& fileName)
     }
 
     return lockfilePrefix;
+}
+
+QString LockFile::parseLockedfileName(QString fileName)
+{
+    int index = fileName.lastIndexOf(LOCKFILE_SEPARATOR);
+    if (index == -1) {
+        return QString();
+    }
+
+    fileName.truncate(index); // truncate _PID part
+
+    // Find indexes for separators
+    index = fileName.lastIndexOf(LOCKFILE_SEPARATOR);
+    if (index == -1) {
+        return QString();
+    }
+
+    // Section counting from the end
+    QString indexString = fileName.section(LOCKFILE_SEPARATOR, -1, -1);
+    QStringList indexList = indexString.split(INDEX_SEPARATOR);
+    // truncate _{comma separated list of indexes}_
+    fileName.truncate(index);
+
+    // Restore separators based on indexes
+    foreach(QString index, indexList) {
+        bool ok;
+        int i = index.toInt(&ok);
+
+        if (!ok) {
+            return QString();
+        }
+
+        fileName.replace(i, qstrlen(LOCKFILE_SEPARATOR.latin1()), QDir::separator());
+
+    }
+    return fileName;
 }
 
 QDir LockFile::tempDir()
