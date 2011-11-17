@@ -1,8 +1,8 @@
-libquill (1.111114.0) unstable; urgency=low
+libquill (1.111117.0) unstable; urgency=low
 
   * Fixes: NB#290453 - Quill edit locking
 
- -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Mon, 14 Nov 2011 16:00:48 +0200
+ -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Thu, 17 Nov 2011 12:42:13 +0200
 
 libquill (1.110916.0) unstable; urgency=low
 
@@ -220,7 +220,7 @@ libquill (1.110407.0) unstable; urgency=low
 libquill (1.110328.0) unstable; urgency=low
 
   * Added proper support for using image data from memory
-  
+
  -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Mon, 28 Mar 2011 15:11:15 +0300
 
 libquill (1.110325.0) unstable; urgency=low
