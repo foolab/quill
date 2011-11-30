@@ -63,12 +63,15 @@ ImageCache::~ImageCache()
 bool ImageCache::insert(const File *file, int commandId,
                         const QuillImage &image, ProtectionStatus status)
 {
+    bool result = false;
+
+    if (image.isNull())
+        return result;
+
     CacheImage *cacheImage = new CacheImage;
     cacheImage->image = image;
     cacheImage->file = file;
     cacheImage->key = commandId;
-
-    bool result = false;
 
     // Insert to not protected
     if (status == NotProtected)
