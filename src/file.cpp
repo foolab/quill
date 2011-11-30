@@ -996,6 +996,11 @@ void File::registerThumbnail(int level)
     touchThumbnail(level);
 }
 
+void File::unregisterThumbnail(int level)
+{
+    m_hasThumbnail.insert(level, File::Thumbnail_NotExists);
+}
+
 bool File::hasOriginal()
 {
     QString indexName = QString('\\') + m_fileName;

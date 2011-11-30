@@ -539,6 +539,11 @@ public:
     void registerThumbnail(int level);
 
     /*!
+      Internally removes registration thumbnail as being saved
+      */
+    void unregisterThumbnail(int level);
+
+    /*!
       If the file has an original registered in core.
     */
 

@@ -745,11 +745,22 @@ void Scheduler::processFinishedTask(Task *task, QuillImage image)
             // Thumbnail load failed
             if ((image.isNull()) &&
                 (filter->role() == QuillImageFilter::Role_Load)) {
-                error = QuillError(QuillError::translateFilterError(filter->error()),
-                                   QuillError::ThumbnailErrorSource,
-                                   filter->option(QuillImageFilter::FileName).toString());
-                file->removeThumbnails();
-                file->setThumbnailError(true);
+
+                QuillError::ErrorCode errorCode = QuillError::translateFilterError(filter->error());
+
+                // Corner case: thumbnail is not found anymore;
+                // e.g. removed by another process. Instead of emitting an error signal,
+                // unregister this thumbnail and fallback to normal thumbnail creation
+                if (errorCode == QuillError::FileNotFoundError)
+                    file->unregisterThumbnail(task->displayLevel());
+                else
+                {
+                    error = QuillError(errorCode,
+                                        QuillError::ThumbnailErrorSource,
+                                        filter->option(QuillImageFilter::FileName).toString());
+                    file->removeThumbnails();
+                    file->setThumbnailError(true);
+                }
             }
 
             image = QuillImage(image, command->fullImageSize());
