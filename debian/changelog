@@ -1,3 +1,10 @@
+libquill (1.111202.0) unstable; urgency=low
+
+  * Fixes: NB#292961 - Blank screen due to busy looping when edited from different process
+  * Fixes: NB#289456 - Loading thumbnail fails when file is edited from different process
+
+ -- Jarkko Palviainen <ext-jarkko.palviainen@nokia.com>  Fri, 02 Dec 2011 12:10:31 +0200
+
 libquill (1.111117.0) unstable; urgency=low
 
   * Fixes: NB#290453 - Quill edit locking
