@@ -1,0 +1,46 @@
+Name: libquill
+Summary: Qt based engine for mobile image processing applications
+Version: 1.111202.0
+Release: 0
+Group: System/Libraries
+License: LGPLv2
+URL: https://maemo.gitorious.org/meego-image-editor/libquill
+Sources:
+    - "meego-image-editor-%{name}-%{version}.tar.gz"
+Description: |
+    A high-level, Qt-based engine for building image viewing and editing
+    applications especially for mobile devices. It provides optimized
+    image loading and handling, fast response times for previewing images,
+    memory-optimized handling of large images, transparent thumbnail
+    handling and non-destructive editing.
+
+PkgConfigBR:
+    - quillimagefilter
+    - quillmetadata
+    - QtCore
+    - QtOpenGL
+    - libexif
+    - exempi-2.0
+Configure: none
+Builder: make
+RunFdupes:
+    - "%{_libdir}/"
+SubPackages:
+    - Name: quill-utils
+      AsWholeName: yes
+      Summary: Small independent utilities to support libquill use
+      Group: Development/Tools
+      Description: "%{summary}."
+
+    - Name: tests
+      Summary: Unit tests for libquill
+      Group: Development/Libraries
+      Description: "%{summary}."
+      Requires:
+          - testrunner-lite
+
+    - Name: devel
+      Summary: Development headers for libquill
+      Group: Development/Libraries
+      Description: "%{summary}."
+

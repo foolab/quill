@@ -1,0 +1,21 @@
+* Thu Feb 09 2012 Marko Saukko <marko.saukko@gmail.com> - 1.111202.0
+- Minor packaging cleanup.
+
+* Wed Dec 21 2011 Marko Saukko <marko.saukko@cybercom.com> - 1.111202.0
+- Changed to Harmattan upstream.
+- Added .yaml for spectacle.
+
+* Tue Oct 04 2011 Marko Saukko <marko.saukko@cybercom.com> - 3.9.0
+- Disabled documentation.
+
+* Tue Jan 11 2011 Teemu Hukkanen <ext-teemu.hukkanen@nokia.com> - 3.9.0
+- update libquill to 3.9.0 (BMC#12596)
+- Fix broken packaging.
+- Remove the libquill-libquill1 package, as it includes duplicate
+  libraries.
+- Re-organise the sub-packages to coherent sections (same content,
+  different order)
+- Fold long descriptions.
+
+* Fri Oct 15 2010 Maitrey Mishra <ext-maitrey.mishra@nokia.com> - 3.8.0    
+- Initial first version   
