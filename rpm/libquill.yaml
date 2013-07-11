@@ -4,7 +4,7 @@ Version: 1.111202.0
 Release: 0
 Group: System/Libraries
 License: LGPLv2
-URL: https://maemo.gitorious.org/meego-image-editor/libquill
+URL: https://github.com/nemomobile/quill
 Sources:
     - "%{name}-%{version}.tar.gz"
 Description: |
