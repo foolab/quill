@@ -6,7 +6,7 @@ Group: System/Libraries
 License: LGPLv2
 URL: https://maemo.gitorious.org/meego-image-editor/libquill
 Sources:
-    - "meego-image-editor-%{name}-%{version}.tar.gz"
+    - "%{name}-%{version}.tar.gz"
 Description: |
     A high-level, Qt-based engine for building image viewing and editing
     applications especially for mobile devices. It provides optimized
