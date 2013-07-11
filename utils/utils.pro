@@ -2,7 +2,10 @@ TEMPLATE = app
 TARGET = quill-autoclean
 DEPENDPATH += .
 INCLUDEPATH += .
-LIBS += -lquill
+
+equals(QT_MAJOR_VERSION, 4): LIBS += -lquill
+equals(QT_MAJOR_VERSION, 5): LIBS += -lquill-qt5
+
 QMAKE_LIBDIR += ../src/
 
 # Avoid automatic casts from QString to QUrl. Dangerous!!!

@@ -2,9 +2,9 @@
 #define REGIONS_OF_INTEREST_H
 
 #include <QuillImageFilter>
-#include <quillmetadata/QuillMetadata>
-#include <quillmetadata/QuillMetadataRegion>
-#include <quillmetadata/QuillMetadataRegionList>
+#include <QuillMetadata>
+#include <QuillMetadataRegion>
+#include <QuillMetadataRegionList>
 #include "quillundostack.h"
 
 class RegionsOfInterest {

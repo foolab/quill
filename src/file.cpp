@@ -668,7 +668,7 @@ void File::writeEditHistory(const QString &history, QuillError *error)
                             file.fileName());
         return;
     }
-    qint64 fileSize = file.write(history.toAscii());
+    qint64 fileSize = file.write(history.toLatin1());
     if(fileSize == -1) {
         *error = QuillError(QuillError::FileWriteError,
                             QuillError::EditHistoryErrorSource,

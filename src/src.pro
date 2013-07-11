@@ -3,15 +3,21 @@
 ##########
 
 TEMPLATE = lib
-TARGET = quill
-# Please do not remove this INCLUDEPATH in any case
-INCLUDEPATH += . $$[QT_INSTALL_HEADERS]/quillimagefilter $$[QT_INSTALL_HEADERS]/quillmetadata
+equals(QT_MAJOR_VERSION, 4): TARGET = quill
+equals(QT_MAJOR_VERSION, 5): TARGET = quill-qt5
+INCLUDEPATH += .
 DEPENDPATH += .
+
+CONFIG += link_pkgconfig
+equals(QT_MAJOR_VERSION, 4): PKGCONFIG += quillmetadata quillimagefilters
+equals(QT_MAJOR_VERSION, 5): PKGCONFIG += quillmetadata-qt5 quillimagefilter-qt5
 
 # Avoid automatic casts from QString to QUrl. Dangerous!!!
 DEFINES += QT_NO_URL_CAST_FROM_STRING
 MOC_DIR = .moc
 QT += dbus
+
+equals(QT_MAJOR_VERSION, 5): QT += widgets
 
 include(../common.pri)
 

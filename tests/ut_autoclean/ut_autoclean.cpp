@@ -105,7 +105,7 @@ void ut_autoclean::testThumbnailPathsSet()
 
 void ut_autoclean::testGetMainFileNameNormal()
 {
-    QByteArray xml = QString(QLatin1String("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE QuillEditHistory><Core><QuillUndoStack><File name=\"/tmp/quill/test.jpeg\"></QuillUndoStack></Core>")).toAscii();
+    QByteArray xml = QString(QLatin1String("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE QuillEditHistory><Core><QuillUndoStack><File name=\"/tmp/quill/test.jpeg\"></QuillUndoStack></Core>")).toLatin1();
 
     QTemporaryFile testFile;
     testFile.open();

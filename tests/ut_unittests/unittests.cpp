@@ -126,7 +126,7 @@ bool Unittests::compareImage(QImage image1, QImage image2)
 
     qDebug() << "Image data follows:";
 
-    for (int i=0; i<image1.numBytes()/4; i++)
+    for (int i=0; i<image1.byteCount()/4; i++)
         qDebug() << QString::number(pixel1[i], 16)
                  << QString::number(pixel2[i], 16);
 

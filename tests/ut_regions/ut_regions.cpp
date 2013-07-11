@@ -40,7 +40,7 @@
 #include <QVariant>
 #include <QtTest/QtTest>
 #include <QuillImageFilterFactory>
-#include <quillmetadata/QuillMetadata>
+#include <QuillMetadata>
 
 #include "quill.h"
 #include "quillfile.h"

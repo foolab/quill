@@ -2,11 +2,15 @@
 
 TEMPLATE = app
 DEPENDPATH += .
-INCLUDEPATH += . ../ut_unittests ../../src ../../src/dbus-thumbnailer $$[QT_INSTALL_HEADERS]/quillimagefilter
+INCLUDEPATH += . ../ut_unittests ../../src ../../src/dbus-thumbnailer
 QMAKE_LIBDIR += ../../src ../bin ../ut_unittests
 
 QMAKEFEATURES += ../../src
-CONFIG += quillimagefilter
+CONFIG += link_pkgconfig
+equals(QT_MAJOR_VERSION, 4): PKGCONFIG += quillmetadata quillimagefilters
+equals(QT_MAJOR_VERSION, 5): PKGCONFIG += quillmetadata-qt5 quillimagefilter-qt5
+
+equals(QT_MAJOR_VERSION, 5): QT += widgets
 
 include(../common.pri)
 
@@ -18,7 +22,10 @@ CONFIG += create_pc create_prl no_install_prl
 QMAKE_PKGCONFIG_REQUIRES = quill quillimagefilter QtGui
 QMAKE_PKGCONFIG_LIBDIR = $$[QT_INSTALL_LIBS]
 
-LIBS += -lquill -lquillimagefilter -lquillmetadata -lunittests-quill
+equals(QT_MAJOR_VERSION, 4): LIBS += -lquill
+equals(QT_MAJOR_VERSION, 5): LIBS += -lquill-qt5
+
+LIBS += -lunittests-quill
 QT += testlib
 
 # --- install
