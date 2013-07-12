@@ -128,7 +128,7 @@ rm %{buildroot}/%{_libdir}/libunittests-quill.so
 %files devel
 %defattr(-,root,root,-)
 # >> files devel
-%{_includedir}/qt5/quill/
+%{_includedir}/qt5/quill-qt5/
 %{_libdir}/%{name}*.so
 %{_libdir}/pkgconfig/*
 %{_datadir}/qt5/mkspecs/features/quill.prf
