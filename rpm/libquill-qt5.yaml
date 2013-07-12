@@ -20,6 +20,7 @@ PkgConfigBR:
     - Qt5Core
     - Qt5Widgets
     - Qt5Test
+    - Qt5DBus
     - libexif
     - exempi-2.0
 Configure: none

@@ -23,6 +23,7 @@ BuildRequires:  pkgconfig(quillmetadata-qt5)
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Test)
+BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(libexif)
 BuildRequires:  pkgconfig(exempi-2.0)
 BuildRequires:  fdupes
