@@ -88,7 +88,7 @@ rm -rf %{buildroot}
 
 # >> install post
 # Remove duplicate pkgconfig file
-rm %{buildroot}/%{_libdir}/quill.pc
+rm %{buildroot}/%{_libdir}/quill-qt5.pc
 
 # Remove development library for tests, it's not meant for use outside
 # the quill unit tests
@@ -128,8 +128,8 @@ rm %{buildroot}/%{_libdir}/libunittests-quill.so
 %files devel
 %defattr(-,root,root,-)
 # >> files devel
-%{_includedir}/qt4/quill/
+%{_includedir}/qt5/quill/
 %{_libdir}/%{name}*.so
 %{_libdir}/pkgconfig/*
-%{_datadir}/qt4/mkspecs/features/quill.prf
+%{_datadir}/qt5/mkspecs/features/quill.prf
 # << files devel
