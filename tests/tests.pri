@@ -7,7 +7,7 @@ QMAKE_LIBDIR += ../../src ../bin ../ut_unittests
 
 QMAKEFEATURES += ../../src
 CONFIG += link_pkgconfig
-equals(QT_MAJOR_VERSION, 4): PKGCONFIG += quillmetadata quillimagefilters
+equals(QT_MAJOR_VERSION, 4): PKGCONFIG += quillmetadata quillimagefilter
 equals(QT_MAJOR_VERSION, 5): PKGCONFIG += quillmetadata-qt5 quillimagefilter-qt5
 
 equals(QT_MAJOR_VERSION, 5): QT += widgets

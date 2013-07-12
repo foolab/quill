@@ -9,7 +9,7 @@ INCLUDEPATH += .
 DEPENDPATH += .
 
 CONFIG += link_pkgconfig
-equals(QT_MAJOR_VERSION, 4): PKGCONFIG += quillmetadata quillimagefilters
+equals(QT_MAJOR_VERSION, 4): PKGCONFIG += quillmetadata quillimagefilter
 equals(QT_MAJOR_VERSION, 5): PKGCONFIG += quillmetadata-qt5 quillimagefilter-qt5
 
 # Avoid automatic casts from QString to QUrl. Dangerous!!!
