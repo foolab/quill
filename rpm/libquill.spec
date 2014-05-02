@@ -14,8 +14,7 @@ Release:    0
 Group:      System/Libraries
 License:    LGPLv2
 URL:        https://github.com/nemomobile/quill
-Source0:    %{name}-%{version}.tar.gz
-Source100:  libquill.yaml
+Source:     %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(quillimagefilter)
