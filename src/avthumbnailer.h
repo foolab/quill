@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <thread>
 
 class AVThumbnailer : public QObject {
   Q_OBJECT
@@ -25,6 +26,10 @@ signals:
 		      const QString message);
 
 private:
+  static void createThumbnail(AVThumbnailer *that, QString flavor, QString inPath, QString outPath,
+			      int width, int height);
+  std::mutex m_mutex;
+  std::thread m_thread;
   bool m_taskInProgress;
 };
 

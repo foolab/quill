@@ -120,3 +120,4 @@ QMAKE_CLEAN += *.gcov *.gcno *.log *.moc_* *.gcda
 #               dbus-thumbnailer/thumbnailer_generic.cpp
 
 QMAKE_LFLAGS += -Wl,--as-needed
+QMAKE_CXXFLAGS += -std=gnu++0x
