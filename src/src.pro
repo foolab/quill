@@ -106,7 +106,6 @@ INSTALL_HEADERS = \
 headers.files = $$INSTALL_HEADERS
 headers.path = $$[QT_INSTALL_HEADERS]/$$TARGET
 target.path = $$[QT_INSTALL_LIBS]
-target.depends += generateproxy
 equals(QT_MAJOR_VERSION, 4): pkgconfig.files = quill.pc
 equals(QT_MAJOR_VERSION, 5): pkgconfig.files = quill-qt5.pc
 pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig
