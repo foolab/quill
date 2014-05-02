@@ -65,7 +65,11 @@ class Task;
 class Scheduler;
 class ThreadManager;
 class TileCache;
+#ifdef USE_AV
+class AVThumbnailer;
+#else
 class DBusThumbnailer;
+#endif
 class DisplayLevel;
 
 class Core : public QObject
@@ -607,6 +611,7 @@ private:
       Converts a D-bus thumbnailer flavor to a preview level.
     */
 
+public:
     int levelFromFlavor(QString flavor);
 
 signals:
@@ -681,7 +686,11 @@ private:
 
     QList<QByteArray> m_writableImageFormats;
 
+#ifdef USE_AV
+    AVThumbnailer *m_avThumbnailer;
+#else
     DBusThumbnailer *m_dBusThumbnailer;
+#endif
 
     QEventLoop m_loop;
     //The list for the file objects in the creation order

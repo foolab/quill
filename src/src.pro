@@ -11,11 +11,11 @@ DEPENDPATH += .
 CONFIG += link_pkgconfig
 equals(QT_MAJOR_VERSION, 4): PKGCONFIG += quillmetadata quillimagefilter
 equals(QT_MAJOR_VERSION, 5): PKGCONFIG += quillmetadata-qt5 quillimagefilter-qt5
+PKGCONFIG += libffmpegthumbnailer
 
 # Avoid automatic casts from QString to QUrl. Dangerous!!!
-DEFINES += QT_NO_URL_CAST_FROM_STRING
+DEFINES += QT_NO_URL_CAST_FROM_STRING USE_AV
 MOC_DIR = .moc
-QT += dbus
 
 equals(QT_MAJOR_VERSION, 5): QT += widgets
 
@@ -65,8 +65,7 @@ HEADERS += quill.h \
            historyxml.h \
            unix_platform.h \
            logger.h \
-           dbus-thumbnailer/dbusthumbnailer.h \
-           dbus-thumbnailer/thumbnailer_generic.h \
+           avthumbnailer.h \
            backgroundthread.h \
            regionsofinterest.h
 
@@ -87,8 +86,7 @@ SOURCES += quill.cpp \
            imagecache.cpp \
            historyxml.cpp \
            unix_platform.cpp \
-           dbus-thumbnailer/dbusthumbnailer.cpp \
-           dbus-thumbnailer/thumbnailer_generic.cpp \
+           avthumbnailer.cpp \
            backgroundthread.cpp \
            regionsofinterest.cpp
 
@@ -116,15 +114,9 @@ prf.files = quill.prf
 prf.path = $$[QMAKE_MKSPECS]/features
 INSTALLS += target headers pkgconfig prf
 
-generateproxy.target = dbus-thumbnailer/thumbnailer_generic.h
-generateproxy.depends = dbus-thumbnailer/tumbler-service-dbus.xml
-generateproxy.commands = qdbusxml2cpp -c ThumbnailerGenericProxy -p dbus-thumbnailer/thumbnailer_generic.h:dbus-thumbnailer/thumbnailer_generic.cpp dbus-thumbnailer/tumbler-service-dbus.xml org.freedesktop.thumbnails.Thumbnailer1
-
 # ---clean
 QMAKE_CLEAN += *.gcov *.gcno *.log *.moc_* *.gcda
 #               dbus-thumbnailer/thumbnailer_generic.h \
 #               dbus-thumbnailer/thumbnailer_generic.cpp
-
-QMAKE_EXTRA_TARGETS += generateproxy
 
 QMAKE_LFLAGS += -Wl,--as-needed

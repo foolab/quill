@@ -59,7 +59,11 @@
 #include "tilecache.h"
 #include "historyxml.h"
 #include "logger.h"
+#ifdef USE_AV
+#include "avthumbnailer.h"
+#else
 #include "dbus-thumbnailer/dbusthumbnailer.h"
+#endif
 #include "strings.h"
 #include "unix_platform.h"
 
@@ -88,6 +92,16 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     qRegisterMetaType<QuillImageList>("QuillImageList");
     qRegisterMetaType<QuillError>("QuillError");
 
+#ifdef USE_AV
+    m_avThumbnailer = new AVThumbnailer;
+    connect(m_avThumbnailer,
+            SIGNAL(thumbnailGenerated(const QString, const QString)),
+            SLOT(processDBusThumbnailerGenerated(const QString, const QString)));
+
+    connect(m_avThumbnailer,
+            SIGNAL(thumbnailError(const QString, uint, const QString)),
+            SLOT(processDBusThumbnailerError(const QString, uint, const QString)));
+#else
     m_dBusThumbnailer = new DBusThumbnailer;
     connect(m_dBusThumbnailer,
             SIGNAL(thumbnailGenerated(const QString, const QString)),
@@ -96,7 +110,7 @@ Core::Core(Quill::ThreadingMode threadingMode) :
     connect(m_dBusThumbnailer,
             SIGNAL(thumbnailError(const QString, uint, const QString)),
             SLOT(processDBusThumbnailerError(const QString, uint, const QString)));
-
+#endif
     m_writableImageFormats = QImageWriter::supportedImageFormats();
     m_fileList.clear();
 }
@@ -112,7 +126,11 @@ Core::~Core()
     delete m_tileCache;
     delete m_threadManager;
     delete m_scheduler;
+#ifdef USE_AV
+    delete m_avThumbnailer;
+#else
     delete m_dBusThumbnailer;
+#endif
 }
 
 void Core::init()
@@ -627,13 +645,23 @@ QRect Core::targetAreaForLevel(int level, const QSize &targetSize,
 
 bool Core::isExternallySupportedFormat(const QString &format) const
 {
+#ifdef USE_AV
+    return m_avThumbnailer->supports(format);
+#else
     return m_dBusThumbnailer->supports(format);
+#endif
 }
 
 void Core::activateDBusThumbnailer()
 {
     QUILL_LOG(Logger::Module_Core, QString(Q_FUNC_INFO));
-    if (m_dBusThumbnailer->isRunning())
+#ifdef USE_AV
+    bool running = m_avThumbnailer->isRunning();
+#else
+    bool running = m_dBusThumbnailer->isRunning();
+#endif
+
+    if (running)
         return;
     for (int level=0; level<=previewLevelCount()-1; level++) {
         QString flavor = thumbnailFlavorName(level);
@@ -647,13 +675,22 @@ void Core::activateDBusThumbnailer()
                     file->stack() &&
                     file->stack()->image(level).isNull() &&
                     !file->hasThumbnail(level) &&
+#ifdef USE_AV
+		    m_avThumbnailer->supports(file->fileFormat())) {
+#else
                     m_dBusThumbnailer->supports(file->fileFormat())) {
-
+#endif
                     QUILL_LOG(Logger::Module_Core, "Requesting thumbnail from D-Bus thumbnailer for "+ file->fileName() + " Mime type " + file->fileFormat() + " Flavor " + flavor);
 
+#ifdef USE_AV
+                    m_avThumbnailer->newThumbnailerTask(file->fileName(),
+                                                          file->fileFormat(),
+                                                          flavor);
+#else
                     m_dBusThumbnailer->newThumbnailerTask(file->fileName(),
                                                           file->fileFormat(),
                                                           flavor);
+#endif
                     return;
                 }
             }
