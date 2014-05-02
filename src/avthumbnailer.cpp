@@ -48,6 +48,8 @@ void AVThumbnailer::newThumbnailerTask(const QString &filePath,
     m_taskInProgress = true;
     int level = Core::instance()->levelFromFlavor(flavor);
     QSize size = Core::instance()->previewSize(level);
+    QSize min = Core::instance()->minimumPreviewSize(level);
+    bool crop = min.isValid();
     QString path = File::filePathHash(filePath);
     path.append(Strings::dot + Core::instance()->thumbnailExtension());
     path.prepend(Core::instance()->thumbnailPath(level) +
@@ -60,7 +62,7 @@ void AVThumbnailer::newThumbnailerTask(const QString &filePath,
       }
 
       m_thread = std::thread(createThumbnail, this, flavor, filePath, path,
-			     size.width(), size.height());
+			     size.width(), crop);
 
     } catch (...) {
       m_taskInProgress = false;
@@ -72,11 +74,11 @@ void AVThumbnailer::newThumbnailerTask(const QString &filePath,
 
 void AVThumbnailer::createThumbnail(AVThumbnailer *that, QString flavor,
 				    QString inPath, QString outPath,
-				    int width, int height) {
+				    int width, bool crop) {
 
   try {
     ffmpegthumbnailer::VideoThumbnailer
-      thumbnailer(width, false, width != height, 8, false);
+      thumbnailer(width, false, !crop, 8, false);
     thumbnailer.setSeekPercentage(10);
     thumbnailer.generateThumbnail(inPath.toStdString(), Jpeg, outPath.toStdString());
     that->m_mutex.lock();

@@ -27,7 +27,7 @@ signals:
 
 private:
   static void createThumbnail(AVThumbnailer *that, QString flavor, QString inPath, QString outPath,
-			      int width, int height);
+			      int width, bool crop);
   std::mutex m_mutex;
   std::thread m_thread;
   bool m_taskInProgress;
