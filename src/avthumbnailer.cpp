@@ -55,6 +55,10 @@ void AVThumbnailer::newThumbnailerTask(const QString &filePath,
     path.prepend(Core::instance()->thumbnailPath(level) +
                             QDir::separator());
 
+    // We will ignore error checking for the sake of simplicity.
+    // thumbnail creation will fail if it cannot save it anyway
+    // and a signal will be emitted
+    QFileInfo(path).absoluteDir().mkpath(".");
     try {
       m_taskInProgress = true;
       if (m_thread.joinable()) {
