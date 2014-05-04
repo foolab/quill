@@ -50,7 +50,7 @@ tiles (in TileCache, accessible via tileMap()).
 #ifndef QUILL_UNDO_COMMAND
 #define QUILL_UNDO_COMMAND
 
-#include <QUndoCommand>
+#include <QtUndoCommand>
 #include <QuillImageFilter>
 
 class QuillUndoStack;
@@ -61,7 +61,7 @@ class TileMap;
 
 class QuillUndoCommandPrivate;
 
-class QuillUndoCommand : public QUndoCommand
+class QuillUndoCommand : public QtUndoCommand
 {
 
 public:

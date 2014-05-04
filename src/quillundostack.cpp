@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#include <QUndoStack>
+#include <QtUndoStack>
 #include <QuillImage>
 #include <QFileInfo>
 #include <QBuffer>
@@ -57,7 +57,7 @@
 #include "displaylevel.h"
 
 QuillUndoStack::QuillUndoStack(File *file) :
-    m_stack(new QUndoStack()), m_file(file), m_isSessionRecording(false),
+    m_stack(new QtUndoStack()), m_file(file), m_isSessionRecording(false),
     m_recordingSessionId(0), m_nextSessionId(1), m_savedIndex(0),
     m_saveCommand(0), m_loadCommand(0), m_saveMap(0),m_revertIndex(0)
 {

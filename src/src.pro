@@ -67,7 +67,8 @@ HEADERS += quill.h \
            logger.h \
            avthumbnailer.h \
            backgroundthread.h \
-           regionsofinterest.h
+           regionsofinterest.h \
+           qtundostack.h
 
 SOURCES += quill.cpp \
            quillfile.cpp \
@@ -88,7 +89,8 @@ SOURCES += quill.cpp \
            unix_platform.cpp \
            avthumbnailer.cpp \
            backgroundthread.cpp \
-           regionsofinterest.cpp
+           regionsofinterest.cpp \
+           qtundostack.cpp
 
 debug {
     SOURCES += logger.cpp
@@ -98,9 +100,12 @@ INSTALL_HEADERS = \
            Quill \
            QuillFile \
            QuillError \
+           QtUndoCommand \
+           QtUndoStack \
            quill.h \
            quillfile.h \
-           quillerror.h
+           quillerror.h \
+           qtundostack.h
 
 # --- install
 headers.files = $$INSTALL_HEADERS

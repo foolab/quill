@@ -52,7 +52,7 @@
 int QuillUndoCommand::m_nextId = 1;
 
 QuillUndoCommand::QuillUndoCommand(QuillUndoStack *parent) :
-    QUndoCommand(), m_filter(0), m_stack(parent),
+    QtUndoCommand(), m_filter(0), m_stack(parent),
     m_index(0), m_belongsToSession(0), m_sessionId(0),
     m_fullImageSize(QSize()), m_tileMap(0)
 {

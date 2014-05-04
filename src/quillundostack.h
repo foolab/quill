@@ -40,7 +40,7 @@
 /*!
   \class QuillUndoStack
 
-  \brief Contains a QUndoStack specialized for QuillUndoCommands,
+  \brief Contains a QtUndoStack specialized for QuillUndoCommands,
   also stores related non-undoable commands like saving and loading.
 
 In addition to normal stack operations, QuillUndoStack can be used
@@ -67,7 +67,7 @@ class QuillUndoCommand;
 class QuillImageFilter;
 class SaveMap;
 class QuillImageFilterGenerator;
-class QUndoStack;
+class QtUndoStack;
 class Logger;
 
 class QuillUndoStack : public QObject
@@ -95,9 +95,9 @@ public:
       no undo/redo outside the session is permitted. A closed undo
       session will be treated as one operation by undo() and
       redo(). Undo sessions can be thought as a more generic
-      replacement of QUndoCommand::mergeWith(). Unlike it, a
+      replacement of QtUndoCommand::mergeWith(). Unlike it, a
       session can also combine different kinds of filters and requires
-      no support from the QUndoCommand subclass implementation.
+      no support from the QtUndoCommand subclass implementation.
      */
 
     void startSession();
@@ -191,13 +191,13 @@ public:
     void calculateFullImageSize(QuillUndoCommand *command);
 
     /*!
-      Count of the elements in the stack (same as QUndoStack)
+      Count of the elements in the stack (same as QtUndoStack)
     */
 
     int count() const;
 
     /*!
-      Index of the next command to be added (same as QUndoStack)
+      Index of the next command to be added (same as QtUndoStack)
      */
 
     int index() const;
@@ -337,7 +337,7 @@ private:
     void setInitialLoadFilter(QuillImageFilter *filter);
 
 private:
-    QUndoStack *m_stack;
+    QtUndoStack *m_stack;
     File *m_file;
     bool m_isSessionRecording;
     int m_recordingSessionId, m_nextSessionId;
