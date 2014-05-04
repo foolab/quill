@@ -105,8 +105,6 @@ public:
     QString text;
     QString actionText;
     int id;
-
-private:
     QtUndoCommand *q_ptr;
 };
 
@@ -123,7 +121,7 @@ public:
 
     void setIndex(int idx, bool clean);
     bool checkUndoLimit();
-private:
+
     QtUndoStack *q_ptr;
 };
 
@@ -140,6 +138,8 @@ private:
 QtUndoCommand::QtUndoCommand(const QString &text, QtUndoCommand *parent)
 {
     d_ptr = new QtUndoCommandPrivate;
+    d_ptr->q_ptr = this;
+
     if (parent != 0)
         parent->d_ptr->child_list.append(this);
     setText(text);
@@ -158,6 +158,8 @@ QtUndoCommand::QtUndoCommand(const QString &text, QtUndoCommand *parent)
 QtUndoCommand::QtUndoCommand(QtUndoCommand *parent)
 {
     d_ptr = new QtUndoCommandPrivate;
+    d_ptr->q_ptr = this;
+
     if (parent != 0)
         parent->d_ptr->child_list.append(this);
 }
@@ -484,7 +486,7 @@ bool QtUndoStackPrivate::checkUndoLimit()
 QtUndoStack::QtUndoStack(QObject *parent)
     : QObject(parent), d_ptr(new QtUndoStackPrivate)
 {
-
+  d_ptr->q_ptr = this;
 }
 
 /*!
