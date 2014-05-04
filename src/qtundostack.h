@@ -39,8 +39,8 @@
 **
 ****************************************************************************/
 
-#ifndef QUNDOSTACK_H
-#define QUNDOSTACK_H
+#ifndef QTUNDOSTACK_H
+#define QTUNDOSTACK_H
 
 #include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
@@ -48,15 +48,15 @@
 QT_BEGIN_NAMESPACE
 
 
-class QUndoCommandPrivate;
-class QUndoStackPrivate;
+class QtUndoCommandPrivate;
+class QtUndoStackPrivate;
 
-class QUndoCommand
+class QtUndoCommand
 {
 public:
-    explicit QUndoCommand(QUndoCommand *parent = 0);
-    explicit QUndoCommand(const QString &text, QUndoCommand *parent = 0);
-    virtual ~QUndoCommand();
+    explicit QtUndoCommand(QtUndoCommand *parent = 0);
+    explicit QtUndoCommand(const QString &text, QtUndoCommand *parent = 0);
+    virtual ~QtUndoCommand();
 
     virtual void undo();
     virtual void redo();
@@ -66,28 +66,28 @@ public:
     void setText(const QString &text);
 
     virtual int id() const;
-    virtual bool mergeWith(const QUndoCommand *other);
+    virtual bool mergeWith(const QtUndoCommand *other);
 
     int childCount() const;
-    const QUndoCommand *child(int index) const;
+    const QtUndoCommand *child(int index) const;
 
 private:
-    friend class QUndoStack;
-    QUndoCommandPrivate *d_ptr;
-    Q_DISABLE_COPY(QUndoCommand)
+    friend class QtUndoStack;
+    QtUndoCommandPrivate *d_ptr;
+    Q_DISABLE_COPY(QtUndoCommand)
 };
 
-class QUndoStack : public QObject
+class QtUndoStack : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int undoLimit READ undoLimit WRITE setUndoLimit)
 
 public:
-    explicit QUndoStack(QObject *parent = 0);
-    ~QUndoStack();
+    explicit QtUndoStack(QObject *parent = 0);
+    ~QtUndoStack();
     void clear();
 
-    void push(QUndoCommand *cmd);
+    void push(QtUndoCommand *cmd);
 
     bool canUndo() const;
     bool canRedo() const;
@@ -107,7 +107,7 @@ public:
     void setUndoLimit(int limit);
     int undoLimit() const;
 
-    const QUndoCommand *command(int index) const;
+    const QtUndoCommand *command(int index) const;
 
 public Q_SLOTS:
     void setClean();
@@ -124,10 +124,10 @@ Q_SIGNALS:
     void redoTextChanged(const QString &redoText);
 
 private:
-    Q_DISABLE_COPY(QUndoStack)
-    QUndoStackPrivate *d_ptr;
+    Q_DISABLE_COPY(QtUndoStack)
+    QtUndoStackPrivate *d_ptr;
 };
 
 QT_END_NAMESPACE
 
-#endif // QUNDOSTACK_H
+#endif // QTUNDOSTACK_H
