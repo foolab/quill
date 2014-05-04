@@ -20,7 +20,6 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(quillimagefilter-qt5)
 BuildRequires:  pkgconfig(quillmetadata-qt5)
 BuildRequires:  pkgconfig(Qt5Core)
-BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(libexif)
