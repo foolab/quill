@@ -41,8 +41,6 @@
 
 #include <QtCore/qdebug.h>
 #include "qundostack.h"
-#include "qundogroup.h"
-#include "qundostack_p.h"
 
 #ifndef QT_NO_UNDOCOMMAND
 
@@ -101,6 +99,36 @@ QT_BEGIN_NAMESPACE
     \sa QUndoStack
 */
 
+class QUndoCommandPrivate
+{
+public:
+    QUndoCommandPrivate() : id(-1) {}
+    QList<QUndoCommand*> child_list;
+    QString text;
+    QString actionText;
+    int id;
+
+private:
+    QUndoCommand *q_ptr;
+};
+
+class QUndoStackPrivate
+{
+public:
+    QUndoStackPrivate() : index(0), clean_index(0), undo_limit(0) {}
+
+    QList<QUndoCommand*> command_list;
+    QList<QUndoCommand*> macro_stack;
+    int index;
+    int clean_index;
+    int undo_limit;
+
+    void setIndex(int idx, bool clean);
+    bool checkUndoLimit();
+private:
+    QUndoStack *q_ptr;
+};
+
 /*!
     Constructs a QUndoCommand object with the given \a parent and \a text.
 
@@ -113,9 +141,9 @@ QT_BEGIN_NAMESPACE
 
 QUndoCommand::QUndoCommand(const QString &text, QUndoCommand *parent)
 {
-    d = new QUndoCommandPrivate;
+    d_ptr = new QUndoCommandPrivate;
     if (parent != 0)
-        parent->d->child_list.append(this);
+        parent->d_ptr->child_list.append(this);
     setText(text);
 }
 
@@ -131,9 +159,9 @@ QUndoCommand::QUndoCommand(const QString &text, QUndoCommand *parent)
 
 QUndoCommand::QUndoCommand(QUndoCommand *parent)
 {
-    d = new QUndoCommandPrivate;
+    d_ptr = new QUndoCommandPrivate;
     if (parent != 0)
-        parent->d->child_list.append(this);
+        parent->d_ptr->child_list.append(this);
 }
 
 /*!
@@ -144,8 +172,8 @@ QUndoCommand::QUndoCommand(QUndoCommand *parent)
 
 QUndoCommand::~QUndoCommand()
 {
-    qDeleteAll(d->child_list);
-    delete d;
+    qDeleteAll(d_ptr->child_list);
+    delete d_ptr;
 }
 
 /*!
@@ -206,8 +234,8 @@ bool QUndoCommand::mergeWith(const QUndoCommand *command)
 
 void QUndoCommand::redo()
 {
-    for (int i = 0; i < d->child_list.size(); ++i)
-        d->child_list.at(i)->redo();
+    for (int i = 0; i < d_ptr->child_list.size(); ++i)
+        d_ptr->child_list.at(i)->redo();
 }
 
 /*!
@@ -224,8 +252,8 @@ void QUndoCommand::redo()
 
 void QUndoCommand::undo()
 {
-    for (int i = d->child_list.size() - 1; i >= 0; --i)
-        d->child_list.at(i)->undo();
+    for (int i = d_ptr->child_list.size() - 1; i >= 0; --i)
+        d_ptr->child_list.at(i)->undo();
 }
 
 /*!
@@ -239,7 +267,7 @@ void QUndoCommand::undo()
 
 QString QUndoCommand::text() const
 {
-    return d->text;
+    return d_ptr->text;
 }
 
 /*!
@@ -256,7 +284,7 @@ QString QUndoCommand::text() const
 
 QString QUndoCommand::actionText() const
 {
-    return d->actionText;
+    return d_ptr->actionText;
 }
 
 /*!
@@ -278,11 +306,11 @@ void QUndoCommand::setText(const QString &text)
 {
     int cdpos = text.indexOf(QLatin1Char('\n'));
     if (cdpos > 0) {
-        d->text = text.left(cdpos);
-        d->actionText = text.mid(cdpos + 1);
+        d_ptr->text = text.left(cdpos);
+        d_ptr->actionText = text.mid(cdpos + 1);
     } else {
-        d->text = text;
-        d->actionText = text;
+        d_ptr->text = text;
+        d_ptr->actionText = text;
     }
 }
 
@@ -296,7 +324,7 @@ void QUndoCommand::setText(const QString &text)
 
 int QUndoCommand::childCount() const
 {
-    return d->child_list.count();
+    return d_ptr->child_list.count();
 }
 
 /*!
@@ -309,9 +337,9 @@ int QUndoCommand::childCount() const
 
 const QUndoCommand *QUndoCommand::child(int index) const
 {
-    if (index < 0 || index >= d->child_list.count())
+    if (index < 0 || index >= d_ptr->child_list.count())
         return 0;
-    return d->child_list.at(index);
+    return d_ptr->child_list.at(index);
 }
 
 #endif // QT_NO_UNDOCOMMAND
@@ -397,38 +425,6 @@ const QUndoCommand *QUndoCommand::child(int index) const
     \sa QUndoCommand, QUndoView
 */
 
-#ifndef QT_NO_ACTION
-
-QUndoAction::QUndoAction(const QString &prefix, QObject *parent)
-    : QAction(parent)
-{
-    m_prefix = prefix;
-}
-
-void QUndoAction::setPrefixedText(const QString &text)
-{
-    if (m_defaultText.isEmpty()) {
-        QString s = m_prefix;
-        if (!m_prefix.isEmpty() && !text.isEmpty())
-            s.append(QLatin1Char(' '));
-        s.append(text);
-        setText(s);
-    } else {
-        if (text.isEmpty())
-            setText(m_defaultText);
-        else
-            setText(m_prefix.arg(text));
-    }
-}
-
-void QUndoAction::setTextFormat(const QString &textFormat, const QString &defaultText)
-{
-    m_prefix = textFormat;
-    m_defaultText = defaultText;
-}
-
-#endif // QT_NO_ACTION
-
 /*! \internal
     Sets the current index to \a idx, emitting appropriate signals. If \a clean is true,
     makes \a idx the clean index as well.
@@ -436,17 +432,15 @@ void QUndoAction::setTextFormat(const QString &textFormat, const QString &defaul
 
 void QUndoStackPrivate::setIndex(int idx, bool clean)
 {
-    Q_Q(QUndoStack);
-
     bool was_clean = index == clean_index;
 
     if (idx != index) {
         index = idx;
-        emit q->indexChanged(index);
-        emit q->canUndoChanged(q->canUndo());
-        emit q->undoTextChanged(q->undoText());
-        emit q->canRedoChanged(q->canRedo());
-        emit q->redoTextChanged(q->redoText());
+        emit q_ptr->indexChanged(index);
+        emit q_ptr->canUndoChanged(q_ptr->canUndo());
+        emit q_ptr->undoTextChanged(q_ptr->undoText());
+        emit q_ptr->canRedoChanged(q_ptr->canRedo());
+        emit q_ptr->redoTextChanged(q_ptr->redoText());
     }
 
     if (clean)
@@ -454,7 +448,7 @@ void QUndoStackPrivate::setIndex(int idx, bool clean)
 
     bool is_clean = index == clean_index;
     if (is_clean != was_clean)
-        emit q->cleanChanged(is_clean);
+        emit q_ptr->cleanChanged(is_clean);
 }
 
 /*! \internal
@@ -494,12 +488,9 @@ bool QUndoStackPrivate::checkUndoLimit()
 */
 
 QUndoStack::QUndoStack(QObject *parent)
-    : QObject(*(new QUndoStackPrivate), parent)
+    : QObject(parent), d_ptr(new QUndoStackPrivate)
 {
-#ifndef QT_NO_UNDOGROUP
-    if (QUndoGroup *group = qobject_cast<QUndoGroup*>(parent))
-        group->addStack(this);
-#endif
+
 }
 
 /*!
@@ -511,12 +502,8 @@ QUndoStack::QUndoStack(QObject *parent)
 
 QUndoStack::~QUndoStack()
 {
-#ifndef QT_NO_UNDOGROUP
-    Q_D(QUndoStack);
-    if (d->group != 0)
-        d->group->removeStack(this);
-#endif
     clear();
+    delete d_ptr;
 }
 
 /*!
@@ -534,19 +521,17 @@ QUndoStack::~QUndoStack()
 
 void QUndoStack::clear()
 {
-    Q_D(QUndoStack);
-
-    if (d->command_list.isEmpty())
+    if (d_ptr->command_list.isEmpty())
         return;
 
     bool was_clean = isClean();
 
-    d->macro_stack.clear();
-    qDeleteAll(d->command_list);
-    d->command_list.clear();
+    d_ptr->macro_stack.clear();
+    qDeleteAll(d_ptr->command_list);
+    d_ptr->command_list.clear();
 
-    d->index = 0;
-    d->clean_index = 0;
+    d_ptr->index = 0;
+    d_ptr->clean_index = 0;
 
     emit indexChanged(0);
     emit canUndoChanged(false);
@@ -583,34 +568,33 @@ void QUndoStack::clear()
 
 void QUndoStack::push(QUndoCommand *cmd)
 {
-    Q_D(QUndoStack);
     cmd->redo();
 
-    bool macro = !d->macro_stack.isEmpty();
+    bool macro = !d_ptr->macro_stack.isEmpty();
 
     QUndoCommand *cur = 0;
     if (macro) {
-        QUndoCommand *macro_cmd = d->macro_stack.last();
-        if (!macro_cmd->d->child_list.isEmpty())
-            cur = macro_cmd->d->child_list.last();
+        QUndoCommand *macro_cmd = d_ptr->macro_stack.last();
+        if (!macro_cmd->d_ptr->child_list.isEmpty())
+            cur = macro_cmd->d_ptr->child_list.last();
     } else {
-        if (d->index > 0)
-            cur = d->command_list.at(d->index - 1);
-        while (d->index < d->command_list.size())
-            delete d->command_list.takeLast();
-        if (d->clean_index > d->index)
-            d->clean_index = -1; // we've deleted the clean state
+        if (d_ptr->index > 0)
+            cur = d_ptr->command_list.at(d_ptr->index - 1);
+        while (d_ptr->index < d_ptr->command_list.size())
+            delete d_ptr->command_list.takeLast();
+        if (d_ptr->clean_index > d_ptr->index)
+            d_ptr->clean_index = -1; // we've deleted the clean state
     }
 
     bool try_merge = cur != 0
                         && cur->id() != -1
                         && cur->id() == cmd->id()
-                        && (macro || d->index != d->clean_index);
+                        && (macro || d_ptr->index != d_ptr->clean_index);
 
     if (try_merge && cur->mergeWith(cmd)) {
         delete cmd;
         if (!macro) {
-            emit indexChanged(d->index);
+            emit indexChanged(d_ptr->index);
             emit canUndoChanged(canUndo());
             emit undoTextChanged(undoText());
             emit canRedoChanged(canRedo());
@@ -618,11 +602,11 @@ void QUndoStack::push(QUndoCommand *cmd)
         }
     } else {
         if (macro) {
-            d->macro_stack.last()->d->child_list.append(cmd);
+            d_ptr->macro_stack.last()->d_ptr->child_list.append(cmd);
         } else {
-            d->command_list.append(cmd);
-            d->checkUndoLimit();
-            d->setIndex(d->index + 1, false);
+            d_ptr->command_list.append(cmd);
+            d_ptr->checkUndoLimit();
+            d_ptr->setIndex(d_ptr->index + 1, false);
         }
     }
 }
@@ -640,13 +624,12 @@ void QUndoStack::push(QUndoCommand *cmd)
 
 void QUndoStack::setClean()
 {
-    Q_D(QUndoStack);
-    if (!d->macro_stack.isEmpty()) {
+    if (!d_ptr->macro_stack.isEmpty()) {
         qWarning("QUndoStack::setClean(): cannot set clean in the middle of a macro");
         return;
     }
 
-    d->setIndex(d->index, true);
+    d_ptr->setIndex(d_ptr->index, true);
 }
 
 /*!
@@ -657,10 +640,9 @@ void QUndoStack::setClean()
 
 bool QUndoStack::isClean() const
 {
-    Q_D(const QUndoStack);
-    if (!d->macro_stack.isEmpty())
+    if (!d_ptr->macro_stack.isEmpty())
         return false;
-    return d->clean_index == d->index;
+    return d_ptr->clean_index == d_ptr->index;
 }
 
 /*!
@@ -676,8 +658,7 @@ bool QUndoStack::isClean() const
 
 int QUndoStack::cleanIndex() const
 {
-    Q_D(const QUndoStack);
-    return d->clean_index;
+    return d_ptr->clean_index;
 }
 
 /*!
@@ -692,18 +673,17 @@ int QUndoStack::cleanIndex() const
 
 void QUndoStack::undo()
 {
-    Q_D(QUndoStack);
-    if (d->index == 0)
+    if (d_ptr->index == 0)
         return;
 
-    if (!d->macro_stack.isEmpty()) {
+    if (!d_ptr->macro_stack.isEmpty()) {
         qWarning("QUndoStack::undo(): cannot undo in the middle of a macro");
         return;
     }
 
-    int idx = d->index - 1;
-    d->command_list.at(idx)->undo();
-    d->setIndex(idx, false);
+    int idx = d_ptr->index - 1;
+    d_ptr->command_list.at(idx)->undo();
+    d_ptr->setIndex(idx, false);
 }
 
 /*!
@@ -718,17 +698,16 @@ void QUndoStack::undo()
 
 void QUndoStack::redo()
 {
-    Q_D(QUndoStack);
-    if (d->index == d->command_list.size())
+    if (d_ptr->index == d_ptr->command_list.size())
         return;
 
-    if (!d->macro_stack.isEmpty()) {
+    if (!d_ptr->macro_stack.isEmpty()) {
         qWarning("QUndoStack::redo(): cannot redo in the middle of a macro");
         return;
     }
 
-    d->command_list.at(d->index)->redo();
-    d->setIndex(d->index + 1, false);
+    d_ptr->command_list.at(d_ptr->index)->redo();
+    d_ptr->setIndex(d_ptr->index + 1, false);
 }
 
 /*!
@@ -740,8 +719,7 @@ void QUndoStack::redo()
 
 int QUndoStack::count() const
 {
-    Q_D(const QUndoStack);
-    return d->command_list.size();
+    return d_ptr->command_list.size();
 }
 
 /*!
@@ -754,8 +732,7 @@ int QUndoStack::count() const
 
 int QUndoStack::index() const
 {
-    Q_D(const QUndoStack);
-    return d->index;
+    return d_ptr->index;
 }
 
 /*!
@@ -768,24 +745,23 @@ int QUndoStack::index() const
 
 void QUndoStack::setIndex(int idx)
 {
-    Q_D(QUndoStack);
-    if (!d->macro_stack.isEmpty()) {
+    if (!d_ptr->macro_stack.isEmpty()) {
         qWarning("QUndoStack::setIndex(): cannot set index in the middle of a macro");
         return;
     }
 
     if (idx < 0)
         idx = 0;
-    else if (idx > d->command_list.size())
-        idx = d->command_list.size();
+    else if (idx > d_ptr->command_list.size())
+        idx = d_ptr->command_list.size();
 
-    int i = d->index;
+    int i = d_ptr->index;
     while (i < idx)
-        d->command_list.at(i++)->redo();
+        d_ptr->command_list.at(i++)->redo();
     while (i > idx)
-        d->command_list.at(--i)->undo();
+        d_ptr->command_list.at(--i)->undo();
 
-    d->setIndex(idx, false);
+    d_ptr->setIndex(idx, false);
 }
 
 /*!
@@ -801,10 +777,9 @@ void QUndoStack::setIndex(int idx)
 
 bool QUndoStack::canUndo() const
 {
-    Q_D(const QUndoStack);
-    if (!d->macro_stack.isEmpty())
+    if (!d_ptr->macro_stack.isEmpty())
         return false;
-    return d->index > 0;
+    return d_ptr->index > 0;
 }
 
 /*!
@@ -820,10 +795,9 @@ bool QUndoStack::canUndo() const
 
 bool QUndoStack::canRedo() const
 {
-    Q_D(const QUndoStack);
-    if (!d->macro_stack.isEmpty())
+    if (!d_ptr->macro_stack.isEmpty())
         return false;
-    return d->index < d->command_list.size();
+    return d_ptr->index < d_ptr->command_list.size();
 }
 
 /*!
@@ -834,11 +808,10 @@ bool QUndoStack::canRedo() const
 
 QString QUndoStack::undoText() const
 {
-    Q_D(const QUndoStack);
-    if (!d->macro_stack.isEmpty())
+    if (!d_ptr->macro_stack.isEmpty())
         return QString();
-    if (d->index > 0)
-        return d->command_list.at(d->index - 1)->actionText();
+    if (d_ptr->index > 0)
+        return d_ptr->command_list.at(d_ptr->index - 1)->actionText();
     return QString();
 }
 
@@ -850,77 +823,12 @@ QString QUndoStack::undoText() const
 
 QString QUndoStack::redoText() const
 {
-    Q_D(const QUndoStack);
-    if (!d->macro_stack.isEmpty())
+    if (!d_ptr->macro_stack.isEmpty())
         return QString();
-    if (d->index < d->command_list.size())
-        return d->command_list.at(d->index)->actionText();
+    if (d_ptr->index < d_ptr->command_list.size())
+        return d_ptr->command_list.at(d_ptr->index)->actionText();
     return QString();
 }
-
-#ifndef QT_NO_ACTION
-
-/*!
-    Creates an undo QAction object with the given \a parent.
-
-    Triggering this action will cause a call to undo(). The text of this action
-    is the text of the command which will be undone in the next call to undo(),
-    prefixed by the specified \a prefix. If there is no command available for undo,
-    this action will be disabled.
-
-    If \a prefix is empty, the default template "Undo %1" is used instead of prefix.
-    Before Qt 4.8, the prefix "Undo" was used by default.
-
-    \sa createRedoAction(), canUndo(), QUndoCommand::text()
-*/
-
-QAction *QUndoStack::createUndoAction(QObject *parent, const QString &prefix) const
-{
-    QUndoAction *result = new QUndoAction(prefix, parent);
-    if (prefix.isEmpty())
-        result->setTextFormat(tr("Undo %1"), tr("Undo", "Default text for undo action"));
-
-    result->setEnabled(canUndo());
-    result->setPrefixedText(undoText());
-    connect(this, SIGNAL(canUndoChanged(bool)),
-            result, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(undoTextChanged(QString)),
-            result, SLOT(setPrefixedText(QString)));
-    connect(result, SIGNAL(triggered()), this, SLOT(undo()));
-    return result;
-}
-
-/*!
-    Creates an redo QAction object with the given \a parent.
-
-    Triggering this action will cause a call to redo(). The text of this action
-    is the text of the command which will be redone in the next call to redo(),
-    prefixed by the specified \a prefix. If there is no command available for redo,
-    this action will be disabled.
-
-    If \a prefix is empty, the default template "Redo %1" is used instead of prefix.
-    Before Qt 4.8, the prefix "Redo" was used by default.
-
-    \sa createUndoAction(), canRedo(), QUndoCommand::text()
-*/
-
-QAction *QUndoStack::createRedoAction(QObject *parent, const QString &prefix) const
-{
-    QUndoAction *result = new QUndoAction(prefix, parent);
-    if (prefix.isEmpty())
-        result->setTextFormat(tr("Redo %1"), tr("Redo", "Default text for redo action"));
-
-    result->setEnabled(canRedo());
-    result->setPrefixedText(redoText());
-    connect(this, SIGNAL(canRedoChanged(bool)),
-            result, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(redoTextChanged(QString)),
-            result, SLOT(setPrefixedText(QString)));
-    connect(result, SIGNAL(triggered()), this, SLOT(redo()));
-    return result;
-}
-
-#endif // QT_NO_ACTION
 
 /*!
     Begins composition of a macro command with the given \a text description.
@@ -954,22 +862,21 @@ QAction *QUndoStack::createRedoAction(QObject *parent, const QString &prefix) co
 
 void QUndoStack::beginMacro(const QString &text)
 {
-    Q_D(QUndoStack);
     QUndoCommand *cmd = new QUndoCommand();
     cmd->setText(text);
 
-    if (d->macro_stack.isEmpty()) {
-        while (d->index < d->command_list.size())
-            delete d->command_list.takeLast();
-        if (d->clean_index > d->index)
-            d->clean_index = -1; // we've deleted the clean state
-        d->command_list.append(cmd);
+    if (d_ptr->macro_stack.isEmpty()) {
+        while (d_ptr->index < d_ptr->command_list.size())
+            delete d_ptr->command_list.takeLast();
+        if (d_ptr->clean_index > d_ptr->index)
+            d_ptr->clean_index = -1; // we've deleted the clean state
+        d_ptr->command_list.append(cmd);
     } else {
-        d->macro_stack.last()->d->child_list.append(cmd);
+        d_ptr->macro_stack.last()->d_ptr->child_list.append(cmd);
     }
-    d->macro_stack.append(cmd);
+    d_ptr->macro_stack.append(cmd);
 
-    if (d->macro_stack.count() == 1) {
+    if (d_ptr->macro_stack.count() == 1) {
         emit canUndoChanged(false);
         emit undoTextChanged(QString());
         emit canRedoChanged(false);
@@ -988,17 +895,16 @@ void QUndoStack::beginMacro(const QString &text)
 
 void QUndoStack::endMacro()
 {
-    Q_D(QUndoStack);
-    if (d->macro_stack.isEmpty()) {
+    if (d_ptr->macro_stack.isEmpty()) {
         qWarning("QUndoStack::endMacro(): no matching beginMacro()");
         return;
     }
 
-    d->macro_stack.removeLast();
+    d_ptr->macro_stack.removeLast();
 
-    if (d->macro_stack.isEmpty()) {
-        d->checkUndoLimit();
-        d->setIndex(d->index + 1, false);
+    if (d_ptr->macro_stack.isEmpty()) {
+        d_ptr->checkUndoLimit();
+        d_ptr->setIndex(d_ptr->index + 1, false);
     }
 }
 
@@ -1016,11 +922,9 @@ void QUndoStack::endMacro()
 */
 const QUndoCommand *QUndoStack::command(int index) const
 {
-    Q_D(const QUndoStack);
-
-    if (index < 0 || index >= d->command_list.count())
+    if (index < 0 || index >= d_ptr->command_list.count())
         return 0;
-    return d->command_list.at(index);
+    return d_ptr->command_list.at(index);
 }
 
 /*!
@@ -1031,11 +935,9 @@ const QUndoCommand *QUndoStack::command(int index) const
 
 QString QUndoStack::text(int idx) const
 {
-    Q_D(const QUndoStack);
-
-    if (idx < 0 || idx >= d->command_list.size())
+    if (idx < 0 || idx >= d_ptr->command_list.size())
         return QString();
-    return d->command_list.at(idx)->text();
+    return d_ptr->command_list.at(idx)->text();
 }
 
 /*!
@@ -1055,67 +957,20 @@ QString QUndoStack::text(int idx) const
 
 void QUndoStack::setUndoLimit(int limit)
 {
-    Q_D(QUndoStack);
-
-    if (!d->command_list.isEmpty()) {
+    if (!d_ptr->command_list.isEmpty()) {
         qWarning("QUndoStack::setUndoLimit(): an undo limit can only be set when the stack is empty");
         return;
     }
 
-    if (limit == d->undo_limit)
+    if (limit == d_ptr->undo_limit)
         return;
-    d->undo_limit = limit;
-    d->checkUndoLimit();
+    d_ptr->undo_limit = limit;
+    d_ptr->checkUndoLimit();
 }
 
 int QUndoStack::undoLimit() const
 {
-    Q_D(const QUndoStack);
-
-    return d->undo_limit;
-}
-
-/*!
-    \property QUndoStack::active
-    \brief the active status of this stack.
-
-    An application often has multiple undo stacks, one for each opened document. The active
-    stack is the one associated with the currently active document. If the stack belongs
-    to a QUndoGroup, calls to QUndoGroup::undo() or QUndoGroup::redo() will be forwarded
-    to this stack when it is active. If the QUndoGroup is watched by a QUndoView, the view
-    will display the contents of this stack when it is active. If the stack does not belong to
-    a QUndoGroup, making it active has no effect.
-
-    It is the programmer's responsibility to specify which stack is active by
-    calling setActive(), usually when the associated document window receives focus.
-
-    \sa QUndoGroup
-*/
-
-void QUndoStack::setActive(bool active)
-{
-#ifdef QT_NO_UNDOGROUP
-    Q_UNUSED(active);
-#else
-    Q_D(QUndoStack);
-
-    if (d->group != 0) {
-        if (active)
-            d->group->setActiveStack(this);
-        else if (d->group->activeStack() == this)
-            d->group->setActiveStack(0);
-    }
-#endif
-}
-
-bool QUndoStack::isActive() const
-{
-#ifdef QT_NO_UNDOGROUP
-    return true;
-#else
-    Q_D(const QUndoStack);
-    return d->group == 0 || d->group->activeStack() == this;
-#endif
+    return d_ptr->undo_limit;
 }
 
 /*!

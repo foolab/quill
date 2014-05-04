@@ -48,16 +48,11 @@
 QT_BEGIN_NAMESPACE
 
 
-class QAction;
 class QUndoCommandPrivate;
 class QUndoStackPrivate;
 
-#ifndef QT_NO_UNDOCOMMAND
-
-class Q_WIDGETS_EXPORT QUndoCommand
+class QUndoCommand
 {
-    QUndoCommandPrivate *d;
-
 public:
     explicit QUndoCommand(QUndoCommand *parent = 0);
     explicit QUndoCommand(const QString &text, QUndoCommand *parent = 0);
@@ -77,19 +72,14 @@ public:
     const QUndoCommand *child(int index) const;
 
 private:
-    Q_DISABLE_COPY(QUndoCommand)
     friend class QUndoStack;
+    QUndoCommandPrivate *d_ptr;
+    Q_DISABLE_COPY(QUndoCommand)
 };
 
-#endif // QT_NO_UNDOCOMMAND
-
-#ifndef QT_NO_UNDOSTACK
-
-class Q_WIDGETS_EXPORT QUndoStack : public QObject
+class QUndoStack : public QObject
 {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(QUndoStack)
-    Q_PROPERTY(bool active READ isActive WRITE setActive)
     Q_PROPERTY(int undoLimit READ undoLimit WRITE setUndoLimit)
 
 public:
@@ -108,14 +98,6 @@ public:
     int index() const;
     QString text(int idx) const;
 
-#ifndef QT_NO_ACTION
-    QAction *createUndoAction(QObject *parent,
-                                const QString &prefix = QString()) const;
-    QAction *createRedoAction(QObject *parent,
-                                const QString &prefix = QString()) const;
-#endif // QT_NO_ACTION
-
-    bool isActive() const;
     bool isClean() const;
     int cleanIndex() const;
 
@@ -132,7 +114,6 @@ public Q_SLOTS:
     void setIndex(int idx);
     void undo();
     void redo();
-    void setActive(bool active = true);
 
 Q_SIGNALS:
     void indexChanged(int idx);
@@ -144,10 +125,8 @@ Q_SIGNALS:
 
 private:
     Q_DISABLE_COPY(QUndoStack)
-    friend class QUndoGroup;
+    QUndoStackPrivate *d_ptr;
 };
-
-#endif // QT_NO_UNDOSTACK
 
 QT_END_NAMESPACE
 
