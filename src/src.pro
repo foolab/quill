@@ -17,8 +17,6 @@ PKGCONFIG += libffmpegthumbnailer
 DEFINES += QT_NO_URL_CAST_FROM_STRING USE_AV
 MOC_DIR = .moc
 
-equals(QT_MAJOR_VERSION, 5): QT += widgets
-
 include(../common.pri)
 
 CONFIG += quillimagefilter quillmetadata
