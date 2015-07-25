@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QStringList>
 #include <thread>
+#include <mutex>
 
 class AVThumbnailer : public QObject {
   Q_OBJECT
