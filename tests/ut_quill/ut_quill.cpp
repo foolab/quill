@@ -43,6 +43,7 @@
 #include <QuillImageFilter>
 #include <QuillImageFilterFactory>
 #include <QSignalSpy>
+#include <unistd.h>
 
 #include "unittests.h"
 #include "ut_quill.h"
